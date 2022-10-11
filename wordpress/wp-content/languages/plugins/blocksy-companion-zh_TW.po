@@ -1,0 +1,2514 @@
+# Translation of Plugins - Blocksy Companion - Stable (latest release) in Chinese (Taiwan)
+# This file is distributed under the same license as the Plugins - Blocksy Companion - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2022-10-07 18:41:58+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/4.0.0-alpha.3\n"
+"Language: zh_TW\n"
+"Project-Id-Version: Plugins - Blocksy Companion - Stable (latest release)\n"
+
+#: framework/extensions/widgets/widgets/ct-socials/options.php:87
+msgid "Official"
+msgstr "官方的"
+
+#: framework/extensions/widgets/widgets/ct-socials/options.php:79
+msgid "Icons Color"
+msgstr "圖示顏色"
+
+#: framework/extensions/newsletter-subscribe/helpers.php:165
+msgid "First name"
+msgstr "名字"
+
+#: framework/features/conditions-manager.php:723
+msgid "Privacy Policy Page"
+msgstr "隱私權政策頁面"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:94
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:156
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:216
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:276
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:336
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:396
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:456
+#: framework/features/header/items/account/options.php:173
+#: framework/features/header/items/account/options.php:419
+msgid "Icon Source"
+msgstr "圖示來源"
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/widgets/config.php:5
+msgctxt "Extension Brand Name"
+msgid "Widgets"
+msgstr "小工具"
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/trending/config.php:5
+#: framework/extensions/trending/customizer.php:97
+msgctxt "Extension Brand Name"
+msgid "Trending Posts"
+msgstr "趨勢文章"
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/product-reviews/config.php:5
+msgctxt "Extension Brand Name"
+msgid "Product Reviews"
+msgstr "商品評論"
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/newsletter-subscribe/config.php:5
+msgctxt "Extension Brand Name"
+msgid "Newsletter Subscribe"
+msgstr "電子報訂閱"
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/cookies-consent/config.php:5
+#: framework/extensions/cookies-consent/customizer.php:5
+msgctxt "Extension Brand Name"
+msgid "Cookies Consent"
+msgstr "Cookies 同意書"
+
+#: framework/extensions/trending/customizer.php:245
+msgid "Image Size"
+msgstr "圖片尺寸"
+
+#: framework/features/header/header-options.php:79
+msgid "Offset"
+msgstr "偏移量"
+
+#: framework/features/header/header-options.php:63
+msgid "Effect"
+msgstr "效果"
+
+#: framework/extensions/newsletter-subscribe/includes/BlocksyMailerliteManager.php:99
+msgid "Thank you for subscribing to our newsletter!"
+msgstr "感謝您訂閱我們的電子報！"
+
+#: framework/extensions/cookies-consent/customizer.php:266
+msgid "Decline Button"
+msgstr "拒絕按鈕"
+
+#: framework/extensions/cookies-consent/customizer.php:199
+msgid "Accept Button"
+msgstr "接受按鈕"
+
+#: framework/extensions/cookies-consent/customizer.php:147
+msgid "Text Color"
+msgstr "文字顏色"
+
+#: framework/extensions/cookies-consent/customizer.php:88
+#: framework/extensions/cookies-consent/helpers.php:34
+msgid "Decline"
+msgstr "拒絕"
+
+#: framework/extensions/cookies-consent/customizer.php:85
+msgid "Decline Button text"
+msgstr "拒絕按鈕文字"
+
+#: framework/extensions/cookies-consent/customizer.php:76
+msgid "Accept Button text"
+msgstr "接受按鈕文字"
+
+#. translators: placeholder here means the actual URL.
+#: framework/extensions/widgets/widgets/ct-socials/options.php:28
+msgid "Configure the social links in Customizer ➝ General ➝ %sSocial Network Accounts%s."
+msgstr "請由外觀自訂 一般 ➝  %s社群網路帳號%s 設定社群連結."
+
+#: framework/extensions/product-reviews/metabox.php:60
+msgid "Please note that some of this information (price, sku, brand) won't be displayed on the front-end. It is solely used for Google's Schema.org markup."
+msgstr "請注意這個資訊的某部分 (價格, 貨號, 品牌) 不會有前台顯示. 它只是單純用在 Google 的 Schema.org 標記"
+
+#: framework/features/header/items/account/options.php:41
+msgid "Customizing: Logged out State"
+msgstr "自訂登出狀態"
+
+#: framework/features/header/account-modal.php:37
+msgid "Close account modal"
+msgstr "關閉帳號彈窗"
+
+#: framework/features/header/items/account/options.php:653
+msgid "Logged Out"
+msgstr "已登出"
+
+#: framework/features/header/items/account/options.php:652
+msgid "Logged In"
+msgstr "已登入"
+
+#: framework/features/header/items/account/options.php:641
+msgid "User Visibility"
+msgstr "使用者可見度"
+
+#: framework/features/header/items/account/options.php:1208
+msgid "Border Color"
+msgstr "框線顏色"
+
+#: framework/features/header/items/account/options.php:1166
+msgid "Background"
+msgstr "背景"
+
+#: framework/features/header/items/account/options.php:1165
+msgid "Border"
+msgstr "框線"
+
+#: framework/features/header/items/account/options.php:1155
+msgid "Close Button Type"
+msgstr "關閉按鈕型式"
+
+#: framework/features/account-auth.php:208
+msgid "Your account was created successfully and a password has been sent to your email address. Please visit the <a href=\"%s\">login page</a>."
+msgstr "您的帳號已成功建立並且將密碼寄到您的電子郵件地址. 請訪問 <a href=\"%s\">登入頁面</a>."
+
+#: framework/features/account-auth.php:199
+msgid "Your account was created successfully. Your login details have been sent to your email address. Please visit the <a href=\"%s\">login page</a>."
+msgstr "您的帳號已成功. 詳細的登入資訊已經寄到您的電子郵件地址. 請訪問 <a href=\"%s\">登入頁面</a>."
+
+#: framework/features/account-auth.php:122
+msgid "Please enter your username or email address. You will receive an email message with instructions on how to reset your password."
+msgstr "請輸入您的帳號或電子郵件地址. 您將會收到一封教您如何重設密碼的信件."
+
+#: framework/features/account-auth.php:121
+msgid "Lost Password"
+msgstr "忘記密碼"
+
+#. translators: %s: Link to the login page.
+#: framework/features/account-auth.php:92
+msgid "Check your email for the confirmation link, then visit the <a href=\"%s\">login page</a>."
+msgstr "請檢查您的郵件中的確認連結, 然後訪問 <a href=\"%s\">登入頁面</a>."
+
+#: framework/features/account-auth.php:73
+msgid "<strong>Error</strong>: %s"
+msgstr "<strong>錯誤</strong>: %s"
+
+#: framework/extensions/product-reviews/metabox.php:126
+msgid "Sponsored Attribute"
+msgstr "贊助屬性"
+
+#: framework/features/conditions-manager.php:810
+msgid "Post Author"
+msgstr "文章作者"
+
+#: framework/features/conditions-manager.php:806
+msgid "Other"
+msgstr "其他"
+
+#: framework/features/conditions-manager.php:654
+msgid "%s %s Taxonomy"
+msgstr "%s %s 分類法"
+
+#: framework/extensions/widgets/widgets/ct-posts/view.php:220
+msgid "% Comments"
+msgstr "% 留言"
+
+#: framework/extensions/widgets/widgets/ct-posts/view.php:220
+msgid "1 Comment"
+msgstr "1 則留言"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:100
+msgid "Sample text"
+msgstr "範例文字"
+
+#: framework/extensions/product-reviews/metabox.php:83
+msgid "Product Brand"
+msgstr "商品品牌"
+
+#: framework/extensions/product-reviews/metabox.php:76
+msgid "Product SKU"
+msgstr "商品貨號"
+
+#: framework/extensions/product-reviews/metabox.php:69
+msgid "Product Price"
+msgstr "商品價格"
+
+#: framework/extensions/product-reviews/metabox.php:18
+msgid "Product"
+msgstr "商品"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:400
+msgid "Container Border Radius"
+msgstr "容器框線圓角半徑"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:366
+msgid "Container Shadow"
+msgstr "容器陰影"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:350
+msgid "Container Border"
+msgstr "容器框線"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:173
+msgid "Description Color"
+msgstr "說明文字顏色"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:152
+msgid "Title Color"
+msgstr "標題顏色"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:34
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:101
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:27
+#: framework/extensions/widgets/widgets/ct-quote/options.php:34
+msgid "You can add here some arbitrary HTML code."
+msgstr "你可以在這裡加任意 HTML 程式碼."
+
+#: framework/extensions/trending/customizer.php:123
+msgid "Module Title Tag"
+msgstr "模組標題標籤"
+
+#: framework/extensions/product-reviews/metabox.php:170
+msgid "Short Description"
+msgstr "簡短說明"
+
+#: framework/extensions/product-reviews/metabox.php:38
+msgid "More info about review entity and how to choose the right one can be found %shere%s."
+msgstr "更多的評論條目資訊以及如何正確選擇您可以在 %s這裡%s 找到."
+
+#: framework/extensions/product-reviews/metabox.php:32
+msgid "Organization"
+msgstr "組織"
+
+#: framework/extensions/product-reviews/metabox.php:31
+msgid "Music Recording"
+msgstr "音樂錄音"
+
+#: framework/extensions/product-reviews/metabox.php:30
+msgid "Music Playlist"
+msgstr "音樂播放清單"
+
+#: framework/extensions/product-reviews/metabox.php:29
+msgid "Movie"
+msgstr "電影"
+
+#: framework/extensions/product-reviews/metabox.php:28
+msgid "Media Object"
+msgstr "媒體物件"
+
+#: framework/extensions/product-reviews/metabox.php:27
+msgid "Local Business"
+msgstr "本地商家"
+
+#: framework/extensions/product-reviews/metabox.php:25
+msgid "Game"
+msgstr "遊戲"
+
+#: framework/extensions/product-reviews/metabox.php:23
+msgid "Episode"
+msgstr "影集"
+
+#: framework/extensions/product-reviews/metabox.php:22
+msgid "Creative Work Series"
+msgstr "創意工作系列"
+
+#: framework/extensions/product-reviews/metabox.php:21
+msgid "Creative Work Season"
+msgstr "創意工作季節"
+
+#: framework/extensions/product-reviews/metabox.php:19
+msgid "Book"
+msgstr "書籍"
+
+#: framework/extensions/product-reviews/metabox.php:10
+msgid "Review Entity"
+msgstr "評論實體"
+
+#: framework/extensions/product-reviews/extension.php:480
+msgid "Overll Score Background"
+msgstr "整體分數背景"
+
+#: framework/extensions/product-reviews/extension.php:458
+msgid "Overll Score Text"
+msgstr "整體分數文字"
+
+#: framework/extensions/product-reviews/extension.php:280
+#: framework/extensions/product-reviews/extension.php:450
+msgid "Inactive"
+msgstr "未啟用"
+
+#: framework/extensions/product-reviews/extension.php:274
+#: framework/extensions/product-reviews/extension.php:444
+#: framework/extensions/product-reviews/extension.php:472
+#: framework/extensions/product-reviews/extension.php:493
+msgid "Active"
+msgstr "啟用中"
+
+#: framework/extensions/product-reviews/extension.php:256
+#: framework/extensions/product-reviews/extension.php:427
+msgid "Star Rating Color"
+msgstr "星級評分顏色"
+
+#: framework/extensions/product-reviews/extension.php:408
+msgid "Buy Now Button"
+msgstr "現在購買按鈕"
+
+#: framework/extensions/product-reviews/extension.php:387
+msgid "Scores Box Width"
+msgstr "分數框寬度"
+
+#: framework/extensions/product-reviews/extension.php:376
+msgid "Review Summary"
+msgstr "評論概要"
+
+#: framework/extensions/widgets/widgets/ct-socials/options.php:73
+msgid "Set links to nofollow"
+msgstr "設定連結為 nofollow"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:269
+msgid "Separate pages ID by comma. More info %shere%s."
+msgstr "以逗號分隔頁面 ID. 更多資訊請參考 %s這裡%s."
+
+#: framework/extensions/product-reviews/extension.php:397
+msgid "Read More Button"
+msgstr "閱讀更多按鈕"
+
+#: framework/features/opengraph-meta-data.php:20
+msgid "Enable the OpenGraph rich meta data features for your website."
+msgstr "為你的網站啟用 OpenGraph 複合式中繼資料功能"
+
+#: framework/features/google-analytics.php:109
+msgid "Enable Google Analytics IP Anonymization for enhanced privacy. More info and instructions can be found %shere%s."
+msgstr "啟用 Google Analytics IP 匿名化以增強隱私權. 更多資訊及指引可以在 %s這裡%s 找到."
+
+#: framework/features/google-analytics.php:75
+msgid "Link your Google Analytics 4 tracking ID. More info and instructions can be found %shere%s."
+msgstr "連結你的 Google Analytics 4 追蹤 ID. 更多資訊及指引可以在 %s這裡%s 找到."
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:201
+msgid "Random"
+msgstr "隨機"
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/widgets/config.php:6
+msgid "Add new handcrafted widgets to your sidebars! Social Network Icons, Newsletter Subscribe, Contact Info, Custom Ads and even a Popular/Recent Posts are the choices available."
+msgstr "新增客製化小工具到你的側邊欄! 可以選擇的有社群網路圖示, 電子報訂閱, 連絡資訊, 自訂廣告更至是一個熱門/最新文章."
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/trending/config.php:6
+msgid "Highlight your most popular posts or products based on the number of comments or reviews they have gotten in the specified period of time."
+msgstr "依據在特定時段的留言或評論數量來突顯你最熱門的文章或商品."
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/product-reviews/config.php:6
+msgid "This extension lets you easily create an affiliate marketing type of website by giving you options to create a personalized product review and use your affiliate links to direct your readers to the purchase page."
+msgstr "此擴充功能透過給你建立個人化商品評論並使用你的聯盟連結將你的讀者轉向至購買頁面讓你輕易地建立一個聯盟行銷網站."
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/newsletter-subscribe/config.php:6
+msgid "Easily capture new leads for your newsletter with the help of a widget, shortcode or even a block inserted on your pages or posts."
+msgstr "透露一個小工具, 短代碼甚至一個插入在你的頁面或文章的區塊來輕易取得電子報的新訂閱."
+
+#. translators: This is a brand name. Preferably to not be translated
+#: framework/extensions/cookies-consent/config.php:6
+msgid "Display a cookie acceptance box in order to comply with the privacy regulations in your country."
+msgstr "顯示一個允許 cookie 的彈出框以符合貴國的隱私權規定."
+
+#: framework/extensions/newsletter-subscribe/customizer.php:273
+#: framework/features/header/items/account/options.php:1073
+msgid "Input Background Color"
+msgstr "輸入背景顏色"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:236
+#: framework/features/header/items/account/options.php:1037
+msgid "Input Border Color"
+msgstr "輸入框線顏色"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:228
+#: framework/extensions/newsletter-subscribe/customizer.php:259
+#: framework/extensions/newsletter-subscribe/customizer.php:295
+#: framework/features/header/items/account/options.php:1029
+#: framework/features/header/items/account/options.php:1059
+#: framework/features/header/items/account/options.php:1095
+msgid "Focus"
+msgstr "焦點"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:204
+#: framework/features/header/items/account/options.php:1007
+msgid "Input Font Color"
+msgstr "輸入文字顏色"
+
+#: framework/features/conditions-manager.php:838
+msgid "Profile"
+msgstr "個人資料"
+
+#: framework/features/conditions-manager.php:834
+msgid "bbPress"
+msgstr "bbPress"
+
+#: framework/extensions/cookies-consent/customizer.php:119
+msgid "I accept the %sPrivacy Policy%s*"
+msgstr "我同意 %s隱私權政策%s*"
+
+#: framework/extensions/newsletter-subscribe/readme.php:25
+msgid "Single Page Block"
+msgstr "單一頁面區塊"
+
+#: framework/extensions/newsletter-subscribe/readme.php:10
+msgid "Widget"
+msgstr "小工具"
+
+#: framework/extensions/trending/customizer.php:115
+msgid "Module Title"
+msgstr "模組標題"
+
+#: framework/features/header/items/account/options.php:1106
+msgid "Modal Background"
+msgstr "彈出背景"
+
+#: framework/features/header/items/account/options.php:1136
+msgid "Modal Shadow"
+msgstr "彈出陰影"
+
+#: framework/features/header/items/account/options.php:971
+msgid "Modal Options"
+msgstr "彈出選項"
+
+#: framework/extensions-manager.php:342
+msgid "Increase the conversion rate by adding a product quick view modal, a floating cart. Control the single product gallery/slider and the layout, add a wishlits page."
+msgstr "透過加上一個商品快速檢視彈出框, 一個浮動購物車, 控制單一商品圖庫/幻燈片及排版, 增加一個追蹤清單來增加轉換率. "
+
+#: framework/extensions-manager.php:330
+msgid "Change the theme and companion plugin branding to your own custom one."
+msgstr "將佈景主題及 companion 外掛的品牌變更為你自己自訂的."
+
+#: framework/extensions-manager.php:329
+msgid "White Label (Agency Package)"
+msgstr "白牌 (限機構版本)"
+
+#: framework/extensions-manager.php:318
+msgid "Create unlimited number of sidebars and display them conditionaly on any page or post."
+msgstr "建立不限數量的邊欄並且依設定條件在任何頁面或文章顯示它們."
+
+#: framework/extensions-manager.php:317
+msgid "Multiple Sidebars"
+msgstr "多重邊欄"
+
+#: framework/extensions-manager.php:306
+msgid "Transform your website into a app like by displaying a neat shortcuts bar at the bottom of the vieport."
+msgstr "利用在視窗底部顯示一個簡潔的捷徑列將你的網站變身為 app 的樣子."
+
+#: framework/extensions-manager.php:305
+msgid "Shortcuts Bar"
+msgstr "捷徑列"
+
+#: framework/extensions-manager.php:294
+msgid "Create beautiful mega menus, assign icons add badges to menu items, and content blocks inside menu items."
+msgstr "建立漂亮的超級選單, 為選單項目指定圖示加上徽章, 以及在選單項目內的內容區塊."
+
+#: framework/extensions-manager.php:293
+msgid "Advanced Menu"
+msgstr "先進選單"
+
+#: framework/extensions-manager.php:282
+msgid "Serve Google Fonts from your own server for full GDPR compliancy."
+msgstr "用你自己的主機來送出 Google 字型以完全符合 GDPR 的規範."
+
+#: framework/extensions-manager.php:281
+msgid "Local Google Fonts"
+msgstr "本地 Google 字型"
+
+#: framework/extensions-manager.php:270
+msgid "Upload unlimited number of custom fonts or variable fonts and use them in any typography option."
+msgstr "上傳不限數量的自訂字體或變化字體並在任何印刷樣式選項使用它們."
+
+#: framework/extensions-manager.php:258
+msgid "Add custom code snippets in your header and footer, globally and per post or page individually."
+msgstr "在你的頁首及頁尾加上自訂程式碼片段. 整體地或是每篇文章或頁面個別地."
+
+#: framework/extensions-manager.php:257
+msgid "Custom Code Snippets"
+msgstr "自訂程式碼片段"
+
+#: framework/extensions-manager.php:246
+msgid "Connect your Typekit account and use your fonts in any typography option."
+msgstr "連結你的 Typekit 帳號並在任何印刷樣式選項使用你的字體."
+
+#: framework/extensions-manager.php:245
+msgid "Adobe Typekit"
+msgstr "Adobe Typekit"
+
+#: framework/extensions/widgets/widgets/ct-socials/options.php:65
+msgid "Open links in new tab"
+msgstr "以新分頁開啟連結"
+
+#: framework/extensions/trending/customizer.php:324
+msgid "Add one or more conditions to display the trending block."
+msgstr "新增一或多個用來顯示趨勢區塊的條件."
+
+#: framework/extensions/trending/customizer.php:323
+msgid "Trending Block Display Conditions"
+msgstr "趨勢區塊顯示條件"
+
+#: framework/extensions/trending/customizer.php:306
+msgid "After Header"
+msgstr "頁首之後"
+
+#: framework/extensions/trending/customizer.php:301
+msgid "After Footer"
+msgstr "頁尾之後"
+
+#: framework/extensions/trending/customizer.php:296
+msgid "Before Footer"
+msgstr "頁尾之前"
+
+#: framework/extensions/trending/customizer.php:288
+msgid "Display Location"
+msgstr "顯示位置"
+
+#: framework/extensions/product-reviews/metabox.php:120
+msgid "Open Link In New Tab"
+msgstr "在新分頁開啟連結"
+
+#: framework/features/header/items/account/options.php:17
+#: framework/features/header/items/account/options.php:18
+msgid "WooCommerce Account"
+msgstr "WooCommerce 帳號"
+
+#: framework/features/conditions-manager.php:903
+msgid "Language"
+msgstr "語言"
+
+#: framework/features/conditions-manager.php:826
+msgid "Current Language"
+msgstr "目前語言"
+
+#: framework/features/conditions-manager.php:822
+msgid "Languages"
+msgstr "語言"
+
+#: framework/features/account-auth.php:239
+msgid "Register For This Site"
+msgstr "註冊此網站"
+
+#: framework/features/account-auth.php:238
+msgid "Registration Form"
+msgstr "註冊表單"
+
+#: framework/features/account-auth.php:104
+#: framework/features/account-auth.php:232
+msgid "Check your email"
+msgstr "請檢查您的電子郵件"
+
+#. translators: %s: Link to the login page.
+#: framework/features/account-auth.php:222
+msgid "Registration complete. Please check your email, then visit the <a href=\"%s\">login page</a>."
+msgstr "已完成註冊. 請檢查您的電子郵件, 然後訪問 <a href=\"%s\">登入頁面</a>."
+
+#: framework/extensions/trending/customizer.php:339
+msgid "Posts Font"
+msgstr "文章字體"
+
+#: framework/features/header/items/account/options.php:1301
+msgid "Element Visibility"
+msgstr "元件可見度"
+
+#: framework/features/header/items/account/options.php:681
+#: framework/features/header/items/account/options.php:710
+#: framework/features/header/items/account/options.php:742
+#: framework/features/header/items/account/options.php:772
+msgid "Label Color"
+msgstr "標籤顏色"
+
+#: framework/features/header/items/account/options.php:670
+msgid "Label Font"
+msgstr "標籤字體"
+
+#: framework/features/header/items/account/options.php:328
+msgid "Label Type"
+msgstr "標籤型式"
+
+#: framework/features/header/items/account/options.php:320
+#: framework/features/header/items/account/options.php:617
+msgid "Bottom"
+msgstr "下方"
+
+#: framework/features/header/items/account/options.php:311
+#: framework/features/header/items/account/options.php:608
+msgid "Label Position"
+msgstr "標籤位置"
+
+#: framework/features/header/items/account/options.php:135
+#: framework/features/header/items/account/options.php:401
+msgid "Account Image"
+msgstr "帳號圖片"
+
+#: framework/features/header/items/account/options.php:827
+#: framework/features/header/items/account/options.php:855
+#: framework/features/header/items/account/options.php:886
+#: framework/features/header/items/account/options.php:915
+#: framework/features/header/items/account/options.php:1172
+msgid "Icon Color"
+msgstr "圖示顏色"
+
+#: framework/features/header/items/account/options.php:347
+#: framework/features/header/items/account/options.php:625
+msgid "Label Text"
+msgstr "標籤文字"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:114
+msgid "Container Type"
+msgstr "容器型式"
+
+#: framework/extensions/product-reviews/extension.php:554
+msgid "Search Product Review"
+msgstr "搜尋商品評論"
+
+#: framework/extensions/product-reviews/extension.php:553
+msgid "Update Product Review"
+msgstr "更新商品評論"
+
+#: framework/extensions/product-reviews/extension.php:552
+msgid "Edit Product Review"
+msgstr "編輯商品評論"
+
+#: framework/extensions/product-reviews/extension.php:551
+msgid "Add New Review"
+msgstr "新增評論"
+
+#: framework/extensions/product-reviews/extension.php:550
+msgid "Add New Product Review"
+msgstr "新增商品評論"
+
+#: framework/extensions/product-reviews/extension.php:549
+msgid "View Product Review"
+msgstr "查看商品評論"
+
+#: framework/extensions/product-reviews/extension.php:548
+msgid "All Reviews"
+msgstr "所有評論"
+
+#: framework/extensions/product-reviews/extension.php:547
+msgid "Parent Product Review"
+msgstr "上層商品評論"
+
+#: framework/extensions/product-reviews/extension.php:545
+msgid "Product Review"
+msgstr "商品評論"
+
+#: framework/extensions/product-reviews/extension.php:540
+#: framework/extensions/product-reviews/extension.php:541
+#: framework/extensions/product-reviews/extension.php:544
+#: framework/extensions/product-reviews/extension.php:546
+msgid "Product Reviews"
+msgstr "商品評論"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/widget.php:14
+msgid "Newsletter subscribe form"
+msgstr "電子報訂閱表單"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/widget.php:13
+msgid "Newsletter Subscribe"
+msgstr "電子報訂閱"
+
+#: framework/features/header/items/account/options.php:12
+msgid "Modal"
+msgstr "情境"
+
+#: framework/features/header/items/account/options.php:319
+#: framework/features/header/items/account/options.php:616
+msgid "Right"
+msgstr "靠右"
+
+#: framework/features/header/items/account/options.php:318
+#: framework/features/header/items/account/options.php:615
+msgid "Left"
+msgstr "靠左"
+
+#: framework/features/header/items/account/options.php:250
+#: framework/features/header/items/account/options.php:491
+#: framework/features/header/items/account/options.php:549
+msgid "Type 6"
+msgstr "類型 6"
+
+#: framework/features/header/items/account/options.php:245
+#: framework/features/header/items/account/options.php:486
+#: framework/features/header/items/account/options.php:544
+msgid "Type 5"
+msgstr "類型 5"
+
+#: framework/features/header/items/account/options.php:240
+#: framework/features/header/items/account/options.php:481
+#: framework/features/header/items/account/options.php:539
+msgid "Type 4"
+msgstr "類型 4"
+
+#: framework/features/header/items/account/options.php:235
+#: framework/features/header/items/account/options.php:476
+#: framework/features/header/items/account/options.php:534
+msgid "Type 3"
+msgstr "類型 3"
+
+#. translators: placeholder here means the actual URL.
+#: framework/features/header/items/account/options.php:103
+msgid "Manage your menu items in the %sMenus screen%s."
+msgstr "在 %s選單畫面%s 管理你的選單項目"
+
+#: framework/features/header/items/account/options.php:99
+msgid "Select menu..."
+msgstr "選擇選單..."
+
+#: framework/features/header/items/account/options.php:93
+msgid "Select Menu"
+msgstr "選擇選單"
+
+#: framework/features/header/items/account/options.php:7
+#: framework/features/header/items/account/options.php:13
+msgid "Custom Link"
+msgstr "自訂連結"
+
+#: framework/features/header/items/account/options.php:80
+#: framework/features/header/items/account/options.php:370
+msgid "Account Action"
+msgstr "帳號動作"
+
+#: framework/features/header/items/account/options.php:60
+msgid "Logged Out Options"
+msgstr "登出選項"
+
+#: framework/features/header/items/account/options.php:55
+msgid "Logged In Options"
+msgstr "登入選項"
+
+#: framework/features/header/items/account/options.php:30
+msgid "Customizing: Logged in State"
+msgstr "自訂登入狀態"
+
+#: framework/extensions/product-reviews/metabox.php:225
+msgid "Product specs"
+msgstr "商品規格"
+
+#: framework/extensions/product-reviews/metabox.php:185
+msgid "Scores"
+msgstr "分數"
+
+#: framework/extensions/product-reviews/metabox.php:148
+msgid "Read More Button Label"
+msgstr "閱讀更多按鈕標籤"
+
+#: framework/extensions/product-reviews/metabox.php:114
+msgid "Affiliate Link"
+msgstr "會員關係連結"
+
+#: framework/extensions/product-reviews/metabox.php:107
+msgid "Affiliate Button Label"
+msgstr "會員關係按鈕標籤"
+
+#: framework/extensions/product-reviews/metabox.php:96
+msgid "Gallery"
+msgstr "圖庫"
+
+#. Translators: %s is the theme name.
+#: framework/extensions/product-reviews/extension.php:619
+msgid "Blocksy"
+msgstr "Blocksy"
+
+#. Translators: %s is the theme name.
+#: framework/extensions/product-reviews/extension.php:618
+msgid "%s Settings"
+msgstr "%s 設定"
+
+#: framework/extensions/product-reviews/extension.php:599
+msgid "New Category Name"
+msgstr "新分類名稱"
+
+#: framework/extensions/product-reviews/extension.php:598
+msgid "Add New Category"
+msgstr "新增分類"
+
+#: framework/extensions/product-reviews/extension.php:597
+msgid "Update Category"
+msgstr "更新分類"
+
+#: framework/extensions/product-reviews/extension.php:596
+msgid "Edit Category"
+msgstr "編輯分類"
+
+#: framework/extensions/product-reviews/extension.php:595
+msgid "Parent Category:"
+msgstr "上層分類："
+
+#: framework/extensions/product-reviews/extension.php:594
+msgid "Parent Category"
+msgstr "上層分類"
+
+#: framework/extensions/product-reviews/extension.php:593
+msgid "All Categories"
+msgstr "所有分類"
+
+#: framework/extensions/product-reviews/extension.php:592
+msgid "Search Category"
+msgstr "搜尋分類"
+
+#: framework/extensions/product-reviews/extension.php:590
+#: framework/extensions/product-reviews/extension.php:600
+msgid "Categories"
+msgstr "分類"
+
+#: framework/extensions/product-reviews/extension.php:556
+msgid "Not found in Trash"
+msgstr "垃圾桶內沒有東西"
+
+#: framework/extensions/product-reviews/extension.php:555
+msgid "Not Found"
+msgstr "找不到"
+
+#: framework/extensions/product-reviews/metabox.php:270
+#: framework/extensions/product-reviews/views/single-top.php:285
+msgid "Cons"
+msgstr "缺點"
+
+#: framework/extensions/product-reviews/metabox.php:250
+#: framework/extensions/product-reviews/views/single-top.php:262
+msgid "Pros"
+msgstr "優點"
+
+#: framework/extensions/product-reviews/views/single-top.php:238
+msgid "Specs"
+msgstr "規格"
+
+#: framework/extensions/product-reviews/metabox.php:150
+#: framework/extensions/product-reviews/views/single-top.php:162
+msgid "Read More"
+msgstr "閱讀更多"
+
+#: framework/extensions/product-reviews/metabox.php:109
+#: framework/extensions/product-reviews/views/single-top.php:156
+msgid "Buy Now"
+msgstr "立即購買"
+
+#: framework/extensions/product-reviews/extension.php:318
+#: framework/extensions/product-reviews/views/single-top.php:139
+msgid "Overall Score"
+msgstr "整體分數"
+
+#: framework/extensions/product-reviews/helpers.php:30
+#: framework/extensions/product-reviews/metabox.php:179
+msgid "Rating"
+msgstr "評分"
+
+#: framework/theme-integration.php:323
+msgid "TikTok"
+msgstr "TikTok"
+
+#: framework/theme-integration.php:322
+msgid "Odnoklassniki"
+msgstr "Odnoklassniki"
+
+#: framework/theme-integration.php:321
+msgid "VKontakte"
+msgstr "VKontakte"
+
+#: framework/theme-integration.php:320
+msgid "Vimeo"
+msgstr "Vimeo"
+
+#: framework/theme-integration.php:319
+msgid "YouTube"
+msgstr "YouTube"
+
+#: framework/theme-integration.php:317
+msgid "GitHub"
+msgstr "GitHub"
+
+#: framework/theme-integration.php:316
+msgid "WordPress"
+msgstr "WordPress"
+
+#: framework/theme-integration.php:315
+msgid "Pinterest"
+msgstr "Pinterest"
+
+#: framework/features/header/header-options.php:74
+msgid "Auto Hide/Show"
+msgstr "自動隱藏/顯示"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:67
+#: framework/extensions/widgets/widgets/ct-posts/options.php:126
+msgid "Image Ratio"
+msgstr "圖片長寬比"
+
+#: framework/features/header/items/account/options.php:275
+#: framework/features/header/items/account/options.php:572
+msgid "Label Visibility"
+msgstr "標籤可見度"
+
+#: framework/features/conditions-manager.php:684
+msgid "Post with Taxonomy ID"
+msgstr "有分類法 ID 的文章"
+
+#: framework/features/conditions-manager.php:850 static/bundle/options.js:2
+#: static/js/options/ConditionsManager.js:106
+msgid "Exclude"
+msgstr "排除"
+
+#: framework/features/conditions-manager.php:850 static/bundle/options.js:2
+#: static/js/options/ConditionsManager.js:105
+msgid "Include"
+msgstr "包含"
+
+#. translators: %s: WordPress version
+#: blocksy-companion.php:137
+msgid "Blocksy requires WordPress version %s+. Because you are using an earlier version, the plugin is currently NOT RUNNING."
+msgstr "Blocksy 需要 WordPress 版本 %s+. 因為你使用的是舊版本, 這個外掛目前 沒有執行."
+
+#. translators: %s: PHP version
+#: blocksy-companion.php:124
+msgid "Blocksy requires PHP version %s+, plugin is currently NOT RUNNING."
+msgstr "Blocksy 需要 PHP 版本 %s+, 外掛目前 沒有執行."
+
+#: framework/extensions/widgets/widgets/ct-contact-info/widget.php:14
+msgid "Contact info"
+msgstr "連絡資訊"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:435
+msgid "Website:"
+msgstr "網站："
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:428
+msgid "Website"
+msgstr "網站"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:375
+msgid "Email:"
+msgstr "電子郵件："
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:315
+msgid "Fax:"
+msgstr "傳真："
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:308
+msgid "Fax"
+msgstr "傳真"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:255
+msgid "Opening hours"
+msgstr "營業時間"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:248
+msgid "Work Hours"
+msgstr "工作時間"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:128
+msgid "Phone"
+msgstr "電話"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:87
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:148
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:208
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:268
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:328
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:388
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:448
+msgid "Link (optional)"
+msgstr "連結(選填)"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:68
+msgid "Address"
+msgstr "位址"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:59
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:195
+#: framework/extensions/widgets/widgets/ct-contact-info/view.php:39
+msgid "Mobile:"
+msgstr "手機："
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:51
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:135
+#: framework/extensions/widgets/widgets/ct-contact-info/view.php:31
+msgid "Phone:"
+msgstr "電話："
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:44
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:74
+#: framework/extensions/widgets/widgets/ct-contact-info/view.php:24
+msgid "Address:"
+msgstr "地址："
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:30
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:24
+#: framework/extensions/widgets/widgets/ct-quote/options.php:31
+#: framework/features/header/items/account/options.php:336
+msgid "Text"
+msgstr "文字"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:19
+#: framework/extensions/widgets/widgets/ct-contact-info/view.php:12
+#: framework/extensions/widgets/widgets/ct-contact-info/widget.php:13
+msgid "Contact Info"
+msgstr "聯絡資訊"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:324
+msgid "Excerpt Lenght"
+msgstr "摘要長度"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:312
+msgid "Show Excerpt"
+msgstr "顯示摘要"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:305
+msgid "Show Comments"
+msgstr "顯示留言"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:298
+msgid "Show Date"
+msgstr "顥示日期"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:287
+msgid "Pages Count"
+msgstr "頁面數量"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:265
+msgid "Pages ID"
+msgstr "頁面編號"
+
+#: framework/extensions/trending/customizer.php:204
+#: framework/extensions/widgets/widgets/ct-posts/options.php:247
+msgid "Separate posts ID by comma. How to find the %spost ID%s."
+msgstr "用逗號分隔文章編號，這裡教你如何找出 %s文章編號%s。"
+
+#: framework/extensions/trending/customizer.php:200
+#: framework/extensions/widgets/widgets/ct-posts/options.php:243
+msgid "Posts ID"
+msgstr "文章編號"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:225
+msgid "Posts Count"
+msgstr "文章數量"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:218
+msgid "1 Year"
+msgstr "1 年"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:217
+msgid "6 Months"
+msgstr "6 個月"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:216
+msgid "3 Months"
+msgstr "3 個月"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:215
+msgid "1 Month"
+msgstr "1 個月"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:214
+msgid "1 Week"
+msgstr "1 週"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:208
+msgid "Order by"
+msgstr "排序依"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:200
+msgid "Most Commented"
+msgstr "最多留言"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:199
+msgid "Recent"
+msgstr "最新發表"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:193
+msgid "Sort by"
+msgstr "排序依據"
+
+#: framework/extensions/trending/customizer.php:177
+#: framework/extensions/widgets/widgets/ct-posts/options.php:155
+#: framework/extensions/widgets/widgets/ct-posts/options.php:174
+msgid "Custom Query"
+msgstr "自訂查詢"
+
+#: framework/extensions/trending/customizer.php:176
+#: framework/extensions/widgets/widgets/ct-posts/options.php:154
+msgid "Taxonomies"
+msgstr "分類法"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:113
+msgid "Numbered"
+msgstr "頁數"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:112
+msgid "Rounded Thumbnails"
+msgstr "圓形縮圖"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:111
+msgid "First Thumbnail Large"
+msgstr "第一大縮圖"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:110
+msgid "Large Thumbnails"
+msgstr "大縮圖"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:109
+msgid "Small Thumbnails"
+msgstr "小縮圖"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:108
+msgid "Without Thumbnails"
+msgstr "沒有縮圖"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:103
+msgid "Widget Design"
+msgstr "小工具設計"
+
+#: framework/extensions/trending/customizer.php:42
+#: framework/extensions/widgets/widgets/ct-posts/options.php:44
+msgid "All taxonomies"
+msgstr "所有分類法"
+
+#: framework/extensions/trending/customizer.php:41
+#: framework/extensions/widgets/widgets/ct-posts/options.php:43
+msgid "Taxonomy"
+msgstr "分類法"
+
+#: framework/extensions/trending/customizer.php:36
+#: framework/extensions/widgets/widgets/ct-posts/options.php:38
+msgid "All categories"
+msgstr "所有分類"
+
+#: framework/extensions/product-reviews/extension.php:591
+#: framework/extensions/trending/customizer.php:35
+#: framework/extensions/widgets/widgets/ct-posts/options.php:37
+msgid "Category"
+msgstr "分類"
+
+#: framework/extensions/widgets/widgets/ct-about-me/view.php:99
+msgid "View Profile"
+msgstr "查看個人資料"
+
+#: framework/extensions/widgets/widgets/ct-about-me/widget.php:13
+msgid "About Me"
+msgstr "關於我"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:166
+msgid "Social Channels"
+msgstr "社群頻道"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:150
+msgid "Alignment"
+msgstr "對齊方式"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:135
+msgid "Avatar Shape"
+msgstr "頭像形狀"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:27
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:97
+#: framework/extensions/widgets/widgets/ct-posts/widget.php:14
+msgid "Description"
+msgstr "內容說明"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:57
+msgid "User"
+msgstr "使用者"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:45
+msgid "From WP"
+msgstr "從 WP"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:121
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:32
+msgid "Boxed"
+msgstr "加外框"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:31
+#: framework/features/header/items/account/options.php:1164
+msgid "Simple"
+msgstr "簡單"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:23
+msgid "Type"
+msgstr "型式"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:18
+#: framework/extensions/widgets/widgets/ct-about-me/view.php:12
+#: framework/extensions/widgets/widgets/ct-about-me/widget.php:14
+msgid "About me"
+msgstr "關於我"
+
+#: framework/extensions/widgets/widgets/ct-socials/widget.php:15
+msgid "Social channels icons"
+msgstr "社群頻道圖示"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:244
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:530
+#: framework/extensions/widgets/widgets/ct-socials/options.php:133
+msgid "Outline"
+msgstr "外框"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:243
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:529
+#: framework/extensions/widgets/widgets/ct-socials/options.php:132
+msgid "Solid"
+msgstr "實心"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:236
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:522
+#: framework/extensions/widgets/widgets/ct-socials/options.php:125
+msgid "Shape Fill Type"
+msgstr "形狀填滿樣式"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:144
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:226
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:512
+#: framework/extensions/widgets/widgets/ct-socials/options.php:115
+msgid "Square"
+msgstr "正方形"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:143
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:225
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:511
+#: framework/extensions/widgets/widgets/ct-socials/options.php:114
+msgid "Rounded"
+msgstr "圓角"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:224
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:510
+#: framework/extensions/widgets/widgets/ct-socials/options.php:113
+#: framework/features/header/items/account/options.php:143
+#: framework/features/header/items/account/options.php:408
+msgid "None"
+msgstr "無"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:217
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:503
+#: framework/extensions/widgets/widgets/ct-socials/options.php:106
+msgid "Icons Shape Type"
+msgstr "圖示形狀樣式"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:130
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:212
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:498
+#: framework/extensions/widgets/widgets/ct-socials/options.php:101
+msgid "Large"
+msgstr "大型"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:129
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:211
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:497
+#: framework/extensions/widgets/widgets/ct-socials/options.php:100
+#: framework/theme-integration.php:318
+msgid "Medium"
+msgstr "中型"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:128
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:210
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:496
+#: framework/extensions/widgets/widgets/ct-socials/options.php:99
+msgid "Small"
+msgstr "小型"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:203
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:489
+#: framework/extensions/widgets/widgets/ct-socials/options.php:92
+msgid "Icons Size"
+msgstr "圖示大小"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:169
+msgid "You can configure social URLs in %s."
+msgstr "你可以在 %s 設定社群網址."
+
+#: framework/extensions/widgets/widgets/ct-socials/options.php:18
+#: framework/extensions/widgets/widgets/ct-socials/view.php:11
+#: framework/extensions/widgets/widgets/ct-socials/widget.php:14
+msgid "Social Icons"
+msgstr "社交網路服務圖示"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:83
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:539
+msgid "Open link in new tab"
+msgstr "在新分頁中開啟連結"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:75
+msgid "Ad URL"
+msgstr "廣告網址"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:58
+msgid "Upload Image"
+msgstr "上傳圖片"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:42
+msgid "Ad Code"
+msgstr "廣告碼"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:32
+msgid "Image"
+msgstr "圖片"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:31
+msgid "Code"
+msgstr "程式碼"
+
+#: framework/extensions/trending/customizer.php:171
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:37
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:23
+#: framework/extensions/widgets/widgets/ct-posts/options.php:149
+#: framework/extensions/widgets/widgets/ct-posts/options.php:168
+msgid "Source"
+msgstr "來源"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:18
+#: framework/extensions/widgets/widgets/ct-advertisement/view.php:12
+#: framework/extensions/widgets/widgets/ct-advertisement/widget.php:13
+#: framework/extensions/widgets/widgets/ct-advertisement/widget.php:14
+msgid "Advertisement"
+msgstr "廣告"
+
+#: framework/extensions/widgets/widgets/ct-facebook/widget.php:14
+msgid "Facebook like box"
+msgstr "Facebook 按讚鈕"
+
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:51
+msgid "Small Header"
+msgstr "小封面"
+
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:44
+msgid "Cover Photo"
+msgstr "封面相片"
+
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:37
+msgid "Timeline"
+msgstr "時間軸"
+
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:30
+msgid "Profile Photos"
+msgstr "個人相片"
+
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:22
+msgid "Page URL"
+msgstr "專頁網址"
+
+#. translators: %s here is the author name
+#: framework/extensions/widgets/widgets/ct-quote/view.php:58
+msgid "By %s"
+msgstr "作者 %s"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:63
+#: framework/extensions/widgets/widgets/ct-quote/options.php:67
+msgid "Change Image"
+msgstr "更換圖片"
+
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:62
+#: framework/extensions/widgets/widgets/ct-quote/options.php:66
+msgid "Select Image"
+msgstr "選取圖片"
+
+#: framework/extensions/widgets/widgets/ct-quote/options.php:62
+msgid "Author Avatar"
+msgstr "作者頭像"
+
+#: framework/extensions/widgets/widgets/ct-quote/options.php:55
+msgid "Author Label"
+msgstr "作者標籤"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:84
+#: framework/extensions/widgets/widgets/ct-about-me/view.php:40
+#: framework/extensions/widgets/widgets/ct-quote/options.php:49
+#: framework/extensions/widgets/widgets/ct-quote/view.php:18
+msgid "John Doe"
+msgstr "John Doe"
+
+#: framework/extensions/widgets/widgets/ct-quote/options.php:46
+msgid "Author Name"
+msgstr "作者名字"
+
+#: framework/extensions/widgets/widgets/ct-quote/options.php:18
+#: framework/extensions/widgets/widgets/ct-quote/view.php:12
+#: framework/extensions/widgets/widgets/ct-quote/widget.php:13
+#: framework/extensions/widgets/widgets/ct-quote/widget.php:14
+msgid "Quote"
+msgstr "引文"
+
+#: framework/extensions-manager.php:341
+msgid "WooCommerce Extra"
+msgstr "WooCommerce 額外功能"
+
+#: framework/extensions/cookies-consent/readme.php:16
+msgid "Customizer ➝ Cookie Consent"
+msgstr "自訂器 ➝ Cookie 同意書"
+
+#: framework/extensions/cookies-consent/readme.php:13
+msgid "Navigate to %s and customize the notification to meet your needs."
+msgstr "請到 %s 並依你的需求自訂通知。"
+
+#: framework/extensions/cookies-consent/readme.php:9
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:173
+msgid "Customizer"
+msgstr "外觀自訂器"
+
+#: framework/extensions/cookies-consent/readme.php:4
+msgid "After installing and activating the Cookies Consent extension you will be able to configure it from this location:"
+msgstr "在安裝並啟用了 Cookies 同意書擴充功能之後，你將可以在這些位置設定它"
+
+#: framework/extensions/cookies-consent/customizer.php:123
+msgid "This text will appear under each comment form and subscribe form."
+msgstr "這段文字將會出現在每個留言表單及訂閱表單下面。"
+
+#: framework/extensions/cookies-consent/helpers.php:79
+msgid "I accept the %sPrivacy Policy%s"
+msgstr "我同意 %s隱私權政策%s"
+
+#: framework/extensions/cookies-consent/customizer.php:112
+msgid "Forms Cookies Content"
+msgstr "表單 Cookies 同意書"
+
+#: framework/extensions/cookies-consent/customizer.php:98
+msgid "Maximum Width"
+msgstr "最大寬度"
+
+#: framework/extensions/cookies-consent/customizer.php:80
+#: framework/extensions/cookies-consent/helpers.php:33
+msgid "Accept"
+msgstr "接受"
+
+#: framework/extensions/cookies-consent/customizer.php:64
+#: framework/extensions/cookies-consent/helpers.php:30
+msgid "We use cookies to ensure that we give you the best experience on our website."
+msgstr "我們使用 cookies 以確保我們可以讓您在我們網站有最好的體驗。"
+
+#: framework/extensions/cookies-consent/customizer.php:62
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:80
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:141
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:201
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:261
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:321
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:381
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:441
+msgid "Content"
+msgstr "內容"
+
+#: framework/extensions/cookies-consent/customizer.php:55
+msgid "Forever"
+msgstr "永久"
+
+#: framework/extensions/cookies-consent/customizer.php:54
+msgid "One year"
+msgstr "一年"
+
+#: framework/extensions/cookies-consent/customizer.php:53
+msgid "Six months"
+msgstr "6 個月"
+
+#: framework/extensions/cookies-consent/customizer.php:52
+msgid "Three months"
+msgstr "3 個月"
+
+#: framework/extensions/cookies-consent/customizer.php:51
+msgid "One month"
+msgstr "1 個月"
+
+#: framework/extensions/cookies-consent/customizer.php:50
+msgid "One week"
+msgstr "1 周"
+
+#: framework/extensions/cookies-consent/customizer.php:49
+msgid "One day"
+msgstr "1 天"
+
+#: framework/extensions/cookies-consent/customizer.php:48
+msgid "One hour"
+msgstr "1 小時"
+
+#: framework/extensions/cookies-consent/customizer.php:40
+msgid "Cookie period"
+msgstr "Cookie 期間"
+
+#: framework/extensions/cookies-consent/customizer.php:33
+#: framework/features/header/items/account/options.php:230
+#: framework/features/header/items/account/options.php:471
+#: framework/features/header/items/account/options.php:529
+msgid "Type 2"
+msgstr "型式 2"
+
+#: framework/extensions/cookies-consent/customizer.php:28
+#: framework/features/header/items/account/options.php:225
+#: framework/features/header/items/account/options.php:466
+#: framework/features/header/items/account/options.php:524
+msgid "Type 1"
+msgstr "型式 1"
+
+#: framework/extensions/newsletter-subscribe/readme.php:32
+msgid "Customizer ➝ Single Posts"
+msgstr "自訂器 ➝ 單一文章"
+
+#: framework/extensions/newsletter-subscribe/readme.php:29
+msgid "Navigate to %s and customize the form and more."
+msgstr "請到 %s 並自訂表單及更多。"
+
+#: framework/extensions/newsletter-subscribe/readme.php:4
+msgid ""
+"After installing and activating the Newsletter Subscribe\n"
+" extension you will have two possibilities to show your subscribe form:"
+msgstr "在安裝並啟用了電子報亭閱擴充功能之後，請將可以有兩種方式來顯示你的訂閱表單:"
+
+#: framework/extensions/cookies-consent/customizer.php:178
+#: framework/extensions/cookies-consent/customizer.php:234
+#: framework/extensions/cookies-consent/customizer.php:299
+#: framework/features/header/items/account/options.php:1247
+msgid "Background Color"
+msgstr "背景顏色"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:305
+msgid "Button Color"
+msgstr "按鈕色彩"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:21
+#: framework/extensions/newsletter-subscribe/helpers.php:42
+#: framework/extensions/newsletter-subscribe/helpers.php:96
+msgid "Newsletter Updates"
+msgstr "電子報更新"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:4
+msgid "Subscribe Form"
+msgstr "訂閱表單"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:104
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:81
+#: framework/features/header/items/account/options.php:337
+#: static/bundle/dashboard.js:2 static/js/screens/SiteExport.js:83
+#: static/js/screens/SiteExport.js:87
+msgid "Name"
+msgstr "名稱"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:127
+msgid "Content Alignment"
+msgstr "內容對齊方式"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:109
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:19
+#: framework/extensions/newsletter-subscribe/customizer.php:116
+#: framework/extensions/newsletter-subscribe/extension.php:175
+#: framework/extensions/newsletter-subscribe/helpers.php:52
+#: framework/extensions/newsletter-subscribe/helpers.php:101
+msgid "Subscribe"
+msgstr "訂閱"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:107
+#: framework/extensions/newsletter-subscribe/customizer.php:114
+msgid "Button Label"
+msgstr "按鈕標籤"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:101
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:70
+#: framework/extensions/newsletter-subscribe/customizer.php:107
+#: framework/extensions/newsletter-subscribe/extension.php:181
+#: framework/extensions/newsletter-subscribe/helpers.php:61
+#: framework/extensions/newsletter-subscribe/helpers.php:109
+msgid "Your email"
+msgstr "你的電子郵件地址"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:99
+#: framework/extensions/newsletter-subscribe/customizer.php:105
+msgid "Mail Label"
+msgstr "郵件標籤"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:90
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:69
+#: framework/extensions/newsletter-subscribe/customizer.php:95
+#: framework/extensions/newsletter-subscribe/extension.php:180
+#: framework/extensions/newsletter-subscribe/helpers.php:57
+#: framework/extensions/newsletter-subscribe/helpers.php:108
+msgid "Your name"
+msgstr "你的姓名"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:88
+#: framework/extensions/newsletter-subscribe/customizer.php:93
+msgid "Name Label"
+msgstr "名稱標籤"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:76
+#: framework/extensions/newsletter-subscribe/customizer.php:80
+msgid "Name Field"
+msgstr "名稱欄位"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:64
+#: framework/extensions/newsletter-subscribe/customizer.php:62
+#: framework/extensions/newsletter-subscribe/dashboard-static/bundle/main.js:2
+#: framework/extensions/newsletter-subscribe/dashboard-static/js/EditCredentials.js:194
+msgid "List ID"
+msgstr "名單編號"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:54
+#: framework/extensions/newsletter-subscribe/customizer.php:50
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:46
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:102
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:164
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:224
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:284
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:344
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:404
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:464
+#: framework/features/header/items/account/options.php:182
+#: framework/features/header/items/account/options.php:428
+msgid "Custom"
+msgstr "自訂"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:46
+#: framework/extensions/newsletter-subscribe/customizer.php:42
+msgid "List Source"
+msgstr "名單來源"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:33
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:16
+#: framework/extensions/newsletter-subscribe/customizer.php:29
+#: framework/extensions/newsletter-subscribe/helpers.php:45
+#: framework/extensions/newsletter-subscribe/helpers.php:97
+msgid "Enter your email address below to subscribe to our newsletter"
+msgstr "請在下面輸入你的電子郵件地址來訂閱我們的電子報"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:17
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:12
+msgid "Newsletter"
+msgstr "電子報"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:14
+#: framework/extensions/newsletter-subscribe/customizer.php:18
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:15
+#: framework/extensions/widgets/widgets/ct-advertisement/options.php:15
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:16
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:73
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:134
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:194
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:254
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:314
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:374
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:434
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:13
+#: framework/extensions/widgets/widgets/ct-posts/options.php:95
+#: framework/extensions/widgets/widgets/ct-quote/options.php:15
+#: framework/extensions/widgets/widgets/ct-socials/options.php:15
+msgid "Title"
+msgstr "標題"
+
+#: framework/extensions/newsletter-subscribe/extension.php:128
+msgid "Disable Subscribe Form"
+msgstr "停用訂閱表單"
+
+#: framework/extensions/newsletter-subscribe/readme.php:17
+msgid "Appearance ➝ Widgets"
+msgstr "外觀 ➝ 小工具"
+
+#: framework/extensions/newsletter-subscribe/readme.php:14
+msgid "Navigate to %s and place the widget in any widget area you want."
+msgstr "請到 %s 在任何小工具區域放置你要的小工具。"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:126
+msgid "Visibility"
+msgstr "可見度"
+
+#: framework/extensions/cookies-consent/readme.php:1
+#: framework/extensions/newsletter-subscribe/readme.php:1
+msgid "Instructions"
+msgstr "操作說明"
+
+#: framework/extensions/trending/customizer.php:118
+#: framework/extensions/trending/helpers.php:221
+msgid "Trending now"
+msgstr "目前趨勢"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:334
+#: framework/extensions/trending/customizer.php:380
+msgid "Container Background"
+msgstr "容器背景"
+
+#: framework/extensions/cookies-consent/customizer.php:203
+#: framework/extensions/cookies-consent/customizer.php:270
+#: framework/extensions/trending/customizer.php:348
+#: framework/features/header/items/account/options.php:975
+msgid "Font Color"
+msgstr "字體顏色"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:138
+#: framework/extensions/trending/customizer.php:280
+#: framework/features/header/items/account/options.php:288
+#: framework/features/header/items/account/options.php:585
+#: framework/features/header/items/account/options.php:1312
+msgid "Tablet"
+msgstr "平板"
+
+#: framework/extensions/trending/customizer.php:267
+msgid "Container Visibility"
+msgstr "容器可見度"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:385
+#: framework/extensions/trending/customizer.php:396
+msgid "Container Inner Spacing"
+msgstr "容器內間隔"
+
+#: framework/extensions/trending/customizer.php:232
+msgid "Last Month"
+msgstr "最近一個月"
+
+#: framework/extensions/trending/customizer.php:231
+msgid "Last 7 Days"
+msgstr "最近7天"
+
+#: framework/extensions/trending/customizer.php:230
+msgid "Last 24 Hours"
+msgstr "最近24小時"
+
+#: framework/extensions/trending/customizer.php:229
+#: framework/extensions/widgets/widgets/ct-posts/options.php:213
+msgid "All Time"
+msgstr "有史以來"
+
+#: framework/extensions/trending/customizer.php:220
+msgid "Trending From"
+msgstr "趨勢來自"
+
+#: framework/extensions/trending/customizer.php:149
+#: framework/extensions/trending/customizer.php:162
+#: framework/extensions/widgets/widgets/ct-posts/options.php:137
+msgid "Post Type"
+msgstr "內容類型"
+
+#: framework/extensions/trending/customizer.php:106
+msgid "Trending Posts"
+msgstr "趨勢文章"
+
+#: framework/extensions/trending/customizer.php:8
+msgid "Products"
+msgstr "商品"
+
+#: framework/extensions/trending/customizer.php:312
+#: framework/features/header/header-options.php:158 static/bundle/options.js:2
+#: static/js/header/EditConditions.js:103
+msgid "Display Conditions"
+msgstr "顯示條件"
+
+#: framework/features/header/header-options.php:120
+msgid "Transparent Functionality"
+msgstr "透明功能性"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:139
+#: framework/extensions/trending/customizer.php:281
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:188
+#: framework/features/header/header-options.php:105
+#: framework/features/header/header-options.php:187
+#: framework/features/header/items/account/options.php:289
+#: framework/features/header/items/account/options.php:586
+#: framework/features/header/items/account/options.php:1313
+msgid "Mobile"
+msgstr "手機"
+
+#: framework/extensions/newsletter-subscribe/customizer.php:137
+#: framework/extensions/trending/customizer.php:279
+#: framework/features/header/header-options.php:103
+#: framework/features/header/header-options.php:185
+#: framework/features/header/items/account/options.php:287
+#: framework/features/header/items/account/options.php:584
+msgid "Desktop"
+msgstr "桌機"
+
+#: framework/features/header/header-options.php:92
+#: framework/features/header/header-options.php:174
+msgid "Enable on"
+msgstr "啟用於"
+
+#: framework/features/header/header-options.php:73
+msgid "Fade"
+msgstr "淡出"
+
+#: framework/features/header/header-options.php:72
+msgid "Slide Down"
+msgstr "下滑"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:53
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:120
+#: framework/extensions/newsletter-subscribe/customizer.php:49
+#: framework/extensions/product-reviews/metabox.php:17
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:101
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:163
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:223
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:283
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:343
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:403
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:463
+#: framework/extensions/widgets/widgets/ct-posts/options.php:173
+#: framework/extensions/widgets/widgets/ct-posts/options.php:198
+#: framework/extensions/widgets/widgets/ct-socials/options.php:86
+#: framework/features/header/header-options.php:71
+#: framework/features/header/items/account/options.php:181
+#: framework/features/header/items/account/options.php:427
+msgid "Default"
+msgstr "預設"
+
+#: framework/features/header/header-options.php:57
+msgid "Only Bottom Row"
+msgstr "只有下面列"
+
+#: framework/features/header/header-options.php:52
+msgid "Only Top Row"
+msgstr "只有上面列"
+
+#: framework/features/header/header-options.php:47
+msgid "Main & Bottom Row"
+msgstr "主要及下面列"
+
+#: framework/features/header/header-options.php:42
+msgid "All Rows"
+msgstr "所有列"
+
+#: framework/features/header/header-options.php:37
+msgid "Top & Main Row"
+msgstr "上面及主要列"
+
+#: framework/features/header/header-options.php:32
+msgid "Only Main Row"
+msgstr "只有主要列"
+
+#: framework/features/header/header-options.php:6
+msgid "Sticky Functionality"
+msgstr "吸附功能性"
+
+#: framework/features/header/account-modal.php:72
+msgid "Back to login"
+msgstr "回到登入頁面"
+
+#: framework/features/header/modal/lostpassword.php:13
+msgid "Get New Password"
+msgstr "取得新密碼"
+
+#: framework/features/header/modal/login.php:28
+#: framework/features/header/modal/lostpassword.php:5
+msgid "Username or Email Address"
+msgstr "使用者帳號或電子郵件地址"
+
+#: framework/features/header/modal/register.php:72
+msgid "Register"
+msgstr "註冊"
+
+#: framework/features/header/modal/register.php:67
+msgid "Registration confirmation will be emailed to you"
+msgstr "註冊確認將透過電子郵件寄送給你"
+
+#: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:107
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:368
+#: framework/features/header/modal/register.php:36
+msgid "Email"
+msgstr "電子郵件"
+
+#: framework/features/header/modal/register.php:30
+msgid "Username"
+msgstr "使用者名稱"
+
+#: framework/features/header/modal/login.php:63
+msgid "Log In"
+msgstr "登入"
+
+#: framework/features/header/modal/login.php:45
+msgid "Forgot Password?"
+msgstr "忘記密碼？"
+
+#: framework/features/header/modal/login.php:41
+msgid "Remember Me"
+msgstr "保持登入"
+
+#: framework/features/header/modal/login.php:33
+#: framework/features/header/modal/register.php:42
+msgid "Password"
+msgstr "密碼"
+
+#: framework/extensions/newsletter-subscribe/helpers.php:168
+msgid "Email address"
+msgstr "電子郵件地址"
+
+#: framework/features/header/account-modal.php:53
+msgid "Sign Up"
+msgstr "註冊"
+
+#: framework/features/header/items/account/config.php:4
+msgid "Account"
+msgstr "帳號"
+
+#: framework/features/header/items/account/options.php:1121
+msgid "Modal Backdrop"
+msgstr "彈出背景"
+
+#: framework/features/header/items/account/options.php:952
+msgid "Item Margin"
+msgstr "項目邊界"
+
+#: framework/extensions/cookies-consent/customizer.php:170
+#: framework/extensions/cookies-consent/customizer.php:226
+#: framework/extensions/cookies-consent/customizer.php:257
+#: framework/extensions/cookies-consent/customizer.php:292
+#: framework/extensions/cookies-consent/customizer.php:321
+#: framework/extensions/newsletter-subscribe/customizer.php:196
+#: framework/extensions/newsletter-subscribe/customizer.php:327
+#: framework/extensions/trending/customizer.php:372
+#: framework/features/header/items/account/options.php:734
+#: framework/features/header/items/account/options.php:765
+#: framework/features/header/items/account/options.php:795
+#: framework/features/header/items/account/options.php:878
+#: framework/features/header/items/account/options.php:908
+#: framework/features/header/items/account/options.php:937
+#: framework/features/header/items/account/options.php:999
+#: framework/features/header/items/account/options.php:1195
+#: framework/features/header/items/account/options.php:1231
+#: framework/features/header/items/account/options.php:1270
+msgid "Hover"
+msgstr "游標暫留"
+
+#: framework/extensions/cookies-consent/customizer.php:164
+#: framework/extensions/cookies-consent/customizer.php:191
+#: framework/extensions/cookies-consent/customizer.php:220
+#: framework/extensions/cookies-consent/customizer.php:251
+#: framework/extensions/cookies-consent/customizer.php:287
+#: framework/extensions/cookies-consent/customizer.php:316
+#: framework/extensions/newsletter-subscribe/customizer.php:165
+#: framework/extensions/newsletter-subscribe/customizer.php:190
+#: framework/extensions/newsletter-subscribe/customizer.php:222
+#: framework/extensions/newsletter-subscribe/customizer.php:253
+#: framework/extensions/newsletter-subscribe/customizer.php:290
+#: framework/extensions/newsletter-subscribe/customizer.php:322
+#: framework/extensions/trending/customizer.php:366
+#: framework/features/header/items/account/options.php:728
+#: framework/features/header/items/account/options.php:760
+#: framework/features/header/items/account/options.php:790
+#: framework/features/header/items/account/options.php:872
+#: framework/features/header/items/account/options.php:903
+#: framework/features/header/items/account/options.php:932
+#: framework/features/header/items/account/options.php:993
+#: framework/features/header/items/account/options.php:1023
+#: framework/features/header/items/account/options.php:1053
+#: framework/features/header/items/account/options.php:1089
+#: framework/features/header/items/account/options.php:1189
+#: framework/features/header/items/account/options.php:1225
+#: framework/features/header/items/account/options.php:1264
+msgid "Initial"
+msgstr "初始"
+
+#: framework/features/header/items/account/options.php:700
+#: framework/features/header/items/account/options.php:846
+msgid "Sticky State"
+msgstr "吸附狀態"
+
+#: framework/features/header/items/account/options.php:691
+#: framework/features/header/items/account/options.php:837
+msgid "Transparent State"
+msgstr "透明狀態"
+
+#: framework/features/header/items/account/options.php:686
+#: framework/features/header/items/account/options.php:832
+msgid "Default State"
+msgstr "預設狀態"
+
+#: framework/extensions/cookies-consent/customizer.php:142
+#: framework/extensions/newsletter-subscribe/customizer.php:147
+#: framework/extensions/product-reviews/extension.php:422
+#: framework/extensions/trending/customizer.php:333
+#: framework/features/header/items/account/options.php:664
+msgid "Design"
+msgstr "設計"
+
+#: framework/features/header/items/account/options.php:120
+#: framework/features/header/items/account/options.php:385
+msgid "Custom Page Link"
+msgstr "自訂頁面連結"
+
+#: framework/features/header/items/account/options.php:8
+msgid "Logout"
+msgstr "登出"
+
+#: framework/features/header/items/account/options.php:5
+msgid "Dashboard Page"
+msgstr "控制台頁面"
+
+#: framework/features/header/items/account/options.php:4
+msgid "Profile Page"
+msgstr "個人資料頁面"
+
+#: framework/features/header/items/account/options.php:352
+#: framework/features/header/items/account/views/login.php:85
+msgid "My Account"
+msgstr "我的帳號"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:115
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:122
+#: framework/features/header/items/account/options.php:154
+msgid "Avatar Size"
+msgstr "頭像大小"
+
+#: framework/extensions/widgets/widgets/ct-about-me/options.php:72
+#: framework/features/header/items/account/options.php:141
+msgid "Avatar"
+msgstr "個人頭像"
+
+#: framework/features/header/account-modal.php:49
+#: framework/features/header/items/account/options.php:631
+#: framework/features/header/items/account/views/logout.php:7
+msgid "Login"
+msgstr "登入"
+
+#: framework/features/header/items/account/options.php:258
+#: framework/features/header/items/account/options.php:499
+#: framework/features/header/items/account/options.php:555
+msgid "Icon Size"
+msgstr "圖示尺寸"
+
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:112
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:174
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:234
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:294
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:354
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:414
+#: framework/extensions/widgets/widgets/ct-contact-info/options.php:474
+#: framework/features/header/items/account/options.php:142
+#: framework/features/header/items/account/options.php:192
+#: framework/features/header/items/account/options.php:407
+#: framework/features/header/items/account/options.php:438
+msgid "Icon"
+msgstr "圖示"
+
+#: framework/extensions/cookies-consent/customizer.php:15
+#: framework/extensions/newsletter-subscribe/customizer.php:12
+#: framework/extensions/product-reviews/extension.php:382
+#: framework/extensions/product-reviews/metabox.php:6
+#: framework/extensions/trending/customizer.php:110
+#: framework/features/header/items/account/options.php:70
+msgid "General"
+msgstr "一般"
+
+#: framework/features/dynamic-css.php:53
+msgid "Inline"
+msgstr "內嵌"
+
+#: framework/features/dynamic-css.php:52
+msgid "File"
+msgstr "檔案"
+
+#: framework/features/dynamic-css.php:50
+msgid "The strategy of outputting the dynamic CSS. File - all the CSS code will be placed in a static file, otherwise it will be placed inline in head."
+msgstr "輸出動態 CSS 的策略. 檔案 - 所有 CSS 程式碼將會放在一個靜態檔案, 否則將會內嵌在head 區段"
+
+#: framework/features/dynamic-css.php:46
+msgid "Dynamic CSS Output"
+msgstr "動態 CSS 輸出"
+
+#: framework/features/demo-install.php:233
+msgid "Your PHP installation doesn't have support for XML. Please install the <i>xml</i> or <i>simplexml</i> PHP extension in order to be able to install starter sites. You might need to contact your hosting provider to assist you in doing so."
+msgstr "你的 PHP 安裝不支援 XML 功能. 請安裝 <i>xml</i> 或 <i>simplexml</i> PHP 擴充模組才能安裝入門範本. 你可能要連絡你的主機商協助你做這件事."
+
+#: framework/features/demo-install/parsers.php:86
+#: framework/features/demo-install/parsers.php:91
+#: framework/features/demo-install/parsers.php:308
+#: framework/features/demo-install/parsers.php:504
+msgid "This does not appear to be a WXR file, missing/invalid WXR version number"
+msgstr "由於找不到版本號碼或版本號碼無效，系統判定這不是 WXR 格式的檔案。"
+
+#: framework/features/demo-install/parsers.php:44
+msgid "Details are shown above. The importer will now try again with a different parser..."
+msgstr "詳細資訊如上所示。匯入程式將以不同的剖析器再次嘗試匯入..."
+
+#: framework/features/demo-install/parsers.php:43
+#: framework/features/demo-install/parsers.php:74
+#: framework/features/demo-install/parsers.php:82
+msgid "There was an error when reading this WXR file"
+msgstr "讀取 WXR 檔案時發生錯誤"
+
+#: framework/features/demo-install/wp-importer.php:1261
+msgid "Choose a WXR (.xml) file to upload, then click Upload file and import."
+msgstr "選取要匯入的 WXR 檔案 (副檔名為 .xml)，然後點擊 [上傳檔案並匯入]。"
+
+#: framework/features/demo-install/wp-importer.php:1260
+msgid "Howdy! Upload your WordPress eXtended RSS (WXR) file and we&#8217;ll import the posts, pages, comments, custom fields, categories, and tags into this site."
+msgstr "你好，請上傳 WordPress eXtended RSS 格式檔案 (WXR 格式，副檔名為 .xml)，匯入程式會將文章、頁面、留言、自訂欄位、分類以及標籤匯入這個網站。"
+
+#: framework/features/demo-install/wp-importer.php:1245
+msgid "A new version of this importer is available. Please update to version %s to ensure compatibility with newer export files."
+msgstr "這個匯入程式已有新版本可供更新，請更新至 %s 版以確保與較新版資料匯出檔格式的相容性。"
+
+#: framework/features/demo-install/wp-importer.php:1238
+msgid "Import WordPress"
+msgstr "匯入 WordPress 內容"
+
+#: framework/features/demo-install/wp-importer.php:1138
+msgid "Remote file is too large, limit is %s"
+msgstr "遠端檔案過大，限制為 %s"
+
+#: framework/features/demo-install/wp-importer.php:1132
+msgid "Zero size file downloaded"
+msgstr "大小為零的檔案已完成下載"
+
+#: framework/features/demo-install/wp-importer.php:1127
+msgid "Remote file is incorrect size"
+msgstr "遠端檔案大小不正確"
+
+#: framework/features/demo-install/wp-importer.php:1120
+msgid "Remote server returned error response %1$d %2$s"
+msgstr "遠端伺服器回傳錯誤反應 %1$d %2$s"
+
+#: framework/features/demo-install/wp-importer.php:1112
+msgid "Remote server did not respond"
+msgstr "遠端伺服器沒有回應"
+
+#: framework/features/demo-install/wp-importer.php:1060
+msgid "Invalid file type"
+msgstr "無效的檔案類型"
+
+#: framework/features/demo-install/wp-importer.php:1047
+msgid "Fetching attachments is not enabled"
+msgstr "[擷取附件] 未啟用"
+
+#: framework/features/demo-install/wp-importer.php:983
+msgid "Menu item skipped due to invalid menu slug: %s"
+msgstr "由於不正確的選單代稱 %s，選單項目不予匯入"
+
+#: framework/features/demo-install/wp-importer.php:976
+msgid "Menu item skipped due to missing menu slug"
+msgstr "由於找不到選單代稱，選單項目不予匯入"
+
+#: framework/features/demo-install/wp-importer.php:806
+msgid "Failed to import %s &#8220;%s&#8221;"
+msgstr "無法匯入內容類型為 [%s] 的〈%s〉"
+
+#: framework/features/demo-install/wp-importer.php:744
+msgid "%s &#8220;%s&#8221; already exists."
+msgstr "內容類型為 [%s] 的〈%s〉已存在。"
+
+#: framework/features/demo-install/wp-importer.php:581
+#: framework/features/demo-install/wp-importer.php:840
+msgid "Failed to import %s %s"
+msgstr "無法匯入 [%s] 分類法的分類法詞彙〈%s〉"
+
+#: framework/features/demo-install/wp-importer.php:528
+msgid "Failed to import post tag %s"
+msgstr "無法匯入文章標籤〈%s〉"
+
+#: framework/features/demo-install/wp-importer.php:482
+msgid "Failed to import category %s"
+msgstr "無法匯入分類〈%s〉"
+
+#: framework/features/demo-install/wp-importer.php:430
+msgid "Failed to create new user for %s. Their posts will be attributed to the current user."
+msgstr "無法為「%s」建立新使用者，相關文章會指派給目前進行匯入的使用者。"
+
+#: framework/features/demo-install/wp-importer.php:377
+msgid "- Select -"
+msgstr "- 選取 -"
+
+#: framework/features/demo-install/wp-importer.php:371
+msgid "or assign posts to an existing user:"
+msgstr "或指派文章給現有使用者:"
+
+#: framework/features/demo-install/wp-importer.php:369
+msgid "assign posts to an existing user:"
+msgstr "指派文章給現有使用者:"
+
+#: framework/features/demo-install/wp-importer.php:361
+msgid "as a new user:"
+msgstr "成為新使用者:"
+
+#: framework/features/demo-install/wp-importer.php:358
+msgid "or create new user with login name:"
+msgstr "或以新的登入名稱建立新使用者:"
+
+#: framework/features/demo-install/wp-importer.php:347
+msgid "Import author:"
+msgstr "匯入作者:"
+
+#: framework/features/demo-install/wp-importer.php:334
+msgid "Submit"
+msgstr "送出"
+
+#: framework/features/demo-install/wp-importer.php:330
+msgid "Download and import file attachments"
+msgstr "下載並匯入檔案附件"
+
+#: framework/features/demo-install/wp-importer.php:327
+msgid "Import Attachments"
+msgstr "匯入附件"
+
+#: framework/features/demo-install/wp-importer.php:317
+msgid "If a new user is created by WordPress, a new password will be randomly generated and the new user&#8217;s role will be set as %s. Manually changing the new user&#8217;s details will be necessary."
+msgstr "如果透過 WordPress 建立新使用者，會為這位新使用者隨機產生一組密碼，並將新使用者的使用者角色指派為 <code>%s</code>。手動變更新使用者的詳細資料為匯入操作完成後的必要操作。"
+
+#: framework/features/demo-install/wp-importer.php:315
+msgid "To make it simpler for you to edit and save the imported content, you may want to reassign the author of the imported item to an existing user of this site, such as your primary administrator account."
+msgstr "為了讓編輯及儲存匯入的內容更加簡單，網站管理員可以將匯入的項目重新指派給網站上現有的使用者。舉例來說，可以將全部匯入項目指都派給主要的網站管理員帳號。"
+
+#: framework/features/demo-install/wp-importer.php:314
+msgid "Assign Authors"
+msgstr "指派作者"
+
+#: framework/features/demo-install/wp-importer.php:288
+msgid "Failed to import author %s. Their posts will be attributed to the current user."
+msgstr "無法匯入作者「%s」，相關文章會指派給目前進行匯入的使用者。"
+
+#: framework/features/demo-install/wp-importer.php:263
+msgid "This WXR file (version %s) may not be supported by this version of the importer. Please consider updating."
+msgstr "目前版本的匯入程式不支援 %s 版的 WXR 檔案，請考慮更新匯入程式以進行匯入。"
+
+#: framework/features/demo-install/wp-importer.php:247
+msgid "The export file could not be found at <code>%s</code>. It is likely that this was caused by a permissions problem."
+msgstr "在 <code>%s</code> 找不到資料匯出檔，這通常是由權限問題所造成。"
+
+#: framework/features/demo-install/wp-importer.php:227
+msgid "Remember to update the passwords and roles of imported users."
+msgstr "請記得為匯入的使用者變更密碼及使用者角色。"
+
+#: framework/features/demo-install/wp-importer.php:226
+msgid "Have fun!"
+msgstr "返回 [控制台]"
+
+#: framework/features/demo-install/wp-importer.php:226
+msgid "All done."
+msgstr "全部完成。"
+
+#: framework/features/demo-install/wp-importer.php:191
+#: framework/features/demo-install/wp-importer.php:242
+#: framework/features/demo-install/wp-importer.php:246
+#: framework/features/demo-install/wp-importer.php:255
+msgid "Sorry, there has been an error."
+msgstr "很抱歉，匯入過程發生錯誤。"
+
+#: framework/features/demo-install/content-installer.php:352
+#: framework/features/demo-install/options-import.php:78
+#: framework/features/demo-install/widgets-import.php:78
+msgid "Downloaded demo is corrupted."
+msgstr "下載的示範檔已損毀"
+
+#: framework/features/conditions-manager.php:801
+msgid "User Roles"
+msgstr "使用者角色"
+
+#: framework/features/conditions-manager.php:795
+msgid "User Logged Out"
+msgstr "使用者已登出"
+
+#: framework/features/conditions-manager.php:790
+msgid "User Logged In"
+msgstr "使用者已登入"
+
+#: framework/features/conditions-manager.php:786
+msgid "User Auth"
+msgstr "使用者驗證"
+
+#: framework/features/conditions-manager.php:718
+msgid "Front Page"
+msgstr "首頁"
+
+#: framework/features/conditions-manager.php:713
+msgid "Blog"
+msgstr "網誌"
+
+#: framework/features/conditions-manager.php:708
+msgid "Search"
+msgstr "搜尋"
+
+#: framework/features/conditions-manager.php:703
+msgid "404"
+msgstr "404 錯誤"
+
+#: framework/features/conditions-manager.php:699
+msgid "Other Pages"
+msgstr "其他頁面:"
+
+#: framework/features/conditions-manager.php:689
+msgid "Taxonomy ID"
+msgstr "分類法 ID"
+
+#: framework/features/conditions-manager.php:679 static/bundle/options.js:2
+#: static/js/options/ConditionsManager/PostIdPicker.js:76
+msgid "Custom Post Type ID"
+msgstr "自訂文章類型 ID"
+
+#: framework/features/conditions-manager.php:674
+msgid "Page ID"
+msgstr "頁面 ID"
+
+#: framework/features/conditions-manager.php:669
+msgid "Post ID"
+msgstr "文章 ID"
+
+#: framework/features/conditions-manager.php:693
+msgid "Specific"
+msgstr "特定的"
+
+#: framework/features/conditions-manager.php:777
+msgid "Custom Post Types"
+msgstr "自訂文章類型"
+
+#: framework/features/conditions-manager.php:769
+msgid "Product Tags"
+msgstr "商品標籤"
+
+#: framework/features/conditions-manager.php:764
+msgid "Product Categories"
+msgstr "商品分類"
+
+#: framework/features/conditions-manager.php:759
+msgid "Product Archives"
+msgstr "商品彙整"
+
+#: framework/features/conditions-manager.php:754
+msgid "Single Product"
+msgstr "單項商品"
+
+#: framework/features/conditions-manager.php:749
+msgid "Shop Home"
+msgstr "商店首頁"
+
+#: framework/features/conditions-manager.php:745
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+#: framework/features/conditions-manager.php:604
+msgid "Single Page"
+msgstr "單一頁面"
+
+#: framework/extensions/widgets/widgets/ct-posts/options.php:12
+#: framework/features/conditions-manager.php:600
+msgid "Pages"
+msgstr "頁面"
+
+#: framework/features/conditions-manager.php:538
+#: framework/features/conditions-manager.php:570
+msgid "Post Tags"
+msgstr "文章標籤"
+
+#: framework/features/conditions-manager.php:533
+#: framework/features/conditions-manager.php:565
+msgid "Post Categories"
+msgstr "文章分類"
+
+#: framework/features/conditions-manager.php:528
+#: framework/features/conditions-manager.php:560
+msgid "All Post Archives"
+msgstr "所有文章彙整"
+
+#: framework/features/conditions-manager.php:523
+#: framework/features/conditions-manager.php:592
+msgid "Single Post"
+msgstr "單篇文章"
+
+#: framework/extensions/trending/customizer.php:4
+#: framework/extensions/widgets/widgets/ct-posts/options.php:11
+#: framework/extensions/widgets/widgets/ct-posts/options.php:98
+#: framework/extensions/widgets/widgets/ct-posts/view.php:139
+#: framework/extensions/widgets/widgets/ct-posts/widget.php:13
+#: framework/features/conditions-manager.php:519
+#: framework/features/conditions-manager.php:556
+#: framework/features/conditions-manager.php:588
+msgid "Posts"
+msgstr "文章"
+
+#: framework/features/conditions-manager.php:513
+#: framework/features/conditions-manager.php:550
+msgid "Archives"
+msgstr "彙整"
+
+#: framework/features/conditions-manager.php:508
+#: framework/features/conditions-manager.php:582
+msgid "Singulars"
+msgstr "單一"
+
+#: framework/features/conditions-manager.php:504
+#: framework/features/conditions-manager.php:546
+#: framework/features/conditions-manager.php:578
+msgid "Basic"
+msgstr "基本"
+
+#: framework/features/conditions-manager.php:496
+msgid "Entire Website"
+msgstr "整個網站"
+
+#: framework/features/conditions-manager.php:641
+msgid "%s Archive"
+msgstr "%s彙整"
+
+#: framework/features/conditions-manager.php:631
+msgid "%s Single"
+msgstr "%s 單一"
+
+#: framework/features/google-analytics.php:105
+msgid "IP Anonymization"
+msgstr "IP 匿名化"
+
+#: framework/features/google-analytics.php:69
+msgid "Google Analytics v4"
+msgstr "Google Analytics v4"
+
+#: framework/features/opengraph-meta-data.php:43
+msgid "Twitter Username"
+msgstr "Twitter 使用者名稱"
+
+#: framework/features/opengraph-meta-data.php:36
+msgid "Facebook App ID"
+msgstr "Facebook 應用程式編號"
+
+#: framework/features/opengraph-meta-data.php:29
+msgid "Facebook Page URL"
+msgstr "Facebook 專頁網址"
+
+#: framework/features/opengraph-meta-data.php:17
+msgid "OpenGraph Meta Data"
+msgstr "OpenGraph 中繼資料"
+
+#: framework/theme-integration.php:413 static/bundle/dashboard.js:2
+#: static/js/screens/SiteExport.js:111
+msgid "PRO"
+msgstr "專業版"
+
+#: framework/theme-integration.php:395
+msgid "Companion"
+msgstr "Companion"
+
+#: framework/theme-integration.php:314
+msgid "Instagram"
+msgstr "Instagram"
+
+#: framework/theme-integration.php:313
+msgid "Dribbble"
+msgstr "Dribbble"
+
+#: framework/theme-integration.php:312
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+#: framework/theme-integration.php:311
+msgid "Twitter"
+msgstr "Twitter"
+
+#: framework/extensions/widgets/widgets/ct-facebook/options.php:16
+#: framework/extensions/widgets/widgets/ct-facebook/view.php:12
+#: framework/extensions/widgets/widgets/ct-facebook/widget.php:13
+#: framework/theme-integration.php:310
+msgid "Facebook"
+msgstr "Facebook"
+
+#: framework/widgets-manager.php:154
+msgid "Widget Title"
+msgstr "小工具標題"
+
+#: framework/widgets-manager.php:81
+msgid "Display online support infomation"
+msgstr "顯示線上支援資訊"
+
+#: framework/widgets-manager.php:75
+msgid "Default widget name"
+msgstr "預設小工具名稱"
+
+#: framework/widgets-manager.php:63
+msgid "Default widget description"
+msgstr "預設小工具說明"
+
+#: framework/extensions-manager.php:269
+msgid "Custom Fonts"
+msgstr "自訂字體"
+
+#. Author URI of the plugin
+msgid "https://creativethemes.com"
+msgstr "https://creativethemes.com"
+
+#. Author of the plugin
+msgid "CreativeThemes"
+msgstr "CreativeThemes"
+
+#. Description of the plugin
+msgid "This plugin is the companion for the Blocksy theme, it runs and adds its enhacements only if the Blocksy theme is installed and active."
+msgstr "這個外掛是 Blocksy 佈景主題的夥伴，它只有在 Blocksy 佈景己安裝並啟用時才會執行並強化它。"
+
+#. Plugin Name of the plugin
+msgid "Blocksy Companion"
+msgstr "Blocksy Companion"

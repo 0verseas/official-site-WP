@@ -1,0 +1,290 @@
+# Translation of Plugins - WP Word Count - Development (trunk) in Chinese (Taiwan)
+# This file is distributed under the same license as the Plugins - WP Word Count - Development (trunk) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2021-01-12 11:12:26+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/3.0.0-alpha.2\n"
+"Language: zh_TW\n"
+"Project-Id-Version: Plugins - WP Word Count - Development (trunk)\n"
+
+#. Author URI of the plugin
+msgid "http://redlettuce.com"
+msgstr "https://redlettuce.com"
+
+#. Author of the plugin
+msgid "RedLettuce Plugins"
+msgstr "RedLettuce Plugins"
+
+#: admin/class-wpwc-admin.php:208
+msgid "This text will appear after the reading time is inserted into your posts."
+msgstr "這個標籤會顯示於插入內容的閱讀時間後方。"
+
+#: admin/class-wpwc-admin.php:195
+msgid "This text will appear before the reading time is inserted into your posts."
+msgstr "這個標籤會顯示於插入內容的閱讀時間前方。"
+
+#: admin/class-wpwc-admin.php:158
+msgid "Define how many words per minute to use in Reading Time statistics and set labels for displaying Reading Time statistics inside of your posts."
+msgstr "這裡可設定要用於 [閱讀時間] 統計資料的每分鐘閱讀字數，同時也可設定在網站內容中顯示閱讀時間統計資料的標籤。"
+
+#: admin/class-wpwc-admin.php:147
+msgid "After Label"
+msgstr "後方標籤"
+
+#: admin/class-wpwc-admin.php:146
+msgid "Before Label"
+msgstr "前方標籤"
+
+#: admin/class-wpwc-admin.php:145
+msgid "Insert before post content?"
+msgstr "插入至內容上方"
+
+#: admin/class-wpwc-admin.php:144
+msgid "Words Per Minute"
+msgstr "每分鐘閱讀字數"
+
+#: admin/partials/wpwc-reading-time.php:26
+msgid "Save Changes"
+msgstr "儲存設定"
+
+#: admin/class-wpwc-admin.php:100 admin/class-wpwc-admin.php:143
+#: admin/partials/wpwc-reading-time.php:18
+#: admin/partials/wpwc-statistics-menu.php:19
+#: admin/partials/wpwc-statistics-totals.php:63
+#: admin/partials/wpwc-statistics.php:43
+msgid "Reading Time"
+msgstr "閱讀時間"
+
+#: admin/class-wpwc-admin.php:99
+msgid "Statistics"
+msgstr "統計資料"
+
+#: admin/partials/wpwc-calculate.php:56
+msgid "Delete all existing WP Word Count data before calculation."
+msgstr "計算字數前，刪除現有的 WP Word Count 資料。"
+
+#: admin/partials/wpwc-calculate.php:49
+msgid "to"
+msgstr "至"
+
+#: admin/partials/wpwc-calculate.php:47
+msgid "Date Range"
+msgstr "日期範圍"
+
+#: admin/partials/wpwc-calculate.php:39
+msgid "Count content by a date range"
+msgstr "依日期範圍計算字數"
+
+#: admin/partials/wpwc-calculate.php:34
+msgid "Count all content on this site at one time"
+msgstr "同時計算這個網站上全部內容"
+
+#: admin/partials/wpwc-calculate.php:24
+msgid "After your first calculation, word counts will be stored automatically every time you save a post."
+msgstr "首次字數計算完成後，內容字數會在每次作者更新文章時自動儲存。"
+
+#: admin/partials/wpwc-calculate.php:23
+msgid "You can calculate the word counts on your site at any time. Sites with thousands of posts or years of content should do multiple calculations by a date range to avoid server complications."
+msgstr "網站管理員隨時可以計算網站內容字數。如果網站有上千篇內容或多年內容，請依照日期範圍進行多次字數計算，以避免伺服器複雜化。"
+
+#. Plugin URI of the plugin
+msgid "https://wpwordcount.com"
+msgstr "https://wpwordcount.com"
+
+#. Description of the plugin
+msgid "Count the words on your WordPress site instantly."
+msgstr "這個外掛能立即計算 WordPress 網站上內容的字數。"
+
+#: admin/partials/wpwc-upgrade.php:43 admin/partials/wpwc-upgrade.php:44
+#: admin/partials/wpwc-upgrade.php:45 admin/partials/wpwc-upgrade.php:46
+msgid "WP Word Count Pro Screenshot"
+msgstr "WP Word Count Pro 螢幕擷圖"
+
+#: admin/partials/wpwc-upgrade.php:38
+msgid "View Features and Pricing"
+msgstr "檢視功能及價格"
+
+#: admin/partials/wpwc-upgrade.php:35
+msgid "Charts and graphs are on nearly every screen of WP Word Count Pro to offer better data visualization."
+msgstr "每個 WP Word Count Pro 畫面幾乎都會顯示圖表，提供更加視覺化的資料。"
+
+#: admin/partials/wpwc-upgrade.php:34
+msgid "The achievement system in WP Word Count Pro gives you extra motivation to write more and increase your site's content."
+msgstr "WP Word Count Pro 的成就系統能激勵作者撰寫更多內容，增加網站內容豐富度。"
+
+#: admin/partials/wpwc-upgrade.php:33
+msgid "All of your posts have expanded statistical details with revision history, post rankings and more."
+msgstr "全部內容都會有可展開的內容修訂記錄、文章排名等詳細統計資料。"
+
+#: admin/partials/wpwc-upgrade.php:32
+msgid "Each author that contributes to your site has their own personal stats page with information beyond just word count totals."
+msgstr "每一位提供網站內容的作者，都會有資料比字數計算更詳細的專屬個人統計資料頁面。"
+
+#: admin/partials/wpwc-upgrade.php:31
+msgid "WP Word Count Pro comes with detailed breakdowns of your monthly writing output by day, author, post type, category, tag and more."
+msgstr "WP Word Count Pro 可以將每月撰寫字數依日期、作者、內容類型、標籤等方式顯示詳細資料。"
+
+#: admin/partials/wpwc-upgrade.php:30
+msgid "You'll get complete control over which post types and statuses you see in your statistics through custom \"Settings\" options."
+msgstr "透過自訂 [設定] 選項，可以完全控制要檢視哪個內容類型及狀態的統計資料。"
+
+#: admin/partials/wpwc-upgrade.php:27
+msgid "Upgrade to get the following extra features:"
+msgstr "升級至 Pro 版以取得以下額外功能:"
+
+#: admin/partials/wpwc-statistics.php:200
+msgid "You need to <a href=\"%s\">calculate</a> your word counts before you can start using the plugin."
+msgstr "在開始使用這個外掛前，必須先<a href=\"%s\">計算</a>這個網站內容的字數。"
+
+#: admin/partials/wpwc-statistics.php:62
+msgid "View"
+msgstr "檢視"
+
+#: admin/partials/wpwc-statistics.php:61
+msgid "Trash"
+msgstr "回收桶"
+
+#: admin/partials/wpwc-statistics.php:60
+msgid "Edit"
+msgstr "編輯"
+
+#: admin/partials/wpwc-statistics-totals.php:58
+msgid "Total Words"
+msgstr "總計字數"
+
+#: admin/partials/wpwc-statistics-totals.php:15
+msgid "Totals"
+msgstr "總計"
+
+#: admin/partials/wpwc-statistics-totals.php:116
+#: admin/partials/wpwc-statistics.php:98 admin/partials/wpwc-statistics.php:154
+msgid "Unpublished"
+msgstr "尚未發佈的內容"
+
+#: admin/partials/wpwc-calculate.php:22 admin/partials/wpwc-calculate.php:62
+msgid "Calculate Word Counts"
+msgstr "計算字數"
+
+#: admin/class-wpwc-admin.php:293
+msgid "Word counts calculated successfully. Visit the <a href=\"%s\">statistics page</a> to view."
+msgstr "網站內容字數計算已完成。請前往<a href=\"%s\">統計資料頁面</a>檢視。"
+
+#: admin/class-wpwc-admin.php:102 admin/partials/wpwc-statistics-menu.php:21
+#: admin/partials/wpwc-upgrade.php:19
+msgid "Upgrade to Pro"
+msgstr "升級至 Pro 版"
+
+#: admin/class-wpwc-admin.php:101 admin/partials/wpwc-calculate.php:18
+#: admin/partials/wpwc-statistics-menu.php:20
+msgid "Calculate"
+msgstr "計算字數"
+
+#: admin/class-wpwc-admin.php:130
+msgid "Settings"
+msgstr "設定"
+
+#: admin/class-wpwc-admin.php:114
+msgid "Upgrade to WP Word Count Pro"
+msgstr "升級至 WP Word Count Pro"
+
+#. Plugin Name of the plugin
+#: admin/partials/wpwc-calculate.php:18 admin/partials/wpwc-reading-time.php:18
+#: admin/partials/wpwc-statistics.php:18 admin/partials/wpwc-upgrade.php:19
+msgid "WP Word Count"
+msgstr "WP Word Count"
+
+#: admin/partials/wpwc-statistics-menu.php:18
+#: admin/partials/wpwc-statistics.php:138
+msgid "Author Statistics"
+msgstr "作者統計資料"
+
+#: admin/partials/wpwc-statistics-menu.php:17
+#: admin/partials/wpwc-statistics.php:82
+msgid "Monthly Statistics"
+msgstr "月份統計資料"
+
+#: admin/partials/wpwc-statistics-menu.php:16
+#: admin/partials/wpwc-statistics.php:35
+msgid "All Content"
+msgstr "全部內容"
+
+#: admin/partials/wpwc-statistics-menu.php:15
+#: admin/partials/wpwc-statistics.php:33
+msgid "Top Content"
+msgstr "內容字數排名"
+
+#: admin/partials/wpwc-upgrade.php:25
+msgid "WP Word Count Pro"
+msgstr "WP Word Count Pro"
+
+#: admin/partials/wpwc-statistics-totals.php:159
+msgid "Unpublished Words"
+msgstr "尚未發佈的內容字數"
+
+#: admin/partials/wpwc-statistics-totals.php:111
+msgid "Published Words"
+msgstr "已發佈的內容字數"
+
+#: admin/partials/wpwc-statistics-totals.php:23
+#: admin/partials/wpwc-statistics-totals.php:76
+#: admin/partials/wpwc-statistics-totals.php:124
+#: admin/partials/wpwc-statistics.php:115
+#: admin/partials/wpwc-statistics.php:122
+#: admin/partials/wpwc-statistics.php:174
+#: admin/partials/wpwc-statistics.php:181
+msgid "Average"
+msgstr "每篇平均字數"
+
+#: admin/partials/wpwc-statistics-totals.php:21
+#: admin/partials/wpwc-statistics-totals.php:74
+#: admin/partials/wpwc-statistics-totals.php:122
+#: admin/partials/wpwc-statistics.php:112
+#: admin/partials/wpwc-statistics.php:119
+#: admin/partials/wpwc-statistics.php:171
+#: admin/partials/wpwc-statistics.php:178
+msgid "Total"
+msgstr "篇數"
+
+#: admin/partials/wpwc-statistics.php:88
+msgid "Month"
+msgstr "月份"
+
+#: admin/partials/wpwc-statistics-totals.php:68
+#: admin/partials/wpwc-statistics.php:97 admin/partials/wpwc-statistics.php:153
+msgid "Published"
+msgstr "已發佈的內容"
+
+#: admin/partials/wpwc-statistics.php:46 admin/partials/wpwc-statistics.php:144
+msgid "Author"
+msgstr "作者"
+
+#: admin/partials/wpwc-statistics.php:45
+msgid "Status"
+msgstr "狀態"
+
+#: admin/partials/wpwc-statistics-totals.php:20
+#: admin/partials/wpwc-statistics-totals.php:73
+#: admin/partials/wpwc-statistics-totals.php:121
+#: admin/partials/wpwc-statistics.php:44
+msgid "Type"
+msgstr "內容類型"
+
+#: admin/partials/wpwc-statistics.php:42
+msgid "Title"
+msgstr "標題"
+
+#: admin/partials/wpwc-statistics-totals.php:22
+#: admin/partials/wpwc-statistics-totals.php:75
+#: admin/partials/wpwc-statistics-totals.php:123
+#: admin/partials/wpwc-statistics.php:41 admin/partials/wpwc-statistics.php:89
+#: admin/partials/wpwc-statistics.php:113
+#: admin/partials/wpwc-statistics.php:120
+#: admin/partials/wpwc-statistics.php:145
+#: admin/partials/wpwc-statistics.php:172
+#: admin/partials/wpwc-statistics.php:179
+msgid "Words"
+msgstr "字數"

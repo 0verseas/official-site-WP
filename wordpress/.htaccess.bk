@@ -1,0 +1,80 @@
+# BEGIN LSCACHE
+## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
+<IfModule LiteSpeed>
+RewriteEngine on
+CacheLookup on
+RewriteRule .* - [E=Cache-Control:no-autoflush]
+RewriteRule \.litespeed_conf\.dat - [F,L]
+
+### marker MOBILE start ###
+RewriteCond %{HTTP_USER_AGENT} Mobile|Android|Silk/|Kindle|BlackBerry|Opera\ Mini|Opera\ Mobi [NC]
+RewriteRule .* - [E=Cache-Control:vary=%{ENV:LSCACHE_VARY_VALUE}+ismobile]
+### marker MOBILE end ###
+
+### marker CACHE RESOURCE start ###
+RewriteRule wp-content/.*/[^/]*(responsive|css|js|dynamic|loader|fonts)\.php - [E=cache-control:max-age=3600]
+### marker CACHE RESOURCE end ###
+
+### marker FAVICON start ###
+RewriteRule favicon\.ico$ - [E=cache-control:max-age=86400]
+### marker FAVICON end ###
+
+### marker DROPQS start ###
+CacheKeyModify -qs:fbclid
+CacheKeyModify -qs:gclid
+CacheKeyModify -qs:utm*
+CacheKeyModify -qs:_ga
+### marker DROPQS end ###
+
+</IfModule>
+## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
+# END LSCACHE
+# BEGIN NON_LSCACHE
+## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
+## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
+# END NON_LSCACHE
+# BEGIN WordPress
+
+Options -Indexes
+
+<Files .htaccess>
+
+   order allow,deny
+
+   deny from all
+
+</Files>
+
+<files wp-config.php>
+
+   order allow,deny
+
+   deny from all
+
+</files>
+
+<IfModule mod_rewrite.c>
+
+RewriteEngine On
+
+RewriteBase /
+
+RewriteRule ^wp-admin/includes/ - [F,L]
+
+RewriteRule !^wp-includes/ - [S=3]
+
+RewriteRule ^wp-includes/[^/]+\.php$ - [F,L]
+
+RewriteRule ^wp-includes/js/tinymce/langs/.+\.php - [F,L]
+
+RewriteRule ^wp-includes/theme-compat/ - [F,L]
+
+</IfModule>
+
+RewriteEngine on
+
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?dev-api.overseas.ncnu.edu.tw [NC]
+RewriteRule \.(jpg|jpeg|png|gif)$ http://i.imgur.com/g7ptdBB.png [NC,R,L]
+
+# END WordPress
