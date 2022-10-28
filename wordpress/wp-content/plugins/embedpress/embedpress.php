@@ -2,10 +2,10 @@
 /**
  * Plugin Name: EmbedPress
  * Plugin URI:  https://embedpress.com/
- * Description: EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC, PPT & all other types of content into your WordPress site with one-click and showcase it beautifully for the visitors. 100+ sources supported.
+ * Description: EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC, PPT & all other types of content into your WordPress site with one-click and showcase it beautifully for the visitors. 150+ sources supported.
  * Author: WPDeveloper
  * Author URI: https://wpdeveloper.com
- * Version: 3.5.1
+ * Version: 3.5.3
  * Text Domain: embedpress
  * Domain Path: /languages
  *
@@ -26,6 +26,7 @@ use EmbedPress\CoreLegacy;
 use EmbedPress\Elementor\Embedpress_Elementor_Integration;
 use EmbedPress\Includes\Classes\Feature_Enhancer;
 use EmbedPress\Shortcode;
+
 
 defined('ABSPATH') or die("No direct script access allowed.");
 
@@ -88,7 +89,16 @@ if (  is_plugin_active('elementor/elementor.php')) {
 
 Shortcode::register();
 
-
 if ( !class_exists( '\simple_html_dom') ) {
 	include_once EMBEDPRESS_PATH_CORE . 'simple_html_dom.php';
 }
+
+
+/**
+ * Check is embedpress-pro active
+ */
+$is_pro_active = false;
+if(class_exists('EmbedPress_Licensing')){
+	$is_pro_active = true;
+}
+

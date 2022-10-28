@@ -514,3 +514,21 @@ if ($card_type === 'simple') {
 		)
 	]);
 }
+
+blocksy_output_background_css([
+	'selector' => blocksy_prefix_selector('', $prefix),
+	'css' => $css,
+	'tablet_css' => $tablet_css,
+	'mobile_css' => $mobile_css,
+	'value' => get_theme_mod(
+		$prefix . '_background',
+		blocksy_background_default_value([
+			'backgroundColor' => [
+				'default' => [
+					'color' => Blocksy_Css_Injector::get_skip_rule_keyword()
+				],
+			],
+		])
+	),
+	'responsive' => true,
+]);

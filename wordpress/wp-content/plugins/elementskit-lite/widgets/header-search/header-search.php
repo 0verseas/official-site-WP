@@ -34,7 +34,7 @@ class ElementsKit_Widget_Header_Search extends Widget_Base
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/search-2/';
     }
 
     protected function register_controls()

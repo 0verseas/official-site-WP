@@ -7,6 +7,7 @@ import { computeFadeSlide } from './sticky/fade-slide'
 
 import {
 	getRowStickyHeight,
+	getRowInitialMinHeight,
 	maybeSetStickyHeightAnimated,
 } from './sticky/shrink-utils'
 
@@ -204,10 +205,19 @@ const compute = () => {
 
 		maybeSetStickyHeightAnimated(() => {
 			return stickyComponents.indexOf('auto-hide') === -1
-				? `${[...stickyContainer.querySelectorAll('[data-row]')].reduce(
-						(res, row) => res + getRowStickyHeight(row),
+				? // case when content is forcing the initial height to be bigger
+				  stickyContainerHeight >
+				  [...stickyContainer.querySelectorAll('[data-row]')].reduce(
+						(res, row) => res + getRowInitialMinHeight(row),
 						0
-				  )}px`
+				  )
+					? `${stickyContainerHeight}px`
+					: `${[
+							...stickyContainer.querySelectorAll('[data-row]'),
+					  ].reduce(
+							(res, row) => res + getRowStickyHeight(row),
+							0
+					  )}px`
 				: '0px'
 		})
 	}

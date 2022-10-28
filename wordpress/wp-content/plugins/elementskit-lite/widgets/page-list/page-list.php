@@ -32,7 +32,7 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/page-list/';
     }
 
 	protected function register_controls() {

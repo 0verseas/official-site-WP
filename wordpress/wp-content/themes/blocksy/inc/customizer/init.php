@@ -177,6 +177,10 @@ add_action(
 				'static_public_url' => get_template_directory_uri() . '/static/',
 				'product_name' => blocksy_get_wp_theme()->get('Name'),
 				'header_builder_data' => Blocksy_Manager::instance()->builder->get_data_for_customizer(),
+				'dismissed_google_fonts_notice' => get_option(
+					'dismissed-blocksy_google_fonts_notice',
+					'no'
+				) === 'yes'
 			]
 		);
 
@@ -355,11 +359,24 @@ add_action(
 				'has_new_widgets' => $has_new_widgets,
 				'gradients' => get_theme_support('editor-gradient-presets')[0],
 				'has_child_theme' => $has_child_theme,
-				'is_parent_theme' => ! wp_get_theme()->parent()
+				'is_parent_theme' => ! wp_get_theme()->parent(),
+				'dismissed_google_fonts_notice' => get_option(
+					'dismissed-blocksy_google_fonts_notice',
+					'no'
+				) === 'yes'
 			]
 		);
 	}
 );
+
+add_action('wp_ajax_blocksy_dismissed_google_fonts_notice_handler', function () {
+	update_option(
+		'dismissed-blocksy_google_fonts_notice',
+		'yes'
+	);
+
+	wp_die();
+});
 
 add_action(
 	'wp_ajax_ct_customizer_reset',

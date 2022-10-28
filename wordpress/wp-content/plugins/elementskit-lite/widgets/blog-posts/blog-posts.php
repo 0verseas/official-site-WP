@@ -28,7 +28,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/blog-posts-2/';
     }
 
     public function format_colname($str) {

@@ -4,7 +4,6 @@ if (! function_exists('blocksy_output_drawer_canvas')) {
 	function blocksy_output_drawer_canvas() {
 		$default_footer_elements = [];
 
-
 		$elements = new Blocksy_Header_Builder_Elements();
 
 		global $blocksy_has_default_header;
@@ -30,11 +29,16 @@ if (! function_exists('blocksy_output_drawer_canvas')) {
 
 		$footer_elements = apply_filters(
 			'blocksy:footer:offcanvas-drawer',
-			$default_footer_elements
+			$default_footer_elements,
+			$blocksy_has_default_header
 		);
 
 		if (function_exists('blocksy_woo_floating_cart')) {
-			$footer_elements[] = blocksy_woo_floating_cart();
+			$maybe_floating_cart = blocksy_woo_floating_cart();
+
+			if (! empty($maybe_floating_cart)) {
+				$footer_elements[] = $maybe_floating_cart;
+			}
 		}
 
 		if (! empty($footer_elements)) {

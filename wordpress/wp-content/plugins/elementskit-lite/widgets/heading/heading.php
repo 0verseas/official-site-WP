@@ -29,7 +29,7 @@ class ElementsKit_Widget_Heading extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/widget-documentation/';
     }
 
     protected function register_controls() {

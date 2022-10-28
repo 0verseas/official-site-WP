@@ -32,7 +32,7 @@ class ElementsKit_Widget_Category_List extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/category-list/';
     }
 
 	protected function register_controls() {

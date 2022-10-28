@@ -1,5 +1,5 @@
-import './events'
 import './public-path.js'
+import './events'
 
 import ctEvents from 'ct-events'
 import $ from 'jquery'

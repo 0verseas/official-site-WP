@@ -34,7 +34,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/client-logo/';
     }
 
     protected function register_controls() {
@@ -939,11 +939,33 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
                 'selector'  => '{{WRAPPER}} .elementskit-clients-slider .slick-arrow',
             ]
 		);
+        		
+        $this->add_control(
+			'ekit_client_logo_position_popover_toggle',
+			[
+				'label' => esc_html__( 'Arrow Position', 'elementskit-lite' ),
+				'type' => Controls_Manager::POPOVER_TOGGLE,
+				'label_off' => esc_html__( 'Default', 'elementskit-lite' ),
+				'label_on' => esc_html__( 'Custom', 'elementskit-lite' ),
+				'return_value' => 'yes',
+				'default' => 'yes',
+			]
+		);
+
+		$this->start_popover();
+
+        $this->add_control(
+			'ekit_client_logo_arrow_pos_head',
+			[
+				'label' => esc_html__( 'Left Arrow Position', 'elementskit-lite' ),
+				'type' => Controls_Manager::HEADING
+			]
+		);
         
         $this->add_responsive_control(
 			'ekit_client_logo_arrow_left_pos',
 			[
-				'label' => esc_html__( 'Left Arrow Position', 'elementskit-lite' ),
+				'label' => esc_html__( 'Left Arrow Position (X)', 'elementskit-lite' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', '%' ],
 				'range' => [
@@ -965,9 +987,42 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         );
 
         $this->add_responsive_control(
-			'ekit_client_logo_arrow_right_pos',
+			'ekit_client_logo_arrow_left_vertical_pos',
+			[
+				'label' => esc_html__( 'Left Arrow Position (Y)', 'elementskit-lite' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%' ],
+				'range' => [
+					'px' => [
+						'min' => -1000,
+						'max' => 1000,
+						'step' => 1,
+					],
+					'%' => [
+						'min' => -1000,
+						'max' => 1000,
+					],
+				],
+
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-prev' => 'top: {{SIZE}}{{UNIT}};',
+				],
+			]
+        );
+
+        $this->add_control(
+			'ekit_client_logo_arrow_right_pos_head',
 			[
 				'label' => esc_html__( 'Right Arrow Position', 'elementskit-lite' ),
+				'type' => Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+        $this->add_responsive_control(
+			'ekit_client_logo_arrow_right_pos',
+			[
+				'label' => esc_html__( 'Right Arrow Position (X)', 'elementskit-lite' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', '%' ],
 				'range' => [
@@ -982,10 +1037,35 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-next' => 'left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-next' => 'right: {{SIZE}}{{UNIT}};',
 				],
 			]
         );
+
+        $this->add_responsive_control(
+			'ekit_client_logo_arrow_right_vertical_pos',
+			[
+				'label' => esc_html__( 'Right Arrow Position (Y)', 'elementskit-lite' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%' ],
+				'range' => [
+					'px' => [
+						'min' => -1000,
+						'max' => 1000,
+						'step' => 1,
+					],
+					'%' => [
+						'min' => -1000,
+						'max' => 1000,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-next' => 'top: {{SIZE}}{{UNIT}};',
+				],
+			]
+        );
+
+        $this->end_popover();
         // Arrow Normal
 
 		$this->start_controls_tabs('ekit_logo_style_tabs');

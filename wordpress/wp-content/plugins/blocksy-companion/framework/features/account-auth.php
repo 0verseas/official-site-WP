@@ -53,7 +53,7 @@ class AccountAuth {
 			$nonce_value = wp_unslash($_POST['blocksy-lostpassword-nonce']);
 		}
 
-		if (! wp_verify_nonce($nonce_value, 'blocksy-lostpassword')) {
+		if (!wp_verify_nonce($nonce_value, 'blocksy-lostpassword')) {
 			wp_send_json_error([]);
 			exit;
 		}
@@ -61,7 +61,7 @@ class AccountAuth {
 		if (class_exists('WC_Shortcode_My_Account')) {
 			$success = \WC_Shortcode_My_Account::retrieve_password();
 
-			if (! $success) {
+			if (!$success) {
 				$errors = new \WP_Error();
 				$notices = wc_get_notices();
 
@@ -79,7 +79,7 @@ class AccountAuth {
 			}
 		} else {
 			$errors = retrieve_password();
-			$success = ! is_wp_error($errors);
+			$success = !is_wp_error($errors);
 		}
 
 		if ($success) {
@@ -119,7 +119,7 @@ class AccountAuth {
 
 		login_header(
 			__('Lost Password'),
-			'<p class="message">' . __( 'Please enter your username or email address. You will receive an email message with instructions on how to reset your password.' ) . '</p>',
+			'<p class="message">' . __('Please enter your username or email address. You will receive an email message with instructions on how to reset your password.') . '</p>',
 			$errors
 		);
 	}
@@ -138,7 +138,7 @@ class AccountAuth {
 			$users_can_register = true;
 		}
 
-		if (! $users_can_register) {
+		if (!$users_can_register) {
 			exit;
 		}
 
@@ -167,7 +167,7 @@ class AccountAuth {
 			$nonce_value = wp_unslash($_POST['blocksy-register-nonce']);
 		}
 
-		if (! wp_verify_nonce($nonce_value, 'blocksy-register')) {
+		if (!wp_verify_nonce($nonce_value, 'blocksy-register')) {
 			wp_send_json_error([]);
 			exit;
 		}
@@ -187,6 +187,24 @@ class AccountAuth {
 				wc_clean($user_login),
 				$user_pass
 			);
+
+			if (
+				! is_wp_error($errors)
+				&&
+				apply_filters(
+					'woocommerce_registration_auth_new_customer',
+					true,
+					$errors
+				)
+				&&
+				isset($_POST['role'])
+				&&
+				$_POST['role'] === 'seller'
+			) {
+				ob_start();
+				wc_set_customer_auth_cookie($errors);
+				ob_clean();
+			}
 		} else {
 			$errors = register_new_user($user_login, $user_email);
 		}
@@ -203,7 +221,7 @@ class AccountAuth {
 					wp_login_url()
 				);
 
-				if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) ) {
+				if ('yes' === get_option('woocommerce_registration_generate_password')) {
 					$error_message = sprintf(
 						__(
 							'Your account was created successfully and a password has been sent to your email address. Please visit the <a href="%s">login page</a>.',
@@ -219,7 +237,7 @@ class AccountAuth {
 					'registered',
 					sprintf(
 						/* translators: %s: Link to the login page. */
-						__( 'Registration complete. Please check your email, then visit the <a href="%s">login page</a>.' ),
+						__('Registration complete. Please check your email, then visit the <a href="%s">login page</a>.'),
 						wp_login_url()
 					),
 					'message'

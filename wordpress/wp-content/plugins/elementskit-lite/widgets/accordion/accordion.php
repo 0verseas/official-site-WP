@@ -28,7 +28,7 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/accordion/';
     }
 
     protected function register_controls() {

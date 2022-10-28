@@ -1,3 +1,21 @@
+1.8.53: 2022-10-20
+- Improvement: Better integration with Read Meter plugin
+- Improvement:  Show type and source of the font in typography option
+- Improvement: More reliable focus lock for all overlays and popups
+- Improvement: Correct whole page refresh in customizer partial sync
+- Improvement: Better integration with CheckoutWC plugin
+- Fix: Top positioned trending posts module z-index issue with footer reveal effect
+- Fix: Show password icon jumps when the password strength meter is shown
+- Fix: Custom WooCommerce sorting lists items do not appear in "Default product sorting" option
+
+1.8.52: 2022-10-13
+- Improvement: Page background option for archives
+- Improvement: More reliable integration with Woocommerce Custom Product Addons
+- Improvement: Smarter calculations of excerpt with special characters
+- Improvement: Correctly check for method presence in header cart item
+- Improvement: Improve excerpt display in shop archives with categories
+- Improvement: Display a GDPR related notice when trying to select a Google Font
+
 1.8.51: 2022-10-07
 - Improvement: YITH Advanced Woo Filters not working correctly on iOS
 - Improvement: Better handling of Custom unit in font size option

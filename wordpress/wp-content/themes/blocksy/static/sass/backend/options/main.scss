@@ -1,12 +1,9 @@
 :root {
-	// --accentColor: #0e8ecc;
 	--accentColor: #2271b1;
-	// --accentColorHover: #0071a1;
 	--accentColorHover: #135e96;
 	--optionBorderColor: #ddd;
 }
 
-// $accent_color: #0e8ecc;
 
 @import 'options/general';
 @import 'options/ct-panel';
@@ -53,6 +50,7 @@
 @import 'options/upload-button';
 @import 'options/options-inherit-state';
 @import 'options/taxonomies-options';
+@import 'options/animated-checkbox';
 
 // woocommerce options
 @import 'options/woo-numbers';

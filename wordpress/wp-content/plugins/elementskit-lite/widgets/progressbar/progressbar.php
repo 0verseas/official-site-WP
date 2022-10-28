@@ -33,7 +33,7 @@ class ElementsKit_Widget_Progressbar extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/progress-bar/';
     }
 
     protected function register_controls() {

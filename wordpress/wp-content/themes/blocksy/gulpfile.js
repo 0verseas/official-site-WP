@@ -55,6 +55,7 @@ var options = {
 				chunkLoadingGlobal: 'blocksyJsonP',
 				path: './static/bundle/',
 				chunkFilename: '[id].[chunkhash].js',
+				publicPath: '',
 			},
 
 			/*

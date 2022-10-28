@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the ElementsKit Lite package.
 msgid ""
 msgstr ""
-"Project-Id-Version: ElementsKit Lite 2.7.2\n"
+"Project-Id-Version: ElementsKit Lite 2.7.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/elementskit-lite\n"
-"POT-Creation-Date: 2022-10-04 03:26:29+00:00\n"
+"POT-Creation-Date: 2022-10-18 06:52:31+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -271,6 +271,7 @@ msgid "You choose your website as per your need."
 msgstr ""
 
 #: libs/framework/views/onboard-steps/step-01.php:36
+#: widgets/client-logo/client-logo.php:949
 #: widgets/fluent-forms/fluent-forms.php:2317 widgets/heading/heading.php:347
 #: widgets/icon-box/icon-box.php:473 widgets/ninja-forms/ninja-forms.php:597
 #: widgets/wp-forms/wp-forms.php:419
@@ -279,7 +280,7 @@ msgstr ""
 
 #: libs/framework/views/onboard-steps/step-01.php:55
 #: libs/framework/views/onboard-steps/step-02.php:16
-#: libs/framework/views/onboard-steps/step-03.php:65
+#: libs/framework/views/onboard-steps/step-03.php:66
 #: libs/framework/views/onboard-steps/step-04.php:36
 #: libs/framework/views/onboard-steps/step-05.php:28
 msgid "Back"
@@ -287,7 +288,7 @@ msgstr ""
 
 #: libs/framework/views/onboard-steps/step-01.php:56
 #: libs/framework/views/onboard-steps/step-02.php:17
-#: libs/framework/views/onboard-steps/step-03.php:66
+#: libs/framework/views/onboard-steps/step-03.php:67
 #: libs/framework/views/onboard-steps/step-04.php:37
 #: libs/framework/views/onboard-steps/step-05.php:29
 msgid "Next Step"
@@ -312,6 +313,7 @@ msgid "We never spam."
 msgstr ""
 
 #: libs/framework/views/onboard-steps/step-03.php:2
+#: libs/pro-awareness/pro-awareness.php:254
 msgid "Take your website to the next level"
 msgstr ""
 
@@ -323,20 +325,27 @@ msgstr ""
 msgid "These are absolute FREE to use."
 msgstr ""
 
-#: libs/framework/views/onboard-steps/step-03.php:16
+#: libs/framework/views/onboard-steps/step-03.php:17
+msgid "Get FREE 1500 AI words, SEO Keyword, and Competitor Analysis credits"
+msgstr ""
+
+#: libs/framework/views/onboard-steps/step-03.php:17
+msgid "on your personal AI assistant for Content & SEO right inside WordPress!"
+msgstr ""
+
+#: libs/framework/views/onboard-steps/step-03.php:27
 msgid "Completely customize your  WooCommerce WordPress"
 msgstr ""
 
-#: libs/framework/views/onboard-steps/step-03.php:26
+#: libs/framework/views/onboard-steps/step-03.php:37
 msgid "Most flexible drag-and-drop form builder"
 msgstr ""
 
-#: libs/framework/views/onboard-steps/step-03.php:36
+#: libs/framework/views/onboard-steps/step-03.php:47
 msgid "Integrate all your social media to your website"
 msgstr ""
 
-#: libs/framework/views/onboard-steps/step-03.php:46
-#: libs/framework/views/onboard-steps/step-03.php:56
+#: libs/framework/views/onboard-steps/step-03.php:57
 msgid "Integrate various styled review system in your website"
 msgstr ""
 
@@ -733,12 +742,12 @@ msgstr ""
 #: widgets/mail-chimp/mail-chimp.php:1367
 #: widgets/ninja-forms/ninja-forms.php:192 widgets/page-list/page-list.php:119
 #: widgets/page-list/page-list.php:226 widgets/page-list/page-list.php:559
-#: widgets/page-list/page-list.php:860 widgets/post-grid/post-grid.php:168
-#: widgets/post-grid/post-grid.php:186 widgets/post-list/post-list.php:577
-#: widgets/post-list/post-list.php:600 widgets/post-list/post-list.php:724
-#: widgets/post-list/post-list.php:860 widgets/post-list/post-list.php:1128
-#: widgets/post-list/post-list.php:1173 widgets/post-tab/post-tab.php:227
-#: widgets/post-tab/post-tab.php:290 widgets/pricing/pricing.php:589
+#: widgets/page-list/page-list.php:860 widgets/post-grid/post-grid.php:171
+#: widgets/post-list/post-list.php:577 widgets/post-list/post-list.php:600
+#: widgets/post-list/post-list.php:724 widgets/post-list/post-list.php:860
+#: widgets/post-list/post-list.php:1128 widgets/post-list/post-list.php:1173
+#: widgets/post-tab/post-tab.php:227 widgets/post-tab/post-tab.php:290
+#: widgets/post-tab/post-tab.php:457 widgets/pricing/pricing.php:589
 #: widgets/pricing/pricing.php:808 widgets/pricing/pricing.php:826
 #: widgets/pricing/pricing.php:1131 widgets/pricing/pricing.php:1593
 #: widgets/pricing/pricing.php:1622 widgets/pricing/pricing.php:1843
@@ -910,8 +919,13 @@ msgid ""
 "speed."
 msgstr ""
 
-#: libs/pro-awareness/pro-awareness.php:157
+#: libs/pro-awareness/pro-awareness.php:158
+#: libs/pro-awareness/pro-awareness.php:173
 msgid "Default Title"
+msgstr ""
+
+#: libs/pro-awareness/pro-awareness.php:255
+msgid "We have some plugins you can install to get most from Wordpress."
 msgstr ""
 
 #: libs/stories/stories.php:252
@@ -1061,7 +1075,7 @@ msgid "ElementsKit Icon Pack"
 msgstr ""
 
 #: modules/header-footer/cpt-api.php:89 modules/header-footer/cpt-hooks.php:55
-#: widgets/client-logo/client-logo.php:1234
+#: widgets/client-logo/client-logo.php:1314
 #: widgets/fluent-forms/fluent-forms.php:1688
 #: widgets/fluent-forms/fluent-forms.php:1887 widgets/nav-menu/nav-menu.php:513
 #: widgets/nav-menu/nav-menu.php:772 widgets/post-tab/post-tab.php:283
@@ -1382,7 +1396,8 @@ msgstr ""
 
 #: modules/megamenu/views/options-menu-item.php:132
 #: widgets/category-list/category-list.php:54
-#: widgets/client-logo/client-logo.php:1081
+#: widgets/client-logo/client-logo.php:948
+#: widgets/client-logo/client-logo.php:1161
 #: widgets/fluent-forms/fluent-forms.php:427 widgets/funfact/funfact.php:118
 #: widgets/image-accordion/image-accordion.php:295
 #: widgets/page-list/page-list.php:264 widgets/progressbar/progressbar.php:53
@@ -1877,8 +1892,8 @@ msgstr ""
 #: widgets/image-accordion/image-accordion.php:75
 #: widgets/image-accordion/image-accordion.php:451
 #: widgets/image-box/image-box.php:1151 widgets/ninja-forms/ninja-forms.php:101
-#: widgets/piechart/piechart.php:158 widgets/post-grid/post-grid.php:143
-#: widgets/progressbar/progressbar.php:88
+#: widgets/piechart/piechart.php:158 widgets/post-grid/post-grid.php:151
+#: widgets/post-tab/post-tab.php:442 widgets/progressbar/progressbar.php:88
 #: widgets/progressbar/progressbar.php:325 widgets/tab/tab.php:348
 msgid "Title"
 msgstr ""
@@ -2050,8 +2065,8 @@ msgstr ""
 #: widgets/client-logo/client-logo.php:557
 #: widgets/client-logo/client-logo.php:578
 #: widgets/client-logo/client-logo.php:591
-#: widgets/client-logo/client-logo.php:1225
-#: widgets/client-logo/client-logo.php:1244
+#: widgets/client-logo/client-logo.php:1305
+#: widgets/client-logo/client-logo.php:1324
 #: widgets/contact-form7/contact-form7.php:309
 #: widgets/contact-form7/contact-form7.php:364
 #: widgets/contact-form7/contact-form7.php:419
@@ -2531,9 +2546,9 @@ msgstr ""
 #: widgets/caldera-forms/caldera-forms.php:169
 #: widgets/caldera-forms/caldera-forms.php:658
 #: widgets/category-list/category-list.php:243
-#: widgets/client-logo/client-logo.php:1166
-#: widgets/client-logo/client-logo.php:1253
-#: widgets/client-logo/client-logo.php:1342
+#: widgets/client-logo/client-logo.php:1246
+#: widgets/client-logo/client-logo.php:1333
+#: widgets/client-logo/client-logo.php:1422
 #: widgets/contact-form7/contact-form7.php:167
 #: widgets/contact-form7/contact-form7.php:657
 #: widgets/countdown-timer/countdown-timer.php:234
@@ -2621,8 +2636,9 @@ msgstr ""
 #: widgets/ninja-forms/ninja-forms.php:749 widgets/page-list/page-list.php:346
 #: widgets/page-list/page-list.php:738 widgets/page-list/page-list.php:793
 #: widgets/page-list/page-list.php:911 widgets/piechart/piechart.php:313
-#: widgets/post-list/post-list.php:1099 widgets/post-tab/post-tab.php:150
-#: widgets/post-tab/post-tab.php:193 widgets/pricing/pricing.php:621
+#: widgets/post-grid/post-grid.php:193 widgets/post-list/post-list.php:1099
+#: widgets/post-tab/post-tab.php:150 widgets/post-tab/post-tab.php:193
+#: widgets/post-tab/post-tab.php:479 widgets/pricing/pricing.php:621
 #: widgets/pricing/pricing.php:1409 widgets/pricing/pricing.php:2009
 #: widgets/social/social.php:486 widgets/social-share/social-share.php:634
 #: widgets/tab/tab.php:587 widgets/team/team.php:849 widgets/team/team.php:930
@@ -2831,16 +2847,16 @@ msgstr ""
 #: widgets/ninja-forms/ninja-forms.php:671
 #: widgets/ninja-forms/ninja-forms.php:833 widgets/page-list/page-list.php:852
 #: widgets/page-list/page-list.php:904 widgets/piechart/piechart.php:302
-#: widgets/post-grid/post-grid.php:151 widgets/post-list/post-list.php:1032
-#: widgets/post-tab/post-tab.php:185 widgets/pricing/pricing.php:839
-#: widgets/pricing/pricing.php:1429 widgets/pricing/pricing.php:1468
-#: widgets/pricing/pricing.php:1517 widgets/pricing/pricing.php:2084
-#: widgets/social/social.php:529 widgets/social-share/social-share.php:623
-#: widgets/tab/tab.php:644 widgets/team/team.php:1663
-#: widgets/testimonial/testimonial.php:976 widgets/video/video.php:415
-#: widgets/we-forms/we-forms.php:140 widgets/wp-forms/wp-forms.php:83
-#: widgets/wp-forms/wp-forms.php:348 widgets/wp-forms/wp-forms.php:382
-#: widgets/wp-forms/wp-forms.php:490
+#: widgets/post-grid/post-grid.php:159 widgets/post-list/post-list.php:1032
+#: widgets/post-tab/post-tab.php:185 widgets/post-tab/post-tab.php:450
+#: widgets/pricing/pricing.php:839 widgets/pricing/pricing.php:1429
+#: widgets/pricing/pricing.php:1468 widgets/pricing/pricing.php:1517
+#: widgets/pricing/pricing.php:2084 widgets/social/social.php:529
+#: widgets/social-share/social-share.php:623 widgets/tab/tab.php:644
+#: widgets/team/team.php:1663 widgets/testimonial/testimonial.php:976
+#: widgets/video/video.php:415 widgets/we-forms/we-forms.php:140
+#: widgets/wp-forms/wp-forms.php:83 widgets/wp-forms/wp-forms.php:348
+#: widgets/wp-forms/wp-forms.php:382 widgets/wp-forms/wp-forms.php:490
 msgid "Typography"
 msgstr ""
 
@@ -2877,8 +2893,8 @@ msgstr ""
 #: widgets/client-logo/client-logo.php:549
 #: widgets/client-logo/client-logo.php:694
 #: widgets/client-logo/client-logo.php:751
-#: widgets/client-logo/client-logo.php:996
-#: widgets/client-logo/client-logo.php:1416
+#: widgets/client-logo/client-logo.php:1076
+#: widgets/client-logo/client-logo.php:1496
 #: widgets/contact-form7/contact-form7.php:301
 #: widgets/contact-form7/contact-form7.php:750
 #: widgets/dual-button/dual-button.php:423
@@ -2906,21 +2922,21 @@ msgstr ""
 #: widgets/nav-menu/nav-menu.php:1096 widgets/nav-menu/nav-menu.php:1297
 #: widgets/ninja-forms/ninja-forms.php:271
 #: widgets/ninja-forms/ninja-forms.php:663 widgets/piechart/piechart.php:444
-#: widgets/piechart/piechart.php:569 widgets/post-grid/post-grid.php:162
-#: widgets/post-list/post-list.php:426 widgets/post-list/post-list.php:568
-#: widgets/post-list/post-list.php:1121 widgets/post-tab/post-tab.php:220
-#: widgets/pricing/pricing.php:565 widgets/pricing/pricing.php:673
-#: widgets/pricing/pricing.php:802 widgets/pricing/pricing.php:899
-#: widgets/pricing/pricing.php:1022 widgets/pricing/pricing.php:1124
-#: widgets/pricing/pricing.php:1586 widgets/pricing/pricing.php:1683
-#: widgets/pricing/pricing.php:1837 widgets/pricing/pricing.php:2160
-#: widgets/pricing/pricing.php:2270 widgets/pricing/pricing.php:2352
-#: widgets/social/social.php:209 widgets/social-share/social-share.php:243
-#: widgets/tab/tab.php:743 widgets/tablepress/tablepress.php:487
-#: widgets/team/team.php:255 widgets/team/team.php:550
-#: widgets/team/team.php:1180 widgets/team/team.php:1281
-#: widgets/team/team.php:1358 widgets/team/team.php:1455
-#: widgets/team/team.php:2039 widgets/testimonial/testimonial.php:710
+#: widgets/piechart/piechart.php:569 widgets/post-list/post-list.php:426
+#: widgets/post-list/post-list.php:568 widgets/post-list/post-list.php:1121
+#: widgets/post-tab/post-tab.php:220 widgets/pricing/pricing.php:565
+#: widgets/pricing/pricing.php:673 widgets/pricing/pricing.php:802
+#: widgets/pricing/pricing.php:899 widgets/pricing/pricing.php:1022
+#: widgets/pricing/pricing.php:1124 widgets/pricing/pricing.php:1586
+#: widgets/pricing/pricing.php:1683 widgets/pricing/pricing.php:1837
+#: widgets/pricing/pricing.php:2160 widgets/pricing/pricing.php:2270
+#: widgets/pricing/pricing.php:2352 widgets/social/social.php:209
+#: widgets/social-share/social-share.php:243 widgets/tab/tab.php:743
+#: widgets/tablepress/tablepress.php:487 widgets/team/team.php:255
+#: widgets/team/team.php:550 widgets/team/team.php:1180
+#: widgets/team/team.php:1281 widgets/team/team.php:1358
+#: widgets/team/team.php:1455 widgets/team/team.php:2039
+#: widgets/testimonial/testimonial.php:710
 #: widgets/testimonial/testimonial.php:1112
 #: widgets/testimonial/testimonial.php:1381
 #: widgets/testimonial/testimonial.php:2237 widgets/video/video.php:546
@@ -2944,8 +2960,8 @@ msgstr ""
 #: widgets/client-logo/client-logo.php:570
 #: widgets/client-logo/client-logo.php:721
 #: widgets/client-logo/client-logo.php:787
-#: widgets/client-logo/client-logo.php:1029
-#: widgets/client-logo/client-logo.php:1435
+#: widgets/client-logo/client-logo.php:1109
+#: widgets/client-logo/client-logo.php:1515
 #: widgets/contact-form7/contact-form7.php:356
 #: widgets/contact-form7/contact-form7.php:809
 #: widgets/dual-button/dual-button.php:564
@@ -2972,18 +2988,17 @@ msgstr ""
 #: widgets/nav-menu/nav-menu.php:734 widgets/nav-menu/nav-menu.php:1138
 #: widgets/nav-menu/nav-menu.php:1338 widgets/ninja-forms/ninja-forms.php:763
 #: widgets/page-list/page-list.php:400 widgets/page-list/page-list.php:805
-#: widgets/piechart/piechart.php:589 widgets/post-grid/post-grid.php:180
-#: widgets/post-list/post-list.php:478 widgets/post-list/post-list.php:591
-#: widgets/post-list/post-list.php:873 widgets/post-list/post-list.php:929
-#: widgets/post-list/post-list.php:1166 widgets/pricing/pricing.php:583
-#: widgets/pricing/pricing.php:700 widgets/pricing/pricing.php:820
-#: widgets/pricing/pricing.php:925 widgets/pricing/pricing.php:1058
-#: widgets/pricing/pricing.php:1179 widgets/pricing/pricing.php:1615
-#: widgets/pricing/pricing.php:1703 widgets/pricing/pricing.php:1863
-#: widgets/pricing/pricing.php:2188 widgets/pricing/pricing.php:2296
-#: widgets/pricing/pricing.php:2369 widgets/social/social.php:271
-#: widgets/social-share/social-share.php:305 widgets/tab/tab.php:339
-#: widgets/team/team.php:318 widgets/team/team.php:574
+#: widgets/piechart/piechart.php:589 widgets/post-list/post-list.php:478
+#: widgets/post-list/post-list.php:591 widgets/post-list/post-list.php:873
+#: widgets/post-list/post-list.php:929 widgets/post-list/post-list.php:1166
+#: widgets/pricing/pricing.php:583 widgets/pricing/pricing.php:700
+#: widgets/pricing/pricing.php:820 widgets/pricing/pricing.php:925
+#: widgets/pricing/pricing.php:1058 widgets/pricing/pricing.php:1179
+#: widgets/pricing/pricing.php:1615 widgets/pricing/pricing.php:1703
+#: widgets/pricing/pricing.php:1863 widgets/pricing/pricing.php:2188
+#: widgets/pricing/pricing.php:2296 widgets/pricing/pricing.php:2369
+#: widgets/social/social.php:271 widgets/social-share/social-share.php:305
+#: widgets/tab/tab.php:339 widgets/team/team.php:318 widgets/team/team.php:574
 #: widgets/team/team.php:1219 widgets/team/team.php:1300
 #: widgets/team/team.php:1378 widgets/team/team.php:1475
 #: widgets/team/team.php:2102 widgets/testimonial/testimonial.php:743
@@ -3362,7 +3377,7 @@ msgid "Image Width"
 msgstr ""
 
 #: widgets/blog-posts/blog-posts.php:992
-#: widgets/client-logo/client-logo.php:1212
+#: widgets/client-logo/client-logo.php:1292
 #: widgets/header-offcanvas/header-offcanvas.php:354
 #: widgets/header-offcanvas/header-offcanvas.php:534
 #: widgets/header-search/header-search.php:189
@@ -3432,8 +3447,8 @@ msgstr ""
 #: widgets/caldera-forms/caldera-forms.php:253
 #: widgets/caldera-forms/caldera-forms.php:688
 #: widgets/category-list/category-list.php:261
-#: widgets/client-logo/client-logo.php:1189
-#: widgets/client-logo/client-logo.php:1279
+#: widgets/client-logo/client-logo.php:1269
+#: widgets/client-logo/client-logo.php:1359
 #: widgets/contact-form7/contact-form7.php:195
 #: widgets/contact-form7/contact-form7.php:252
 #: widgets/contact-form7/contact-form7.php:687
@@ -3531,8 +3546,8 @@ msgstr ""
 #: widgets/blog-posts/blog-posts.php:2064
 #: widgets/blog-posts/blog-posts.php:2389
 #: widgets/blog-posts/blog-posts.php:2408
-#: widgets/client-logo/client-logo.php:1424
-#: widgets/client-logo/client-logo.php:1443
+#: widgets/client-logo/client-logo.php:1504
+#: widgets/client-logo/client-logo.php:1523
 #: widgets/fluent-forms/fluent-forms.php:1262
 #: widgets/testimonial/testimonial.php:1388
 #: widgets/testimonial/testimonial.php:1408
@@ -3540,7 +3555,8 @@ msgid "Separator Color"
 msgstr ""
 
 #: widgets/blog-posts/blog-posts.php:2175 widgets/heading/heading.php:461
-#: widgets/heading/heading.php:643
+#: widgets/heading/heading.php:643 widgets/post-grid/post-grid.php:182
+#: widgets/post-tab/post-tab.php:468
 msgid "Hover Color"
 msgstr ""
 
@@ -3549,17 +3565,17 @@ msgid "Show Highlight  Border"
 msgstr ""
 
 #: widgets/blog-posts/blog-posts.php:2266
-#: widgets/client-logo/client-logo.php:1318
+#: widgets/client-logo/client-logo.php:1398
 msgid "Hight"
 msgstr ""
 
 #: widgets/blog-posts/blog-posts.php:2320
-#: widgets/client-logo/client-logo.php:1366
+#: widgets/client-logo/client-logo.php:1446
 msgid "Top Bottom Position"
 msgstr ""
 
 #: widgets/blog-posts/blog-posts.php:2348
-#: widgets/client-logo/client-logo.php:1390
+#: widgets/client-logo/client-logo.php:1470
 msgid "Left Right Position"
 msgstr ""
 
@@ -3817,7 +3833,7 @@ msgstr ""
 msgid "Line Height"
 msgstr ""
 
-#: widgets/caldera-forms/caldera-forms.php:891
+#: widgets/caldera-forms/caldera-forms.php:892
 msgid "Please select a Contact Form From Setting!"
 msgstr ""
 
@@ -3893,7 +3909,7 @@ msgid "Solid"
 msgstr ""
 
 #: widgets/category-list/category-list.php:202
-#: widgets/client-logo/client-logo.php:1083 widgets/heading/heading.php:343
+#: widgets/client-logo/client-logo.php:1163 widgets/heading/heading.php:343
 #: widgets/image-box/image-box.php:771 widgets/page-list/page-list.php:471
 #: widgets/post-list/post-list.php:636 widgets/pricing/pricing.php:1909
 #: widgets/tablepress/tablepress.php:223 widgets/tablepress/tablepress.php:350
@@ -3902,7 +3918,7 @@ msgid "Dotted"
 msgstr ""
 
 #: widgets/category-list/category-list.php:203
-#: widgets/client-logo/client-logo.php:1082 widgets/image-box/image-box.php:772
+#: widgets/client-logo/client-logo.php:1162 widgets/image-box/image-box.php:772
 #: widgets/page-list/page-list.php:472 widgets/post-list/post-list.php:637
 #: widgets/pricing/pricing.php:1910 widgets/tablepress/tablepress.php:224
 #: widgets/tablepress/tablepress.php:351 widgets/tablepress/tablepress.php:434
@@ -4011,7 +4027,7 @@ msgid "Title #5"
 msgstr ""
 
 #: widgets/client-logo/client-logo.php:190
-#: widgets/client-logo/client-logo.php:1092
+#: widgets/client-logo/client-logo.php:1172
 #: widgets/testimonial/testimonial.php:472
 msgid "Spacing Left Right"
 msgstr ""
@@ -4150,15 +4166,35 @@ msgid "Inside"
 msgstr ""
 
 #: widgets/client-logo/client-logo.php:946
+msgid "Arrow Position"
+msgstr ""
+
+#: widgets/client-logo/client-logo.php:960
 msgid "Left Arrow Position"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:970
+#: widgets/client-logo/client-logo.php:968
+msgid "Left Arrow Position (X)"
+msgstr ""
+
+#: widgets/client-logo/client-logo.php:992
+msgid "Left Arrow Position (Y)"
+msgstr ""
+
+#: widgets/client-logo/client-logo.php:1016
 msgid "Right Arrow Position"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1003
-#: widgets/client-logo/client-logo.php:1036
+#: widgets/client-logo/client-logo.php:1025
+msgid "Right Arrow Position (X)"
+msgstr ""
+
+#: widgets/client-logo/client-logo.php:1048
+msgid "Right Arrow Position (Y)"
+msgstr ""
+
+#: widgets/client-logo/client-logo.php:1083
+#: widgets/client-logo/client-logo.php:1116
 #: widgets/image-comparison/image-comparison.php:464
 #: widgets/image-comparison/image-comparison.php:480
 #: widgets/image-comparison/image-comparison.php:521
@@ -4166,32 +4202,32 @@ msgstr ""
 msgid "Arrow Color"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1014
-#: widgets/client-logo/client-logo.php:1047
+#: widgets/client-logo/client-logo.php:1094
+#: widgets/client-logo/client-logo.php:1127
 msgid "Arrow Background"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1066
+#: widgets/client-logo/client-logo.php:1146
 msgid "Dots"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1077
+#: widgets/client-logo/client-logo.php:1157
 msgid "Dot Style"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1084
+#: widgets/client-logo/client-logo.php:1164
 msgid "Paginate"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1128
+#: widgets/client-logo/client-logo.php:1208
 msgid "Spacing Top To Bottom"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1152
+#: widgets/client-logo/client-logo.php:1232
 msgid "Dot Color"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1308
+#: widgets/client-logo/client-logo.php:1388
 msgid "Separator"
 msgstr ""
 

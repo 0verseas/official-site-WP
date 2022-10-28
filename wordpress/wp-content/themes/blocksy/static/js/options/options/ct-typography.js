@@ -52,6 +52,8 @@ const Typography = ({
 	// options | fonts | variations | search
 	const [currentViewCache, setCurrentViewCache] = useState('_:_')
 
+	const [isConfirmingGdpr, setIsConfirmingGdpr] = useState(false)
+
 	const typographyWrapper = useRef()
 
 	let [currentView, previousView] = useMemo(
@@ -93,6 +95,8 @@ const Typography = ({
 	const fontSizeRef = useRef()
 	const fontWeightRef = useRef()
 	const dotsRef = useRef()
+
+	const confirmationRef = useRef()
 
 	const arrowLeft = useMemo(() => {
 		const view = currentView
@@ -153,8 +157,11 @@ const Typography = ({
 				disabled={!isOpen}
 				useCapture={false}
 				className="ct-typohraphy-value"
-				additionalRefs={[popoverProps.ref]}
+				additionalRefs={[popoverProps.ref, confirmationRef]}
 				onOutsideClick={() => {
+					if (isConfirmingGdpr) {
+						return
+					}
 					setIsOpen(false)
 				}}
 				wrapperProps={{
@@ -277,6 +284,9 @@ const Typography = ({
 
 							return (
 								<TypographyModal
+									isConfirmingGdpr={isConfirmingGdpr}
+									setIsConfirmingGdpr={setIsConfirmingGdpr}
+									confirmationRef={confirmationRef}
 									wrapperProps={{
 										style: {
 											...style,

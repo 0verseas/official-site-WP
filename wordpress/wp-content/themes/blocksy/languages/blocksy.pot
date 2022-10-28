@@ -7,7 +7,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-10-07 12:09+0000\n"
+"Content-Transfer-Econdig: 8bit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"MIME-Version: 1.0\n"
 "Project-Id-Version: undefined\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;"
@@ -58,8 +60,8 @@ msgctxt "placeholder"
 msgid "Search"
 msgstr ""
 
-#: searchform.php:98
-msgid "Search Input"
+#: searchform.php:98, searchform.php:98
+msgid "Search for..."
 msgstr ""
 
 #: searchform.php:100
@@ -74,23 +76,23 @@ msgstr ""
 msgid "You don't have a menu yet, please create one here &rarr;"
 msgstr ""
 
-#: inc/helpers.php:675
+#: inc/helpers.php:679
 msgid "Thumbnail"
 msgstr ""
 
-#: inc/helpers.php:676, inc/panel-builder/header/button/options.php:39
+#: inc/helpers.php:680, inc/panel-builder/header/button/options.php:39
 msgid "Medium"
 msgstr ""
 
-#: inc/helpers.php:677
+#: inc/helpers.php:681
 msgid "Medium Large"
 msgstr ""
 
-#: inc/helpers.php:678, inc/panel-builder/header/button/options.php:40
+#: inc/helpers.php:682, inc/panel-builder/header/button/options.php:40
 msgid "Large"
 msgstr ""
 
-#: inc/helpers.php:679, inc/helpers.php:685
+#: inc/helpers.php:683, inc/helpers.php:689
 msgid "Full Size"
 msgstr ""
 
@@ -184,6 +186,8 @@ msgid "Collapse dropdown menu"
 msgstr ""
 
 #. translators: placeholder here is the actual PHP version.
+#. translators: placeholder here is the actual PHP version.
+#. translators: placeholder here is the actual PHP version.
 #: inc/php-fallback.php:16, inc/php-fallback.php:28, inc/php-fallback.php:42
 msgid ""
 "Blocksy requires at least PHP version 5.7.0. You are running version %s. "
@@ -191,7 +195,9 @@ msgid ""
 msgstr ""
 
 #. translators: %s: Name of current post. Only visible to screen readers
-#: inc/template-tags.php:86, template-parts/single.php:41,
+#. translators: %s: Name of current post. Only visible to screen readers
+#. translators: %s: Name of current post. Only visible to screen readers
+#: inc/template-tags.php:86, template-parts/single.php:38,
 #: inc/single/content-helpers.php:225
 msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
 msgstr ""
@@ -564,6 +570,7 @@ msgstr ""
 #: inc/options/general/page-title.php:1268,
 #: inc/options/general/pagination.php:24,
 #: inc/options/general/posts-listing.php:29,
+#: inc/options/general/posts-listing.php:1290,
 #: inc/options/general/sidebar.php:17,
 #: inc/options/integrations/tutorlms-archive.php:24,
 #: inc/options/integrations/tutorlms-single.php:207,
@@ -571,11 +578,12 @@ msgstr ""
 #: inc/options/meta/post.php:24, inc/options/pages/page.php:27,
 #: inc/options/posts/custom-post-type-single.php:40,
 #: inc/options/posts/post.php:17, inc/options/posts/woo-add-to-cart.php:11,
-#: inc/options/posts/woo-categories.php:98,
+#: inc/options/posts/woo-categories.php:22,
+#: inc/options/posts/woo-categories.php:104,
 #: inc/options/posts/woo-gallery.php:10, inc/options/posts/woo-general.php:440,
 #: inc/options/posts/woo-general.php:571,
 #: inc/options/posts/woo-general.php:786,
-#: inc/options/posts/woo-general.php:1116,
+#: inc/options/posts/woo-general.php:1114,
 #: inc/options/posts/woo-product-tabs.php:16,
 #: inc/options/posts/woo-single.php:21,
 #: inc/options/single-elements/author-box.php:21,
@@ -849,6 +857,7 @@ msgid "Close cart drawer"
 msgstr ""
 
 #. translators: %s is the number of results
+#. translators: %s is the number of results
 #: inc/components/hero/elements.php:183, inc/components/hero/elements.php:328
 msgid "<span>Search Results for</span> %s"
 msgstr ""
@@ -925,7 +934,7 @@ msgstr ""
 #: static/js/backend/woo-variation.js:39
 #: static/js/options/options/ct-ratio.js:283
 #: static/js/options/options/ct-slider.js:120
-#: static/js/options/options/ct-typography.js:147
+#: static/js/options/options/ct-typography.js:151
 msgid "Custom"
 msgstr ""
 
@@ -938,7 +947,7 @@ msgstr ""
 #: inc/options/general/breadcrumbs.php:59,
 #: inc/options/general/content-elements.php:59,
 #: inc/options/general/page-title.php:198, inc/options/general/sidebar.php:30,
-#: inc/options/posts/woo-categories.php:30,
+#: inc/options/posts/woo-categories.php:36,
 #: inc/options/posts/woo-general.php:470,
 #: inc/options/posts/woo-general.php:588,
 #: inc/options/posts/woo-product-tabs.php:27,
@@ -955,7 +964,7 @@ msgstr ""
 #: inc/options/general/breadcrumbs.php:64,
 #: inc/options/general/content-elements.php:60,
 #: inc/options/general/page-title.php:203, inc/options/general/sidebar.php:35,
-#: inc/options/posts/woo-categories.php:35,
+#: inc/options/posts/woo-categories.php:41,
 #: inc/options/posts/woo-general.php:471,
 #: inc/options/posts/woo-general.php:593,
 #: inc/options/posts/woo-product-tabs.php:28,
@@ -1158,6 +1167,7 @@ msgstr ""
 #: inc/options/general/page-title.php:1295,
 #: inc/options/general/pagination.php:131,
 #: inc/options/general/posts-listing.php:632,
+#: inc/options/general/posts-listing.php:1471,
 #: inc/options/general/sidebar.php:266,
 #: inc/options/integrations/tutorlms-archive.php:39,
 #: inc/options/integrations/tutorlms-single.php:219,
@@ -1165,12 +1175,13 @@ msgstr ""
 #: inc/options/meta/post.php:158, inc/options/pages/page.php:38,
 #: inc/options/posts/custom-post-type-single.php:52,
 #: inc/options/posts/post.php:27, inc/options/posts/woo-add-to-cart.php:30,
-#: inc/options/posts/woo-categories.php:323,
+#: inc/options/posts/woo-categories.php:329,
+#: inc/options/posts/woo-categories.php:878,
 #: inc/options/posts/woo-gallery.php:150,
 #: inc/options/posts/woo-general.php:482,
 #: inc/options/posts/woo-general.php:705,
-#: inc/options/posts/woo-general.php:843,
-#: inc/options/posts/woo-general.php:1148,
+#: inc/options/posts/woo-general.php:841,
+#: inc/options/posts/woo-general.php:1146,
 #: inc/options/posts/woo-product-tabs.php:62,
 #: inc/options/posts/woo-single.php:52,
 #: inc/options/single-elements/author-box.php:203,
@@ -1201,7 +1212,7 @@ msgid "Design"
 msgstr ""
 
 #: inc/options/general/back-to-top.php:224,
-#: inc/options/posts/woo-categories.php:657,
+#: inc/options/posts/woo-categories.php:663,
 #: inc/panel-builder/header/cart/options.php:287,
 #: inc/panel-builder/header/cart/options.php:315,
 #: inc/panel-builder/header/cart/options.php:345,
@@ -1264,19 +1275,19 @@ msgstr ""
 #: inc/options/posts/woo-add-to-cart.php:178,
 #: inc/options/posts/woo-add-to-cart.php:219,
 #: inc/options/posts/woo-add-to-cart.php:251,
-#: inc/options/posts/woo-categories.php:356,
-#: inc/options/posts/woo-categories.php:397,
-#: inc/options/posts/woo-categories.php:423,
-#: inc/options/posts/woo-categories.php:455,
-#: inc/options/posts/woo-categories.php:495,
-#: inc/options/posts/woo-categories.php:526,
-#: inc/options/posts/woo-categories.php:568,
-#: inc/options/posts/woo-categories.php:594,
-#: inc/options/posts/woo-categories.php:675,
-#: inc/options/posts/woo-categories.php:707,
-#: inc/options/posts/woo-categories.php:749,
-#: inc/options/posts/woo-categories.php:780,
-#: inc/options/posts/woo-categories.php:801,
+#: inc/options/posts/woo-categories.php:362,
+#: inc/options/posts/woo-categories.php:403,
+#: inc/options/posts/woo-categories.php:429,
+#: inc/options/posts/woo-categories.php:461,
+#: inc/options/posts/woo-categories.php:501,
+#: inc/options/posts/woo-categories.php:532,
+#: inc/options/posts/woo-categories.php:574,
+#: inc/options/posts/woo-categories.php:600,
+#: inc/options/posts/woo-categories.php:681,
+#: inc/options/posts/woo-categories.php:713,
+#: inc/options/posts/woo-categories.php:755,
+#: inc/options/posts/woo-categories.php:786,
+#: inc/options/posts/woo-categories.php:807,
 #: inc/options/posts/woo-gallery.php:171,
 #: inc/options/posts/woo-gallery.php:201,
 #: inc/options/posts/woo-gallery.php:237,
@@ -1294,11 +1305,11 @@ msgstr ""
 #: inc/options/posts/woo-general.php:503,
 #: inc/options/posts/woo-general.php:538,
 #: inc/options/posts/woo-general.php:545,
-#: inc/options/posts/woo-general.php:864,
-#: inc/options/posts/woo-general.php:894,
-#: inc/options/posts/woo-general.php:920,
-#: inc/options/posts/woo-general.php:1168,
-#: inc/options/posts/woo-general.php:1189,
+#: inc/options/posts/woo-general.php:862,
+#: inc/options/posts/woo-general.php:892,
+#: inc/options/posts/woo-general.php:918,
+#: inc/options/posts/woo-general.php:1166,
+#: inc/options/posts/woo-general.php:1187,
 #: inc/options/posts/woo-product-tabs.php:98,
 #: inc/options/posts/woo-product-tabs.php:130,
 #: inc/options/posts/woo-single.php:100, inc/options/posts/woo-single.php:139,
@@ -1426,11 +1437,11 @@ msgstr ""
 #: inc/options/posts/woo-add-to-cart.php:184,
 #: inc/options/posts/woo-add-to-cart.php:225,
 #: inc/options/posts/woo-add-to-cart.php:257,
-#: inc/options/posts/woo-categories.php:362,
-#: inc/options/posts/woo-categories.php:460,
-#: inc/options/posts/woo-categories.php:501,
-#: inc/options/posts/woo-categories.php:532,
-#: inc/options/posts/woo-categories.php:573,
+#: inc/options/posts/woo-categories.php:368,
+#: inc/options/posts/woo-categories.php:466,
+#: inc/options/posts/woo-categories.php:507,
+#: inc/options/posts/woo-categories.php:538,
+#: inc/options/posts/woo-categories.php:579,
 #: inc/options/posts/woo-gallery.php:177,
 #: inc/options/posts/woo-gallery.php:207,
 #: inc/options/posts/woo-gallery.php:243,
@@ -1716,7 +1727,7 @@ msgstr ""
 #: inc/options/general/form-elements.php:119,
 #: inc/options/general/form-elements.php:276,
 #: inc/options/general/sidebar.php:385,
-#: inc/options/posts/woo-categories.php:689,
+#: inc/options/posts/woo-categories.php:695,
 #: inc/options/posts/woo-general.php:85, inc/options/posts/woo-general.php:201,
 #: inc/options/posts/woo-general.php:315,
 #: inc/options/single-elements/author-box.php:424,
@@ -1933,7 +1944,7 @@ msgstr ""
 #: inc/options/general/content-elements.php:25,
 #: inc/options/general/page-title.php:716,
 #: inc/options/general/posts-listing.php:285,
-#: inc/options/posts/woo-categories.php:168,
+#: inc/options/posts/woo-categories.php:174,
 #: inc/panel-builder/footer/socials/options.php:109,
 #: inc/panel-builder/footer/widget-area-1/options.php:109,
 #: inc/panel-builder/header/socials/options.php:108
@@ -2007,7 +2018,7 @@ msgid "Form Elements"
 msgstr ""
 
 #: inc/options/general/form-elements.php:28,
-#: inc/options/general/posts-listing.php:1305
+#: inc/options/general/posts-listing.php:1311
 msgid "Classic"
 msgstr ""
 
@@ -2064,8 +2075,8 @@ msgstr ""
 #: inc/options/general/form-elements.php:268,
 #: inc/options/general/form-elements.php:298,
 #: inc/options/posts/woo-general.php:417,
-#: inc/options/posts/woo-general.php:870,
-#: inc/options/posts/woo-general.php:900,
+#: inc/options/posts/woo-general.php:868,
+#: inc/options/posts/woo-general.php:898,
 #: inc/options/posts/woo-product-tabs.php:109,
 #: inc/options/posts/woo-product-tabs.php:156,
 #: inc/panel-builder/footer/menu/options.php:196,
@@ -2237,7 +2248,7 @@ msgstr ""
 
 #: inc/options/general/meta.php:390, inc/options/general/posts-listing.php:66,
 #: inc/options/general/posts-listing.php:394,
-#: inc/options/general/posts-listing.php:1300,
+#: inc/options/general/posts-listing.php:1306,
 #: inc/panel-builder/header/cart/options.php:917,
 #: inc/panel-builder/header/menu/options.php:561,
 #: inc/panel-builder/header/menu/options.php:591,
@@ -2443,8 +2454,8 @@ msgstr ""
 #: inc/options/general/page-title.php:821,
 #: inc/options/general/posts-listing.php:644,
 #: inc/options/integrations/tutorlms-single.php:8,
-#: inc/options/posts/woo-categories.php:329,
-#: inc/options/posts/woo-categories.php:727
+#: inc/options/posts/woo-categories.php:335,
+#: inc/options/posts/woo-categories.php:733
 msgid "Title Font"
 msgstr ""
 
@@ -2675,12 +2686,12 @@ msgid "Image Ratio"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:286,
-#: inc/options/posts/woo-categories.php:170
+#: inc/options/posts/woo-categories.php:176
 msgid "Zoom In"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:287,
-#: inc/options/posts/woo-categories.php:171
+#: inc/options/posts/woo-categories.php:177
 msgid "Zoom Out"
 msgstr ""
 
@@ -2698,7 +2709,7 @@ msgid "Full Post"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:372,
-#: inc/options/posts/woo-categories.php:250
+#: inc/options/posts/woo-categories.php:256
 msgid "Length"
 msgstr ""
 
@@ -2723,7 +2734,7 @@ msgid "Card Min Height"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:544,
-#: inc/options/posts/woo-categories.php:304
+#: inc/options/posts/woo-categories.php:310
 msgid "Cards Gap"
 msgstr ""
 
@@ -2732,7 +2743,7 @@ msgid "Card Inner Spacing"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:568,
-#: inc/options/posts/woo-categories.php:286,
+#: inc/options/posts/woo-categories.php:292,
 #: inc/options/single-elements/post-share-box.php:386,
 #: inc/panel-builder/header/logo/options.php:265,
 #: inc/panel-builder/header/text/options.php:53
@@ -2770,7 +2781,7 @@ msgid "Card Overlay Color"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:1205,
-#: inc/options/posts/woo-categories.php:580
+#: inc/options/posts/woo-categories.php:586
 msgid "Card Background Color"
 msgstr ""
 
@@ -2779,56 +2790,73 @@ msgid "Card Border"
 msgstr ""
 
 #: inc/options/general/posts-listing.php:1237,
-#: inc/options/posts/woo-categories.php:602
+#: inc/options/posts/woo-categories.php:608
 msgid "Card Shadow"
 msgstr ""
 
 #. translators: placeholder here means the actual structure title.
-#: inc/options/general/posts-listing.php:1278,
+#: inc/options/general/posts-listing.php:1279,
 #: inc/options/posts/custom-post-type-single.php:34
 msgid "%s Structure"
 msgstr ""
 
 #. translators: placeholder here means the actual structure title.
-#: inc/options/general/posts-listing.php:1283
+#: inc/options/general/posts-listing.php:1284
 msgid "Set the %s entries default structure."
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1310
+#: inc/options/general/posts-listing.php:1316
 msgid "Grid"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1315
+#: inc/options/general/posts-listing.php:1321
 msgid "Enhanced Grid"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1320
+#: inc/options/general/posts-listing.php:1326
 msgid "Gutenberg"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1360
+#: inc/options/general/posts-listing.php:1366
 msgid "Number of Posts"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1401,
+#: inc/options/general/posts-listing.php:1407,
 #: inc/options/single-elements/related-posts.php:141
 msgid "Columns & Posts"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1408,
+#: inc/options/general/posts-listing.php:1414,
 #: inc/options/single-elements/related-posts.php:159
 #: static/js/options/options/ct-woocommerce-columns-and-rows.js:49
 msgid "Number of columns"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1427,
+#: inc/options/general/posts-listing.php:1433,
 #: inc/options/single-elements/related-posts.php:174
 msgid "Number of posts"
 msgstr ""
 
-#: inc/options/general/posts-listing.php:1454,
-#: inc/options/posts/woo-categories.php:91
+#: inc/options/general/posts-listing.php:1460,
+#: inc/options/posts/woo-categories.php:97
 msgid "Cards Options"
+msgstr ""
+
+#: inc/options/general/posts-listing.php:1476,
+#: inc/options/posts/woo-categories.php:882,
+#: inc/options/single-elements/structure-design.php:21
+msgid "Page Background"
+msgstr ""
+
+#. translators: placeholder here means the actual URL.
+#. translators: placeholder here means the actual URL.
+#. translators: placeholder here means the actual URL.
+#: inc/options/general/posts-listing.php:1491,
+#: inc/options/posts/woo-categories.php:897,
+#: inc/options/single-elements/structure-design.php:36
+msgid ""
+"Please note, by default this option is inherited from Colors ➝ %sSite "
+"Background%s."
 msgstr ""
 
 #: inc/options/general/sidebar-particular.php:30
@@ -2905,14 +2933,14 @@ msgstr ""
 msgid "Mobile Sidebar Position"
 msgstr ""
 
-#: inc/options/general/sidebar.php:256, inc/options/posts/woo-general.php:1139,
+#: inc/options/general/sidebar.php:256, inc/options/posts/woo-general.php:1137,
 #: inc/options/single-elements/post-share-box.php:112,
 #: inc/panel-builder/header/logo/options.php:249
 #: static/js/options/options/ct-spacing.js:91
 msgid "Top"
 msgstr ""
 
-#: inc/options/general/sidebar.php:257, inc/options/posts/woo-general.php:1140,
+#: inc/options/general/sidebar.php:257, inc/options/posts/woo-general.php:1138,
 #: inc/options/single-elements/post-share-box.php:113,
 #: inc/panel-builder/header/cart/options.php:125,
 #: inc/panel-builder/header/search/options.php:97,
@@ -3002,6 +3030,16 @@ msgstr ""
 msgid "Star Rating Color"
 msgstr ""
 
+#: inc/options/meta/blog.php:6, inc/options/meta/default.php:223,
+#: inc/options/meta/page.php:197, inc/options/meta/post.php:219
+msgid "Disable Header"
+msgstr ""
+
+#: inc/options/meta/blog.php:12, inc/options/meta/default.php:229,
+#: inc/options/meta/page.php:203, inc/options/meta/post.php:225
+msgid "Disable Footer"
+msgstr ""
+
 #: inc/options/meta/default.php:8, inc/options/meta/post.php:6,
 #: inc/options/posts/post.php:7
 msgid "Post Title"
@@ -3070,6 +3108,9 @@ msgid "Only Bottom"
 msgstr ""
 
 #. translators: placeholder here means the actual URL.
+#. translators: placeholder here means the actual URL.
+#. translators: placeholder here means the actual URL.
+#. translators: placeholder here means the actual URL.
 #: inc/options/meta/default.php:146, inc/options/meta/page.php:145,
 #: inc/options/meta/post.php:144, inc/options/single-elements/structure.php:116
 msgid ""
@@ -3110,23 +3151,13 @@ msgstr ""
 #: inc/options/posts/blog.php:26,
 #: inc/options/posts/custom-post-type-archive.php:23,
 #: inc/options/posts/custom-post-type-single.php:120,
-#: inc/options/posts/post.php:75, inc/options/posts/woo-categories.php:870,
+#: inc/options/posts/post.php:75, inc/options/posts/woo-categories.php:910,
 #: inc/options/posts/woo-single.php:192
 msgid "Page Elements"
 msgstr ""
 
 #: inc/options/meta/default.php:217, inc/options/meta/post.php:213
 msgid "Disable Related Posts"
-msgstr ""
-
-#: inc/options/meta/default.php:223, inc/options/meta/page.php:197,
-#: inc/options/meta/post.php:219
-msgid "Disable Header"
-msgstr ""
-
-#: inc/options/meta/default.php:229, inc/options/meta/page.php:203,
-#: inc/options/meta/post.php:225
-msgid "Disable Footer"
 msgstr ""
 
 #: inc/options/meta/page.php:23, inc/options/pages/page.php:22,
@@ -3168,7 +3199,7 @@ msgstr ""
 
 #: inc/options/pages/search-page.php:35, inc/options/posts/blog.php:42,
 #: inc/options/posts/custom-post-type-archive.php:38,
-#: inc/options/posts/woo-categories.php:904,
+#: inc/options/posts/woo-categories.php:944,
 #: inc/options/posts/woo-single.php:291
 msgid "Functionality Options"
 msgstr ""
@@ -3225,7 +3256,7 @@ msgstr ""
 
 #: inc/options/posts/woo-add-to-cart.php:160,
 #: inc/options/posts/woo-add-to-cart.php:233,
-#: inc/options/posts/woo-categories.php:509,
+#: inc/options/posts/woo-categories.php:515,
 #: inc/options/posts/woo-general.php:135,
 #: inc/options/posts/woo-general.php:251, inc/options/posts/woo-general.php:363
 msgid "Button Background Color"
@@ -3235,227 +3266,227 @@ msgstr ""
 msgid "View Cart Button"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:17
+#: inc/options/posts/woo-categories.php:18
 msgid "Shop Settings"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:48,
+#: inc/options/posts/woo-categories.php:54,
 #: inc/options/posts/woo-single.php:205
 msgid "Columns & Rows"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:103,
+#: inc/options/posts/woo-categories.php:109,
 #: inc/options/posts/woo-gallery.php:95
 #: static/js/options/options/background/BackgroundModal.js:112
 #: static/js/options/options/ct-background.js:164
 msgid "Image"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:121,
+#: inc/options/posts/woo-categories.php:127,
 #: inc/options/single-elements/featured-image.php:48
 msgid "Image Width"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:122
+#: inc/options/posts/woo-categories.php:128
 msgid "Image height will be automatically calculated based on the image ratio."
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:143,
+#: inc/options/posts/woo-categories.php:149,
 #: inc/panel-builder/header/menu/options.php:596
 msgid "Width"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:156
+#: inc/options/posts/woo-categories.php:162
 msgid "Height"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:160
+#: inc/options/posts/woo-categories.php:166
 msgid "Image Hover Effect"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:169
+#: inc/options/posts/woo-categories.php:175
 msgid "Swap Images"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:188
+#: inc/options/posts/woo-categories.php:194
 msgid "Video Thumbnail"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:201,
+#: inc/options/posts/woo-categories.php:207,
 #: inc/options/posts/woo-general.php:394, inc/options/posts/woo-single.php:164
 msgid "Star Rating"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:212,
+#: inc/options/posts/woo-categories.php:218,
 #: inc/options/posts/woo-general.php:710, inc/options/posts/woo-single.php:154
 msgid "Sale Badge"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:223
+#: inc/options/posts/woo-categories.php:229
 msgid "Product Categories"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:234
+#: inc/options/posts/woo-categories.php:240
 msgid "Short Description"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:262
+#: inc/options/posts/woo-categories.php:268
 msgid "Add to Cart Button"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:338,
-#: inc/options/posts/woo-categories.php:735
+#: inc/options/posts/woo-categories.php:344,
+#: inc/options/posts/woo-categories.php:741
 msgid "Title Color"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:376
+#: inc/options/posts/woo-categories.php:382
 msgid "Short Description Font"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:383
+#: inc/options/posts/woo-categories.php:389
 msgid "Short Description Color"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:408,
-#: inc/options/posts/woo-categories.php:766
+#: inc/options/posts/woo-categories.php:414,
+#: inc/options/posts/woo-categories.php:772
 msgid "Price Color"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:436
+#: inc/options/posts/woo-categories.php:442
 msgid "Categories Color"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:476,
-#: inc/options/posts/woo-categories.php:549
+#: inc/options/posts/woo-categories.php:482,
+#: inc/options/posts/woo-categories.php:555
 msgid "Button Text Color"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:625,
+#: inc/options/posts/woo-categories.php:631,
 #: inc/options/single-elements/related-posts.php:589
 msgid "Image Border Radius"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:629
+#: inc/options/posts/woo-categories.php:635
 msgid "Card Border Radius"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:653
+#: inc/options/posts/woo-categories.php:659
 msgid "Quick View Button"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:681,
-#: inc/options/posts/woo-categories.php:713,
+#: inc/options/posts/woo-categories.php:687,
+#: inc/options/posts/woo-categories.php:719,
 #: inc/panel-builder/header/menu/options.php:878,
 #: inc/panel-builder/header/menu/options.php:909,
 #: inc/panel-builder/header/menu/options.php:939
 msgid "Hover/Active"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:722
+#: inc/options/posts/woo-categories.php:728
 msgid "Quick View Modal"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:758
+#: inc/options/posts/woo-categories.php:764
 msgid "Price Font"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:788
+#: inc/options/posts/woo-categories.php:794
 msgid "Description Color"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:809
+#: inc/options/posts/woo-categories.php:815
 msgid "Modal Shadow"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:828,
+#: inc/options/posts/woo-categories.php:834,
 #: inc/panel-builder/header/search/options.php:605
 msgid "Modal Background"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:844
+#: inc/options/posts/woo-categories.php:850
 msgid "Modal Backgrop"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:874
+#: inc/options/posts/woo-categories.php:914
 msgid "Shop Sort"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:881
+#: inc/options/posts/woo-categories.php:921
 msgid "Shop Results Count"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:908
+#: inc/options/posts/woo-categories.php:948
 msgid "Product Catalog"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:915
+#: inc/options/posts/woo-categories.php:955
 msgid "Shop page display"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:919,
-#: inc/options/posts/woo-categories.php:927,
-#: inc/options/posts/woo-categories.php:939,
-#: inc/options/posts/woo-categories.php:947
+#: inc/options/posts/woo-categories.php:959,
+#: inc/options/posts/woo-categories.php:967,
+#: inc/options/posts/woo-categories.php:979,
+#: inc/options/posts/woo-categories.php:987
 msgid "Show products"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:924
+#: inc/options/posts/woo-categories.php:964
 msgid "Choose what to display on the main shop page."
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:928
+#: inc/options/posts/woo-categories.php:968
 msgid "Show categories"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:929
+#: inc/options/posts/woo-categories.php:969
 msgid "Show categories & products"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:935
+#: inc/options/posts/woo-categories.php:975
 msgid "Category display"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:944
+#: inc/options/posts/woo-categories.php:984
 msgid "Choose what to display on product category pages."
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:948
+#: inc/options/posts/woo-categories.php:988
 msgid "Show subcategories"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:949
+#: inc/options/posts/woo-categories.php:989
 msgid "Show subcategories & products"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:955
+#: inc/options/posts/woo-categories.php:995
 msgid "Default product sorting"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:960
+#: inc/options/posts/woo-categories.php:1000
 msgid "How should products be sorted in the catalog by default?"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:966
+#: inc/options/posts/woo-categories.php:1008
 msgid "Default sorting (custom ordering + name)"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:967
+#: inc/options/posts/woo-categories.php:1009
 msgid "Popularity (sales)"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:968
+#: inc/options/posts/woo-categories.php:1010
 msgid "Average rating"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:969
+#: inc/options/posts/woo-categories.php:1011
 msgid "Sort by most recent"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:970
+#: inc/options/posts/woo-categories.php:1012
 msgid "Sort by price (asc)"
 msgstr ""
 
-#: inc/options/posts/woo-categories.php:971
+#: inc/options/posts/woo-categories.php:1013
 msgid "Sort by price (desc)"
 msgstr ""
 
@@ -3603,121 +3634,121 @@ msgstr ""
 msgid "User Name"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:830
+#: inc/options/posts/woo-general.php:829
 msgid "Navigation Quick Links"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:848
+#: inc/options/posts/woo-general.php:846
 msgid "Navigation Text Color"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:878
+#: inc/options/posts/woo-general.php:876
 msgid "Navigation Background Color"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:908
+#: inc/options/posts/woo-general.php:906
 msgid "Navigation Divider Color"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:928
+#: inc/options/posts/woo-general.php:926
 msgid "Navigation Shadow"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:954
+#: inc/options/posts/woo-general.php:952
 msgid "Checkout Page"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:960
+#: inc/options/posts/woo-general.php:958
 msgid "Coupon Form"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:970
+#: inc/options/posts/woo-general.php:968
 msgid "Highlight Required Fields"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:980
+#: inc/options/posts/woo-general.php:978
 msgid "Company Name Field"
+msgstr ""
+
+#: inc/options/posts/woo-general.php:985,
+#: inc/options/posts/woo-general.php:1003,
+#: inc/options/posts/woo-general.php:1021
+msgid "Hidden"
+msgstr ""
+
+#: inc/options/posts/woo-general.php:986,
+#: inc/options/posts/woo-general.php:1004,
+#: inc/options/posts/woo-general.php:1022
+msgid "Optional"
 msgstr ""
 
 #: inc/options/posts/woo-general.php:987,
 #: inc/options/posts/woo-general.php:1005,
 #: inc/options/posts/woo-general.php:1023
-msgid "Hidden"
-msgstr ""
-
-#: inc/options/posts/woo-general.php:988,
-#: inc/options/posts/woo-general.php:1006,
-#: inc/options/posts/woo-general.php:1024
-msgid "Optional"
-msgstr ""
-
-#: inc/options/posts/woo-general.php:989,
-#: inc/options/posts/woo-general.php:1007,
-#: inc/options/posts/woo-general.php:1025
 msgid "Required"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:998
+#: inc/options/posts/woo-general.php:996
 msgid "Address Line 2 Field"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1016
+#: inc/options/posts/woo-general.php:1014
 msgid "Phone Field"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1034
+#: inc/options/posts/woo-general.php:1032
 msgid "Privacy Policy Page"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1047
+#: inc/options/posts/woo-general.php:1045
 msgid "Terms And Conditions Page"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1059
+#: inc/options/posts/woo-general.php:1057
 msgid "Privacy policy"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1060
+#: inc/options/posts/woo-general.php:1058
 msgid ""
 "Optionally add some text about your store privacy policy to show during "
 "checkout."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1062
+#: inc/options/posts/woo-general.php:1060
 msgid ""
 "Your personal data will be used to process your order, support your "
 "experience throughout this website, and for other purposes described in our "
 "[privacy_policy]."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1075
+#: inc/options/posts/woo-general.php:1073
 msgid "Terms and conditions"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1076
+#: inc/options/posts/woo-general.php:1074
 msgid ""
 "Optionally add some text for the terms checkbox that customers must accept."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1105
+#: inc/options/posts/woo-general.php:1103
 msgid "Store Notice"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1123
+#: inc/options/posts/woo-general.php:1121
 msgid ""
 "This is a demo store for testing purposes &mdash; no orders shall be "
 "fulfilled."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1133
+#: inc/options/posts/woo-general.php:1131
 msgid "Notice Position"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1153
+#: inc/options/posts/woo-general.php:1151
 msgid "Notice Font Color"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1175
+#: inc/options/posts/woo-general.php:1173
 msgid "Notice Background Color"
 msgstr ""
 
@@ -4060,17 +4091,6 @@ msgstr ""
 msgid "Posts Meta Font Color"
 msgstr ""
 
-#: inc/options/single-elements/structure-design.php:21
-msgid "Page Background"
-msgstr ""
-
-#. translators: placeholder here means the actual URL.
-#: inc/options/single-elements/structure-design.php:36
-msgid ""
-"Please note, by default this option is inherited from Colors ➝ %sSite "
-"Background%s."
-msgstr ""
-
 #: inc/options/single-elements/structure-design.php:54
 msgid "Content Area Background"
 msgstr ""
@@ -4192,6 +4212,7 @@ msgstr ""
 msgid "Select menu..."
 msgstr ""
 
+#. translators: placeholder here means the actual URL.
 #. translators: placeholder here means the actual URL.
 #: inc/panel-builder/footer/menu/options.php:19,
 #: inc/panel-builder/header/mobile-menu/options.php:15
@@ -4319,6 +4340,7 @@ msgstr ""
 msgid "Socials"
 msgstr ""
 
+#. translators: placeholder here means the actual URL.
 #. translators: placeholder here means the actual URL.
 #: inc/panel-builder/footer/socials/options.php:37,
 #: inc/panel-builder/header/socials/options.php:37
@@ -4712,7 +4734,7 @@ msgstr ""
 msgid "Close Button Type"
 msgstr ""
 
-#: inc/panel-builder/header/cart/view.php:185
+#: inc/panel-builder/header/cart/view.php:189
 msgid "Shopping cart"
 msgstr ""
 
@@ -6091,6 +6113,7 @@ msgid ""
 msgstr ""
 
 #: static/js/options/options/ct-customizer-reset-options.js:47
+#: static/js/options/options/typography/TypographyModal.js:467
 msgid "Cancel"
 msgstr ""
 
@@ -6145,11 +6168,11 @@ msgstr ""
 msgid "custom"
 msgstr ""
 
-#: static/js/options/options/ct-typography.js:128
+#: static/js/options/options/ct-typography.js:132
 msgid "Default Size"
 msgstr ""
 
-#: static/js/options/options/ct-typography.js:191
+#: static/js/options/options/ct-typography.js:198
 msgid "Default Family"
 msgstr ""
 
@@ -6175,6 +6198,49 @@ msgstr ""
 
 #: static/js/options/options/typography/FontOptions.js:88
 msgid "Line Height"
+msgstr ""
+
+#: static/js/options/options/typography/FontsList.js:88
+msgid "Variable"
+msgstr ""
+
+#: static/js/options/options/typography/TypographyModal.js:412
+msgid "Looks like you've picked a Google Font"
+msgstr ""
+
+#: static/js/options/options/typography/TypographyModal.js:421
+msgid ""
+"By using external Google Fonts, your website might not comply with the "
+"privacy regulations in your country. As an alternative you can use a system "
+"font, our %sLocal Google Fonts%s extension, or this %splugin%s."
+msgstr ""
+
+#: static/js/options/options/typography/TypographyModal.js:455
+msgid "I understand, don't show this notification again."
+msgstr ""
+
+#: static/js/options/options/typography/TypographyModal.js:497
+msgid "Continue"
+msgstr ""
+
+#: static/js/options/options/typography/helpers.js:129
+msgid "System Font"
+msgstr ""
+
+#: static/js/options/options/typography/helpers.js:130
+msgid "Local Google Font"
+msgstr ""
+
+#: static/js/options/options/typography/helpers.js:131
+msgid "Adobe Font"
+msgstr ""
+
+#: static/js/options/options/typography/helpers.js:132
+msgid "Custom Font"
+msgstr ""
+
+#: static/js/options/options/typography/helpers.js:133
+msgid "Google Font"
 msgstr ""
 
 #: static/js/options/options/typography/helpers.js:75

@@ -29,7 +29,7 @@ class ElementsKit_Widget_Business_Hours extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/business-hours/';
     }
 
     protected function register_controls() {

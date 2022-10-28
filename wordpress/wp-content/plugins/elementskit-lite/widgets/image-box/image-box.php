@@ -29,7 +29,7 @@ class ElementsKit_Widget_Image_Box extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/image-box-2/';
     }
 
     protected function register_controls() {

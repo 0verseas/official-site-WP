@@ -1,6 +1,7 @@
 import ctEvents from 'ct-events'
 import { formPreSubmitHook } from './account/hooks'
 import { resetCaptchaFor, reCreateCaptchaFor } from './account/captcha'
+import { mountPasswordStrength } from './account/password-strength'
 
 const maybeAddLoadingState = (form) => {
 	const maybeButton = form.querySelector('[name*="submit"]')
@@ -422,6 +423,21 @@ export const handleAccountModal = (el) => {
 							}`
 						)
 
+						if (!hasError) {
+							if (
+								maybeRegister.querySelector(
+									'[name="redirect_to"]'
+								) &&
+								maybeRegister.querySelector(
+									'[name="role"][value="seller"]:checked'
+								)
+							) {
+								location = maybeRegister.querySelector(
+									'[name="redirect_to"]'
+								).value
+							}
+						}
+
 						if (
 							!hasError ||
 							(hasError &&
@@ -439,6 +455,12 @@ export const handleAccountModal = (el) => {
 					})
 			)
 		})
+
+		let maybePassField = maybeRegister.querySelector('#user_pass_register')
+
+		if (maybePassField) {
+			mountPasswordStrength(maybePassField)
+		}
 	}
 
 	if (maybeLostPassword) {

@@ -1,7 +1,8 @@
 import { enable, disable } from './overlay/no-bounce'
 import ctEvents from 'ct-events'
 import { mount as mountMobileMenu } from './overlay/mobile-menu'
-import { focusLockOn, focusLockOff } from '../helpers/focus-lock'
+
+import { focusLockManager } from '../helpers/focus-lock'
 
 const showOffcanvas = (settings) => {
 	settings = {
@@ -98,8 +99,12 @@ const showOffcanvas = (settings) => {
 		)
 
 		setTimeout(() => {
-			focusLockOn(
-				settings.container.querySelector('.ct-panel-content').parentNode
+			focusLockManager().focusLockOn(
+				settings.container.querySelector('.ct-panel-content')
+					.parentNode,
+				{
+					focusOnMount: !settings.focus,
+				}
 			)
 		})
 	}
@@ -145,8 +150,14 @@ const hideOffcanvas = (settings, args = {}) => {
 		),
 
 		...document.querySelectorAll(`[href*="${settings.container.id}"]`),
-	].map((trigger) => {
+	].map((trigger, index) => {
 		trigger.setAttribute('aria-expanded', 'false')
+
+		setTimeout(() => {
+			if (index === 0) {
+				trigger.focus()
+			}
+		}, 50)
 	})
 
 	settings.container.classList.remove('active')
@@ -178,7 +189,7 @@ const hideOffcanvas = (settings, args = {}) => {
 							  )
 					)
 
-					focusLockOff(
+					focusLockManager().focusLockOff(
 						settings.container.querySelector('.ct-panel-content')
 							.parentNode
 					)

@@ -655,6 +655,10 @@ if (! function_exists('blocksy_is_page')) {
 				$post_id = get_option('woocommerce_shop_page_id');
 			}
 
+			if (get_post_type($post_id) !== 'page') {
+				$post_id = get_queried_object_id();
+			}
+
 			$static_result = $post_id;
 
 			if ($post_id === '0') {

@@ -33,7 +33,7 @@ class ElementsKit_Widget_Video extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/video/';
     }
 
 	protected function register_controls() {

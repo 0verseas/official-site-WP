@@ -95,7 +95,7 @@ if (isset($args['icon'])) {
 
 <form role="search" method="get" class="search-form" action="<?php echo esc_url($home_url); ?>" aria-haspopup="listbox" <?php echo wp_kses_post($search_live_results_output) ?>>
 
-	<input type="search" <?php echo $class_output ?> placeholder="<?php echo $placeholder; ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" title="<?php echo __('Search Input', 'blocksy') ?>">
+	<input type="search" <?php echo $class_output ?> placeholder="<?php echo $placeholder; ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" title="<?php echo __('Search for...', 'blocksy') ?>" aria-label="<?php echo __('Search for...', 'blocksy') ?>">
 
 	<button type="submit" class="search-submit" aria-label="<?php echo __('Search button', 'blocksy')?>">
 		<?php

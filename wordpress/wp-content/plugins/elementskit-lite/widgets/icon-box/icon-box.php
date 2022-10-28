@@ -29,7 +29,7 @@ class ElementsKit_Widget_Icon_Box extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/icon-box-4/';
     }
 
     protected function register_controls() {

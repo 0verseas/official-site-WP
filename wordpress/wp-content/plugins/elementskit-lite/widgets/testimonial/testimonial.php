@@ -33,7 +33,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/how-to-create-testimonials-in-wordpress/';
     }
 
     protected function register_controls() {

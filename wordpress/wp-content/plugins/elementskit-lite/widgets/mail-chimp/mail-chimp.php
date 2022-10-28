@@ -28,7 +28,7 @@ class ElementsKit_Widget_Mail_Chimp extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/mailchimp-3/';
     }
 
 	public function __get_lists(){

@@ -8,6 +8,7 @@
 .ct-account-form {
 	width: 100%;
 	margin: auto;
+	font-size: 14px;
 	color: var(--color);
 	background-color: #fff;
 	--linkInitialColor: var(--color);
@@ -88,7 +89,7 @@
 
 	label {
 		display: block;
-		--fontSize: 14px;
+		font-size: 14px;
 	}
 
 	.ct-button {
@@ -110,7 +111,6 @@
 
 	#reg_passmail,
 	.ct-back-to-login {
-		font-size: 14px;
 		text-align: center;
 	}
 
@@ -120,8 +120,6 @@
 	}
 
 	.login-remember {
-		font-size: 14px;
-
 		span {
 			display: flex;
 		}
@@ -131,13 +129,8 @@
 		}
 	}
 
-	#reg_passmail {
-		opacity: 0.7;
-	}
-
 	// form notifications
 	[class*='ct-form-notification'] {
-		font-size: 14px;
 		margin-bottom: 25px;
 		border-radius: 3px;
 		padding: 10px 15px;

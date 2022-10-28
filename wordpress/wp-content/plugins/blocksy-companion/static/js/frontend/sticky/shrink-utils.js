@@ -4,7 +4,7 @@ export const computeLinearScale = (domain, range, value) =>
 	range[0] +
 	((range[1] - range[0]) / (domain[1] - domain[0])) * (value - domain[0])
 
-const getRowInitialMinHeight = (el) => {
+export const getRowInitialMinHeight = (el) => {
 	const elComp = getComputedStyle(el)
 	return parseFloat(elComp.getPropertyValue('--height'))
 }
@@ -50,7 +50,11 @@ export const getRowStickyHeight = (el, hasBorder = true) => {
 
 		let stickyHeight = el.getBoundingClientRect().height - borderHeight
 
-		if (stickyHeight !== rowStickyHeight) {
+		if (
+			stickyHeight !== rowStickyHeight ||
+			// case when content is forcing the initial height to be bigger
+			rowStickyHeight > getRowInitialMinHeight(el)
+		) {
 			el.blcStickyHeight = el.getBoundingClientRect().height
 			return stickyHeight
 		}

@@ -37,7 +37,7 @@ class ElementsKit_Widget_Image_Comparison extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/image-comparisn/';
     }
 
     protected function register_controls() {

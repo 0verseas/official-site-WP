@@ -12,6 +12,10 @@ define( 'WP_CACHE', true );
 
 
 
+
+
+
+
 /** Enable W3 Total Cache */
 
 /** Enable W3 Total Cache */
@@ -142,6 +146,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once ABSPATH . 'wp-settings.php';
 
 define( 'DISALLOW_FILE_EDIT', true );   
+
+
 
 
 

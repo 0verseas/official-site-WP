@@ -28,7 +28,7 @@ class ElementsKit_Widget_Back_To_Top extends Widget_Base {
     }
     
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/back-to-top/';
     }
 
     protected function register_controls() {

@@ -20,19 +20,21 @@ if (! $forgot_password_inline) {
 
 ?>
 
-<form name="loginform" id="loginform" action="#" method="post">
+<form name="loginform" id="loginform" class="login" action="#" method="post">
 	<?php do_action('woocommerce_login_form_start'); ?>
 	<?php do_action('blocksy:account:modal:login:start'); ?>
 
-	<p class="login-username">
+	<p>
 		<label for="user_login"><?php echo __('Username or Email Address', 'blocksy-companion') ?></label>
 		<input type="text" name="log" id="user_login" class="input" value="" size="20">
 	</p>
 
-	<p class="login-password-input">
+	<p>
 		<label for="user_pass"><?php echo __('Password', 'blocksy-companion') ?></label>
-		<input type="password" name="pwd" id="user_pass" class="input" value="" size="20">
-		<span class="show-password-input"></span>
+		<span class="account-password-input">
+			<input type="password" name="pwd" id="user_pass" class="input" value="" size="20">
+			<span class="show-password-input"></span>
+		</span>
 	</p>
 
 	<p class="login-remember col-2">

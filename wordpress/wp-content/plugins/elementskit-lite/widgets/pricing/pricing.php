@@ -28,7 +28,7 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/pricing-table/';
     }
 
     protected function register_controls() {

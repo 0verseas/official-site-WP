@@ -67,6 +67,17 @@
         &.llar-col-nowrap {
           white-space: nowrap;
         }
+
+        .llar-log-country-flag {
+          display: flex;
+          align-items: center;
+          white-space: nowrap;
+
+          img {
+            width: 20px;
+            height: auto;
+          }
+        }
       }
       td {
         button {
@@ -109,6 +120,7 @@
     .llar-table-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin: 15px 0 5px;
 
       h3 {

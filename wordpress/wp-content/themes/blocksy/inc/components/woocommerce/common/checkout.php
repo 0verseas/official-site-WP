@@ -29,6 +29,11 @@ add_action('wpfunnels/before_gb_checkout_form', function($widget) {
 	$ct_skip_checkout = true;
 }, 10 , 1);
 
+add_action('cfw_checkout_main_container_start', function($widget) {
+	global $ct_skip_checkout;
+	$ct_skip_checkout = true;
+}, 10, 1);
+
 add_action('wp', function () {
 	if (class_exists('FluidCheckout')) {
 		return;

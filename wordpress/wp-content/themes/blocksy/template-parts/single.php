@@ -19,9 +19,6 @@ if (
 		'template_subtype' => 'canvas'
 	])
 ) {
-	global $blocksy_template_output;
-	$blocksy_template_output = true;
-
 	echo blc_render_content_block(
 		blc_get_content_block_that_matches([
 			'template_type' => 'single',

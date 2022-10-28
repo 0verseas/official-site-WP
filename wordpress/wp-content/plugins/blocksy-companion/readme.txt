@@ -5,7 +5,7 @@ Requires PHP: 7.0
 Tested up to: 6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 1.8.51
+Stable tag: 1.8.54
 
 == Description ==
 
@@ -23,6 +23,18 @@ It runs and adds its enhancements only if the Blocksy theme is installed and act
 2. Activate the plugin by going to **Plugins** page in WordPress admin and clicking on **Activate** link.
 
 == Changelog ==
+1.8.54: 2022-10-27
+- Improvement: Sticky header makes floating cart cut off under some specific circumstances
+- Improvement: Ensure special characters in localize data is correctly sanitized
+- Improvement: Better integration with Dokan plugin and account modal extension
+
+1.8.53: 2022-10-20
+- Improvement: Account modal show password strength in Sign Up tab
+- Fix: Cookies consent decline button is not translatable
+
+1.8.52: 2022-10-13
+- Improvement: General fixes and improvements
+
 1.8.51: 2022-10-07
 - Improvement: Account modal - add show/hide password button in password field
 - Fix: Double captcha appears on register modal

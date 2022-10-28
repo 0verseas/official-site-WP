@@ -29,7 +29,7 @@ class ElementsKit_Widget_Image_Accordion extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/image-accordion/';
     }
 
     protected function register_controls() {

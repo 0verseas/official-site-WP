@@ -302,14 +302,17 @@ export const mount = (el) => {
 
 		let defaultCanDoInPlaceUpdate = '__DEFAULT__'
 
-		if (variation && currentElement.querySelector('.wcpa_form_outer')) {
-			variation.variation_id =
-				'wcpa' + Math.floor(1 + Math.random() * (100 - 1 + 1))
+		if (
+			variation &&
+			!variation.variation_id &&
+			currentElement.querySelector('.wcpa_form_outer')
+		) {
 			defaultCanDoInPlaceUpdate = true
 			nextVariationObj = variation
 		}
 
 		if (
+			defaultCanDoInPlaceUpdate === '__DEFAULT__' &&
 			!variation.variation_id &&
 			!currentVariation.dataset.currentVariation
 		) {
@@ -317,14 +320,19 @@ export const mount = (el) => {
 		}
 
 		if (
+			defaultCanDoInPlaceUpdate === '__DEFAULT__' &&
 			parseInt(variation.variation_id) ===
-			parseInt(currentVariation.dataset.currentVariation)
+				parseInt(currentVariation.dataset.currentVariation)
 		) {
 			return
 		}
 
-		if (variation.variation_id) {
-			currentVariation.dataset.currentVariation = variation.variation_id
+		if (
+			variation.variation_id ||
+			defaultCanDoInPlaceUpdate === '__DEFAULT__'
+		) {
+			currentVariation.dataset.currentVariation =
+				variation.variation_id || '0'
 		} else {
 			currentVariation.removeAttribute('data-current-variation')
 		}

@@ -809,7 +809,7 @@ $options = [
 											'value' => 35,
 											'min' => 20,
 											'max' => 100,
-											'divider' => 'top',
+											'divider' => 'bottom',
 											'setting' => [ 'transport' => 'postMessage' ],
 										],
 									],
@@ -819,7 +819,6 @@ $options = [
 									'label' => __( 'User Name', 'blocksy' ),
 									'type' => 'ct-switch',
 									'value' => 'no',
-									'divider' => 'top',
 									'sync' => blocksy_sync_whole_page([
 										'prefix' => 'single_page',
 										'loader_selector' => '.ct-woo-account'
@@ -830,7 +829,6 @@ $options = [
 									'label' => __( 'Navigation Quick Links', 'blocksy' ),
 									'type' => 'ct-switch',
 									'value' => 'no',
-									'divider' => 'top',
 									'sync' => blocksy_sync_whole_page([
 										'prefix' => 'single_page',
 										'loader_selector' => '.ct-woo-account'

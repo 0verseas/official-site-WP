@@ -144,7 +144,7 @@ if (! function_exists('blocksy_sidebar_position_unfiltered')) {
 			return 'none';
 		}
 
-		$is_dokan_store = class_exists('WeDevs_Dokan') && dokan_is_store_page();
+		$is_dokan_store = class_exists('WeDevs_Dokan') && function_exists('dokan_is_store_page') && dokan_is_store_page();
 
 		if ($is_dokan_store) {
 			return 'none';

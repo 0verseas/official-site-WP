@@ -25,6 +25,46 @@ class ThemeIntegration {
 						],
 						BLOCKSY_URL . 'static/bundle/account.js'
 					),
+					'deps' => [
+						'blocksy-zxcvbn',
+						'wp-hooks',
+						'wp-i18n',
+						'password-strength-meter',
+					],
+
+					'global_data' => [
+						[
+							'var' => 'wc_password_strength_meter_params',
+							'data' => [
+								'min_password_strength' => apply_filters(
+									'woocommerce_min_password_strength',
+									3
+								),
+								'stop_checkout' => apply_filters(
+									'woocommerce_enforce_password_strength_meter_on_checkout',
+									false
+								),
+								'i18n_password_error'=> esc_attr__(
+									'Please enter a stronger password.',
+									'woocommerce'
+								),
+								'i18n_password_hint' => addslashes(wp_get_password_hint()),
+							]
+						],
+
+						[
+							'var' => 'pwsL10n',
+							'data' => [
+								'unknown'  => _x( 'Password strength unknown', 'password strength' ),
+								'short'    => _x( 'Very weak', 'password strength' ),
+								'bad'      => _x( 'Weak', 'password strength' ),
+								'good'     => _x( 'Medium', 'password strength' ),
+								'strong'   => _x( 'Strong', 'password strength' ),
+								'mismatch' => _x( 'Mismatch', 'password mismatch' ),
+							]
+						]
+
+					],
 					'trigger' => 'click',
 					'has_modal_loader' => [
 						'skip_if_no_template' => true,

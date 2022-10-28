@@ -34,7 +34,7 @@ class ElementsKit_Widget_Social_Share extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/social-share/';
     }
 
     protected function register_controls() {

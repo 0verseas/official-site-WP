@@ -1,12 +1,12 @@
 === EmbedPress – Embed Google Docs, YouTube, Maps, Vimeo, Wistia Videos & Upload PDF, PPT in Gutenberg & Elementor ===
-Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, manzurahammed, alimuzzamanalim
+Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, seakashdiu, alimuzzamanalim
 Author: WPDeveloper
 Author URI: https://wpdeveloper.com
 Tags: embed, embed youtube, gutenberg embed, pdf, doc, docs, ppt, elementor embed, video embed, Google Doc, map embed, youTube Embed, content embed, iframes, vimeo embed, wistia, google sheet, youtube player, block editor, embed wordpress, elementor, WPML, Meetup, Boomplay, PDF Logo
 Requires at least: 4.6
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 5.6
-Stable tag: 3.5.1
+Stable tag: 3.5.3
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -14,7 +14,7 @@ EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC
 
 == Description ==
 
-= EMBEDPRESS – EMBED ANYTHING FROM 100+ SOURCES -  YOUTUBE, GOOGLE DOCS, DRIVE, MAPS, VIMEO, WISTIA, SPOTIFY, BOOMPLAY, PDF, PPT ETC & DISPLAY IT USING ELEMENTOR, BLOCK EDITOR, CLASSIC EDITOR & MORE =
+= EMBEDPRESS – EMBED ANYTHING FROM 150+ SOURCES -  YOUTUBE, GOOGLE DOCS, DRIVE, MAPS, VIMEO, WISTIA, SPOTIFY, BOOMPLAY, PDF, PPT ETC & DISPLAY IT USING ELEMENTOR, BLOCK EDITOR, CLASSIC EDITOR & MORE =
 
 [EmbedPress](https://embedpress.com/) lets you embed any engaging and interactive multimedia content such as videos, images, posts, audio, maps, documents, PDF, and much more into your WordPress site with one click and showcase it beautifully for your website visitors.
 
@@ -23,9 +23,9 @@ Fuel up your storytelling by embedding content directly on to Classic Editor, Gu
 
 https://www.youtube.com/watch?v=fvYKLkEnJbI
 
-### 🔥 RICH MEDIA EMBEDS FROM MORE THAN 100 SITES
+### 🔥 RICH MEDIA EMBEDS FROM MORE THAN 150 SITES
 
-With EmbedPress, all you need is an URL to embed attention-grabbing content from **over 100 websites**. Find the URL for your preferred video, image, audio files, post, or map and simply cut-and-paste the link into a WordPress post. EmbedPress automatically understands the URL and instantly embeds fully responsive content on your websites.
+With EmbedPress, all you need is an URL to embed attention-grabbing content from **over 150 websites**. Find the URL for your preferred video, image, audio files, post, or map and simply cut-and-paste the link into a WordPress post. EmbedPress automatically understands the URL and instantly embeds fully responsive content on your websites.
 
 ### 🔗 EMBED CONTENT USING ANY WORDPRESS PAGE BUILDER
 
@@ -336,7 +336,7 @@ If you like EmbedPress, then consider checking out our other WordPress Plugins:
 
 🗒️ [BetterDocs](https://betterdocs.co/) – Best Documentation & Knowledge Base Plugin for WordPress, whcih also reduce your manual support request.
 
-☁  [Templately](https://wordpress.org/plugins/templately/): Ultimate Template clouds with 1000+ ready templates for Elementor & Gutenberg along with FREE cloud collaboration with your team
+☁  [Templately](https://wordpress.org/plugins/templately/): Ultimate Template clouds with 2500+ ready templates for Elementor & Gutenberg along with FREE cloud collaboration with your team
 
 ⭐ [ReviewX](https://wordpress.org/plugins/reviewx/): WooCommerce Product review plugin that allows users to submit product reviews with multiple criteria, photos, videos, and more.
 
@@ -382,10 +382,20 @@ Not at all. You can set up everything your team needs without any coding knowled
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+= [3.5.3] - 2022-10-27 =
+* Fixed: PDF layout breaking issues in Gutenberg.
+* Fixed: Height-width controller isn't working in Gutenberg. 
+* Few minor bug fixes and improvements.
+
+= [3.5.2] - 2022-10-20 =
+* Improved: Added new options to PDF embed.
+* Improved: YouTube channel embedding with new controls.
+* Few minor bug fixes and improvements.
+
 = [3.5.1] - 2022-09-27 =
 * Fixed: Meetup fatal error while event image was missing.
 * Fixed: Conflict with Elementor old version.
-* Improved: Changed library for documents viewing for Elementor.
+* Improved: Changed library for document viewing for Elementor.
 * Few minor bug fix and improvements.
 
 = [3.5.0] - 2022-08-25 =

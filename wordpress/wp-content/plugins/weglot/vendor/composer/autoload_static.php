@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit92257254c6fd8e45e5db2df9f00b1b3d
+class ComposerStaticInit753bf99e8a5ed4ce5a7a253c0afabbbf
 {
     public static $files = array (
         '6c200413eed8aeea54dbaf934a31b127' => __DIR__ . '/..' . '/weglot/simplehtmldom/src/simple_html_dom.php',
@@ -66,10 +66,10 @@ class ComposerStaticInit92257254c6fd8e45e5db2df9f00b1b3d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit92257254c6fd8e45e5db2df9f00b1b3d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit92257254c6fd8e45e5db2df9f00b1b3d::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit92257254c6fd8e45e5db2df9f00b1b3d::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit92257254c6fd8e45e5db2df9f00b1b3d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit753bf99e8a5ed4ce5a7a253c0afabbbf::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit753bf99e8a5ed4ce5a7a253c0afabbbf::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit753bf99e8a5ed4ce5a7a253c0afabbbf::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit753bf99e8a5ed4ce5a7a253c0afabbbf::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -44,6 +44,10 @@ registerDynamicChunk('blocksy_account', {
 				window.anr_onloadCallback()
 			}
 
+			if (window.Dokan_Vendor_Registration) {
+				window.Dokan_Vendor_Registration.init()
+			}
+
 			ctEvents.trigger('ct:overlay:handle-click', {
 				e: event,
 				href: '#account-modal',

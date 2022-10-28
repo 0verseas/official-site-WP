@@ -3,6 +3,20 @@
 
 # Change Log
 
+##3.8 (11/10/2022) =
+* Add: Add ajax checker for woocommerce variations cart popin
+* Add: Rework switcher. Generate it direclty on render method
+* Add: Add vary header accept language on redirect
+* Bug: Fix rtl issue
+* Bug: Add missing ; on pageviews script
+* Bug: Send code lang instead of name for wp search query
+* Bug: Don't translate pdf on original language (woocommerce PDF invoice plugin)
+* Bug: Prevent add twice weglot_language post meta on woocommerce order
+* Bug: Prevent block translate if ajax referer are not exclude
+
+##3.7.4 (19/09/2022) =
+* Bugfix: Update CA Root Certificates from Mozilla
+
 ##3.7.3 (05/07/2022) =
 * Bugfix: Remove mod_rewrite check with apache_get_module()
 * Bugfix: Fix problem with empty switcher from switcher editor
@@ -20,7 +34,7 @@
 * Add: Optimize button accessibility
 * Add: Pageviews integration
 * Add: Add switcher editor integration
-* Add: Woocomerce translate all mail
+* Add: Woocommerce translate all mail
 * Add: Do not translate .eps or .txt
 * Add: Detect if switcher is child of an iframe and if so, don't display it
 * Add: Reduce api call on wp-admin

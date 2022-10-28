@@ -28,7 +28,7 @@ class ElementsKit_Widget_Tab extends Widget_Base {
     }
 
     public function get_help_url() {
-        return '';
+        return 'https://wpmet.com/doc/tab/';
     }
 
     protected function register_controls() {

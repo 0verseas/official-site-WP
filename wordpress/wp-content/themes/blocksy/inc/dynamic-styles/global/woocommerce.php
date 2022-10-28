@@ -4,6 +4,25 @@ if (! function_exists('is_woocommerce')) {
 	return;
 }
 
+
+blocksy_output_background_css([
+	'css' => $css,
+	'tablet_css' => $tablet_css,
+	'mobile_css' => $mobile_css,
+	'responsive' => true,
+	'selector' => '[data-prefix="woo_categories"]',
+	'value' => get_theme_mod('shop_archive_background',
+		blocksy_background_default_value([
+			'backgroundColor' => [
+				'default' => [
+					'color' => Blocksy_Css_Injector::get_skip_rule_keyword()
+				],
+			],
+		])
+	),
+	'responsive' => true,
+]);
+
 $shop_cards_type = get_theme_mod('shop_cards_type', 'type-1');
 
 if ($shop_cards_type === 'type-1') {

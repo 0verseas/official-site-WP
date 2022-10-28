@@ -496,7 +496,7 @@ function blocksy_related_posts($location = null) {
 									),
 									'html_atts' => [
 										'href' => esc_url( get_permalink() ),
-										'aria-label' => get_the_title(),
+										'aria-label' => wp_strip_all_tags( get_the_title() ),
 										'tabindex' => "-1"
 									],
 

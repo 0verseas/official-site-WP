@@ -665,146 +665,162 @@ $options = [
 		'type' => 'tab',
 		'options' => [
 
-			'account_label_font' => [
-				'type' => 'ct-typography',
-				'label' => __( 'Label Font', 'blocksy-companion' ),
-				'value' => blocksy_typography_default_values([
-					'size' => '12px',
-					'variation' => 'n6',
-					'text-transform' => 'uppercase',
-				]),
-				'setting' => [ 'transport' => 'postMessage' ],
-			],
-
 			blocksy_rand_md5() => [
-				'type' => 'ct-labeled-group',
-				'label' => __( 'Label Color', 'blocksy-companion' ),
-				'responsive' => true,
-				'choices' => [
-					[
-						'id' => 'accountHeaderColor',
-						'label' => __('Default State', 'blocksy-companion')
-					],
-
-					[
-						'id' => 'transparentAccountHeaderColor',
-						'label' => __('Transparent State', 'blocksy-companion'),
-						'condition' => [
-							'row' => '!offcanvas',
-							'builderSettings/has_transparent_header' => 'yes',
-						],
-					],
-
-					[
-						'id' => 'stickyAccountHeaderColor',
-						'label' => __('Sticky State', 'blocksy-companion'),
-						'condition' => [
-							'row' => '!offcanvas',
-							'builderSettings/has_sticky_header' => 'yes',
-						],
-					],
+				'type' => 'ct-condition',
+				'condition' => [
+					'any' => [
+						'loggedin_account_label_visibility/desktop' => true,
+						'loggedin_account_label_visibility/tablet' => true,
+						'loggedin_account_label_visibility/mobile' => true,
+						'loggedout_account_label_visibility/desktop' => true,
+						'loggedout_account_label_visibility/tablet' => true,
+						'loggedout_account_label_visibility/mobile' => true,
+					]
 				],
 				'options' => [
 
-					'accountHeaderColor' => [
-						'label' => __( 'Label Color', 'blocksy-companion' ),
-						'type'  => 'ct-color-picker',
-						'design' => 'block:right',
-						'responsive' => true,
+					'account_label_font' => [
+						'type' => 'ct-typography',
+						'label' => __( 'Label Font', 'blocksy-companion' ),
+						'value' => blocksy_typography_default_values([
+							'size' => '12px',
+							'variation' => 'n6',
+							'text-transform' => 'uppercase',
+						]),
 						'setting' => [ 'transport' => 'postMessage' ],
+					],
 
-						'value' => [
-							'default' => [
-								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+					blocksy_rand_md5() => [
+						'type' => 'ct-labeled-group',
+						'label' => __( 'Label Color', 'blocksy-companion' ),
+						'responsive' => true,
+						'choices' => [
+							[
+								'id' => 'accountHeaderColor',
+								'label' => __('Default State', 'blocksy-companion')
 							],
 
-							'hover' => [
-								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+							[
+								'id' => 'transparentAccountHeaderColor',
+								'label' => __('Transparent State', 'blocksy-companion'),
+								'condition' => [
+									'row' => '!offcanvas',
+									'builderSettings/has_transparent_header' => 'yes',
+								],
+							],
+
+							[
+								'id' => 'stickyAccountHeaderColor',
+								'label' => __('Sticky State', 'blocksy-companion'),
+								'condition' => [
+									'row' => '!offcanvas',
+									'builderSettings/has_sticky_header' => 'yes',
+								],
 							],
 						],
+						'options' => [
 
-						'pickers' => [
-							[
-								'title' => __( 'Initial', 'blocksy-companion' ),
-								'id' => 'default',
-								'inherit' => 'var(--color)'
+							'accountHeaderColor' => [
+								'label' => __( 'Label Color', 'blocksy-companion' ),
+								'type'  => 'ct-color-picker',
+								'design' => 'block:right',
+								'responsive' => true,
+								'setting' => [ 'transport' => 'postMessage' ],
+
+								'value' => [
+									'default' => [
+										'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+									],
+
+									'hover' => [
+										'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+									],
+								],
+
+								'pickers' => [
+									[
+										'title' => __( 'Initial', 'blocksy-companion' ),
+										'id' => 'default',
+										'inherit' => 'var(--color)'
+									],
+
+									[
+										'title' => __( 'Hover', 'blocksy-companion' ),
+										'id' => 'hover',
+										'inherit' => 'var(--linkHoverColor)'
+									],
+								],
 							],
 
-							[
-								'title' => __( 'Hover', 'blocksy-companion' ),
-								'id' => 'hover',
-								'inherit' => 'var(--linkHoverColor)'
+							'transparentAccountHeaderColor' => [
+								'label' => __( 'Label Color', 'blocksy-companion' ),
+								'type'  => 'ct-color-picker',
+								'design' => 'block:right',
+								'responsive' => true,
+								'setting' => [ 'transport' => 'postMessage' ],
+
+								'value' => [
+									'default' => [
+										'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+									],
+
+									'hover' => [
+										'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+									],
+								],
+
+								'pickers' => [
+									[
+										'title' => __( 'Initial', 'blocksy-companion' ),
+										'id' => 'default',
+									],
+
+									[
+										'title' => __( 'Hover', 'blocksy-companion' ),
+										'id' => 'hover',
+									],
+								],
 							],
+
+							'stickyAccountHeaderColor' => [
+								'label' => __( 'Label Color', 'blocksy-companion' ),
+								'type'  => 'ct-color-picker',
+								'design' => 'block:right',
+								'responsive' => true,
+								'setting' => [ 'transport' => 'postMessage' ],
+
+								'value' => [
+									'default' => [
+										'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+									],
+
+									'hover' => [
+										'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+									],
+								],
+
+								'pickers' => [
+									[
+										'title' => __( 'Initial', 'blocksy-companion' ),
+										'id' => 'default',
+									],
+
+									[
+										'title' => __( 'Hover', 'blocksy-companion' ),
+										'id' => 'hover',
+									],
+								],
+							],
+
 						],
 					],
 
-					'transparentAccountHeaderColor' => [
-						'label' => __( 'Label Color', 'blocksy-companion' ),
-						'type'  => 'ct-color-picker',
-						'design' => 'block:right',
-						'responsive' => true,
-						'setting' => [ 'transport' => 'postMessage' ],
-
-						'value' => [
-							'default' => [
-								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
-							],
-
-							'hover' => [
-								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
-							],
-						],
-
-						'pickers' => [
-							[
-								'title' => __( 'Initial', 'blocksy-companion' ),
-								'id' => 'default',
-							],
-
-							[
-								'title' => __( 'Hover', 'blocksy-companion' ),
-								'id' => 'hover',
-							],
-						],
-					],
-
-					'stickyAccountHeaderColor' => [
-						'label' => __( 'Label Color', 'blocksy-companion' ),
-						'type'  => 'ct-color-picker',
-						'design' => 'block:right',
-						'responsive' => true,
-						'setting' => [ 'transport' => 'postMessage' ],
-
-						'value' => [
-							'default' => [
-								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
-							],
-
-							'hover' => [
-								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
-							],
-						],
-
-						'pickers' => [
-							[
-								'title' => __( 'Initial', 'blocksy-companion' ),
-								'id' => 'default',
-							],
-
-							[
-								'title' => __( 'Hover', 'blocksy-companion' ),
-								'id' => 'hover',
-							],
-						],
+					blocksy_rand_md5() => [
+						'type' => 'ct-divider',
 					],
 
 				],
 			],
-
-			blocksy_rand_md5() => [
-				'type' => 'ct-divider',
-			],
-
 
 			blocksy_rand_md5() => [
 				'type' => 'ct-condition',

@@ -4,7 +4,11 @@ if (! function_exists('woocommerce_mini_cart')) {
     return '';
 }
 
-if (! method_exists(WC()->cart, 'get_cart_contents_count')) {
+if (
+	! WC()->cart
+	||
+	! method_exists(WC()->cart, 'get_cart_contents_count')
+) {
 	return '';
 }
 
