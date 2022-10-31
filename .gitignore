@@ -13,7 +13,7 @@ wordpress/readme.html
 !wordpress/wp-content/plugins/
 !wordpress/wp-content/themes/
 !wordpress/wp-content/languages/
-#!wordpress/wp-content/uploads/
+!wordpress/wp-content/uploads/
 !wordpress/wp-content/upgrade/
 wordpress/wp-content/litespeed/*
 wordpress/wp-content/uploads/supsystic-tables/cache/*
