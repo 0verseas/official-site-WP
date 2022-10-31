@@ -1,17 +1,24 @@
 # ignore everything in the root except the "wp-content" directory.
 .env
 wordpress/readme.html
+
+#wordpress/wp-content/uploads/supsystic-tables/cache/tables/1
 !wordpress/wp-content/
 
 # ignore everything in the "wp-content" directory, except:
 # "mu-plugins", "plugins", "themes" directory
-wordpress/wp-content/*
+#wordpress/wp-content/*
+
 !wordpress/wp-content/mu-plugins/
 !wordpress/wp-content/plugins/
 !wordpress/wp-content/themes/
 !wordpress/wp-content/languages/
-!wordpress/wp-content/uploads/
+#!wordpress/wp-content/uploads/
 !wordpress/wp-content/upgrade/
+wordpress/wp-content/litespeed/*
+wordpress/wp-content/uploads/supsystic-tables/cache/*
+wordpress/wp-content/uploads/sucuri/sucuri-auditqueue.php
+wordpress/wp-content/uploads/sucuri/sucuri-settings.php
 
 # ignore these plugins
 wordpress/wp-content/plugins/hello.php
