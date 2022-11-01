@@ -20,6 +20,7 @@ wordpress/wp-content/uploads/supsystic-tables/cache/*
 wordpress/wp-content/uploads/sucuri/sucuri-auditqueue.php
 wordpress/wp-content/uploads/sucuri/sucuri-settings.php
 wordpress/wp-content/uploads/sucuri/sucuri-lastlogins.php
+wordpress/wp-content/uploads/elementor/css/*
 
 # ignore these plugins
 wordpress/wp-content/plugins/hello.php
