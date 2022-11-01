@@ -76,3 +76,15 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteRule \.(jpg|jpeg|png|gif)$ http://i.imgur.com/g7ptdBB.png [NC,R,L]
 
 # END WordPress
+
+# BEGIN DS-XML-RPC-API
+# 在含有 BEGIN DS-XML-RPC-API 及 END DS-XML-RPC-API 標記的這兩行間的指示詞內容為動態產生，
+# 且應僅有 WordPress 篩選器能進行修改。對這兩行間任何指示詞內容的變更，
+# 都會遭到系統覆寫。
+<Files xmlrpc.php>
+order deny,allow
+deny from all
+
+</Files>
+
+# END DS-XML-RPC-API
