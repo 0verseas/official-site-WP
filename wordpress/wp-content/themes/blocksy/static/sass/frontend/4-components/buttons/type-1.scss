@@ -1,7 +1,5 @@
 $buttons-type-1:
-	// 'button',
 	'.button',
-	'.submit',
 	'.ct-button',
 	'.entry-tags a',
 	'.added_to_cart',
@@ -11,15 +9,15 @@ $buttons-type-1:
 	'.forminator-ui[data-design="none"] .forminator-button',
 
 	// special buttons
-	'button[class*="ajax"]',
-	'button.regform-button',
+	'a.showlogin',
 	'a.restore-item',
-	'a.showlogin'
+	'button.regform-button',
+	'button[class*="ajax"]',
+	'.submit:where(:not(div.submit))',
 ;
 
 #{$buttons-type-1} {
 	position: relative;
-	// z-index: 1;
 	color: var(--buttonTextInitialColor);
 	border: var(--button-border);
 	background-color: var(--buttonInitialColor);

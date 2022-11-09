@@ -286,6 +286,12 @@ if ($) {
 	$(document).on('sf:ajaxfinish', () => {
 		ctEvents.trigger('blocksy:frontend:init')
 	})
+
+	$(document).on('ddwcpoRenderVariation', () => {
+		setTimeout(() => {
+			ctEvents.trigger('blocksy:frontend:init')
+		})
+	})
 }
 
 ctEvents.on('blocksy:frontend:init', () => {
