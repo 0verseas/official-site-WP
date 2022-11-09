@@ -514,7 +514,10 @@ class ThemeIntegration {
 
 		if ($svg && function_exists('simplexml_load_string')) {
 			$svg = @simplexml_load_string($svg);
-			$attributes = $svg->attributes();
+
+			if ($svg) {
+				$attributes = $svg->attributes();
+			}
 		}
 
 		if (

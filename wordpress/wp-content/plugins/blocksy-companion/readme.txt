@@ -5,7 +5,7 @@ Requires PHP: 7.0
 Tested up to: 6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 1.8.55
+Stable tag: 1.8.56
 
 == Description ==
 
@@ -23,6 +23,10 @@ It runs and adds its enhancements only if the Blocksy theme is installed and act
 2. Activate the plugin by going to **Plugins** page in WordPress admin and clicking on **Activate** link.
 
 == Changelog ==
+1.8.56: 2022-11-04
+- Improvement: Sticky header shrink with border correctly position floating cart
+- Improvement: Better logic for simple XML svg parsing
+
 1.8.55: 2022-11-03
 - Improvement: XML strategy for SVG dimensions when simple xml is absent
 - Improvement: Correctly recalculate sticky position on page resize

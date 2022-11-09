@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the ElementsKit Lite package.
 msgid ""
 msgstr ""
-"Project-Id-Version: ElementsKit Lite 2.7.3\n"
+"Project-Id-Version: ElementsKit Lite 2.7.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/elementskit-lite\n"
-"POT-Creation-Date: 2022-10-18 06:52:31+00:00\n"
+"POT-Creation-Date: 2022-11-07 12:45:21+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -662,8 +662,8 @@ msgstr ""
 
 #: libs/framework/views/settings-sections/usersettings.php:275
 #: widgets/accordion/accordion.php:255 widgets/accordion/accordion.php:347
-#: widgets/accordion/accordion.php:485 widgets/accordion/accordion.php:690
-#: widgets/accordion/accordion.php:752 widgets/back-to-top/back-to-top.php:377
+#: widgets/accordion/accordion.php:485 widgets/accordion/accordion.php:692
+#: widgets/accordion/accordion.php:754 widgets/back-to-top/back-to-top.php:377
 #: widgets/back-to-top/back-to-top.php:409
 #: widgets/blog-posts/blog-posts.php:1152
 #: widgets/blog-posts/blog-posts.php:1235
@@ -831,7 +831,7 @@ msgid "User ID"
 msgstr ""
 
 #: libs/framework/views/settings-sections/usersettings.php:497
-msgid "Token expires time"
+msgid "Token Expiry Time"
 msgstr ""
 
 #: libs/framework/views/settings-sections/usersettings.php:507
@@ -960,11 +960,11 @@ msgstr ""
 
 #: modules/controls/widget-area-utils.php:28
 #: modules/controls/widget-area-utils.php:97
-msgid "Click here to add content."
+msgid "Click on the Edit Content button to edit/add the content."
 msgstr ""
 
 #: modules/controls/widget-area-utils.php:59
-msgid "Edit"
+msgid "Edit Content"
 msgstr ""
 
 #: modules/dynamic-content/cpt.php:19 modules/dynamic-content/cpt.php:20
@@ -1261,7 +1261,7 @@ msgid "Content"
 msgstr ""
 
 #: modules/megamenu/views/options-menu-item.php:9
-#: widgets/accordion/accordion.php:137 widgets/accordion/accordion.php:661
+#: widgets/accordion/accordion.php:137 widgets/accordion/accordion.php:663
 #: widgets/back-to-top/back-to-top.php:69 widgets/blog-posts/blog-posts.php:552
 #: widgets/button/button.php:97 widgets/button/button.php:422
 #: widgets/category-list/category-list.php:87
@@ -2047,7 +2047,7 @@ msgstr ""
 
 #: widgets/accordion/accordion.php:268 widgets/accordion/accordion.php:358
 #: widgets/accordion/accordion.php:368 widgets/accordion/accordion.php:505
-#: widgets/accordion/accordion.php:733 widgets/accordion/accordion.php:794
+#: widgets/accordion/accordion.php:735 widgets/accordion/accordion.php:796
 #: widgets/back-to-top/back-to-top.php:389
 #: widgets/back-to-top/back-to-top.php:422
 #: widgets/blog-posts/blog-posts.php:657 widgets/blog-posts/blog-posts.php:681
@@ -2205,7 +2205,7 @@ msgstr ""
 
 #: widgets/accordion/accordion.php:306 widgets/accordion/accordion.php:396
 #: widgets/accordion/accordion.php:567 widgets/accordion/accordion.php:587
-#: widgets/accordion/accordion.php:626 widgets/back-to-top/back-to-top.php:307
+#: widgets/accordion/accordion.php:627 widgets/back-to-top/back-to-top.php:307
 #: widgets/blog-posts/blog-posts.php:984 widgets/blog-posts/blog-posts.php:1190
 #: widgets/blog-posts/blog-posts.php:1279
 #: widgets/blog-posts/blog-posts.php:1566
@@ -2298,7 +2298,7 @@ msgstr ""
 
 #: widgets/accordion/accordion.php:317 widgets/accordion/accordion.php:406
 #: widgets/accordion/accordion.php:514 widgets/accordion/accordion.php:595
-#: widgets/accordion/accordion.php:634 widgets/back-to-top/back-to-top.php:319
+#: widgets/accordion/accordion.php:635 widgets/back-to-top/back-to-top.php:319
 #: widgets/blog-posts/blog-posts.php:1198
 #: widgets/blog-posts/blog-posts.php:1287
 #: widgets/blog-posts/blog-posts.php:1576
@@ -2386,7 +2386,7 @@ msgid "Border Radius"
 msgstr ""
 
 #: widgets/accordion/accordion.php:332 widgets/accordion/accordion.php:422
-#: widgets/accordion/accordion.php:608 widgets/accordion/accordion.php:647
+#: widgets/accordion/accordion.php:609 widgets/accordion/accordion.php:649
 #: widgets/blog-posts/blog-posts.php:849 widgets/blog-posts/blog-posts.php:1211
 #: widgets/blog-posts/blog-posts.php:1300
 #: widgets/caldera-forms/caldera-forms.php:345
@@ -2588,11 +2588,11 @@ msgstr ""
 msgid "OPEN"
 msgstr ""
 
-#: widgets/accordion/accordion.php:618
+#: widgets/accordion/accordion.php:619
 msgid "CLOSED"
 msgstr ""
 
-#: widgets/accordion/accordion.php:669 widgets/blog-posts/blog-posts.php:1004
+#: widgets/accordion/accordion.php:671 widgets/blog-posts/blog-posts.php:1004
 #: widgets/blog-posts/blog-posts.php:2026
 #: widgets/blog-posts/blog-posts.php:2132
 #: widgets/blog-posts/blog-posts.php:2237
@@ -2653,11 +2653,11 @@ msgstr ""
 msgid "Margin"
 msgstr ""
 
-#: widgets/accordion/accordion.php:684
+#: widgets/accordion/accordion.php:686
 msgid "Slide Closed Icon"
 msgstr ""
 
-#: widgets/accordion/accordion.php:703 widgets/accordion/accordion.php:764
+#: widgets/accordion/accordion.php:705 widgets/accordion/accordion.php:766
 #: widgets/category-list/category-list.php:377
 #: widgets/client-logo/client-logo.php:870
 #: widgets/fluent-forms/fluent-forms.php:931 widgets/funfact/funfact.php:679
@@ -2666,7 +2666,7 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
-#: widgets/accordion/accordion.php:746
+#: widgets/accordion/accordion.php:748
 msgid " Slide Open icon"
 msgstr ""
 
@@ -3538,7 +3538,7 @@ msgid "justify"
 msgstr ""
 
 #: widgets/blog-posts/blog-posts.php:2050
-#: widgets/client-logo/client-logo.php:459
+#: widgets/client-logo/client-logo.php:459 widgets/heading/heading.php:329
 #: widgets/testimonial/testimonial.php:287
 msgid "Show Separator"
 msgstr ""
@@ -4227,7 +4227,8 @@ msgstr ""
 msgid "Dot Color"
 msgstr ""
 
-#: widgets/client-logo/client-logo.php:1388
+#: widgets/client-logo/client-logo.php:1388 widgets/heading/heading.php:322
+#: widgets/heading/heading.php:1129
 msgid "Separator"
 msgstr ""
 
@@ -5140,16 +5141,8 @@ msgstr ""
 msgid "bussiness"
 msgstr ""
 
-#: widgets/heading/heading.php:322 widgets/heading/heading.php:1129
-msgid "Seperator"
-msgstr ""
-
-#: widgets/heading/heading.php:329
-msgid "Show Seperator"
-msgstr ""
-
 #: widgets/heading/heading.php:340
-msgid "Seperator Style"
+msgid "Separator Style"
 msgstr ""
 
 #: widgets/heading/heading.php:345
@@ -5161,7 +5154,7 @@ msgid "Solid with bullet"
 msgstr ""
 
 #: widgets/heading/heading.php:359
-msgid "Seperator Position"
+msgid "Separator Position"
 msgstr ""
 
 #: widgets/heading/heading.php:526
@@ -5222,7 +5215,7 @@ msgid "Title Description color"
 msgstr ""
 
 #: widgets/heading/heading.php:1203
-msgid "Seperator color"
+msgid "Separator color"
 msgstr ""
 
 #: widgets/heading/heading.php:1252
@@ -6145,16 +6138,16 @@ msgid "Conatiner width"
 msgstr ""
 
 #: widgets/nav-menu/nav-menu.php:958
-msgid "Humburger Style"
+msgid "Hamburger Style"
 msgstr ""
 
 #: widgets/nav-menu/nav-menu.php:966
-msgid "Humburger Toggle"
+msgid "Hamburger Toggle"
 msgstr ""
 
 #: widgets/nav-menu/nav-menu.php:1123 widgets/nav-menu/nav-menu.php:1165
 #: widgets/nav-menu/nav-menu.php:1324 widgets/nav-menu/nav-menu.php:1365
-msgid "Humber Icon Color"
+msgid "Hamburger Icon Color"
 msgstr ""
 
 #: widgets/nav-menu/nav-menu.php:1183

@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '62e0e7596e7c037102987515cefbb74c2a941253',
+    'reference' => 'aa2e6f61982c460fa8200013fb786e46deb123af',
     'name' => 'weglot/translate-wordpress',
   ),
   'versions' => 
@@ -45,7 +45,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '62e0e7596e7c037102987515cefbb74c2a941253',
+      'reference' => 'aa2e6f61982c460fa8200013fb786e46deb123af',
     ),
     'weglot/translation-definitions' => 
     array (

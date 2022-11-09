@@ -118,7 +118,10 @@ class Plugin {
 		/**
 		 * Show go Premium menu
 		 */
-		\Wpmet\Libs\Pro_Awareness::instance( 'elementskit-lite' )
+		$pro_awareness = \Wpmet\Libs\Pro_Awareness::instance('elementskit-lite');
+
+		if(version_compare($pro_awareness->get_version(), '1.2.0') >= 0) {
+			$pro_awareness
 			->set_parent_menu_slug( 'elementskit' )
 			->set_plugin_file( 'elementskit-lite/elementskit-lite.php' )
 			->set_pro_link(
@@ -230,6 +233,7 @@ class Plugin {
 				) 
 			)
 			->call();
+		}
 
 		// Adding pro lebel
 		if ( \ElementsKit_Lite::package_type() == 'free' ) {

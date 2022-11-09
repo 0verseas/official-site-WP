@@ -955,7 +955,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->start_controls_section(
             'elementskit_menu_toggle_style_tab',
             [
-                'label' => esc_html__( 'Humburger Style', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Style', 'elementskit-lite' ),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -963,7 +963,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->add_control(
             'elementskit_menu_toggle_style_title',
             [
-                'label' => esc_html__( 'Humburger Toggle', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Toggle', 'elementskit-lite' ),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
             ]
@@ -1120,7 +1120,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->add_control(
             'elementskit_menu_toggle_icon_color',
             [
-                'label' => esc_html__( 'Humber Icon Color', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Icon Color', 'elementskit-lite' ),
                 'type' => Controls_Manager::COLOR,
                 'default' => 'rgba(0, 0, 0, 0.5)',
                 'selectors' => [
@@ -1162,7 +1162,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->add_control(
             'elementskit_menu_toggle_icon_color_hover',
             [
-                'label' => esc_html__( 'Humber Icon Color', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Icon Color', 'elementskit-lite' ),
                 'type' => Controls_Manager::COLOR,
                 'default' => 'rgba(0, 0, 0, 0.5)',
                 'selectors' => [
@@ -1321,7 +1321,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->add_control(
             'elementskit_menu_close_icon_color',
             [
-                'label' => esc_html__( 'Humber Icon Color', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Icon Color', 'elementskit-lite' ),
                 'type' => Controls_Manager::COLOR,
                 'default' => 'rgba(51, 51, 51, 1)',
                 'selectors' => [
@@ -1362,7 +1362,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->add_control(
             'elementskit_menu_close_icon_color_hover',
             [
-                'label' => esc_html__( 'Humber Icon Color', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Icon Color', 'elementskit-lite' ),
                 'type' => Controls_Manager::COLOR,
                 'default' => 'rgba(0, 0, 0, 0.5)',
                 'selectors' => [
@@ -1576,21 +1576,25 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
 				!empty($settings['elementskit_nav_dropdown_as']) ? $settings['elementskit_nav_dropdown_as'] : 'ekit-nav-dropdown-hover',
 			];
 
-            $args = [
-                'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>' . $markup,
-                'container'       => 'div',
-                'container_id'    => 'ekit-megamenu-' . $settings['elementskit_nav_menu'],
-                'container_class' => join(' ', $container_classes),
-                'menu'         	  => $settings['elementskit_nav_menu'],
-                'menu_class'      => 'elementskit-navbar-nav ' . $settings['elementskit_main_menu_position'] .' submenu-click-on-'. $settings['submenu_click_area'],
-                'depth'           => 4,
-                'echo'            => true,
-                'fallback_cb'     => 'wp_page_menu',
-                'walker'          => (class_exists('\ElementsKit_Lite\ElementsKit_Menu_Walker') ? new \ElementsKit_Lite\ElementsKit_Menu_Walker() : '' )
-            ];
+			$args = [
+				'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>' . $markup,
+				'container'       => 'div',
+				'container_id'    => 'ekit-megamenu-' . $settings['elementskit_nav_menu'],
+				'container_class' => join(' ', $container_classes),
+				'menu'         	  => $settings['elementskit_nav_menu'],
+				'menu_class'      => 'elementskit-navbar-nav ' . $settings['elementskit_main_menu_position'] .' submenu-click-on-'. $settings['submenu_click_area'],
+				'depth'           => 4,
+				'echo'            => true,
+				'fallback_cb'     => 'wp_page_menu',
+				'walker'          => (class_exists('\ElementsKit_Lite\ElementsKit_Menu_Walker') ? new \ElementsKit_Lite\ElementsKit_Menu_Walker() : '' )
+			];
 
-            wp_nav_menu($args);
-            
+			// WP 6.1 submenu issue
+			if(version_compare(get_bloginfo('version'), '6.1', '>=')){
+				unset($args['depth']);
+			}
+
+			wp_nav_menu($args);
 
             /**
              * Mobile Menu Overlay

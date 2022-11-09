@@ -319,14 +319,14 @@ class ElementsKit_Widget_Heading extends Widget_Base {
 		$this->start_controls_section(
 			'ekit_heading_section_seperator',
 			array(
-				'label' => esc_html__( 'Seperator', 'elementskit-lite' ),
+				'label' => esc_html__( 'Separator', 'elementskit-lite' ),
 			)
 		);
 
 
 		$this->add_control(
 			'ekit_heading_show_seperator', [
-				'label'			 =>esc_html__( 'Show Seperator', 'elementskit-lite' ),
+				'label'			 =>esc_html__( 'Show Separator', 'elementskit-lite' ),
 				'type'			 => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'label_on' =>esc_html__( 'Yes', 'elementskit-lite' ),
@@ -337,7 +337,7 @@ class ElementsKit_Widget_Heading extends Widget_Base {
 		$this->add_control(
 			'ekit_heading_seperator_style',
 			[
-				'label' => esc_html__( 'Seperator Style', 'elementskit-lite' ),
+				'label' => esc_html__( 'Separator Style', 'elementskit-lite' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
 					'elementskit-border-divider ekit-dotted' => esc_html__( 'Dotted', 'elementskit-lite' ),
@@ -356,7 +356,7 @@ class ElementsKit_Widget_Heading extends Widget_Base {
 		$this->add_control(
 			'ekit_heading_seperator_position',
 			[
-				'label' => esc_html__( 'Seperator Position', 'elementskit-lite' ),
+				'label' => esc_html__( 'Separator Position', 'elementskit-lite' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
 					'top' => esc_html__( 'Top', 'elementskit-lite' ),
@@ -1123,10 +1123,10 @@ class ElementsKit_Widget_Heading extends Widget_Base {
 
 		$this->end_controls_section();
 
-		//Seperator Style Section
+		//Separator Style Section
 		$this->start_controls_section(
 			'ekit_heading_section_seperator_style', [
-				'label'	 => esc_html__( 'Seperator', 'elementskit-lite' ),
+				'label'	 => esc_html__( 'Separator', 'elementskit-lite' ),
 				'tab'	 => Controls_Manager::TAB_STYLE,
 				'condition' => [
 					'ekit_heading_show_seperator' => 'yes'
@@ -1200,7 +1200,7 @@ class ElementsKit_Widget_Heading extends Widget_Base {
 
 		$this->add_responsive_control(
 			'ekit_heading_seperator_color', [
-				'label'		 =>esc_html__( 'Seperator color', 'elementskit-lite' ),
+				'label'		 =>esc_html__( 'Separator color', 'elementskit-lite' ),
 				'type'		 => Controls_Manager::COLOR,
 				'selectors'	 => [
 					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-divider' => 'background: linear-gradient(90deg, {{VALUE}} 0%, {{VALUE}} 100%);',

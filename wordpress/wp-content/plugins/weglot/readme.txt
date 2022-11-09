@@ -4,7 +4,7 @@ Tags: translate, multilingual, language, translation, localization, multilingual
 Requires at least: 4.5
 Tested up to: 6.0
 Requires PHP: 5.6
-Stable tag: 3.8.1
+Stable tag: 3.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -210,11 +210,8 @@ See changelog for upgrade changes.
 
 == Changelog ==
 
-= 3.8.1 (18/10/2022) =
-* Bug: Default is_rtl value for custom_languages
-* Bug: Update render button for gutenberg editor
-* Bug: Improve UI for adding excluded block
-* Add: Update assets for wordpress.org
+= 3.8.2 (08/11/2022) =
+* Bug: Update cdn url for pageviews replace cdn-api-weglot.com by cdn-api.weglot.com
 
 = Older versions =
 

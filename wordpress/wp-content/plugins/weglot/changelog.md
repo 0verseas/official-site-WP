@@ -3,6 +3,12 @@
 
 # Change Log
 
+##3.8.1 (18/10/2022) =
+* Bug: Default is_rtl value for custom_languages
+* Bug: Update render button for gutenberg editor
+* Bug: Improve UI for adding excluded block
+* Add: Update assets for wordpress.org
+
 ##3.8 (11/10/2022) =
 * Add: Add ajax checker for woocommerce variations cart popin
 * Add: Rework switcher. Generate it direclty on render method
