@@ -1,3 +1,11 @@
+1.8.56: 2022-11-04
+- Improvement: Integrate quantity input buttons with WooCommerce Pre Order
+- Improvement: Gutenberg container and inner container width improvements
+- Fix: WooCommerce "Highlight Required Fields" customizer option issue
+- Fix: Some customiser options do not work for BuddyPress pages
+- Fix: Boxed view posts/pages make the Gutenberg editor extremely narrow
+- Fix: Links underline decoration issue
+
 1.8.55: 2022-11-03
 - Improvement: Gradient tool does not work correctly with WP 6.1
 - Improvement: Don't steal focus when clicking a link inside overlay

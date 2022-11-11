@@ -1,7 +1,5 @@
 $buttons-base:
-	// 'button',
 	'.button',
-	'.submit',
 	'.ct-button',
 	'.added_to_cart',
 	'.ct-button-ghost',
@@ -11,10 +9,11 @@ $buttons-base:
 	'.forminator-ui[data-design="none"] .forminator-button',
 
 	// special buttons
-	'button[class*="ajax"]',
-	'button.regform-button',
+	'a.showlogin',
 	'a.restore-item',
-	'a.showlogin'
+	'button.regform-button',
+	'button[class*="ajax"]',
+	'.submit:where(:not(div.submit))',
 ;
 
 
@@ -37,7 +36,6 @@ $buttons-base:
 	&:disabled, &.disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
-		// pointer-events: none;
 	}
 
 	@include media-breakpoint-down (xs) {

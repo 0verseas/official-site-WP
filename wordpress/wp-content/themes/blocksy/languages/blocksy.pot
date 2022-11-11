@@ -583,7 +583,7 @@ msgstr ""
 #: inc/options/posts/woo-gallery.php:10, inc/options/posts/woo-general.php:440,
 #: inc/options/posts/woo-general.php:571,
 #: inc/options/posts/woo-general.php:786,
-#: inc/options/posts/woo-general.php:1114,
+#: inc/options/posts/woo-general.php:1115,
 #: inc/options/posts/woo-product-tabs.php:16,
 #: inc/options/posts/woo-single.php:21,
 #: inc/options/single-elements/author-box.php:21,
@@ -1181,7 +1181,7 @@ msgstr ""
 #: inc/options/posts/woo-general.php:482,
 #: inc/options/posts/woo-general.php:705,
 #: inc/options/posts/woo-general.php:841,
-#: inc/options/posts/woo-general.php:1146,
+#: inc/options/posts/woo-general.php:1147,
 #: inc/options/posts/woo-product-tabs.php:62,
 #: inc/options/posts/woo-single.php:52,
 #: inc/options/single-elements/author-box.php:203,
@@ -1308,8 +1308,8 @@ msgstr ""
 #: inc/options/posts/woo-general.php:862,
 #: inc/options/posts/woo-general.php:892,
 #: inc/options/posts/woo-general.php:918,
-#: inc/options/posts/woo-general.php:1166,
-#: inc/options/posts/woo-general.php:1187,
+#: inc/options/posts/woo-general.php:1167,
+#: inc/options/posts/woo-general.php:1188,
 #: inc/options/posts/woo-product-tabs.php:98,
 #: inc/options/posts/woo-product-tabs.php:130,
 #: inc/options/posts/woo-single.php:100, inc/options/posts/woo-single.php:139,
@@ -2922,14 +2922,14 @@ msgstr ""
 msgid "Mobile Sidebar Position"
 msgstr ""
 
-#: inc/options/general/sidebar.php:256, inc/options/posts/woo-general.php:1137,
+#: inc/options/general/sidebar.php:256, inc/options/posts/woo-general.php:1138,
 #: inc/options/single-elements/post-share-box.php:112,
 #: inc/panel-builder/header/logo/options.php:249
 #: static/js/options/options/ct-spacing.js:91
 msgid "Top"
 msgstr ""
 
-#: inc/options/general/sidebar.php:257, inc/options/posts/woo-general.php:1138,
+#: inc/options/general/sidebar.php:257, inc/options/posts/woo-general.php:1139,
 #: inc/options/single-elements/post-share-box.php:113,
 #: inc/panel-builder/header/cart/options.php:125,
 #: inc/panel-builder/header/search/options.php:97,
@@ -3655,89 +3655,89 @@ msgstr ""
 msgid "Highlight Required Fields"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:978
+#: inc/options/posts/woo-general.php:979
 msgid "Company Name Field"
-msgstr ""
-
-#: inc/options/posts/woo-general.php:985,
-#: inc/options/posts/woo-general.php:1003,
-#: inc/options/posts/woo-general.php:1021
-msgid "Hidden"
 msgstr ""
 
 #: inc/options/posts/woo-general.php:986,
 #: inc/options/posts/woo-general.php:1004,
 #: inc/options/posts/woo-general.php:1022
-msgid "Optional"
+msgid "Hidden"
 msgstr ""
 
 #: inc/options/posts/woo-general.php:987,
 #: inc/options/posts/woo-general.php:1005,
 #: inc/options/posts/woo-general.php:1023
+msgid "Optional"
+msgstr ""
+
+#: inc/options/posts/woo-general.php:988,
+#: inc/options/posts/woo-general.php:1006,
+#: inc/options/posts/woo-general.php:1024
 msgid "Required"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:996
+#: inc/options/posts/woo-general.php:997
 msgid "Address Line 2 Field"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1014
+#: inc/options/posts/woo-general.php:1015
 msgid "Phone Field"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1032
+#: inc/options/posts/woo-general.php:1033
 msgid "Privacy Policy Page"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1045
+#: inc/options/posts/woo-general.php:1046
 msgid "Terms And Conditions Page"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1057
+#: inc/options/posts/woo-general.php:1058
 msgid "Privacy policy"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1058
+#: inc/options/posts/woo-general.php:1059
 msgid ""
 "Optionally add some text about your store privacy policy to show during "
 "checkout."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1060
+#: inc/options/posts/woo-general.php:1061
 msgid ""
 "Your personal data will be used to process your order, support your "
 "experience throughout this website, and for other purposes described in our "
 "[privacy_policy]."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1073
+#: inc/options/posts/woo-general.php:1074
 msgid "Terms and conditions"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1074
+#: inc/options/posts/woo-general.php:1075
 msgid ""
 "Optionally add some text for the terms checkbox that customers must accept."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1103
+#: inc/options/posts/woo-general.php:1104
 msgid "Store Notice"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1121
+#: inc/options/posts/woo-general.php:1122
 msgid ""
 "This is a demo store for testing purposes &mdash; no orders shall be "
 "fulfilled."
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1131
+#: inc/options/posts/woo-general.php:1132
 msgid "Notice Position"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1151
+#: inc/options/posts/woo-general.php:1152
 msgid "Notice Font Color"
 msgstr ""
 
-#: inc/options/posts/woo-general.php:1173
+#: inc/options/posts/woo-general.php:1174
 msgid "Notice Background Color"
 msgstr ""
 
