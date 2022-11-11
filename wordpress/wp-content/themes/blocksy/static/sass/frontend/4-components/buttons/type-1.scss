@@ -4,9 +4,9 @@ $buttons-type-1:
 	'.entry-tags a',
 	'.added_to_cart',
 	'[type="submit"]',
-	'.wp-block-file .wp-block-file__button',
-	'div:not(.is-style-outline) > .wp-block-button__link',
-	'.forminator-ui[data-design="none"] .forminator-button',
+	'.wp-element-button',
+	// 'div:not(.is-style-outline) > .wp-block-button__link',
+	// '.wp-block-file .wp-block-file__button',
 
 	// special buttons
 	'a.showlogin',
@@ -14,6 +14,7 @@ $buttons-type-1:
 	'button.regform-button',
 	'button[class*="ajax"]',
 	'.submit:where(:not(div.submit))',
+	'.forminator-ui[data-design="none"] .forminator-button',
 ;
 
 #{$buttons-type-1} {

@@ -94,6 +94,10 @@ class DynamicCss {
 			return;
 		}
 
+		if (defined('IFRAME_REQUEST') && IFRAME_REQUEST) {
+			return;
+		}
+
 		if (
 			! function_exists('blocksy_has_css_in_files')
 			||

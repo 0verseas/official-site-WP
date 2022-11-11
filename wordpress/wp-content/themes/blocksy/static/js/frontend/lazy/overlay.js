@@ -4,6 +4,8 @@ import { mount as mountMobileMenu } from './overlay/mobile-menu'
 
 import { focusLockManager } from '../helpers/focus-lock'
 
+import { isTouchDevice } from '../helpers/is-touch-device'
+
 const showOffcanvas = (settings) => {
 	settings = {
 		onClose: () => {},
@@ -21,7 +23,7 @@ const showOffcanvas = (settings) => {
 		trigger.setAttribute('aria-expanded', 'true')
 	})
 
-	if (settings.focus) {
+	if (settings.focus && !isTouchDevice()) {
 		setTimeout(() => {
 			settings.container.querySelector('input') &&
 				settings.container.querySelector('input').focus()
@@ -154,7 +156,7 @@ const hideOffcanvas = (settings, args = {}) => {
 	].map((trigger, index) => {
 		trigger.setAttribute('aria-expanded', 'false')
 
-		if (args.shouldFocusOriginalTrigger) {
+		if (args.shouldFocusOriginalTrigger && !isTouchDevice()) {
 			setTimeout(() => {
 				if (index === 0) {
 					trigger.focus()

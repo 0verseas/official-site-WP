@@ -190,6 +190,13 @@ add_action('init', function () {
 	);
 
 	add_action('elementor/editor/after_enqueue_styles', function () {
+		if (! apply_filters(
+			'blocksy:integrations:elementor:has-ui-styles',
+			true
+		)) {
+			return;
+		}
+
 		$theme = blocksy_get_wp_parent_theme();
 
 		wp_enqueue_style(

@@ -246,6 +246,25 @@ class Blocksy_Header_Builder_Elements {
 			'<svg class="ct-icon" width="12" height="12" viewBox="0 0 15 15"><path d="M1 15a1 1 0 01-.71-.29 1 1 0 010-1.41l5.8-5.8-5.8-5.8A1 1 0 011.7.29l5.8 5.8 5.8-5.8a1 1 0 011.41 1.41l-5.8 5.8 5.8 5.8a1 1 0 01-1.41 1.41l-5.8-5.8-5.8 5.8A1 1 0 011 15z"/></svg>'
 		);
 
+		$search_form_args = [
+			'enable_search_field_class' => true,
+			'ct_post_type' => $post_type,
+			'search_placeholder' => $search_placeholder,
+			'search_live_results' => 'no'
+		];
+
+		if (blocksy_akg('enable_live_results', $atts, 'yes') === 'yes') {
+			$search_form_args['search_live_results'] = 'yes';
+
+			$search_form_args['live_results_attr'] = blocksy_akg(
+				'searchHeaderImages', $atts, 'yes'
+			) === 'yes' ? 'thumbs' : '';
+
+			$search_form_args['ct_product_price'] = blocksy_akg(
+				'searchHeaderProductPrice', $atts, 'no'
+			) === 'yes';
+		}
+
 		?>
 
 		<div id="search-modal" class="ct-panel" data-behaviour="modal">
@@ -256,13 +275,7 @@ class Blocksy_Header_Builder_Elements {
 			</div>
 
 			<div class="ct-panel-content">
-				<?php get_search_form([
-					'enable_search_field_class' => true,
-					'live_results_attr' => blocksy_akg('searchHeaderImages', $atts, 'yes') === 'yes' ? 'thumbs' : '',
-					'ct_post_type' => $post_type,
-					'ct_product_price' => blocksy_akg('searchHeaderProductPrice', $atts, 'no') === 'yes',
-					'search_placeholder' => $search_placeholder
-				]); ?>
+				<?php get_search_form($search_form_args); ?>
 			</div>
 		</div>
 
@@ -280,8 +293,10 @@ class Blocksy_Header_Builder_Elements {
 			'current_section_id' => $this->current_section_id
 		]);
 
-		if (! $render->contains_item('cart')) {
-			return '';
+		if (! $args['force_output']) {
+			if (! $render->contains_item('cart')) {
+				return '';
+			}
 		}
 
 		if (! function_exists('woocommerce_mini_cart')) {

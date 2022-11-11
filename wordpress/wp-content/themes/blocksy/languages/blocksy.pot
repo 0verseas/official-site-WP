@@ -68,7 +68,7 @@ msgstr ""
 msgid "Search button"
 msgstr ""
 
-#: searchform.php:127, inc/manager.php:132
+#: searchform.php:127, inc/manager.php:136
 msgid "No results"
 msgstr ""
 
@@ -158,30 +158,30 @@ msgstr ""
 msgid "Footer Widget Area "
 msgstr ""
 
-#: inc/manager.php:128
+#: inc/manager.php:132
 msgid "Show more"
 msgstr ""
 
-#: inc/manager.php:129
+#: inc/manager.php:133
 msgid "More"
 msgstr ""
 
-#: inc/manager.php:130
+#: inc/manager.php:134
 msgid "Search results"
 msgstr ""
 
-#: inc/manager.php:133, inc/manager.php:139
+#: inc/manager.php:137, inc/manager.php:143
 msgid "You got %s result. Please press Tab to select it."
 msgid_plural "You got %s results. Please press Tab to select one."
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/manager.php:146, inc/components/menus.php:91,
+#: inc/manager.php:150, inc/components/menus.php:91,
 #: inc/components/menus.php:80, inc/components/menus.php:239
 msgid "Expand dropdown menu"
 msgstr ""
 
-#: inc/manager.php:147
+#: inc/manager.php:151
 msgid "Collapse dropdown menu"
 msgstr ""
 
@@ -848,11 +848,11 @@ msgstr ""
 msgid "Close drawer"
 msgstr ""
 
-#: inc/components/builder/header-elements.php:378
+#: inc/components/builder/header-elements.php:393
 msgid "Shopping Cart"
 msgstr ""
 
-#: inc/components/builder/header-elements.php:380
+#: inc/components/builder/header-elements.php:395
 msgid "Close cart drawer"
 msgstr ""
 
@@ -1027,7 +1027,7 @@ msgstr ""
 #: inc/panel-builder/header/cart/options.php:1035,
 #: inc/panel-builder/header/offcanvas/options.php:304,
 #: inc/panel-builder/header/search/options.php:47,
-#: inc/panel-builder/header/search/options.php:746,
+#: inc/panel-builder/header/search/options.php:761,
 #: inc/panel-builder/header/trigger/options.php:38
 msgid "Icon Size"
 msgstr ""
@@ -1112,7 +1112,7 @@ msgstr ""
 #: inc/panel-builder/header/logo/options.php:331,
 #: inc/panel-builder/header/mobile-menu/options.php:165,
 #: inc/panel-builder/header/search/options.php:71,
-#: inc/panel-builder/header/search/options.php:799,
+#: inc/panel-builder/header/search/options.php:814,
 #: inc/panel-builder/header/socials/options.php:153,
 #: inc/panel-builder/header/socials/options.php:179,
 #: inc/panel-builder/header/text/options.php:119,
@@ -1150,7 +1150,7 @@ msgstr ""
 #: inc/panel-builder/header/logo/options.php:332,
 #: inc/panel-builder/header/mobile-menu/options.php:166,
 #: inc/panel-builder/header/search/options.php:72,
-#: inc/panel-builder/header/search/options.php:800,
+#: inc/panel-builder/header/search/options.php:815,
 #: inc/panel-builder/header/socials/options.php:154,
 #: inc/panel-builder/header/socials/options.php:180,
 #: inc/panel-builder/header/text/options.php:120,
@@ -1204,7 +1204,7 @@ msgstr ""
 #: inc/panel-builder/header/offcanvas/options.php:100,
 #: inc/panel-builder/header/offcanvas-logo/options.php:32,
 #: inc/panel-builder/header/search/options.php:116,
-#: inc/panel-builder/header/search/options.php:465,
+#: inc/panel-builder/header/search/options.php:480,
 #: inc/panel-builder/header/socials/options.php:191,
 #: inc/panel-builder/header/text/options.php:146,
 #: inc/panel-builder/header/trigger/options.php:130
@@ -1223,7 +1223,7 @@ msgstr ""
 #: inc/panel-builder/header/search/options.php:296,
 #: inc/panel-builder/header/search/options.php:328,
 #: inc/panel-builder/header/search/options.php:358,
-#: inc/panel-builder/header/search/options.php:637,
+#: inc/panel-builder/header/search/options.php:652,
 #: inc/panel-builder/header/trigger/options.php:283,
 #: inc/panel-builder/header/trigger/options.php:312,
 #: inc/panel-builder/header/trigger/options.php:343,
@@ -1380,13 +1380,13 @@ msgstr ""
 #: inc/panel-builder/header/search/options.php:314,
 #: inc/panel-builder/header/search/options.php:346,
 #: inc/panel-builder/header/search/options.php:376,
-#: inc/panel-builder/header/search/options.php:499,
-#: inc/panel-builder/header/search/options.php:530,
-#: inc/panel-builder/header/search/options.php:560,
-#: inc/panel-builder/header/search/options.php:591,
-#: inc/panel-builder/header/search/options.php:654,
-#: inc/panel-builder/header/search/options.php:690,
-#: inc/panel-builder/header/search/options.php:729,
+#: inc/panel-builder/header/search/options.php:514,
+#: inc/panel-builder/header/search/options.php:545,
+#: inc/panel-builder/header/search/options.php:575,
+#: inc/panel-builder/header/search/options.php:606,
+#: inc/panel-builder/header/search/options.php:669,
+#: inc/panel-builder/header/search/options.php:705,
+#: inc/panel-builder/header/search/options.php:744,
 #: inc/panel-builder/header/socials/options.php:269,
 #: inc/panel-builder/header/socials/options.php:300,
 #: inc/panel-builder/header/socials/options.php:329,
@@ -1515,12 +1515,12 @@ msgstr ""
 #: inc/panel-builder/header/search/options.php:320,
 #: inc/panel-builder/header/search/options.php:351,
 #: inc/panel-builder/header/search/options.php:381,
-#: inc/panel-builder/header/search/options.php:504,
-#: inc/panel-builder/header/search/options.php:566,
-#: inc/panel-builder/header/search/options.php:597,
-#: inc/panel-builder/header/search/options.php:660,
-#: inc/panel-builder/header/search/options.php:696,
-#: inc/panel-builder/header/search/options.php:735,
+#: inc/panel-builder/header/search/options.php:519,
+#: inc/panel-builder/header/search/options.php:581,
+#: inc/panel-builder/header/search/options.php:612,
+#: inc/panel-builder/header/search/options.php:675,
+#: inc/panel-builder/header/search/options.php:711,
+#: inc/panel-builder/header/search/options.php:750,
 #: inc/panel-builder/header/socials/options.php:275,
 #: inc/panel-builder/header/socials/options.php:305,
 #: inc/panel-builder/header/socials/options.php:334,
@@ -1709,7 +1709,7 @@ msgstr ""
 #: inc/panel-builder/header/search/options.php:171,
 #: inc/panel-builder/header/search/options.php:202,
 #: inc/panel-builder/header/search/options.php:231,
-#: inc/panel-builder/header/search/options.php:481,
+#: inc/panel-builder/header/search/options.php:496,
 #: inc/panel-builder/header/socials/options.php:252,
 #: inc/panel-builder/header/socials/options.php:283,
 #: inc/panel-builder/header/socials/options.php:312,
@@ -1735,7 +1735,7 @@ msgstr ""
 #: inc/panel-builder/header/cart/options.php:744,
 #: inc/panel-builder/header/cart/options.php:1000,
 #: inc/panel-builder/header/offcanvas/options.php:268,
-#: inc/panel-builder/header/search/options.php:712,
+#: inc/panel-builder/header/search/options.php:727,
 #: inc/panel-builder/header/trigger/options.php:410,
 #: inc/panel-builder/header/trigger/options.php:452,
 #: inc/panel-builder/header/trigger/options.php:492,
@@ -1751,7 +1751,7 @@ msgstr ""
 #: inc/panel-builder/header/cart/options.php:918,
 #: inc/panel-builder/header/mobile-menu/options.php:85,
 #: inc/panel-builder/header/offcanvas/options.php:183,
-#: inc/panel-builder/header/search/options.php:630
+#: inc/panel-builder/header/search/options.php:645
 msgid "Border"
 msgstr ""
 
@@ -1769,7 +1769,7 @@ msgstr ""
 #: inc/panel-builder/header/cart/options.php:1051,
 #: inc/panel-builder/header/middle-row/options.php:491,
 #: inc/panel-builder/header/offcanvas/options.php:320,
-#: inc/panel-builder/header/search/options.php:762,
+#: inc/panel-builder/header/search/options.php:777,
 #: inc/panel-builder/header/trigger/options.php:570
 msgid "Border Radius"
 msgstr ""
@@ -1817,7 +1817,7 @@ msgstr ""
 #: inc/panel-builder/header/middle-row/options.php:158,
 #: inc/panel-builder/header/middle-row/options.php:173,
 #: inc/panel-builder/header/offcanvas/options.php:184,
-#: inc/panel-builder/header/search/options.php:631
+#: inc/panel-builder/header/search/options.php:646
 msgid "Background"
 msgstr ""
 
@@ -2019,7 +2019,7 @@ msgstr ""
 #: inc/options/general/form-elements.php:63,
 #: inc/options/general/form-elements.php:107,
 #: inc/options/general/form-elements.php:140,
-#: inc/panel-builder/header/search/options.php:535
+#: inc/panel-builder/header/search/options.php:550
 msgid "Focus"
 msgstr ""
 
@@ -2037,7 +2037,7 @@ msgstr ""
 #: inc/options/single-elements/author-box.php:391,
 #: inc/panel-builder/header/cart/options.php:960,
 #: inc/panel-builder/header/offcanvas/options.php:227,
-#: inc/panel-builder/header/search/options.php:673,
+#: inc/panel-builder/header/search/options.php:688,
 #: inc/panel-builder/header/trigger/options.php:406,
 #: inc/panel-builder/header/trigger/options.php:448,
 #: inc/panel-builder/header/trigger/options.php:488,
@@ -2244,7 +2244,7 @@ msgstr ""
 #: inc/panel-builder/header/menu/options.php:591,
 #: inc/panel-builder/header/mobile-menu/options.php:84,
 #: inc/panel-builder/header/offcanvas/options.php:182,
-#: inc/panel-builder/header/search/options.php:629,
+#: inc/panel-builder/header/search/options.php:644,
 #: inc/panel-builder/header/trigger/options.php:58
 msgid "Simple"
 msgstr ""
@@ -3198,7 +3198,7 @@ msgid "Live results"
 msgstr ""
 
 #: inc/options/pages/search-page.php:50,
-#: inc/panel-builder/header/search/options.php:434
+#: inc/panel-builder/header/search/options.php:445
 msgid "Live Results Product Price"
 msgstr ""
 
@@ -3388,7 +3388,7 @@ msgid "Modal Shadow"
 msgstr ""
 
 #: inc/options/posts/woo-categories.php:834,
-#: inc/panel-builder/header/search/options.php:605
+#: inc/panel-builder/header/search/options.php:620
 msgid "Modal Background"
 msgstr ""
 
@@ -3757,7 +3757,7 @@ msgstr ""
 #: inc/panel-builder/header/menu/options.php:656,
 #: inc/panel-builder/header/mobile-menu/options.php:189,
 #: inc/panel-builder/header/mobile-menu/options.php:338,
-#: inc/panel-builder/header/search/options.php:471,
+#: inc/panel-builder/header/search/options.php:486,
 #: inc/panel-builder/header/text/options.php:152
 msgid "Font"
 msgstr ""
@@ -4165,7 +4165,7 @@ msgstr ""
 #: inc/panel-builder/header/cart/options.php:1088,
 #: inc/panel-builder/header/logo/options.php:319,
 #: inc/panel-builder/header/mobile-menu/options.php:153,
-#: inc/panel-builder/header/search/options.php:788,
+#: inc/panel-builder/header/search/options.php:803,
 #: inc/panel-builder/header/socials/options.php:168,
 #: inc/panel-builder/header/text/options.php:107,
 #: inc/panel-builder/header/text/options.php:343,
@@ -4719,7 +4719,7 @@ msgstr ""
 
 #: inc/panel-builder/header/cart/options.php:908,
 #: inc/panel-builder/header/offcanvas/options.php:173,
-#: inc/panel-builder/header/search/options.php:620
+#: inc/panel-builder/header/search/options.php:635
 msgid "Close Button Type"
 msgstr ""
 
@@ -5036,27 +5036,27 @@ msgstr ""
 msgid "Placeholder Text"
 msgstr ""
 
-#: inc/panel-builder/header/search/options.php:422
+#: inc/panel-builder/header/search/options.php:433
 msgid "Live Results Images"
 msgstr ""
 
-#: inc/panel-builder/header/search/options.php:445
+#: inc/panel-builder/header/search/options.php:460
 msgid "Search Through Criteria"
 msgstr ""
 
-#: inc/panel-builder/header/search/options.php:446
+#: inc/panel-builder/header/search/options.php:461
 msgid "Chose in which post types do you want to perform searches."
 msgstr ""
 
-#: inc/panel-builder/header/search/options.php:512
+#: inc/panel-builder/header/search/options.php:527
 msgid "Input Font Color"
 msgstr ""
 
-#: inc/panel-builder/header/search/options.php:543
+#: inc/panel-builder/header/search/options.php:558
 msgid "Search Icon Color"
 msgstr ""
 
-#: inc/panel-builder/header/search/options.php:574
+#: inc/panel-builder/header/search/options.php:589
 msgid "Search Button Color"
 msgstr ""
 

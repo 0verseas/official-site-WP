@@ -1,3 +1,11 @@
+1.8.57: 2022-11-10
+- Improvement: Introduce filter for modifying static assets urls for CDN
+- Improvement: Outline button type not inheriting the correct color
+- Improvement: Left/right alignment blocks improvement
+- Improvement: Don't show iOS focus highlighter on trigger buttons
+- Improvement: Option to disable live results in header search module
+- Fix: Legacy nav widget menu inherits page site body background options in preview
+
 1.8.56: 2022-11-04
 - Improvement: Integrate quantity input buttons with WooCommerce Pre Order
 - Improvement: Gutenberg container and inner container width improvements

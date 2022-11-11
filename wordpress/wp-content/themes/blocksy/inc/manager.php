@@ -73,6 +73,10 @@ class Blocksy_Manager {
 		add_action(
 			'wp_head',
 			function () {
+				if (defined('IFRAME_REQUEST') && IFRAME_REQUEST) {
+					return;
+				}
+
 				$this->dynamic_css->load_frontend_css([
 					'descriptor' => $this->dynamic_styles_descriptor
 				]);
