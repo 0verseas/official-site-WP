@@ -25,8 +25,9 @@ while ( $loop->have_posts() ) : $loop->the_post();
 			$all_selected_filters = array_merge($all_selected_filters, $filters_value);
 		}
 	} ?>
-	<div class="portfolio-wraper pfg-bootstrap" version="<?php echo PFG_PLUGIN_VER ?>">
+	<div class="portfolio-wraper pfg-bootstrap" version="<?php echo PFG_PLUGIN_VER; ?>">
 		<?php
+		$filter_align = '';
 		if($hide_filters == 0 ) {
 			if($filter_position == 'center') {
 				$filter_align = 'text-center';

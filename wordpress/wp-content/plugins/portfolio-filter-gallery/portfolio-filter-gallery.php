@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 Plugin Name: Portfolio Filter Gallery
 Plugin URI: http://awplife.com/
 Description: Portfolio Filter Gallery For WordPress.
-Version: 1.4.5
+Version: 1.4.6
 Author: A WP Life
 Author URI: http://awplife.com/
 License: GPLv2 or later
@@ -23,7 +23,7 @@ if ( ! class_exists( 'Awl_Portfolio_Filter_Gallery' ) ) {
 		
 		protected function _constants() {
 			//Plugin Version
-			define( 'PFG_PLUGIN_VER', '1.4.5' );
+			define( 'PFG_PLUGIN_VER', '1.4.6' );
 			
 			//Plugin Name
 			define( 'PFG_PLUGIN_NAME', __( 'Portfolio Filter Gallery', 'portfolio-filter-gallery' ) );
@@ -36,8 +36,6 @@ if ( ! class_exists( 'Awl_Portfolio_Filter_Gallery' ) ) {
 
 			//Plugin Directory URL
 			define( 'PFG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-
-			define( 'PFG_SECURE_KEY', md5( NONCE_KEY ) );
 			
 		} // end of constructor function 
 		
@@ -87,7 +85,6 @@ if ( ! class_exists( 'Awl_Portfolio_Filter_Gallery' ) ) {
 		
 		}// end of hook function
 		
-		
 		public function awplife_pfg_admin_scripts() {
 			wp_enqueue_style( 'admin_css', PFG_PLUGIN_URL . 'css/pfg-admin-style.css', false, '1.0.0' );
 
@@ -99,7 +96,6 @@ if ( ! class_exists( 'Awl_Portfolio_Filter_Gallery' ) ) {
 				)
 			);
 		}
-		
 		
 		// delete filter by ajax
 		public function awplife_pfg_delete_filter() {
@@ -297,13 +293,6 @@ if ( ! class_exists( 'Awl_Portfolio_Filter_Gallery' ) ) {
 			</div>
 			<span onclick="copyToClipboard('#shortcode')" class="pw-copy dashicons dashicons-clipboard"></span>
 			<style>
-			#menu-posts-awl_filter_gallery ul li:nth-child(6) a {
-    color: #00ff89;
-}
-#menu-posts-awl_filter_gallery ul li:nth-child(6) a:hover {
-    color: #00ff89;
-}
-
 			.pw-copy {
 				position: absolute;
 				top: 9px;
