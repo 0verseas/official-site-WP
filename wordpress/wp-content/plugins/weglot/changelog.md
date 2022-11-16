@@ -3,6 +3,9 @@
 
 # Change Log
 
+##3.8.2 (08/11/2022) =
+* Bug: Update cdn url for pageviews replace cdn-api-weglot.com by cdn-api.weglot.com
+
 ##3.8.1 (18/10/2022) =
 * Bug: Default is_rtl value for custom_languages
 * Bug: Update render button for gutenberg editor

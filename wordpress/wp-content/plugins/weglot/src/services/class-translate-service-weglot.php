@@ -183,6 +183,8 @@ class Translate_Service_Weglot {
 			if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 				if ( ! $this->request_url_services->create_url_object( wp_get_referer() )->getForLanguage( $this->request_url_services->get_current_language(), false ) ) {
 					// do nothing because the ajax referer are not exclude!
+				} else {
+					return $content;
 				}
 			} else {
 				// if type is xml we render the content without treatment.
@@ -202,17 +204,21 @@ class Translate_Service_Weglot {
 					$extra_keys         = apply_filters( 'weglot_add_json_keys', array() );
 					$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, $extra_keys );
 					$translated_content = wp_json_encode( $this->replace_url_services->replace_link_in_json( json_decode( $translated_content, true ) ) );
+
 					return apply_filters( 'weglot_json_treat_page', $translated_content );
 				case 'xml':
 					$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical );
 					$translated_content = apply_filters( 'weglot_html_treat_page', $translated_content );
+
 					return apply_filters( 'weglot_xml_treat_page', $translated_content );
 				case 'html':
 					$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical );
 					$translated_content = apply_filters( 'weglot_html_treat_page', $translated_content );
+
 					return $this->weglot_render_dom( $translated_content, $canonical );
 				default:
 					$name_filter = sprintf( 'weglot_%s_treat_page', $type );
+
 					return apply_filters( $name_filter, $content, $parser, $this->original_language, $this->current_language );
 			}
 		} catch ( ApiError $e ) {

@@ -4,7 +4,7 @@ Tags: translate, multilingual, language, translation, localization, multilingual
 Requires at least: 4.5
 Tested up to: 6.0
 Requires PHP: 5.6
-Stable tag: 3.8.2
+Stable tag: 3.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -210,8 +210,10 @@ See changelog for upgrade changes.
 
 == Changelog ==
 
-= 3.8.2 (08/11/2022) =
-* Bug: Update cdn url for pageviews replace cdn-api-weglot.com by cdn-api.weglot.com
+= 3.8.3 (15/11/2022) =
+* Bug: Prevent Ajax call from original lang to original lang
+* Bug: Fix PHP Warning on class-replace-url-service line 192
+* Update: Add index 'text' to ld+json translated value
 
 = Older versions =
 
