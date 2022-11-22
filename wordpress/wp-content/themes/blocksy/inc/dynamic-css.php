@@ -48,6 +48,14 @@ class Blocksy_Dynamic_Css {
 				$tablet_css = $tablet_css->build_css_structure();
 				$mobile_css = $mobile_css->build_css_structure();
 
+				if (is_singular()) {
+					$single_styles_descriptor = $this->maybe_get_single_post_styles_descriptor();
+
+					$desktop_css .= $single_styles_descriptor['styles']['desktop'];
+					$tablet_css .= $single_styles_descriptor['styles']['tablet'];
+					$mobile_css .= $single_styles_descriptor['styles']['mobile'];
+				}
+
 				$final_css = '';
 
 				if (! empty($desktop_css)) {
@@ -207,7 +215,6 @@ class Blocksy_Dynamic_Css {
 		if ($styles_descriptor && isset($styles_descriptor['version'])) {
 			$current_saved_version = intval($styles_descriptor['version']);
 		}
-
 
 		if (
 			! $styles_descriptor

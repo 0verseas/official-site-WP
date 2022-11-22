@@ -477,9 +477,13 @@ export const getPostListingVariables = () => ({
 		unit: '',
 	},
 
-	...handleBackgroundOptionFor({
-		id: `${prefix}_background`,
-		selector: `[data-prefix="${prefix}"]`,
-		responsive: true,
-	}),
+	...(prefix.indexOf('single') === -1
+		? {
+				...handleBackgroundOptionFor({
+					id: `${prefix}_background`,
+					selector: `[data-prefix="${prefix}"]`,
+					responsive: true,
+				}),
+		  }
+		: {}),
 })

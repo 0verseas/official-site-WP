@@ -34,6 +34,15 @@ msgid ""
 "version, the plugin is currently NOT RUNNING."
 msgstr ""
 
+#: framework/dashboard.php:279, framework/dashboard.php:280,
+#: framework/extensions/product-reviews/extension.php:619
+msgid "Blocksy"
+msgstr ""
+
+#: framework/dashboard.php:317
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
 #: framework/extensions-manager.php:245,
 #: framework/premium/extensions/adobe-typekit/extension.php:46
 msgid "Adobe Typekit"
@@ -124,73 +133,73 @@ msgid ""
 "a wishlits page."
 msgstr ""
 
-#: framework/theme-integration.php:358,
+#: framework/theme-integration.php:369,
 #: framework/extensions/widgets/widgets/ct-facebook/options.php:16,
 #: framework/extensions/widgets/widgets/ct-facebook/view.php:12,
 #: framework/extensions/widgets/widgets/ct-facebook/widget.php:13
 msgid "Facebook"
 msgstr ""
 
-#: framework/theme-integration.php:359
+#: framework/theme-integration.php:370
 msgid "Twitter"
 msgstr ""
 
-#: framework/theme-integration.php:360
+#: framework/theme-integration.php:371
 msgid "LinkedIn"
 msgstr ""
 
-#: framework/theme-integration.php:361
+#: framework/theme-integration.php:372
 msgid "Dribbble"
 msgstr ""
 
-#: framework/theme-integration.php:362
+#: framework/theme-integration.php:373
 msgid "Instagram"
 msgstr ""
 
-#: framework/theme-integration.php:363
+#: framework/theme-integration.php:374
 msgid "Pinterest"
 msgstr ""
 
-#: framework/theme-integration.php:364
+#: framework/theme-integration.php:375
 msgid "WordPress"
 msgstr ""
 
-#: framework/theme-integration.php:365
+#: framework/theme-integration.php:376
 msgid "GitHub"
 msgstr ""
 
-#: framework/theme-integration.php:366,
+#: framework/theme-integration.php:377,
 #: framework/extensions/widgets/widgets/ct-contact-info/options.php:497,
 #: framework/extensions/widgets/widgets/ct-socials/options.php:100,
 #: framework/premium/features/content-blocks/options/archive.php:47
 msgid "Medium"
 msgstr ""
 
-#: framework/theme-integration.php:367
+#: framework/theme-integration.php:378
 msgid "YouTube"
 msgstr ""
 
-#: framework/theme-integration.php:368
+#: framework/theme-integration.php:379
 msgid "Vimeo"
 msgstr ""
 
-#: framework/theme-integration.php:369
+#: framework/theme-integration.php:380
 msgid "VKontakte"
 msgstr ""
 
-#: framework/theme-integration.php:370
+#: framework/theme-integration.php:381
 msgid "Odnoklassniki"
 msgstr ""
 
-#: framework/theme-integration.php:371
+#: framework/theme-integration.php:382
 msgid "TikTok"
 msgstr ""
 
-#: framework/theme-integration.php:443
+#: framework/theme-integration.php:454
 msgid "Companion"
 msgstr ""
 
-#: framework/theme-integration.php:461 static/js/screens/SiteExport.js:111
+#: framework/theme-integration.php:472 static/js/screens/SiteExport.js:111
 msgid "PRO"
 msgstr ""
 
@@ -1443,10 +1452,6 @@ msgstr ""
 msgid "%s Settings"
 msgstr ""
 
-#: framework/extensions/product-reviews/extension.php:619
-msgid "Blocksy"
-msgstr ""
-
 #: framework/extensions/product-reviews/helpers.php:30,
 #: framework/extensions/product-reviews/metabox.php:179
 msgid "Rating"
@@ -1629,7 +1634,7 @@ msgid "Module Title"
 msgstr ""
 
 #: framework/extensions/trending/customizer.php:118,
-#: framework/extensions/trending/helpers.php:221
+#: framework/extensions/trending/helpers.php:220
 msgid "Trending now"
 msgstr ""
 
@@ -5143,7 +5148,7 @@ msgstr ""
 #: framework/extensions/newsletter-subscribe/admin-static/js/ListPicker.js:14
 #: framework/extensions/newsletter-subscribe/admin-static/js/ListPicker/Implementation.js:63
 #: framework/extensions/newsletter-subscribe/dashboard-static/js/EditCredentials.js:213
-#: static/js/screens/SiteExport.js:170
+#: static/js/dashboard-no-theme.js:46 static/js/screens/SiteExport.js:170
 msgid "Loading..."
 msgstr ""
 
@@ -5908,11 +5913,32 @@ msgstr ""
 msgid "%s System"
 msgstr ""
 
-#: static/js/dashboard.js:30
+#: static/js/dashboard-no-theme.js:16
+msgid "Action Required - Install Blocksy Theme"
+msgstr ""
+
+#: static/js/dashboard-no-theme.js:19
+msgid ""
+"Blocksy Companion is the complementary plugin to Blocksy theme. It adds a "
+"bunch of great features to the theme and acts as an unlocker for the Blocksy "
+"Pro package."
+msgstr ""
+
+#: static/js/dashboard-no-theme.js:23
+msgid ""
+"In order to take full advantage of all features it has to offer - please "
+"install and activate the Blocksy theme also."
+msgstr ""
+
+#: static/js/dashboard-no-theme.js:47
+msgid "Install and activate the Blocksy theme"
+msgstr ""
+
+#: static/js/dashboard.js:29
 msgid "Starter Sites"
 msgstr ""
 
-#: static/js/dashboard.js:42
+#: static/js/dashboard.js:41
 msgid "Extensions"
 msgstr ""
 
@@ -6354,11 +6380,11 @@ msgid ""
 "Please select your prefered one in order to continue."
 msgstr ""
 
-#: static/js/screens/DemoInstall/Wizzard/Plugins.js:63
+#: static/js/screens/DemoInstall/Wizzard/Plugins.js:64
 msgid "Install & Activate Plugins"
 msgstr ""
 
-#: static/js/screens/DemoInstall/Wizzard/Plugins.js:65
+#: static/js/screens/DemoInstall/Wizzard/Plugins.js:66
 msgid ""
 "The following plugins are required for this starter site in order to work "
 "properly."
@@ -6394,20 +6420,6 @@ msgstr ""
 
 #: static/js/screens/Extensions.js:268
 msgid "Pro Extensions"
-msgstr ""
-
-#: static/js/screens/OptIn.js:55
-msgid "Stay Updated"
-msgstr ""
-
-#: static/js/screens/OptIn.js:58
-msgid ""
-"Never miss an important update - opt in to our security & feature updates "
-"notifications, and non-sensitive diagnostic tracking."
-msgstr ""
-
-#: static/js/screens/OptIn.js:69
-msgid "Allow & Continue"
 msgstr ""
 
 #: static/js/screens/SiteExport.js:125

@@ -3,9 +3,9 @@ Contributors: awordpresslife
 Donate link: https://paypal.me/awplife
 Tags: portfolio, gallery, portfolio gallery, responsive, wordpress portfolio plugin
 Requires at least: 3.2
-Tested up to: 6.0.2
+Tested up to: 6.1.1
 Requires PHP: 5.4
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -180,7 +180,8 @@ After uploading the images choose the image type = (video) from the select box b
 == Changelog ==
 
 = 1.4.6 =
-* Nonce security function error fixed.
+* CSS Fixed.
+* Tasted with WordPress version 6.1.1
 
 = 1.4.5 =
 * Image CSS fixed.

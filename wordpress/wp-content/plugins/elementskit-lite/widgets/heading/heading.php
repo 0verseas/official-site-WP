@@ -1204,9 +1204,9 @@ class ElementsKit_Widget_Heading extends Widget_Base {
 				'type'		 => Controls_Manager::COLOR,
 				'selectors'	 => [
 					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-divider' => 'background: linear-gradient(90deg, {{VALUE}} 0%, {{VALUE}} 100%);',
-					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-divider:before' => 'background-color: {{VALUE}};box-shadow: 9px 0px 0px 0px {{VALUE}}, 18px 0px 0px 0px {{VALUE}};',
+					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-divider:before' => 'background-color: {{VALUE}}; color: {{VALUE}};',
 					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-divider.elementskit-style-long' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-star' => 'background: linear-gradient(90deg, {{VALUE}} 0%, {{VALUE}} 38%, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 62%, {{VALUE}} 62%, {{VALUE}} 100%);',
+					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-star' => 'color: {{VALUE}}',
 					'{{WRAPPER}} .elementskit-section-title-wraper .elementskit-border-star:after' => 'background-color: {{VALUE}};',
 				],
 				'condition'		=> [

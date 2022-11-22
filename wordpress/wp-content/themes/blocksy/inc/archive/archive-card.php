@@ -198,8 +198,7 @@ if (! function_exists('blocksy_render_archive_card')) {
 			'size' => $featured_image_size,
 			'html_atts' => [
 				'href' => esc_url(get_permalink()),
-				'aria-label' => get_the_title(),
-				// 'aria-hidden' => 'true'
+				'aria-label' => wp_strip_all_tags(get_the_title()),
 			],
 			'lazyload' => get_theme_mod(
 				'has_lazy_load_archives_image',

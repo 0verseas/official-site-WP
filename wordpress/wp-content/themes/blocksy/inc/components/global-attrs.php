@@ -80,8 +80,59 @@ if (! function_exists('blocksy_body_attr')) {
 			$attrs['data-frame'] = 'default';
 		};
 
-
 		$attrs['data-prefix'] = blocksy_manager()->screen->get_prefix() . blocksy_manager()->screen->get_prefix_addition();
+
+		if (is_customize_preview()) {
+			$prefix_custom = [];
+
+			if (is_singular()) {
+				$atts = blocksy_get_post_options();
+
+				$maybe_hero_strategy = blocksy_get_page_title_source();
+
+				if (
+					$maybe_hero_strategy
+					&&
+					$maybe_hero_strategy['strategy'] !== 'customizer'
+				) {
+					$prefix_custom[] = 'hero';
+				}
+
+				$default_page_structure = blocksy_default_akg(
+					'page_structure_type',
+					$atts,
+					'default'
+				);
+
+				if ($default_page_structure !== 'default') {
+					$prefix_custom[] = 'single-structure';
+				}
+
+				$default_content_style = blocksy_default_akg(
+					'content_style_source',
+					$atts,
+					'inherit'
+				);
+
+				if ($default_content_style !== 'inherit') {
+					$prefix_custom[] = 'content-style';
+				}
+
+				$vertical_spacing_source = blocksy_default_akg(
+					'vertical_spacing_source',
+					$atts,
+					'inherit'
+				);
+
+				if ($vertical_spacing_source !== 'inherit') {
+					$prefix_custom[] = 'vertical-spacing';
+				}
+			}
+
+			if (! empty($prefix_custom)) {
+				$attrs['data-prefix-custom'] = implode(':', $prefix_custom);
+			}
+		}
 
 		$attrs['data-header'] = apply_filters(
 			'blocksy:general:body-header-attr',

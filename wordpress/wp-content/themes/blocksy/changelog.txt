@@ -1,3 +1,10 @@
+1.8.58: 2022-11-17
+- Improvement: Don't output HTML tags in aria-label attribute
+- Improvement: Correctly sync customiser options on posts with metabox overrides
+- Fix: WooCommerce archive video thumbnail ratio issue
+- Fix: Table block default border color issue
+- Fix: Manually embedded iframe affected by block-width CSS if sidebar is present
+
 1.8.57: 2022-11-10
 - Improvement: Introduce filter for modifying static assets urls for CDN
 - Improvement: Outline button type not inheriting the correct color

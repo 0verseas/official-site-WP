@@ -5,12 +5,43 @@ namespace Blocksy;
 class Dashboard {
 	public function __construct() {
 		add_action(
+			'admin_menu',
+			[$this, 'setup_framework_page'],
+			5
+		);
+
+		add_action(
+			'admin_menu',
+			function () {
+				if (function_exists('blocksy_get_wp_parent_theme')) {
+					return;
+				}
+
+				$menu_slug = plugin_basename('ct-dashboard');
+				$hookname = get_plugin_page_hookname('ct-dashboard', '');
+				remove_all_actions($hookname);
+
+				add_action(
+					$hookname,
+					function () {
+						$this->welcome_page_template();
+					}
+				);
+			},
+			99999999999
+		);
+
+		add_action(
 			'admin_enqueue_scripts',
-			[ $this, 'enqueue_static' ],
+			[$this, 'enqueue_static'],
 			100
 		);
 
 		add_action('admin_body_class', function ($class) {
+			if (! function_exists('blocksy_get_wp_parent_theme')) {
+				return;
+			}
+
 			if (function_exists('blc_fs') && blc_fs()->is_activation_mode()) {
 				$class .= ' blocksy-fs-optin-dashboard';
 			}
@@ -19,6 +50,13 @@ class Dashboard {
 		});
 
 		if (function_exists('blc_fs')) {
+			blc_fs()->add_filter(
+				'hide_plan_change',
+				function ($res) {
+					return true;
+				}
+			);
+
 			blc_fs()->add_filter(
 				'show_deactivation_feedback_form',
 				function ($res) {
@@ -156,6 +194,14 @@ class Dashboard {
 				return;
 			}
 
+			if (! is_admin()) {
+				return;
+			}
+
+			if (! is_user_logged_in()) {
+				return;
+			}
+
 			if (intval(get_option('blc_activation_redirect', false)) === wp_get_current_user()->ID) {
 				delete_option('blc_activation_redirect');
 				exit(wp_redirect(admin_url('admin.php?page=ct-dashboard')));
@@ -164,8 +210,7 @@ class Dashboard {
 	}
 
 	public function enqueue_static() {
-		if (! function_exists('blocksy_is_dashboard_page')) return;
-		if (! blocksy_is_dashboard_page()) return;
+		if (! $this->is_dashboard_page()) return;
 
 		$data = get_plugin_data(BLOCKSY__FILE__);
 
@@ -175,13 +220,41 @@ class Dashboard {
 			'ct-options-scripts'
 		]);
 
-		wp_enqueue_script(
-			'blocksy-dashboard-scripts',
-			BLOCKSY_URL . 'static/bundle/dashboard.js',
-			$deps,
-			$data['Version'],
-			false
-		);
+		if (function_exists('blocksy_get_wp_parent_theme')) {
+			wp_enqueue_script(
+				'blocksy-dashboard-scripts',
+				BLOCKSY_URL . 'static/bundle/dashboard.js',
+				$deps,
+				$data['Version'],
+				false
+			);
+		} else {
+			wp_enqueue_script(
+				'blocksy-dashboard-scripts',
+				BLOCKSY_URL . 'static/bundle/dashboard-no-theme.js',
+				[
+					'underscore',
+					'react',
+					'react-dom',
+					'wp-element',
+					'wp-date',
+					'wp-i18n',
+					'updates'
+				],
+				$data['Version'],
+				false
+			);
+
+			$slug = 'blocksy';
+			wp_localize_script(
+				'blocksy-dashboard-scripts',
+				'ctDashboardLocalizations',
+				[
+					'activate'=> current_user_can('switch_themes') ? wp_nonce_url(admin_url('themes.php?action=activate&amp;stylesheet=' . $slug), 'switch-theme_' . $slug) : null,
+				]
+			);
+		}
+
 
 		wp_enqueue_style(
 			'blocksy-dashboard-styles',
@@ -189,5 +262,63 @@ class Dashboard {
 			[],
 			$data['Version']
 		);
+	}
+
+	public function setup_framework_page() {
+		if (function_exists('blocksy_get_wp_parent_theme')) {
+			return;
+		}
+
+		if (! current_user_can('activate_plugins')) {
+			return;
+		}
+
+		$data = get_plugin_data(BLOCKSY__FILE__);
+
+		$options = [
+			'title' => __('Blocksy', 'blocksy-companion'),
+			'menu-title' => __('Blocksy', 'blocksy-companion'),
+			'permision' => 'activate_plugins',
+			'top-level-handle' => 'ct-dashboard',
+			'callback' => [$this, 'welcome_page_template'],
+			'icon-url' => apply_filters(
+				'blocksy:dashboard:icon-url',
+				BLOCKSY_URL . 'static/img/navigation.svg'
+			),
+			'position' => 2,
+		];
+
+
+		add_menu_page(
+			$options['title'],
+			$options['menu-title'],
+			$options['permision'],
+			$options['top-level-handle'],
+			$options['callback'],
+			$options['icon-url'],
+			2
+		);
+	}
+
+	public function is_dashboard_page() {
+		global $pagenow;
+
+		$is_ct_settings =
+			// 'themes.php' === $pagenow &&
+			isset( $_GET['page'] ) && 'ct-dashboard' === $_GET['page'];
+
+		return $is_ct_settings;
+	}
+
+	public function welcome_page_template() {
+		if (! current_user_can('manage_options')) {
+			wp_die(
+				esc_html(
+					__( 'You do not have sufficient permissions to access this page.', 'blocksy-companion' )
+				)
+			);
+		}
+
+		echo '<div id="ct-dashboard"></div>';
 	}
 }

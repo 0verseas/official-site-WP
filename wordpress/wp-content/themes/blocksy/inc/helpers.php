@@ -96,9 +96,18 @@ class Blocksy_Walker_Page extends Walker_Page {
 }
 
 function blocksy_sync_whole_page($args = []) {
+	$args = wp_parse_args(
+		$args,
+		[
+			'prefix_custom' => ''
+		]
+	);
+
+	$selector = 'main#main';
+
 	return array_merge(
 		[
-			'selector' => 'main#main',
+			'selector' => $selector,
 			'container_inclusive' => true,
 			'render' => function () {
 				echo blocksy_replace_current_template();

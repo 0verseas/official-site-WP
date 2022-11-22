@@ -1,10 +1,10 @@
 
 === ElementsKit Elementor addons (Header Footer Builder, Mega Menu Builder, Free Elementor Widgets & Elementor Templates Library) ===
-Contributors: Ataurr, wpmet, emranio, aion11
+Contributors: xpeedstudio, Ataurr, emranio
 Tags: elementor addons, mega menu builder, header footer builder, elementor widgets, Accordion tab, elementor modules, page builder addons, elementor addon, elementor widget, addons
 Requires at least: 5.0
-Tested up to: 6.0
-Stable tag: 2.7.4
+Tested up to: 6.1
+Stable tag: 2.7.5
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -460,6 +460,11 @@ Visit  [wpmet](https://wpmet.com/)  to learn more about how to get the best of W
 
 
 == Changelog ==
+Version: 2.7.5 (2022-11-17)
+Improved: Compatibility with WP 6.1
+Fixed: Heading widget color changes issues
+Fixed: Accordion widget box-shadow issue
+
 Version: 2.7.4 (2022-11-07)
 Improved: Coding standard
 Improved: Edit Content button for advanced widgets

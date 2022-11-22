@@ -688,6 +688,14 @@ function blocksy_customizer_register_options(
 								$local_sync['prefix']
 							);
 
+							if (
+								isset($local_sync['prefix_custom'])
+								&&
+								! empty($local_sync['prefix_custom'])
+							) {
+								$prefix_selector = 'body:not([data-prefix-custom*="' . $local_sync['prefix_custom'] . '"])' . $prefix_selector;
+							}
+
 							if (is_array($prefix_selector)) {
 								foreach ($prefix_selector as $index => $single_prefix_selector) {
 									$prefix_selector[$index] = $single_prefix_selector . ' ' . $local_sync['selector'];

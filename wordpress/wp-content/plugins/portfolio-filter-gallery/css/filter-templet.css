@@ -1,4 +1,6 @@
-
+.post-type-awl_filter_gallery .notice {
+	display:none;
+}
 /* pointer */
 .cat_icon{
 	cursor:pointer;
