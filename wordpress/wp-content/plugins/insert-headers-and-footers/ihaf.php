@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WPCode Lite
  * Plugin URI: https://www.wpcode.com/
- * Version: 2.0.4.2
+ * Version: 2.0.4.3
  * Requires at least: 4.6
  * Requires PHP: 5.5
  * Tested up to: 6.1
@@ -367,6 +367,8 @@ class WPCode {
 			require_once WPCODE_PLUGIN_PATH . 'includes/admin/class-wpcode-metabox-snippets.php';
 			// Metabox class.
 			require_once WPCODE_PLUGIN_PATH . 'includes/admin/class-wpcode-admin-notice.php';
+			// Ask for some love.
+			require_once WPCODE_PLUGIN_PATH . 'includes/admin/class-wpcode-review.php';
 		}
 
 		// Load lite-specific files.

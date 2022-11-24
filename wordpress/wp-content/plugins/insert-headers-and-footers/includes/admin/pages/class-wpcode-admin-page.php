@@ -254,7 +254,7 @@ abstract class WPCode_Admin_Page {
 						<?php wpcode_icon( 'file', 48, 48 ); ?>
 						<h3><?php esc_html_e( 'View Documentation', 'insert-headers-and-footers' ); ?></h3>
 						<p><?php esc_html_e( 'Browse documentation, reference material, and tutorials for WPCode.', 'insert-headers-and-footers' ); ?></p>
-						<a class="wpcode-button wpcode-button-secondary" href="<?php echo esc_url( wpcode_utm_url( 'https://wpcode.com/docs', 'help-overlay', 'docs', 'footer' ) ); ?>" target="_blank"><?php esc_html_e( 'View All Documentation', 'insert-headers-and-footers' ); ?></a>
+						<a class="wpcode-button wpcode-button-secondary" href="<?php echo esc_url( wpcode_utm_url( 'https://wpcode.com/docs/', 'help-overlay', 'docs', 'footer' ) ); ?>" target="_blank"><?php esc_html_e( 'View All Documentation', 'insert-headers-and-footers' ); ?></a>
 					</div>
 					<div class="wpcode-help-footer-box">
 						<?php wpcode_icon( 'support', 48, 48 ); ?>
@@ -1049,7 +1049,7 @@ abstract class WPCode_Admin_Page {
 			array(
 				'tag'        => 'a',
 				'text'       => '',
-				'url'        => wpcode_utm_url( 'https://wpcode.com/lite' ),
+				'url'        => wpcode_utm_url( 'https://wpcode.com/lite/' ),
 				'class'      => 'wpcode-button wpcode-button-orange wpcode-button-large',
 				'attributes' => array(
 					'target' => '_blank',
@@ -1061,7 +1061,7 @@ abstract class WPCode_Admin_Page {
 			array(
 				'tag'        => 'a',
 				'text'       => '',
-				'url'        => wpcode_utm_url( 'https://wpcode.com/lite' ),
+				'url'        => wpcode_utm_url( 'https://wpcode.com/lite/' ),
 				'class'      => 'wpcode-upsell-button-text',
 				'attributes' => array(
 					'target' => '_blank',

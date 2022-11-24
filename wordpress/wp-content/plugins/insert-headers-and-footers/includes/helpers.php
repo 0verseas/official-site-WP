@@ -23,7 +23,7 @@ function wpcode_utm_url( $url, $medium = '', $campaign = '', $ad_content = '' ) 
 			'utm_campaign' => sanitize_key( $campaign ),
 			'utm_content'  => sanitize_key( $ad_content ),
 		),
-		trailingslashit( $url )
+		$url
 	);
 }
 

@@ -68,6 +68,34 @@ abstract class WPCode_Metabox_Snippets {
 	 */
 	public function hooks() {
 		add_action( 'add_meta_boxes', array( $this, 'register_metabox' ) );
+		add_action( 'admin_head', array( $this, 'close_metabox_for_current_screen' ) );
+	}
+
+	/**
+	 * Make sure the metabox is closed by default.
+	 *
+	 * @return void
+	 */
+	public function close_metabox_for_current_screen() {
+		// Close the metabox by default.
+		$screen = get_current_screen();
+		if ( ! isset( $screen->id ) ) {
+			return;
+		}
+		add_filter( 'get_user_option_closedpostboxes_' . $screen->id, array( $this, 'add_metabox_to_user_closed' ) );
+	}
+
+	/**
+	 * Add our metabox id to the array of closed metaboxes when the page loads.
+	 *
+	 * @param array $closed
+	 *
+	 * @return array
+	 */
+	public function add_metabox_to_user_closed( $closed ) {
+		$closed[] = $this->id;
+
+		return $closed;
 	}
 
 	/**
@@ -83,7 +111,7 @@ abstract class WPCode_Metabox_Snippets {
 			return;
 		}
 
-		if ( wpcode()->settings->get_option('headers_footers_mode') ) {
+		if ( wpcode()->settings->get_option( 'headers_footers_mode' ) ) {
 			// Don't load the metabox when headers & footers mode is enabled.
 			return;
 		}
@@ -104,7 +132,7 @@ abstract class WPCode_Metabox_Snippets {
 			),
 			$post_type,
 			'normal',
-			apply_filters( 'wpcode_post_metabox_priority', 'high' )
+			apply_filters( 'wpcode_post_metabox_priority', 'default' )
 		);
 	}
 

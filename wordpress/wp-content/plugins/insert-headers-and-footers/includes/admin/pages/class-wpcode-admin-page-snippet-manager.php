@@ -1068,7 +1068,7 @@ class WPCode_Admin_Page_Snippet_Manager extends WPCode_Admin_Page {
 		$data['save_to_library_button'] = __( 'Upgrade to PRO', 'insert-headers-and-footers' );
 		$data['shortcode_title']        = __( 'Custom Shortcode is a Pro Feature', 'insert-headers-and-footers' );
 		$data['shortcode_text']         = __( 'Upgrade today to use a custom shortcode and nerver worry about changing snippet ids again, even when importing your snippets to another site. You\'ll also get access to a private library that makes setting up new sites a lot easier.', 'insert-headers-and-footers' );
-		$data['shortcode_url']          = wpcode_utm_url( 'https://wpcode.com/lite', 'snippet-editor', 'custom-shortcode', 'modal' );
+		$data['shortcode_url']          = wpcode_utm_url( 'https://wpcode.com/lite/', 'snippet-editor', 'custom-shortcode', 'modal' );
 
 		return $data;
 	}
@@ -1221,11 +1221,11 @@ class WPCode_Admin_Page_Snippet_Manager extends WPCode_Admin_Page {
 			),
 			array(
 				'text' => esc_html__( 'Upgrade to Pro and Unlock Revisions', 'insert-headers-and-footers' ),
-				'url'  => wpcode_utm_url( 'https://wpcode.com/lite', 'snippet-editor', 'revisions', 'upgrade-to-pro' ),
+				'url'  => wpcode_utm_url( 'https://wpcode.com/lite/', 'snippet-editor', 'revisions', 'upgrade-to-pro' ),
 			),
 			array(
 				'text' => esc_html__( 'Learn more about all the features', 'insert-headers-and-footers' ),
-				'url'  => wpcode_utm_url( 'https://wpcode.com/lite', 'snippet-editor', 'revisions', 'features' ),
+				'url'  => wpcode_utm_url( 'https://wpcode.com/lite/', 'snippet-editor', 'revisions', 'features' ),
 			)
 		);
 	}

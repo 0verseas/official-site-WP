@@ -199,7 +199,7 @@ class WPCode_Admin_Page_Library extends WPCode_Admin_Page {
 			),
 			array(
 				'text' => esc_html__( 'Learn more about all the features', 'insert-headers-and-footers' ),
-				'url'  => wpcode_utm_url( 'https://wpcode.com/lite', 'library-page', 'my-library', 'features' ),
+				'url'  => wpcode_utm_url( 'https://wpcode.com/lite/', 'library-page', 'my-library', 'features' ),
 			),
 			array(
 				__( 'Save your snippets to the WPCode Library', 'insert-headers-and-footers' ),
@@ -225,11 +225,11 @@ class WPCode_Admin_Page_Library extends WPCode_Admin_Page {
 			'<p>' . __( 'Upgrade to WPCode PRO today and see the snippets you starred in the WPCode Library directly in the plugin.', 'insert-headers-and-footers' ) . '</p>',
 			array(
 				'text' => __( 'Upgrade to PRO and Unlock "My Favorites"', 'insert-headers-and-footers' ),
-				'url'  => wpcode_utm_url( 'https://wpcode.com/lite', 'library-page', 'my-favorites', 'upgrade-and-unlock' ),
+				'url'  => wpcode_utm_url( 'https://wpcode.com/lite/', 'library-page', 'my-favorites', 'upgrade-and-unlock' ),
 			),
 			array(
 				'text' => esc_html__( 'Learn more about all the features', 'insert-headers-and-footers' ),
-				'url'  => wpcode_utm_url( 'https://wpcode.com/lite', 'library-page', 'my-favorites', 'features' ),
+				'url'  => wpcode_utm_url( 'https://wpcode.com/lite/', 'library-page', 'my-favorites', 'features' ),
 			),
 			array(
 				__( 'Load favorite snippets in the plugin', 'insert-headers-and-footers' ),
