@@ -61,7 +61,7 @@ class Blocksy_Walker_Page extends Walker_Page {
 		}
 
 		$indent  = str_repeat( $t, $depth );
-		$output .= "{$n}{$indent}<ul class='sub-menu'>{$n}";
+		$output .= "{$n}{$indent}<ul class='sub-menu' role='menu'>{$n}";
 	}
 
 	public function start_el( &$output, $page, $depth = 0, $args = array(), $current_page = 0 ) {
@@ -74,8 +74,8 @@ class Blocksy_Walker_Page extends Walker_Page {
 		);
 
 		$output = str_replace(
-			"</a><ul class='sub-menu'>",
-			"~</a>^<ul class='sub-menu'>",
+			"</a><ul class='sub-menu' role='menu'>",
+			"~</a>^<ul class='sub-menu' role='menu'>",
 			$output
 		);
 

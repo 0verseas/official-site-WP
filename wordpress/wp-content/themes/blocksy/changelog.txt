@@ -1,3 +1,11 @@
+1.8.59: 2022-11-24
+- Improvement: Menu accessibility improvements
+- Improvement: theme.json file minor styling improvements
+- Improvement: Insert WooCommerce variation images only once
+- Improvement: Better integration with Simple Block Gallery plugin
+- Fix: Respect post number option on search results page
+- Fix: Menu aria-expanded attribute toggle issue
+
 1.8.58: 2022-11-17
 - Improvement: Don't output HTML tags in aria-label attribute
 - Improvement: Correctly sync customiser options on posts with metabox overrides

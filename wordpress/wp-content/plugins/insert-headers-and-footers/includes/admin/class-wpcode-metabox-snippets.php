@@ -88,11 +88,15 @@ abstract class WPCode_Metabox_Snippets {
 	/**
 	 * Add our metabox id to the array of closed metaboxes when the page loads.
 	 *
-	 * @param array $closed
+	 * @param mixed $closed
 	 *
 	 * @return array
 	 */
 	public function add_metabox_to_user_closed( $closed ) {
+		// Make sure it's an array.
+		if ( ! is_array( $closed ) ) {
+			$closed = array();
+		}
 		$closed[] = $this->id;
 
 		return $closed;

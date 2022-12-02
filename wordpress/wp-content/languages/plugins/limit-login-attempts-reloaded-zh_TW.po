@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - Limit Login Attempts Reloaded - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-10-13 20:21:29+0000\n"
+"PO-Revision-Date: 2022-11-27 08:52:05+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -10,6 +10,78 @@ msgstr ""
 "X-Generator: GlotPress/4.0.0-alpha.3\n"
 "Language: zh_TW\n"
 "Project-Id-Version: Plugins - Limit Login Attempts Reloaded - Stable (latest release)\n"
+
+#: views/tab-dashboard.php:66
+msgid "Premium protection enabled"
+msgstr "進階保護功能已啟用"
+
+#: views/onboarding-popup.php:102
+msgid "Continue"
+msgstr "繼續"
+
+#: views/onboarding-popup.php:85
+msgid "Complete Limit Login Attempts Reloaded Installation"
+msgstr "完成 Limit Login Attempts Reloaded 的安裝"
+
+#: views/onboarding-popup.php:71
+msgid "Please Complete Limit Login Attempts Reloaded Installation"
+msgstr "請完成 Limit Login Attempts Reloaded 的安裝"
+
+#: views/onboarding-popup.php:58
+msgid "No thanks"
+msgstr "不用了，謝謝"
+
+#: views/onboarding-popup.php:55
+msgid "Starting from $8/month"
+msgstr "每月美金 8 元起"
+
+#: views/onboarding-popup.php:55
+msgid "Upgrade To Premium"
+msgstr "升級至 Premium 版"
+
+#: views/onboarding-popup.php:52
+msgid "If you don't have one, you can purchase one now."
+msgstr "如果沒有安裝代碼，請立即購買。"
+
+#: views/onboarding-popup.php:50
+msgid "Or"
+msgstr "或"
+
+#: views/onboarding-popup.php:45
+msgid "Install"
+msgstr "安裝"
+
+#: views/onboarding-popup.php:40
+msgid "Enter Setup Code"
+msgstr "輸入安裝代碼"
+
+#: views/onboarding-popup.php:37
+msgid "Enter your setup code to enable cloud protection. This will provide the highest level of security and performance during brute force attacks."
+msgstr "請輸入專屬設定代碼以啟用雲端保護功能。雲端保護功能會在網站遭到暴力密碼破解攻擊時，提供最好的安全性及效能保護。"
+
+#: views/onboarding-popup.php:36
+msgid "Activate Premium"
+msgstr "啟用 Premium 版"
+
+#: views/onboarding-popup.php:26
+msgid "No"
+msgstr "否"
+
+#: views/onboarding-popup.php:25
+msgid "Yes"
+msgstr "是"
+
+#: views/onboarding-popup.php:23
+msgid "Would you also like to join our email newsletter to receive plugin updates, WordPress security news, and other relevant content?"
+msgstr "是否想要訂閱我們的電子報以接收外掛更新、WordPress 安全性新聞及其他相關內容？"
+
+#: views/onboarding-popup.php:20
+msgid "We do not use this email address for any other purpose unless you opt-in to receive other mailings. You can turn off alerts in the settings."
+msgstr "除非選擇接收其他電子郵件，否則我們不會將這個電子郵件地址用於其他目的。這項通知可在設定中關閉。"
+
+#: views/onboarding-popup.php:17
+msgid "Please tell us where Limit Login Attempts Reloaded should send security notifications for your website?"
+msgstr "請設定 Limit Login Attempts Reloaded 傳送這個網站的安全性通知的方式。"
 
 #: views/app-widgets/active-lockouts.php:10
 msgid "Reload"
@@ -19,7 +91,7 @@ msgstr "重新載入"
 msgid "Edit"
 msgstr "編輯"
 
-#: core/LimitLoginAttempts.php:1193
+#: core/LimitLoginAttempts.php:1180
 msgid ""
 "<p><i>This alert was sent by your website where Limit Login Attempts Reloaded free version \n"
 "is installed and you are listed as the admin. If you are a GoDaddy customer, the plugin is installed \n"
@@ -74,13 +146,29 @@ msgstr "使用顯示於下方的短代碼，便能插入連結；舉例來說，
 msgid "this makes the plugin <a href=\"https://gdpr-info.eu/\" target=\"_blank\">GDPR</a> compliant by showing a message on the login page. <a href=\"https://www.limitloginattempts.com/gdpr-qa/?from=plugin-settings-gdpr\" target=\"_blank\">Read more</a>"
 msgstr "啟用這項設定後，顯示於登入頁面的訊息，能讓外掛的資料記錄方式符合 <a href=\"https://gdpr-info.eu/\" target=\"_blank\">GDPR</a> 合規性。<a href=\"https://www.limitloginattempts.com/gdpr-qa/?from=plugin-settings-gdpr\" target=\"_blank\">進一步了解</a>"
 
-#: core/LimitLoginAttempts.php:1139
+#: core/LimitLoginAttempts.php:1126
 msgid "[%s] Failed WordPress login attempt by IP %s on %s"
 msgstr "《%s》通知：由 IP 位址 %s 產生的登入嘗試失敗 (%s)"
 
-#: core/LimitLoginAttempts.php:1199
+#: core/LimitLoginAttempts.php:1186
 msgid "<hr><a href=\"%s\">Unsubscribe</a> from these notifications."
 msgstr "<hr><a href=\"%s\">取消訂閱</a>外掛相關通知。"
+
+#: core/LimitLoginAttempts.php:1132
+msgid ""
+"<p>Hello%1$s,</p>\n"
+"<p>%2$d failed login attempts (%3$d lockout(s)) from IP <b>%4$s</b><br>\n"
+"Last user attempted: <b>%5$s</b><br>\n"
+"IP was blocked for %6$s</p>\n"
+"<p>This notification was sent automatically via Limit Login Attempts Reloaded Plugin. \n"
+"<b>This is installed on your %7$s WordPress site. <a href=\"%8$s\" target=\"_blank\">Please login to your WordPress</a> dashboard to view more info.</b></p><p>Experiencing frequent attacks or degraded performance? Try our <a href=\"%9$s\" target=\"_blank\">advanced protection</a>. Have Questions? Visit our <a href=\"%10$s\" target=\"_blank\">help section</a>.</p>"
+msgstr ""
+"<p>%1$s，你好，</p>\n"
+"<p>來自 IP 位址 <b>%4$s</b> 的登入嘗試已失敗 %2$d 次 (%3$d 次登入鎖定)<br>\n"
+"最後嘗試登入的使用者：<b>%5$s</b><br>\n"
+"這個 IP 位址已遭鎖定 %6$s</p>\n"
+"<p>這封電子郵件通知由 Limit Login Attempts Reloaded 自動傳送。\n"
+"<b>這個外掛安裝於網址為 %7$s 的 WordPress 網站，<a href=\"%8$s\" target=\"_blank\">請登入至 WordPress</a> 控制台以檢視相關資訊。</b></p><p>如果網站遭到攻擊，可以試用我們提供的<a href=\"%9$s\" target=\"_blank\">進階保護</a>功能。如果有任何使用上的問題，請參考我們的<a href=\"%10$s\" target=\"_blank\">線上說明</a>。</p>"
 
 #: views/app-widgets/country-access-rules.php:14
 msgid "these countries:"
@@ -90,7 +178,7 @@ msgstr "國家/地區清單:"
 msgid "Country Access Rules"
 msgstr "國家/地區存取規則"
 
-#: core/LimitLoginAttempts.php:97
+#: core/LimitLoginAttempts.php:93
 msgid "By proceeding you understand and give your consent that your IP address and browser information might be processed by the security plugins installed on this site."
 msgstr "如果繼續進行，代表你理解並同意你的 IP 位址及瀏覽器資訊可能會由這個網站上安裝的安全性外掛處理。"
 
@@ -173,7 +261,7 @@ msgstr "工具"
 msgid "Connect This Site"
 msgstr "連結這個網站"
 
-#: views/tab-dashboard.php:296
+#: views/onboarding-popup.php:57 views/tab-dashboard.php:296
 msgid "Learn More"
 msgstr "進一步了解"
 
@@ -189,7 +277,7 @@ msgstr "加入更多網域進行加倍保護"
 msgid "Notifications"
 msgstr "通知"
 
-#: core/LimitLoginAttempts.php:348 views/tab-dashboard.php:274
+#: core/LimitLoginAttempts.php:343 views/tab-dashboard.php:274
 msgid "Upgrade to Premium"
 msgstr "升級至付費版"
 
@@ -225,166 +313,6 @@ msgstr "這個網站可能已遭駭客鎖定目標"
 msgid "Safelist"
 msgstr "安全清單"
 
-#: views/welcome-page.php:139
-msgid "Questions? Email us at <a href=\"mailto:sales@limitloginattempts.com\">sales@limitloginattempts.com</a>"
-msgstr "如有任何問題，請使用電子郵件地址 <a href=\"mailto:sales@limitloginattempts.com\">sales@limitloginattempts.com</a> 與我們聯絡。"
-
-#: views/welcome-page.php:137
-msgid "Upgrade Now"
-msgstr "立即升級"
-
-#: views/welcome-page.php:133
-msgid "A website that is constantly being attacked"
-msgstr "經常遭受攻擊的網站"
-
-#: views/welcome-page.php:132
-msgid "A website with hundreds or thousands of registered users"
-msgstr "擁有數百、甚至數千註冊使用者的網站"
-
-#: views/welcome-page.php:131
-msgid "A website that holds sensitive data"
-msgstr "擁有敏感性資料的網站"
-
-#: views/welcome-page.php:130
-msgid "A website with a lot of traffic"
-msgstr "高流量網站"
-
-#: views/welcome-page.php:129
-msgid "A forum"
-msgstr "線上論壇"
-
-#: views/welcome-page.php:128
-msgid "E-commerce website"
-msgstr "電子商務網站"
-
-#: views/welcome-page.php:127
-msgid "Site admin w/ multiple domains"
-msgstr "多個網域的網站管理員"
-
-#: views/welcome-page.php:126
-msgid "Digital Agency"
-msgstr "數位行銷人員"
-
-#: views/welcome-page.php:123
-msgid "We highly recommend upgrading if you are a…"
-msgstr "如果具備以下身分，我們強烈建議升級付費服務..."
-
-#: views/welcome-page.php:118
-msgid "Regular cloud backups of all data"
-msgstr "定期將全部資料備份至雲端"
-
-#: views/welcome-page.php:117
-msgid "Auto Backup Of All Data"
-msgstr "自動備份全部資料"
-
-#: views/welcome-page.php:109
-msgid "Safelist/Blacklists can be shared between multiple domains"
-msgstr "在多個網域間分享安全清單/封鎖清單資料"
-
-#: views/welcome-page.php:108
-msgid "Synchronized Safelist/Blacklist"
-msgstr "同步安全清單/封鎖清單"
-
-#: views/welcome-page.php:100
-msgid "Lockouts can be shared between multiple domains"
-msgstr "在多個網域間分享登入鎖定資料"
-
-#: views/welcome-page.php:99
-msgid "Synchronized Lockouts"
-msgstr "同步登入鎖定資料"
-
-#: views/welcome-page.php:91
-msgid "CSV Download of all IP data"
-msgstr "下載 CSV 格式的全部 IP 位址資料"
-
-#: views/welcome-page.php:90
-msgid "CSV Download of IP Data"
-msgstr "下載 CSV 格式的 IP 位址資料"
-
-#: views/welcome-page.php:82
-msgid "We make sure the legitimate IP’s are allowed automatically"
-msgstr "這個外掛能確保合法 IP 位址會自動放行"
-
-#: views/welcome-page.php:81
-msgid "Intelligent IP Blocking/Unblocking"
-msgstr "智慧型 IP 位址封鎖/解除封鎖技術"
-
-#: views/welcome-page.php:73
-msgid "Get your technical questions answered by our experts"
-msgstr "由我們的專家回覆付費使用者的技術問題"
-
-#: views/welcome-page.php:72
-msgid "Premium Support Forum"
-msgstr "付費技術支援論壇"
-
-#: views/welcome-page.php:64
-msgid "Longer lockout intervals each time a hacker/bot tries to login unsuccessfully"
-msgstr "每次駭客/惡意漫遊器嘗試登入失敗後，均會延長登入鎖定間隔時間"
-
-#: views/welcome-page.php:63
-msgid "Lockout/IP Throttling"
-msgstr "登入鎖定/IP 位址限制"
-
-#: views/welcome-page.php:55
-msgid "We absorb up to 100k login attempts (per month) to keep your site at optimal performance"
-msgstr "我們每個月最高能承受 10 萬次登入嘗試，以便保持網站的最佳效能"
-
-#: views/welcome-page.php:54
-msgid "Performance Optimizer"
-msgstr "效能最佳化程式"
-
-#: views/welcome-page.php:44
-msgid "Looking for advanced protection? <a href=\"%s\" target=\"_blank\">Try our premium service</a> for only $4.99/month!"
-msgstr "如果正在尋找網站進階保護功能，請使用我們提供的<a href=\"%s\" target=\"_blank\">付費服務</a>，每月僅美金 4.99 元。"
-
-#: views/welcome-page.php:42
-msgid "2,000,000+ active installations on <br>WordPress worldwide!"
-msgstr "全球有超過 2 百萬的 WordPress 網站安裝使用！"
-
-#: views/welcome-page.php:37
-msgid "If you have more questions, please check out the <a href=\"%s\" target=\"_blank\">help section</a> on our website."
-msgstr "如果有任何使用上的問題，請參考我們的<a href=\"%s\" target=\"_blank\">線上說明</a>。"
-
-#: views/welcome-page.php:31
-msgid "Although we recommend using the default settings, you can get a quick video tutorial if you wanted to learn more about the plugin and what it does."
-msgstr "我們建議使用預設設定，如果想要進一步了解外掛及其運作方式，請觀看快速教學影片。"
-
-#: views/welcome-page.php:25
-msgid "And Much More!"
-msgstr "還有更多功能！"
-
-#: views/welcome-page.php:23
-msgid "Synchronize lockout data across a network of sites"
-msgstr "在多站網路的子網站間同步登入鎖定資料"
-
-#: views/welcome-page.php:22
-msgid "Receive email alerts when your site is under attack"
-msgstr "網站遭到攻擊時傳送電子郵件通知"
-
-#: views/welcome-page.php:21
-msgid "Optimize site performance by redirecting malicious logins"
-msgstr "重新導向惡意登入企圖，藉以最佳化網站效能"
-
-#: views/welcome-page.php:20
-msgid "Protect from future attacks by allowing or denying IPs"
-msgstr "透過允許或拒絕 IP 位址的方式，保護網站免遭攻擊"
-
-#: views/welcome-page.php:19
-msgid "View who’s trying to access your site"
-msgstr "檢視哪些人嘗試存取這個網站"
-
-#: views/welcome-page.php:17
-msgid "With This Plugin, You Can…"
-msgstr "使用這個外掛，網站管理員便能..."
-
-#: views/welcome-page.php:15
-msgid "Thank you for choosing Limit Login Attempts Reloaded - A simple, yet powerful bot-blocking plugin that keeps your login page safe. "
-msgstr "感謝採用 Limit Login Attempts Reloaded，這個一款簡單卻功能強大的防登入暴力破解外掛，能讓網站的登入頁面維持安全性。"
-
-#: views/welcome-page.php:14
-msgid "Welcome to Limit Login Attempts Reloaded"
-msgstr "歡迎使用 Limit Login Attempts Reloaded"
-
 #: views/options-page.php:22
 msgid "Thank you for using the free version of <b>Limit Login Attempts Reloaded</b>. <a href=\"%s\" target=\"_blank\">Upgrade to our cloud app</a> for enhanced protection, visual metrics & premium support."
 msgstr "感謝使用免費版 <b>Limit Login Attempts Reloaded</b>。<a href=\"%s\" target=\"_blank\">升級至 Cloud App</a> 便能加強保護，並提供視覺化指標及付費技術支援。"
@@ -410,19 +338,19 @@ msgid "%d failed login attempt "
 msgid_plural "%d failed login attempts "
 msgstr[0] "%d 次登入嘗試失敗 - "
 
-#: core/LimitLoginAttempts.php:2061
+#: core/LimitLoginAttempts.php:2040
 msgid "Don't show this message again"
 msgstr "請不要再次顯示這個訊息"
 
-#: core/LimitLoginAttempts.php:2060
+#: core/LimitLoginAttempts.php:2039
 msgid "Remind me a month from now"
 msgstr "一個月後再提醒"
 
-#: core/LimitLoginAttempts.php:2059
+#: core/LimitLoginAttempts.php:2038
 msgid "Yes, turn on email notifications"
 msgstr "是，開啟電子郵件通知"
 
-#: core/LimitLoginAttempts.php:2054
+#: core/LimitLoginAttempts.php:2033
 msgid "You have been upgraded to the latest version of <strong>Limit Login Attempts Reloaded</strong>.<br> Due to increased security threats around the holidays, we recommend turning on email notifications when you receive a failed login attempt."
 msgstr "這個網站已升級至最新版的 <strong>Limit Login Attempts Reloaded</strong>。<br>隨著假期的到來，安全性威脅與日俱增，我們建議開啟接收登入失敗嘗試的電子郵件通知。"
 
@@ -514,7 +442,7 @@ msgstr "事件記錄"
 msgid "The endpoint is not responding. Please contact your app provider to settle that."
 msgstr "端點沒有回應。請聯絡應用程式提供者以解決這個問題。"
 
-#: core/LimitLoginAttempts.php:2553
+#: core/LimitLoginAttempts.php:2532
 msgid "No rules yet."
 msgstr "尚無規則。"
 
@@ -539,11 +467,11 @@ msgstr "拒絕"
 msgid "Action"
 msgstr "可用操作"
 
-#: core/LimitLoginAttempts.php:2510
+#: core/LimitLoginAttempts.php:2489
 msgid "Meanwhile, the app falls over to the <a href=\"%s\">default functionality</a>."
 msgstr "同時，應用程式會回復到<a href=\"%s\">預設功能</a>。"
 
-#: core/LimitLoginAttempts.php:2494
+#: core/LimitLoginAttempts.php:2473
 msgid "No lockouts yet."
 msgstr "尚無登入鎖定。"
 
@@ -555,7 +483,7 @@ msgstr "封鎖期限 (分鐘)"
 msgid "Count"
 msgstr "登入次數"
 
-#: core/LimitLoginAttempts.php:2445
+#: core/LimitLoginAttempts.php:2424
 msgid "No events yet."
 msgstr "尚無事件。"
 
@@ -598,11 +526,11 @@ msgstr "IP 位址"
 msgid "Time"
 msgstr "時間"
 
-#: core/LimitLoginAttempts.php:2235
+#: core/LimitLoginAttempts.php:2214
 msgid "Please specify the Setup Code"
 msgstr "請輸入 [設定代碼]"
 
-#: core/LimitLoginAttempts.php:2221
+#: core/LimitLoginAttempts.php:2200
 msgid "The app has been successfully imported."
 msgstr "應用程式已成功匯入。"
 
@@ -610,7 +538,7 @@ msgstr "應用程式已成功匯入。"
 msgid "https://www.limitloginattempts.com/"
 msgstr "https://www.limitloginattempts.com/"
 
-#: core/LimitLoginAttempts.php:341 views/options-page.php:32
+#: core/LimitLoginAttempts.php:336 views/options-page.php:32
 msgid "Dashboard"
 msgstr "控制台"
 
@@ -630,31 +558,31 @@ msgstr "這些設定獨立於下方的應用程式。"
 msgid "General Settings"
 msgstr "一般設定"
 
-#: core/LimitLoginAttempts.php:1795 core/LimitLoginAttempts.php:1868
+#: core/LimitLoginAttempts.php:1782 core/LimitLoginAttempts.php:1855
 msgid "Settings saved."
 msgstr "設定已儲存。"
 
-#: core/LimitLoginAttempts.php:1973
+#: core/LimitLoginAttempts.php:1952
 msgid "Leave a review"
 msgstr "撰寫評論"
 
-#: core/LimitLoginAttempts.php:1972
+#: core/LimitLoginAttempts.php:1951
 msgid "Maybe later"
 msgstr "稍後再說"
 
-#: core/LimitLoginAttempts.php:1971
+#: core/LimitLoginAttempts.php:1950
 msgid "Don't show again"
 msgstr "不再顯示這項訊息"
 
-#: core/LimitLoginAttempts.php:1968
+#: core/LimitLoginAttempts.php:1947
 msgid "We would really like to hear your feedback about the plugin! Please take a couple minutes to write a few words <a href=\"https://wordpress.org/support/plugin/limit-login-attempts-reloaded/reviews/#new-post\" target=\"_blank\">here</a>. Thank you!"
 msgstr "我們非常願意傾聽使用者的外掛使用意見回覆，請前往<a href=\"https://wordpress.org/support/plugin/limit-login-attempts-reloaded/reviews/#new-post\" target=\"_blank\">外掛評論頁面</a>用些許時間撰寫意見，感謝。"
 
-#: core/LimitLoginAttempts.php:1967
+#: core/LimitLoginAttempts.php:1946
 msgid "A <strong>crazy idea</strong> we wanted to share! What if we put an image from YOU on the <a href=\"https://wordpress.org/plugins/limit-login-attempts-reloaded/\" target=\"_blank\">LLAR page</a>?! (<a href=\"https://wordpress.org/plugins/hello-dolly/\" target=\"_blank\">example</a>) A drawing made by you or your child would cheer people up! Send us your drawing by <a href=\"mailto:wpchef.me@gmail.com\" target=\"_blank\">email</a> and we like it, we'll add it in the next release. Let's have some fun!"
 msgstr "開發團隊在此分享一個<strong>大膽的想法</strong>！我們想將你或你的子女的畫作放在<a href=\"https://tw.wordpress.org/plugins/limit-login-attempts-reloaded/\" target=\"_blank\">這個外掛</a>的說明頁面 (<a href=\"https://tw.wordpress.org/plugins/hello-dolly/\" target=\"_blank\">範例</a>)，藉以振奮人心！請將畫作以電子郵件寄送至<a href=\"mailto:wpchef.me@gmail.com\" target=\"_blank\">這個電子郵件地址</a>，如果錄取的話，我們會在下一個發佈版本中使用。大家一起參加活動吧。"
 
-#: core/LimitLoginAttempts.php:1966
+#: core/LimitLoginAttempts.php:1945
 msgid "Hey <strong>Limit Login Attempts Reloaded</strong> user!"
 msgstr "你好，<strong>Limit Login Attempts Reloaded</strong> 的使用者。"
 
@@ -666,7 +594,7 @@ msgstr "進行技術支援時，請複製上方區域的內容並提供這些資
 msgid "Debug"
 msgstr "偵錯"
 
-#: core/LimitLoginAttempts.php:342 views/options-page.php:33
+#: core/LimitLoginAttempts.php:337 views/options-page.php:33
 msgid "Settings"
 msgstr "設定"
 
@@ -690,11 +618,11 @@ msgstr "(在"
 msgid "Email to"
 msgstr "傳送電子郵件至"
 
-#: core/LimitLoginAttempts.php:1773
+#: core/LimitLoginAttempts.php:1760
 msgid "The \""
 msgstr "The \""
 
-#: core/LimitLoginAttempts.php:1481
+#: core/LimitLoginAttempts.php:1468
 msgid "<strong>ERROR</strong>: Incorrect email address or password."
 msgstr "<strong>錯誤:</strong> 不正確的電子郵件地址或密碼。"
 
@@ -709,7 +637,6 @@ msgstr "每行一個 IP 位址或 IP 位址範圍 (例如 1.2.3.4-5.6.7.8)"
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: core/LimitLoginAttempts.php:180 views/options-page.php:29
-#: views/welcome-page.php:11
 msgid "Limit Login Attempts Reloaded"
 msgstr "Limit Login Attempts Reloaded"
 
@@ -823,58 +750,58 @@ msgstr "登入鎖定次數總計"
 msgid "Statistics"
 msgstr "統計資料"
 
-#: core/LimitLoginAttempts.php:1739
+#: core/LimitLoginAttempts.php:1726
 msgid "Cleared current lockouts"
 msgstr "清除目前的登入鎖定資料"
 
-#: core/LimitLoginAttempts.php:1732
+#: core/LimitLoginAttempts.php:1719
 msgid "Reset lockout count"
 msgstr "重設登入鎖定計數"
 
-#: core/LimitLoginAttempts.php:1725
+#: core/LimitLoginAttempts.php:1712
 msgid "Cleared IP log"
 msgstr "清除 IP 位址記錄"
 
-#: core/LimitLoginAttempts.php:1498
+#: core/LimitLoginAttempts.php:1485
 msgid "WC Error"
 msgstr "WooCommerce 錯誤"
 
-#: core/LimitLoginAttempts.php:1483
+#: core/LimitLoginAttempts.php:1470
 msgid "<strong>ERROR</strong>: Incorrect username or password."
 msgstr "<strong>錯誤:</strong> 不正確的使用者名稱或密碼。"
 
-#: core/LimitLoginAttempts.php:527 core/LimitLoginAttempts.php:925
-#: core/LimitLoginAttempts.php:1429
+#: core/LimitLoginAttempts.php:522 core/LimitLoginAttempts.php:912
+#: core/LimitLoginAttempts.php:1416
 msgid "Please try again in %d minute."
 msgid_plural "Please try again in %d minutes."
 msgstr[0] "請於 %d 分鐘後再試。"
 
-#: core/LimitLoginAttempts.php:525 core/LimitLoginAttempts.php:923
-#: core/LimitLoginAttempts.php:1427
+#: core/LimitLoginAttempts.php:520 core/LimitLoginAttempts.php:910
+#: core/LimitLoginAttempts.php:1414
 msgid "Please try again in %d hour."
 msgid_plural "Please try again in %d hours."
 msgstr[0] "請於 %d 小時後再試。"
 
-#: core/LimitLoginAttempts.php:1419
+#: core/LimitLoginAttempts.php:1406
 msgid "Please try again later."
 msgstr "請稍後再試。"
 
-#: core/LimitLoginAttempts.php:518 core/LimitLoginAttempts.php:918
-#: core/LimitLoginAttempts.php:1411
+#: core/LimitLoginAttempts.php:513 core/LimitLoginAttempts.php:905
+#: core/LimitLoginAttempts.php:1398
 msgid "<strong>ERROR</strong>: Too many failed login attempts."
 msgstr "<strong>錯誤:</strong> 過多的登入嘗試失敗次數。"
 
-#: core/LimitLoginAttempts.php:1102
+#: core/LimitLoginAttempts.php:1089
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分鐘"
 
-#: core/LimitLoginAttempts.php:1096
+#: core/LimitLoginAttempts.php:1083
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 小時"
 
-#: core/LimitLoginAttempts.php:2679
+#: core/LimitLoginAttempts.php:2724
 msgid "<strong>%d</strong> attempt remaining."
 msgid_plural "<strong>%d</strong> attempts remaining."
 msgstr[0] "尚餘 <strong>%d</strong> 次嘗試機會。"

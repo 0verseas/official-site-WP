@@ -50,7 +50,11 @@ if (! $forgot_password_inline) {
 
 	<?php
 		if (function_exists('blc_fs') && blc_fs()->can_use_premium_code()) {
-			if (class_exists('NextendSocialLogin')) {
+			if (
+				class_exists('NextendSocialLogin', false)
+				&&
+				! class_exists('NextendSocialLoginPRO', false)
+			) {
 				\NextendSocialLogin::addLoginFormButtons();
 			}
 		}

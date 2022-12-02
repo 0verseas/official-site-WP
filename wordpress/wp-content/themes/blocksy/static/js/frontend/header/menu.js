@@ -143,8 +143,9 @@ const closeSubmenu = (e) => {
 	}
 
 	if (childIndicator) {
+		childIndicator.setAttribute('aria-expanded', 'false')
+
 		if (childIndicator.tagName.toLowerCase() === 'button') {
-			childIndicator.setAttribute('aria-expanded', 'false')
 			childIndicator.setAttribute(
 				'aria-label',
 				ct_localizations.expand_submenu

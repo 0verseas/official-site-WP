@@ -4,7 +4,7 @@ Tags: code, css, php, footer, functions, content, facebook pixel, footer code, f
 Requires at least: 4.6
 Tested up to: 6.1
 Requires PHP: 5.5
-Stable tag: 2.0.4.3
+Stable tag: 2.0.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -307,6 +307,9 @@ Thank you
 Syed Balkhi
 
 == Changelog ==
+
+= 2.0.4.4 =
+* Fix: Added an extra check to prevent errors in setups where the closed metaboxes user option is not an array.
 
 = 2.0.4.3 =
 * Tweak: We updated the default behaviour of our page scripts metabox so that it is collapsed by default.

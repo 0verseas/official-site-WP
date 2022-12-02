@@ -34,12 +34,12 @@ msgid ""
 "version, the plugin is currently NOT RUNNING."
 msgstr ""
 
-#: framework/dashboard.php:279, framework/dashboard.php:280,
+#: framework/dashboard.php:272, framework/dashboard.php:273,
 #: framework/extensions/product-reviews/extension.php:619
 msgid "Blocksy"
 msgstr ""
 
-#: framework/dashboard.php:317
+#: framework/dashboard.php:310
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -2087,7 +2087,7 @@ msgstr ""
 msgid "Forgot Password?"
 msgstr ""
 
-#: framework/features/header/modal/login.php:65
+#: framework/features/header/modal/login.php:69
 msgid "Log In"
 msgstr ""
 
@@ -2112,11 +2112,11 @@ msgstr ""
 msgid "A link to set a new password will be sent to your email address."
 msgstr ""
 
-#: framework/features/header/modal/register.php:76
+#: framework/features/header/modal/register.php:80
 msgid "Registration confirmation will be emailed to you."
 msgstr ""
 
-#: framework/features/header/modal/register.php:82
+#: framework/features/header/modal/register.php:86
 msgid "Register"
 msgstr ""
 

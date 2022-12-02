@@ -50,26 +50,19 @@ class Dashboard {
 		});
 
 		if (function_exists('blc_fs')) {
+			blc_fs()->add_filter('hide_plan_change', '__return_true');
+
 			blc_fs()->add_filter(
-				'hide_plan_change',
-				function ($res) {
-					return true;
-				}
+				'permission_diagnostic_default',
+				'__return_false'
 			);
 
 			blc_fs()->add_filter(
 				'show_deactivation_feedback_form',
-				function ($res) {
-					return false;
-				}
+				'__return_false'
 			);
 
-			blc_fs()->add_filter(
-				'hide_freemius_powered_by',
-				function ($res) {
-					return true;
-				}
-			);
+			blc_fs()->add_filter('hide_freemius_powered_by', '__return_true');
 
 			blc_fs()->add_filter(
 				'connect-message_on-premium',

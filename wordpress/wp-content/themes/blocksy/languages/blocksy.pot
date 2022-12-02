@@ -176,8 +176,8 @@ msgid_plural "You got %s results. Please press Tab to select one."
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/manager.php:150, inc/components/menus.php:91,
-#: inc/components/menus.php:80, inc/components/menus.php:239
+#: inc/manager.php:150, inc/components/menus.php:92,
+#: inc/components/menus.php:80, inc/components/menus.php:241
 msgid "Expand dropdown menu"
 msgstr ""
 
@@ -330,7 +330,7 @@ msgstr ""
 msgid "Default image"
 msgstr ""
 
-#: inc/components/menus.php:422, inc/integrations/custom-post-types.php:192,
+#: inc/components/menus.php:488, inc/integrations/custom-post-types.php:192,
 #: inc/options/general/back-to-top.php:37,
 #: inc/options/general/breadcrumbs.php:12, inc/options/general/meta.php:139,
 #: inc/options/general/meta.php:341, inc/options/general/page-title.php:703,

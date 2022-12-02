@@ -370,12 +370,16 @@ export const mount = (el) => {
 					el.remove()
 				}
 			})
+			let didInsert = false
 			;[...currentVariation.children].map((el, index) => {
 				if (el.matches('.flexy-container, .ct-image-container')) {
-					el.insertAdjacentHTML(
-						'beforebegin',
-						div.firstElementChild.innerHTML
-					)
+					if (!didInsert) {
+						didInsert = true
+						el.insertAdjacentHTML(
+							'beforebegin',
+							div.firstElementChild.innerHTML
+						)
+					}
 				}
 
 				if (
