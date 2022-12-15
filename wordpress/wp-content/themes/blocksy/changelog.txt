@@ -1,3 +1,12 @@
+1.8.61: 2022-12-09
+- Fix: Minor layout issue with overflow-x on mobile
+
+1.8.60: 2022-12-08
+- Improvement: Better handle the theme color palettes inside block editor
+- Improvement: Scoped selector for infinite loading pagination
+- Improvement: Correctly compute sidebar position for BuddyPress pages
+- Improvement: Better integration with "WooCommerce Buy for me" plugin
+
 1.8.59: 2022-11-24
 - Improvement: Menu accessibility improvements
 - Improvement: theme.json file minor styling improvements

@@ -22,6 +22,7 @@ wordpress/wp-content/uploads/sucuri/sucuri-settings.php
 wordpress/wp-content/uploads/sucuri/sucuri-lastlogins.php
 wordpress/wp-content/uploads/sucuri/sucuri-failedlogins.php
 wordpress/wp-content/uploads/sucuri/sucuri-oldfailedlogins.php
+wordpress/wp-content/uploads/sucuri/sucuri-hookdata.php
 wordpress/wp-content/uploads/elementor/css/*
 
 # ignore these plugins

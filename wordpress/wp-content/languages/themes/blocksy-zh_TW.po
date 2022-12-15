@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Blocksy package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-11-26 08:12:59+0000\n"
+"PO-Revision-Date: 2022-12-07 18:14:43+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1438,7 +1438,7 @@ msgstr "全幅寬度"
 #: static/js/customizer/panels-builder/placements/PlacementsBuilder/Row.js:18
 #: static/js/customizer/sync/builder.js:125
 #: static/bundle/customizer-controls.js:1297 static/bundle/options.js:12231
-#: static/bundle/sync.min.js:7376
+#: static/bundle/sync.min.js:7322
 msgid "Main Row"
 msgstr "主要列"
 
@@ -1797,7 +1797,7 @@ msgstr "項目樣式"
 #: inc/components/post-meta.php:82 inc/components/post-meta.php:649
 #: inc/options/general/meta.php:357
 #: static/js/customizer/sync/helpers/entry-meta.js:74
-#: static/bundle/sync.min.js:8503
+#: static/bundle/sync.min.js:8260
 msgid "In"
 msgstr "於"
 
@@ -1871,7 +1871,7 @@ msgstr "上間距"
 
 #: inc/options/general/page-title.php:106
 msgid "Subtitle"
-msgstr "副標題"
+msgstr "子標題"
 
 #: inc/options/general/page-title.php:94
 msgid "Bio"
@@ -2029,7 +2029,7 @@ msgstr "主要資訊欄"
 #: static/bundle/options.js:2 static/js/customizer/sync/builder.js:110
 #: static/js/options/options/ct-image-uploader.js:369
 #: static/bundle/customizer-controls.js:14200 static/bundle/options.js:14239
-#: static/bundle/sync.min.js:7361
+#: static/bundle/sync.min.js:7307
 msgid "Edit"
 msgstr "編輯"
 
@@ -2369,7 +2369,7 @@ msgstr "分類元件"
 
 #: inc/options/pages/search-page.php:35 inc/options/posts/blog.php:42
 #: inc/options/posts/custom-post-type-archive.php:38
-#: inc/options/posts/woo-categories.php:944
+#: inc/options/posts/woo-categories.php:950
 #: inc/options/posts/woo-single.php:291
 msgid "Functionality Options"
 msgstr "功能性選項"
@@ -2792,7 +2792,7 @@ msgstr "滑動選單"
 #: static/js/customizer/sync/builder.js:133
 #: static/bundle/customizer-controls.js:1298
 #: static/bundle/customizer-controls.js:12563 static/bundle/options.js:10700
-#: static/bundle/options.js:12232 static/bundle/sync.min.js:7384
+#: static/bundle/options.js:12232 static/bundle/sync.min.js:7330
 msgid "Bottom Row"
 msgstr "下面列"
 
@@ -2809,7 +2809,7 @@ msgstr "手機列"
 #: static/js/customizer/sync/builder.js:117
 #: static/bundle/customizer-controls.js:1296
 #: static/bundle/customizer-controls.js:12561 static/bundle/options.js:10698
-#: static/bundle/options.js:12230 static/bundle/sync.min.js:7368
+#: static/bundle/options.js:12230 static/bundle/sync.min.js:7314
 msgid "Top Row"
 msgstr "上面列"
 
@@ -3386,7 +3386,7 @@ msgstr "水平"
 msgid "Breadcrumbs"
 msgstr "麵包屑"
 
-#: inc/options/posts/woo-categories.php:921
+#: inc/options/posts/woo-categories.php:924
 msgid "Shop Results Count"
 msgstr "商店結果數"
 
@@ -3433,78 +3433,78 @@ msgstr "特價徽章"
 msgid "Star Rating"
 msgstr "星級評分"
 
-#: inc/options/posts/woo-categories.php:1013
+#: inc/options/posts/woo-categories.php:1019
 msgid "Sort by price (desc)"
 msgstr "依價格排序 (遞減)"
 
-#: inc/options/posts/woo-categories.php:1012
+#: inc/options/posts/woo-categories.php:1018
 msgid "Sort by price (asc)"
 msgstr "依價格排序 (遞增)"
 
-#: inc/options/posts/woo-categories.php:1011
+#: inc/options/posts/woo-categories.php:1017
 msgid "Sort by most recent"
 msgstr "依最新上架排序"
 
-#: inc/options/posts/woo-categories.php:1010
+#: inc/options/posts/woo-categories.php:1016
 msgid "Average rating"
 msgstr "依評分分數"
 
-#: inc/options/posts/woo-categories.php:1009
+#: inc/options/posts/woo-categories.php:1015
 msgid "Popularity (sales)"
 msgstr "依熱門程度 (銷售)"
 
-#: inc/options/posts/woo-categories.php:1008
+#: inc/options/posts/woo-categories.php:1014
 msgid "Default sorting (custom ordering + name)"
 msgstr "預設排序 (自訂排序 + 名稱)"
 
-#: inc/options/posts/woo-categories.php:1000
+#: inc/options/posts/woo-categories.php:1006
 msgid "How should products be sorted in the catalog by default?"
 msgstr "商品預設在分類當中應該如何排序?"
 
-#: inc/options/posts/woo-categories.php:995
+#: inc/options/posts/woo-categories.php:1001
 msgid "Default product sorting"
 msgstr "預設商品排序"
 
-#: inc/options/posts/woo-categories.php:989
+#: inc/options/posts/woo-categories.php:995
 msgid "Show subcategories & products"
 msgstr "顯示子分類及商品"
 
-#: inc/options/posts/woo-categories.php:988
+#: inc/options/posts/woo-categories.php:994
 msgid "Show subcategories"
 msgstr "顯示子分類"
 
-#: inc/options/posts/woo-categories.php:984
+#: inc/options/posts/woo-categories.php:990
 msgid "Choose what to display on product category pages."
 msgstr "選擇在商品分類頁面要顯示什麼."
 
-#: inc/options/posts/woo-categories.php:975
+#: inc/options/posts/woo-categories.php:981
 msgid "Category display"
 msgstr "分類顯示"
 
-#: inc/options/posts/woo-categories.php:969
+#: inc/options/posts/woo-categories.php:975
 msgid "Show categories & products"
 msgstr "顯示分類及商品"
 
-#: inc/options/posts/woo-categories.php:968
+#: inc/options/posts/woo-categories.php:974
 msgid "Show categories"
 msgstr "顥示分類"
 
-#: inc/options/posts/woo-categories.php:964
+#: inc/options/posts/woo-categories.php:970
 msgid "Choose what to display on the main shop page."
 msgstr "選擇在主要商店頁面要顯示什麼."
 
-#: inc/options/posts/woo-categories.php:959
-#: inc/options/posts/woo-categories.php:967
-#: inc/options/posts/woo-categories.php:979
-#: inc/options/posts/woo-categories.php:987
+#: inc/options/posts/woo-categories.php:965
+#: inc/options/posts/woo-categories.php:973
+#: inc/options/posts/woo-categories.php:985
+#: inc/options/posts/woo-categories.php:993
 msgid "Show products"
 msgstr "顯示商品"
 
-#: inc/options/posts/woo-categories.php:955
+#: inc/options/posts/woo-categories.php:961
 msgid "Shop page display"
 msgstr "商店頁面顯示"
 
-#: inc/options/posts/woo-categories.php:948
+#: inc/options/posts/woo-categories.php:954
 msgid "Product Catalog"
 msgstr "商品分類"
 

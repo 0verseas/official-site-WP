@@ -157,11 +157,15 @@ const hideOffcanvas = (settings, args = {}) => {
 		trigger.setAttribute('aria-expanded', 'false')
 
 		if (args.shouldFocusOriginalTrigger && !isTouchDevice()) {
-			setTimeout(() => {
-				if (index === 0) {
-					trigger.focus()
-				}
-			}, 50)
+			if (!trigger.focusDisabled) {
+				setTimeout(() => {
+					if (index === 0) {
+						trigger.focus()
+					}
+				}, 50)
+			}
+
+			trigger.focusDisabled = false
 		}
 	})
 

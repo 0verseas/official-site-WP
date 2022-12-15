@@ -195,6 +195,10 @@ class Dashboard {
 				return;
 			}
 
+			if (is_network_admin()) {
+				return;
+			}
+
 			if (intval(get_option('blc_activation_redirect', false)) === wp_get_current_user()->ID) {
 				delete_option('blc_activation_redirect');
 				exit(wp_redirect(admin_url('admin.php?page=ct-dashboard')));
@@ -295,6 +299,14 @@ class Dashboard {
 
 	public function is_dashboard_page() {
 		global $pagenow;
+
+		if (is_network_admin()) {
+			$is_ct_settings =
+				// 'themes.php' === $pagenow &&
+				isset( $_GET['page'] ) && 'blocksy-companion' === $_GET['page'];
+
+			return $is_ct_settings;
+		}
 
 		$is_ct_settings =
 			// 'themes.php' === $pagenow &&

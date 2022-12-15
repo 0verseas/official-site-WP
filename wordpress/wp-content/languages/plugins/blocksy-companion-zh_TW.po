@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - Blocksy Companion - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-10-07 18:41:58+0000\n"
+"PO-Revision-Date: 2022-12-03 01:14:39+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -141,27 +141,27 @@ msgstr "已登入"
 msgid "User Visibility"
 msgstr "使用者可見度"
 
-#: framework/features/header/items/account/options.php:1208
+#: framework/features/header/items/account/options.php:1224
 msgid "Border Color"
 msgstr "框線顏色"
 
-#: framework/features/header/items/account/options.php:1166
+#: framework/features/header/items/account/options.php:1182
 msgid "Background"
 msgstr "背景"
 
-#: framework/features/header/items/account/options.php:1165
+#: framework/features/header/items/account/options.php:1181
 msgid "Border"
 msgstr "框線"
 
-#: framework/features/header/items/account/options.php:1155
+#: framework/features/header/items/account/options.php:1171
 msgid "Close Button Type"
 msgstr "關閉按鈕型式"
 
-#: framework/features/account-auth.php:208
+#: framework/features/account-auth.php:226
 msgid "Your account was created successfully and a password has been sent to your email address. Please visit the <a href=\"%s\">login page</a>."
 msgstr "您的帳號已成功建立並且將密碼寄到您的電子郵件地址. 請訪問 <a href=\"%s\">登入頁面</a>."
 
-#: framework/features/account-auth.php:199
+#: framework/features/account-auth.php:217
 msgid "Your account was created successfully. Your login details have been sent to your email address. Please visit the <a href=\"%s\">login page</a>."
 msgstr "您的帳號已成功. 詳細的登入資訊已經寄到您的電子郵件地址. 請訪問 <a href=\"%s\">登入頁面</a>."
 
@@ -404,26 +404,26 @@ msgid "Display a cookie acceptance box in order to comply with the privacy regul
 msgstr "顯示一個允許 cookie 的彈出框以符合貴國的隱私權規定."
 
 #: framework/extensions/newsletter-subscribe/customizer.php:273
-#: framework/features/header/items/account/options.php:1073
+#: framework/features/header/items/account/options.php:1089
 msgid "Input Background Color"
 msgstr "輸入背景顏色"
 
 #: framework/extensions/newsletter-subscribe/customizer.php:236
-#: framework/features/header/items/account/options.php:1037
+#: framework/features/header/items/account/options.php:1053
 msgid "Input Border Color"
 msgstr "輸入框線顏色"
 
 #: framework/extensions/newsletter-subscribe/customizer.php:228
 #: framework/extensions/newsletter-subscribe/customizer.php:259
 #: framework/extensions/newsletter-subscribe/customizer.php:295
-#: framework/features/header/items/account/options.php:1029
-#: framework/features/header/items/account/options.php:1059
-#: framework/features/header/items/account/options.php:1095
+#: framework/features/header/items/account/options.php:1045
+#: framework/features/header/items/account/options.php:1075
+#: framework/features/header/items/account/options.php:1111
 msgid "Focus"
 msgstr "焦點"
 
 #: framework/extensions/newsletter-subscribe/customizer.php:204
-#: framework/features/header/items/account/options.php:1007
+#: framework/features/header/items/account/options.php:1023
 msgid "Input Font Color"
 msgstr "輸入文字顏色"
 
@@ -451,15 +451,15 @@ msgstr "小工具"
 msgid "Module Title"
 msgstr "模組標題"
 
-#: framework/features/header/items/account/options.php:1106
+#: framework/features/header/items/account/options.php:1122
 msgid "Modal Background"
 msgstr "彈出背景"
 
-#: framework/features/header/items/account/options.php:1136
+#: framework/features/header/items/account/options.php:1152
 msgid "Modal Shadow"
 msgstr "彈出陰影"
 
-#: framework/features/header/items/account/options.php:971
+#: framework/features/header/items/account/options.php:987
 msgid "Modal Options"
 msgstr "彈出選項"
 
@@ -576,21 +576,21 @@ msgstr "目前語言"
 msgid "Languages"
 msgstr "語言"
 
-#: framework/features/account-auth.php:239
+#: framework/features/account-auth.php:257
 msgid "Register For This Site"
 msgstr "註冊此網站"
 
-#: framework/features/account-auth.php:238
+#: framework/features/account-auth.php:256
 msgid "Registration Form"
 msgstr "註冊表單"
 
 #: framework/features/account-auth.php:104
-#: framework/features/account-auth.php:232
+#: framework/features/account-auth.php:250
 msgid "Check your email"
 msgstr "請檢查您的電子郵件"
 
 #. translators: %s: Link to the login page.
-#: framework/features/account-auth.php:222
+#: framework/features/account-auth.php:240
 msgid "Registration complete. Please check your email, then visit the <a href=\"%s\">login page</a>."
 msgstr "已完成註冊. 請檢查您的電子郵件, 然後訪問 <a href=\"%s\">登入頁面</a>."
 
@@ -598,18 +598,18 @@ msgstr "已完成註冊. 請檢查您的電子郵件, 然後訪問 <a href=\"%s\
 msgid "Posts Font"
 msgstr "文章字體"
 
-#: framework/features/header/items/account/options.php:1301
+#: framework/features/header/items/account/options.php:1317
 msgid "Element Visibility"
 msgstr "元件可見度"
 
-#: framework/features/header/items/account/options.php:681
-#: framework/features/header/items/account/options.php:710
-#: framework/features/header/items/account/options.php:742
-#: framework/features/header/items/account/options.php:772
+#: framework/features/header/items/account/options.php:695
+#: framework/features/header/items/account/options.php:724
+#: framework/features/header/items/account/options.php:756
+#: framework/features/header/items/account/options.php:786
 msgid "Label Color"
 msgstr "標籤顏色"
 
-#: framework/features/header/items/account/options.php:670
+#: framework/features/header/items/account/options.php:684
 msgid "Label Font"
 msgstr "標籤字體"
 
@@ -632,11 +632,11 @@ msgstr "標籤位置"
 msgid "Account Image"
 msgstr "帳號圖片"
 
-#: framework/features/header/items/account/options.php:827
-#: framework/features/header/items/account/options.php:855
-#: framework/features/header/items/account/options.php:886
-#: framework/features/header/items/account/options.php:915
-#: framework/features/header/items/account/options.php:1172
+#: framework/features/header/items/account/options.php:843
+#: framework/features/header/items/account/options.php:871
+#: framework/features/header/items/account/options.php:902
+#: framework/features/header/items/account/options.php:931
+#: framework/features/header/items/account/options.php:1188
 msgid "Icon Color"
 msgstr "圖示顏色"
 
@@ -798,6 +798,7 @@ msgid "Gallery"
 msgstr "圖庫"
 
 #. Translators: %s is the theme name.
+#: framework/dashboard.php:272 framework/dashboard.php:273
 #: framework/extensions/product-reviews/extension.php:619
 msgid "Blocksy"
 msgstr "Blocksy"
@@ -886,35 +887,35 @@ msgstr "整體分數"
 msgid "Rating"
 msgstr "評分"
 
-#: framework/theme-integration.php:323
+#: framework/theme-integration.php:382
 msgid "TikTok"
 msgstr "TikTok"
 
-#: framework/theme-integration.php:322
+#: framework/theme-integration.php:381
 msgid "Odnoklassniki"
 msgstr "Odnoklassniki"
 
-#: framework/theme-integration.php:321
+#: framework/theme-integration.php:380
 msgid "VKontakte"
 msgstr "VKontakte"
 
-#: framework/theme-integration.php:320
+#: framework/theme-integration.php:379
 msgid "Vimeo"
 msgstr "Vimeo"
 
-#: framework/theme-integration.php:319
+#: framework/theme-integration.php:378
 msgid "YouTube"
 msgstr "YouTube"
 
-#: framework/theme-integration.php:317
+#: framework/theme-integration.php:376
 msgid "GitHub"
 msgstr "GitHub"
 
-#: framework/theme-integration.php:316
+#: framework/theme-integration.php:375
 msgid "WordPress"
 msgstr "WordPress"
 
-#: framework/theme-integration.php:315
+#: framework/theme-integration.php:374
 msgid "Pinterest"
 msgstr "Pinterest"
 
@@ -1211,7 +1212,7 @@ msgid "Boxed"
 msgstr "加外框"
 
 #: framework/extensions/widgets/widgets/ct-about-me/options.php:31
-#: framework/features/header/items/account/options.php:1164
+#: framework/features/header/items/account/options.php:1180
 msgid "Simple"
 msgstr "簡單"
 
@@ -1286,7 +1287,7 @@ msgstr "大型"
 #: framework/extensions/widgets/widgets/ct-about-me/options.php:211
 #: framework/extensions/widgets/widgets/ct-contact-info/options.php:497
 #: framework/extensions/widgets/widgets/ct-socials/options.php:100
-#: framework/theme-integration.php:318
+#: framework/theme-integration.php:377
 msgid "Medium"
 msgstr "中型"
 
@@ -1543,7 +1544,7 @@ msgstr "在安裝並啟用了電子報亭閱擴充功能之後，請將可以有
 #: framework/extensions/cookies-consent/customizer.php:178
 #: framework/extensions/cookies-consent/customizer.php:234
 #: framework/extensions/cookies-consent/customizer.php:299
-#: framework/features/header/items/account/options.php:1247
+#: framework/features/header/items/account/options.php:1263
 msgid "Background Color"
 msgstr "背景顏色"
 
@@ -1701,7 +1702,7 @@ msgid "Instructions"
 msgstr "操作說明"
 
 #: framework/extensions/trending/customizer.php:118
-#: framework/extensions/trending/helpers.php:221
+#: framework/extensions/trending/helpers.php:220
 msgid "Trending now"
 msgstr "目前趨勢"
 
@@ -1713,7 +1714,7 @@ msgstr "容器背景"
 #: framework/extensions/cookies-consent/customizer.php:203
 #: framework/extensions/cookies-consent/customizer.php:270
 #: framework/extensions/trending/customizer.php:348
-#: framework/features/header/items/account/options.php:975
+#: framework/features/header/items/account/options.php:991
 msgid "Font Color"
 msgstr "字體顏色"
 
@@ -1721,7 +1722,7 @@ msgstr "字體顏色"
 #: framework/extensions/trending/customizer.php:280
 #: framework/features/header/items/account/options.php:288
 #: framework/features/header/items/account/options.php:585
-#: framework/features/header/items/account/options.php:1312
+#: framework/features/header/items/account/options.php:1328
 msgid "Tablet"
 msgstr "平板"
 
@@ -1786,7 +1787,7 @@ msgstr "透明功能性"
 #: framework/features/header/header-options.php:187
 #: framework/features/header/items/account/options.php:289
 #: framework/features/header/items/account/options.php:586
-#: framework/features/header/items/account/options.php:1313
+#: framework/features/header/items/account/options.php:1329
 msgid "Mobile"
 msgstr "手機"
 
@@ -1873,13 +1874,9 @@ msgstr "取得新密碼"
 msgid "Username or Email Address"
 msgstr "使用者帳號或電子郵件地址"
 
-#: framework/features/header/modal/register.php:72
+#: framework/features/header/modal/register.php:86
 msgid "Register"
 msgstr "註冊"
-
-#: framework/features/header/modal/register.php:67
-msgid "Registration confirmation will be emailed to you"
-msgstr "註冊確認將透過電子郵件寄送給你"
 
 #: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/view.php:107
 #: framework/extensions/widgets/widgets/ct-contact-info/options.php:368
@@ -1891,15 +1888,15 @@ msgstr "電子郵件"
 msgid "Username"
 msgstr "使用者名稱"
 
-#: framework/features/header/modal/login.php:63
+#: framework/features/header/modal/login.php:69
 msgid "Log In"
 msgstr "登入"
 
-#: framework/features/header/modal/login.php:45
+#: framework/features/header/modal/login.php:47
 msgid "Forgot Password?"
 msgstr "忘記密碼？"
 
-#: framework/features/header/modal/login.php:41
+#: framework/features/header/modal/login.php:43
 msgid "Remember Me"
 msgstr "保持登入"
 
@@ -1920,11 +1917,11 @@ msgstr "註冊"
 msgid "Account"
 msgstr "帳號"
 
-#: framework/features/header/items/account/options.php:1121
+#: framework/features/header/items/account/options.php:1137
 msgid "Modal Backdrop"
 msgstr "彈出背景"
 
-#: framework/features/header/items/account/options.php:952
+#: framework/features/header/items/account/options.php:968
 msgid "Item Margin"
 msgstr "項目邊界"
 
@@ -1936,16 +1933,16 @@ msgstr "項目邊界"
 #: framework/extensions/newsletter-subscribe/customizer.php:196
 #: framework/extensions/newsletter-subscribe/customizer.php:327
 #: framework/extensions/trending/customizer.php:372
-#: framework/features/header/items/account/options.php:734
-#: framework/features/header/items/account/options.php:765
-#: framework/features/header/items/account/options.php:795
-#: framework/features/header/items/account/options.php:878
-#: framework/features/header/items/account/options.php:908
-#: framework/features/header/items/account/options.php:937
-#: framework/features/header/items/account/options.php:999
-#: framework/features/header/items/account/options.php:1195
-#: framework/features/header/items/account/options.php:1231
-#: framework/features/header/items/account/options.php:1270
+#: framework/features/header/items/account/options.php:748
+#: framework/features/header/items/account/options.php:779
+#: framework/features/header/items/account/options.php:809
+#: framework/features/header/items/account/options.php:894
+#: framework/features/header/items/account/options.php:924
+#: framework/features/header/items/account/options.php:953
+#: framework/features/header/items/account/options.php:1015
+#: framework/features/header/items/account/options.php:1211
+#: framework/features/header/items/account/options.php:1247
+#: framework/features/header/items/account/options.php:1286
 msgid "Hover"
 msgstr "游標暫留"
 
@@ -1962,34 +1959,34 @@ msgstr "游標暫留"
 #: framework/extensions/newsletter-subscribe/customizer.php:290
 #: framework/extensions/newsletter-subscribe/customizer.php:322
 #: framework/extensions/trending/customizer.php:366
-#: framework/features/header/items/account/options.php:728
-#: framework/features/header/items/account/options.php:760
-#: framework/features/header/items/account/options.php:790
-#: framework/features/header/items/account/options.php:872
-#: framework/features/header/items/account/options.php:903
-#: framework/features/header/items/account/options.php:932
-#: framework/features/header/items/account/options.php:993
-#: framework/features/header/items/account/options.php:1023
-#: framework/features/header/items/account/options.php:1053
-#: framework/features/header/items/account/options.php:1089
-#: framework/features/header/items/account/options.php:1189
-#: framework/features/header/items/account/options.php:1225
-#: framework/features/header/items/account/options.php:1264
+#: framework/features/header/items/account/options.php:742
+#: framework/features/header/items/account/options.php:774
+#: framework/features/header/items/account/options.php:804
+#: framework/features/header/items/account/options.php:888
+#: framework/features/header/items/account/options.php:919
+#: framework/features/header/items/account/options.php:948
+#: framework/features/header/items/account/options.php:1009
+#: framework/features/header/items/account/options.php:1039
+#: framework/features/header/items/account/options.php:1069
+#: framework/features/header/items/account/options.php:1105
+#: framework/features/header/items/account/options.php:1205
+#: framework/features/header/items/account/options.php:1241
+#: framework/features/header/items/account/options.php:1280
 msgid "Initial"
 msgstr "初始"
 
-#: framework/features/header/items/account/options.php:700
-#: framework/features/header/items/account/options.php:846
+#: framework/features/header/items/account/options.php:714
+#: framework/features/header/items/account/options.php:862
 msgid "Sticky State"
 msgstr "吸附狀態"
 
-#: framework/features/header/items/account/options.php:691
-#: framework/features/header/items/account/options.php:837
+#: framework/features/header/items/account/options.php:705
+#: framework/features/header/items/account/options.php:853
 msgid "Transparent State"
 msgstr "透明狀態"
 
-#: framework/features/header/items/account/options.php:686
-#: framework/features/header/items/account/options.php:832
+#: framework/features/header/items/account/options.php:700
+#: framework/features/header/items/account/options.php:848
 msgid "Default State"
 msgstr "預設狀態"
 
@@ -2089,10 +2086,10 @@ msgstr "動態 CSS 輸出"
 msgid "Your PHP installation doesn't have support for XML. Please install the <i>xml</i> or <i>simplexml</i> PHP extension in order to be able to install starter sites. You might need to contact your hosting provider to assist you in doing so."
 msgstr "你的 PHP 安裝不支援 XML 功能. 請安裝 <i>xml</i> 或 <i>simplexml</i> PHP 擴充模組才能安裝入門範本. 你可能要連絡你的主機商協助你做這件事."
 
-#: framework/features/demo-install/parsers.php:86
-#: framework/features/demo-install/parsers.php:91
-#: framework/features/demo-install/parsers.php:308
-#: framework/features/demo-install/parsers.php:504
+#: framework/features/demo-install/parsers.php:90
+#: framework/features/demo-install/parsers.php:95
+#: framework/features/demo-install/parsers.php:312
+#: framework/features/demo-install/parsers.php:508
 msgid "This does not appear to be a WXR file, missing/invalid WXR version number"
 msgstr "由於找不到版本號碼或版本號碼無效，系統判定這不是 WXR 格式的檔案。"
 
@@ -2101,8 +2098,8 @@ msgid "Details are shown above. The importer will now try again with a different
 msgstr "詳細資訊如上所示。匯入程式將以不同的剖析器再次嘗試匯入..."
 
 #: framework/features/demo-install/parsers.php:43
-#: framework/features/demo-install/parsers.php:74
-#: framework/features/demo-install/parsers.php:82
+#: framework/features/demo-install/parsers.php:78
+#: framework/features/demo-install/parsers.php:86
 msgid "There was an error when reading this WXR file"
 msgstr "讀取 WXR 檔案時發生錯誤"
 
@@ -2445,35 +2442,35 @@ msgstr "Facebook 專頁網址"
 msgid "OpenGraph Meta Data"
 msgstr "OpenGraph 中繼資料"
 
-#: framework/theme-integration.php:413 static/bundle/dashboard.js:2
+#: framework/theme-integration.php:472 static/bundle/dashboard.js:2
 #: static/js/screens/SiteExport.js:111
 msgid "PRO"
 msgstr "專業版"
 
-#: framework/theme-integration.php:395
+#: framework/theme-integration.php:454
 msgid "Companion"
 msgstr "Companion"
 
-#: framework/theme-integration.php:314
+#: framework/theme-integration.php:373
 msgid "Instagram"
 msgstr "Instagram"
 
-#: framework/theme-integration.php:313
+#: framework/theme-integration.php:372
 msgid "Dribbble"
 msgstr "Dribbble"
 
-#: framework/theme-integration.php:312
+#: framework/theme-integration.php:371
 msgid "LinkedIn"
 msgstr "LinkedIn"
 
-#: framework/theme-integration.php:311
+#: framework/theme-integration.php:370
 msgid "Twitter"
 msgstr "Twitter"
 
 #: framework/extensions/widgets/widgets/ct-facebook/options.php:16
 #: framework/extensions/widgets/widgets/ct-facebook/view.php:12
 #: framework/extensions/widgets/widgets/ct-facebook/widget.php:13
-#: framework/theme-integration.php:310
+#: framework/theme-integration.php:369
 msgid "Facebook"
 msgstr "Facebook"
 

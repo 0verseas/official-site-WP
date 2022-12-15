@@ -33,7 +33,7 @@ var getParents = function (elem) {
 }
 
 let cachedStartPosition = null
-let cachedContainerInitialHeight = null
+let cachedContainerInitialHeight = {}
 let cachedHeaderInitialHeight = null
 let cachedStickyContainerHeight = null
 
@@ -42,7 +42,6 @@ const clearCache = () => {
 	clearLogoShrinkCache()
 
 	cachedStartPosition = null
-	cachedContainerInitialHeight = null
 	cachedHeaderInitialHeight = null
 	cachedStickyContainerHeight = null
 	prevScrollY = null
@@ -156,14 +155,20 @@ const compute = () => {
 		return
 	}
 
-	let containerInitialHeight = cachedContainerInitialHeight
+	const currentScreenWithTablet = getCurrentScreen({ withTablet: true })
+
+	let containerInitialHeight =
+		cachedContainerInitialHeight[currentScreenWithTablet]
 
 	if (!containerInitialHeight) {
-		cachedContainerInitialHeight = Array.from(
-			stickyContainer.querySelectorAll('[data-row]')
-		).reduce((sum, el) => sum + el.getBoundingClientRect().height, 0)
+		cachedContainerInitialHeight[currentScreenWithTablet] = [
+			...stickyContainer.querySelectorAll('[data-row]'),
+		].reduce((res, row) => {
+			return res + getRowInitialMinHeight(row)
+		}, 0)
 
-		containerInitialHeight = cachedContainerInitialHeight
+		containerInitialHeight =
+			cachedContainerInitialHeight[currentScreenWithTablet]
 
 		stickyContainer.parentNode.style.height = `${containerInitialHeight}px`
 	}

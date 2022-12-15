@@ -76,6 +76,8 @@ if (! function_exists('blocksy_get_single_page_structure')) {
 			&&
 			$prefix !== 'bbpress_single'
 			&&
+			$prefix !== 'buddypress_single'
+			&&
 			(
 				$prefix !== 'courses_archive'
 				&&
