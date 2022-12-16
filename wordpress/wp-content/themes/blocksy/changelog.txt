@@ -1,3 +1,10 @@
+1.8.62: 2022-12-15
+- Improvement: Additional actions for page title with two post meta elements
+- Improvement: Don't output `data-header` and `data-footer` attributes if header or footer is disabled
+- Improvement: Add filter to disable comments.css file on single pages
+- Fix: WooCommerce 7.2 and "Sold individually" products have a broken quantity input design
+- Fix: Global colors won't change dynamically when changing a color palette
+
 1.8.61: 2022-12-09
 - Fix: Minor layout issue with overflow-x on mobile
 

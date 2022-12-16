@@ -198,9 +198,9 @@ const compute = () => {
 		.filter((c) => c !== 'yes' && c !== 'no' && c !== 'fixed')
 
 	if (!stickyContainerHeight) {
-		stickyContainerHeight = parseInt(
-			stickyContainer.getBoundingClientRect().height
-		)
+		stickyContainerHeight = [
+			...stickyContainer.querySelectorAll('[data-row]'),
+		].reduce((res, row) => res + getRowStickyHeight(row), 0)
 		cachedStickyContainerHeight = parseInt(stickyContainerHeight)
 
 		maybeSetStickyHeightAnimated(() => {
@@ -297,9 +297,17 @@ export const mountStickyHeader = () => {
 		return
 	}
 
+	var prevWidth = window.width
+
 	window.addEventListener(
 		'resize',
 		(event) => {
+			if (window.width === prevWidth) {
+				return
+			}
+
+			prevWidth = window.width
+
 			clearCache()
 			compute(event)
 			ctEvents.trigger('ct:header:update')

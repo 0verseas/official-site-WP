@@ -62,49 +62,57 @@ add_action('after_setup_theme', function () {
 		[
 			'name' => __( 'Palette Color 1', 'blocksy' ),
 			'slug' => 'palette-color-1',
-			'color' => $paletteColors['color1']
+			'color' => 'var(--paletteColor1, ' . $paletteColors['color1'] . ')',
+			// 'color' => $paletteColors['color1']
 		],
 
 		[
 			'name' => __( 'Palette Color 2', 'blocksy' ),
 			'slug' => 'palette-color-2',
-			'color' => $paletteColors['color2']
+			'color' => 'var(--paletteColor2, ' . $paletteColors['color2'] . ')',
+			// 'color' => $paletteColors['color2']
 		],
 
 		[
 			'name' => __( 'Palette Color 3', 'blocksy' ),
 			'slug' => 'palette-color-3',
-			'color' => $paletteColors['color3']
+			'color' => 'var(--paletteColor3, '. $paletteColors['color3'] . ')',
+			// 'color' => $paletteColors['color3']
 		],
 
 		[
 			'name' => __( 'Palette Color 4', 'blocksy' ),
 			'slug' => 'palette-color-4',
-			'color' => $paletteColors['color4']
+			'color' => 'var(--paletteColor4, ' . $paletteColors['color4'] . ')',
+			// 'color' => $paletteColors['color4']
 		],
 
 		[
 			'name' => __( 'Palette Color 5', 'blocksy' ),
 			'slug' => 'palette-color-5',
-			'color' => $paletteColors['color5']
+			'color' => 'var(--paletteColor5, ' . $paletteColors['color5'] . ')',
+			// 'color' => $paletteColors['color5']
 		],
 
 		[
 			'name' => __( 'Palette Color 6', 'blocksy' ),
 			'slug' => 'palette-color-6',
-			'color' => $paletteColors['color6']
+			'color' => 'var(--paletteColor6, ' . $paletteColors['color6'] . ')',
+			// 'color' => $paletteColors['color6']
 		],
 
 		[
 			'name' => __( 'Palette Color 7', 'blocksy' ),
 			'slug' => 'palette-color-7',
-			'color' => $paletteColors['color7']
+			'color' => 'var(--paletteColor7, ' . $paletteColors['color7'] . ')',
+			// 'color' => $paletteColors['color7']
 		],
 
 		[
 			'name' => __( 'Palette Color 8', 'blocksy' ),
 			'slug' => 'palette-color-8',
-			'color' => $paletteColors['color8']
+			'color' => 'var(--paletteColor8, ' . $paletteColors['color8'] . ')',
+			// 'color' => $paletteColors['color8']
 		]
 	]));
 
