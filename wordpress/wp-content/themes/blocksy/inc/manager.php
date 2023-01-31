@@ -130,7 +130,7 @@ class Blocksy_Manager {
 			'rest_url' => get_rest_url(),
 			'search_url' => get_search_link('QUERY_STRING'),
 			'show_more_text' => __('Show more', 'blocksy'),
-			'more_text' => __('More', 'blocksy'),
+			'more_text' => "More",
 			'search_live_results' => __('Search results', 'blocksy'),
 
 			'search_live_no_result' => __('No results', 'blocksy'),

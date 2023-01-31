@@ -118,5 +118,5 @@ function dsxmlrpc_admin_notice_review() {
 	<?php
 }
 
-add_action( 'admin_notices', 'dsxmlrpc_admin_notice_review' );
+//add_action( 'admin_notices', 'dsxmlrpc_admin_notice_review' );
 add_action( 'admin_notices', 'dsxmlrpc_admin_notice_wpsg' );

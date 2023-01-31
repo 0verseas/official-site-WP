@@ -4,7 +4,7 @@ Tags: code, css, php, footer, functions, content, facebook pixel, footer code, f
 Requires at least: 4.6
 Tested up to: 6.1
 Requires PHP: 5.5
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -307,6 +307,12 @@ Thank you
 Syed Balkhi
 
 == Changelog ==
+
+= 2.0.6 =
+* New: WPCode Library public snippets can now be installed with 1-click on sites connected to the WPCode Library - no more copy/paste needed!
+* New: We added a new setting for the editor height, so you can set the editor to a custom height or make it automatically grow with the code.
+* Tweak: We adjusted the "Connect To Library" functionality to improve support for site names with special characters or empty names.
+* Fix: We added extra checks to prevent errors when certain conditional logic rules were being called too early with PHP snippets.
 
 = 2.0.5 =
 * New: 2 new bulk actions are available in the admin to allow enabling or disabling multiple snippets at once.

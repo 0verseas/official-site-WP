@@ -54,7 +54,7 @@ const pdfIframeStyle = (data) => {
     let copy_text = isDisplay(data.copy_text);
 
     if (copy_text === 'block' || copy_text == 'true' || copy_text == true) {
-        copy_text = 'all';
+        copy_text = 'text';
     }
 
     let doc_details = isDisplay(data.doc_details);
@@ -128,6 +128,9 @@ const pdfIframeStyle = (data) => {
         }
         .textLayer{
             user-select: ${copy_text}!important;
+        }
+        button#cursorSelectTool{
+            display: ${copy_text}!important;
         }
         ${settingsPos}
     `;

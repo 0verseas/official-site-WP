@@ -34,7 +34,7 @@ function wpcode_maybe_add_library_connect_notice() {
 
 	WPCode_Notice::info(
 		sprintf(
-			// Translators: %1$s and %2$s add a link to the settings page. %3$s and %4$s make the text bold. %6$s is replaced with the number of snippets and %5$s adds a "new" icon.
+		// Translators: %1$s and %2$s add a link to the settings page. %3$s and %4$s make the text bold. %6$s is replaced with the number of snippets and %5$s adds a "new" icon.
 			__( '%5$s%1$sConnect to the WPCode Library%2$s to get access to %3$s%6$s FREE snippets%4$s!', 'insert-headers-and-footers' ),
 			'<a href="' . $settings_url . '" class="wpcode-start-auth">',
 			'</a>',
@@ -80,7 +80,7 @@ function wpcode_maybe_add_lite_top_bar_notice() {
 
 	WPCode_Notice::top(
 		sprintf(
-			// Translators: %1$s and %2$s add a link to the upgrade page. %3$s and %4$s make the text bold.
+		// Translators: %1$s and %2$s add a link to the upgrade page. %3$s and %4$s make the text bold.
 			__( '%3$sYou\'re using WPCode Lite%4$s. To unlock more features consider %1$supgrading to Pro%2$s.', 'insert-headers-and-footers' ),
 			'<a href="' . $upgrade_url . '" target="_blank" rel="noopener noreferrer">',
 			'</a>',
@@ -129,7 +129,7 @@ function wpcode_headers_footers_bottom_notice() {
 	);
 	$html .= '<p>';
 	$html .= sprintf(
-		// Translators: Placeholders make the text bold.
+	// Translators: Placeholders make the text bold.
 		esc_html__( '%1$sBonus:%2$s WPCode Lite users get %3$s$50 off regular price%4$s, automatically applied at checkout', 'insert-headers-and-footers' ),
 		'<strong>',
 		'</strong>',

@@ -168,11 +168,8 @@ while ( $loop->have_posts() ) : $loop->the_post();
 								if($image_numbering) { ?>
 									<div class="item-position item_position_<?php echo esc_html($pf_gallery_id); ?>"><?php echo esc_html($no); ?></div>
 									<?php 
-								} 
-								if($title_thumb == "show") { ?>
-									<span class="item-desc item_desc_<?php echo esc_html($pf_gallery_id); ?>"><?php esc_html_e($title, 'portfolio-filter-gallery'); ?></span>
-									<?php 
 								} ?>
+									<span class="item-desc item_desc_<?php echo esc_html($pf_gallery_id); ?>"><?php esc_html_e($title, 'portfolio-filter-gallery'); ?></span>
 								<?php
 							}
 							//Type Video
@@ -184,10 +181,10 @@ while ( $loop->have_posts() ) : $loop->the_post();
 									if($image_numbering) { ?>
 										<div class="item-position item_position_<?php echo esc_html($pf_gallery_id); ?>"><?php echo esc_html($no); ?></div>
 										<?php 
-									} if($title_thumb == "show") { ?>
+									} ?>
 										<span class="item-desc item_desc_<?php echo esc_html($pf_gallery_id); ?>"><?php esc_html_e($title, 'portfolio-filter-gallery'); ?></span>
 										<?php 
-									} if (!strpos($image_link_url, 'vimeo')) { ?>
+									if (!strpos($image_link_url, 'vimeo')) { ?>
 										<i class=""><img src="<?php echo PFG_PLUGIN_URL ?>/img/p-youtube.png"></i>
 										<?php
 									} else { ?>

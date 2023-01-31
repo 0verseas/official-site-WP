@@ -51,6 +51,12 @@ class Dashboard {
 
 		if (function_exists('blc_fs')) {
 			blc_fs()->add_filter('hide_plan_change', '__return_true');
+			blc_fs()->add_filter(
+				'plugin_icon',
+				function ($url) {
+					return BLOCKSY_PATH . '/static/img/logo.jpg';
+				}
+			);
 
 			blc_fs()->add_filter(
 				'permission_diagnostic_default',

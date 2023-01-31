@@ -165,3 +165,7 @@ screenshot-2.jpg
 = 2.1.4.5 =
 * Fix removing pingback header issue in the last major update
 * Update tested up to wp 6.1
+
+= 2.1.4.7 =
+* Fix issues on uninstallation hook
+* Minor improvements on admin review notification 

@@ -81,6 +81,13 @@ function awl_filter_gallery_shortcode($post_id) {
 			margin-bottom:20px;
 		}
 		
+		<?php 
+		if($title_thumb == "hide") { ?>
+			span.item_desc_<?php echo esc_html($pf_gallery_id); ?>{
+				display:none !important;
+			}
+		<?php
+		} ?>
 		li#all {
 			margin: 0;
 		}

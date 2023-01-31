@@ -23,6 +23,11 @@ export const getRowInitialMinHeight = (el) => {
 
 		let logoHeight = parseFloat(logoComp.height)
 
+		let marginHeight =
+			parseFloat(logoComp.marginTop) + parseFloat(logoComp.marginBottom)
+
+		logoHeight = logoHeight + marginHeight
+
 		if (el.querySelector('.site-logo-container')) {
 			const logoImgComp = getComputedStyle(
 				el.querySelector('.site-logo-container')

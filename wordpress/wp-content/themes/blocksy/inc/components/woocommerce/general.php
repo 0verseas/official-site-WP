@@ -355,7 +355,13 @@ add_action('rest_api_init', function () {
 						);
 					}
 
-					$price = wc_get_price_including_tax($product);
+					$tax_display_mode = get_option('woocommerce_tax_display_shop');
+
+					if ($tax_display_mode === 'incl') {
+						$price = wc_get_price_including_tax($product);
+					} else {
+						$price = wc_get_price_excluding_tax($product);
+					}
 				}
 
 				return $price ? wc_price($price) : 0;

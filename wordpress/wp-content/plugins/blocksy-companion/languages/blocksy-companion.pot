@@ -1,4 +1,4 @@
-# Copyright (C) 2022 blocksy-companion
+# Copyright (C) 2023 blocksy-companion
 # This file is distributed under the same license as the blocksy-companion package.
 #, fuzzy
 msgid ""
@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-12-15 17:12+0000\n"
+"POT-Creation-Date: 2023-01-11 17:05+0000\n"
 "Project-Id-Version: undefined\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;"
@@ -32,12 +32,12 @@ msgid ""
 "version, the plugin is currently NOT RUNNING."
 msgstr ""
 
-#: framework/dashboard.php:276, framework/dashboard.php:277,
+#: framework/dashboard.php:282, framework/dashboard.php:283,
 #: framework/extensions/product-reviews/extension.php:619
 msgid "Blocksy"
 msgstr ""
 
-#: framework/dashboard.php:322
+#: framework/dashboard.php:328
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -216,8 +216,8 @@ msgstr ""
 #. translators: %s: Link to the login page.
 #: framework/features/account-auth.php:92
 msgid ""
-"Check your email for the confirmation link, then visit the <a href=\"%s"
-"\">login page</a>."
+"Check your email for the confirmation link, then visit the <a "
+"href=\"%s\">login page</a>."
 msgstr ""
 
 #: framework/features/account-auth.php:104,
@@ -987,7 +987,7 @@ msgstr ""
 #: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:120,
 #: framework/extensions/widgets/widgets/ct-posts/options.php:173,
 #: framework/extensions/widgets/widgets/ct-posts/options.php:198,
-#: framework/premium/features/content-blocks/options/hook.php:289
+#: framework/premium/features/content-blocks/options/hook.php:303
 msgid "Default"
 msgstr ""
 
@@ -995,7 +995,7 @@ msgstr ""
 #: framework/extensions/newsletter-subscribe/ct-newsletter-subscribe/options.php:54,
 #: framework/premium/extensions/shortcuts/customizer.php:250,
 #: framework/premium/extensions/shortcuts/customizer.php:276,
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:379,
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:381,
 #: framework/premium/features/content-blocks/options/archive.php:48
 msgid "Custom"
 msgstr ""
@@ -1065,7 +1065,7 @@ msgstr ""
 #: framework/premium/extensions/shortcuts/customizer.php:745,
 #: framework/premium/features/content-blocks/options/404.php:146,
 #: framework/premium/features/content-blocks/options/header.php:166,
-#: framework/premium/features/content-blocks/options/hook.php:343,
+#: framework/premium/features/content-blocks/options/hook.php:357,
 #: framework/premium/features/content-blocks/options/popup.php:339,
 #: framework/premium/extensions/post-types-extra/includes/filtering/customizer.php:144,
 #: framework/premium/extensions/post-types-extra/includes/read-progress/customizer.php:43
@@ -1095,7 +1095,7 @@ msgstr ""
 #: framework/features/header/items/account/options.php:584,
 #: framework/premium/features/content-blocks/options/404.php:157,
 #: framework/premium/features/content-blocks/options/header.php:177,
-#: framework/premium/features/content-blocks/options/hook.php:354,
+#: framework/premium/features/content-blocks/options/hook.php:368,
 #: framework/premium/features/content-blocks/options/popup.php:350,
 #: framework/premium/extensions/post-types-extra/includes/filtering/customizer.php:157,
 #: framework/premium/extensions/post-types-extra/includes/read-progress/customizer.php:56,
@@ -1125,7 +1125,7 @@ msgstr ""
 #: framework/features/header/items/account/options.php:1328,
 #: framework/premium/features/content-blocks/options/404.php:158,
 #: framework/premium/features/content-blocks/options/header.php:178,
-#: framework/premium/features/content-blocks/options/hook.php:355,
+#: framework/premium/features/content-blocks/options/hook.php:369,
 #: framework/premium/features/content-blocks/options/popup.php:351,
 #: framework/premium/extensions/post-types-extra/includes/filtering/customizer.php:158,
 #: framework/premium/extensions/post-types-extra/includes/read-progress/customizer.php:57,
@@ -1158,7 +1158,7 @@ msgstr ""
 #: framework/features/header/items/account/options.php:1329,
 #: framework/premium/features/content-blocks/options/404.php:159,
 #: framework/premium/features/content-blocks/options/header.php:179,
-#: framework/premium/features/content-blocks/options/hook.php:356,
+#: framework/premium/features/content-blocks/options/hook.php:370,
 #: framework/premium/features/content-blocks/options/popup.php:352,
 #: framework/premium/extensions/post-types-extra/includes/filtering/customizer.php:159,
 #: framework/premium/extensions/post-types-extra/includes/read-progress/customizer.php:58,
@@ -1902,7 +1902,7 @@ msgstr ""
 msgid "Nothing found in Trash"
 msgstr ""
 
-#: framework/premium/features/content-blocks.php:897
+#: framework/premium/features/content-blocks.php:902
 msgid "Close popup"
 msgstr ""
 
@@ -1972,7 +1972,7 @@ msgstr ""
 #: framework/features/header/items/account/options.php:192,
 #: framework/features/header/items/account/options.php:407,
 #: framework/features/header/items/account/options.php:438,
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:455,
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:457,
 #: framework/premium/extensions/post-types-extra/includes/estimated-read-time.php:18,
 #: framework/premium/extensions/woocommerce-extra/header-items/wish-list/options.php:28,
 #: framework/premium/features/premium-header/items/contacts/options.php:65,
@@ -2618,7 +2618,7 @@ msgstr ""
 #: framework/premium/features/content-blocks/hooks-manager.php:477,
 #: framework/features/header/items/account/options.php:320,
 #: framework/features/header/items/account/options.php:617,
-#: framework/premium/features/content-blocks/options/hook.php:307,
+#: framework/premium/features/content-blocks/options/hook.php:321,
 #: framework/premium/extensions/woocommerce-extra/header-items/wish-list/options.php:132
 msgid "Bottom"
 msgstr ""
@@ -2644,7 +2644,7 @@ msgstr ""
 #: framework/premium/features/content-blocks/options/hook.php:9,
 #: framework/premium/features/content-blocks/options/hook.php:158,
 #: framework/premium/features/content-blocks/options/popup.php:162,
-#: framework/premium/features/content-blocks/options/popup.php:437,
+#: framework/premium/features/content-blocks/options/popup.php:445,
 #: framework/premium/features/premium-header/items/contacts/options.php:338
 msgid "None"
 msgstr ""
@@ -2859,7 +2859,7 @@ msgstr ""
 
 #: framework/premium/extensions/woocommerce-extra/floating-cart.php:24,
 #: framework/premium/features/content-blocks/hooks-manager.php:439,
-#: framework/premium/features/content-blocks/options/hook.php:306
+#: framework/premium/features/content-blocks/options/hook.php:320
 msgid "Top"
 msgstr ""
 
@@ -2879,15 +2879,15 @@ msgstr ""
 msgid "Go to product page"
 msgstr ""
 
-#: framework/premium/extensions/woocommerce-extra/helpers.php:149
+#: framework/premium/extensions/woocommerce-extra/helpers.php:153
 msgid "Quick view icon"
 msgstr ""
 
-#: framework/premium/extensions/woocommerce-extra/helpers.php:157
+#: framework/premium/extensions/woocommerce-extra/helpers.php:161
 msgid "Quick view toggle"
 msgstr ""
 
-#: framework/premium/extensions/woocommerce-extra/helpers.php:191
+#: framework/premium/extensions/woocommerce-extra/helpers.php:195
 msgid "Filter"
 msgstr ""
 
@@ -3418,7 +3418,7 @@ msgid "After related posts"
 msgstr ""
 
 #: framework/premium/features/content-blocks/hooks-manager.php:411,
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:467
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:469
 msgid "Before"
 msgstr ""
 
@@ -3428,7 +3428,7 @@ msgid "Loop"
 msgstr ""
 
 #: framework/premium/features/content-blocks/hooks-manager.php:418,
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:478
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:480
 msgid "After"
 msgstr ""
 
@@ -3848,12 +3848,23 @@ msgstr ""
 msgid "Before Heading Number"
 msgstr ""
 
-#: framework/extensions/widgets/widgets/ct-about-me/widget.php:13
-msgid "About Me"
-msgstr ""
-
+#: framework/extensions/widgets/widgets/ct-about-me/view.php:12,
 #: framework/extensions/widgets/widgets/ct-about-me/widget.php:14
 msgid "About me"
+msgstr ""
+
+#: framework/extensions/widgets/widgets/ct-about-me/view.php:39,
+#: framework/extensions/widgets/widgets/ct-quote/options.php:49,
+#: framework/extensions/widgets/widgets/ct-quote/view.php:18
+msgid "John Doe"
+msgstr ""
+
+#: framework/extensions/widgets/widgets/ct-about-me/view.php:100
+msgid "View Profile"
+msgstr ""
+
+#: framework/extensions/widgets/widgets/ct-about-me/widget.php:13
+msgid "About Me"
 msgstr ""
 
 #: framework/extensions/widgets/widgets/ct-advertisement/options.php:18,
@@ -4182,11 +4193,6 @@ msgstr ""
 msgid "Author Name"
 msgstr ""
 
-#: framework/extensions/widgets/widgets/ct-quote/options.php:49,
-#: framework/extensions/widgets/widgets/ct-quote/view.php:18
-msgid "John Doe"
-msgstr ""
-
 #: framework/extensions/widgets/widgets/ct-quote/options.php:55
 msgid "Author Label"
 msgstr ""
@@ -4422,38 +4428,38 @@ msgstr ""
 msgid "Element Visibility"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:417
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:419
 msgid "You have no %s fields declared for this custom post type."
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:429,
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:904,
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:915
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:431,
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:906,
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:917
 msgid "Field"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:441,
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:443,
 #: framework/premium/features/premium-header/items/language-switcher/options.php:60
 msgid "Label"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:490
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:492
 msgid "Fallback"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:502
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:504
 msgid "%s Field"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:888
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:890
 msgid "Custom Field"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:902
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:904
 msgid "%s %s Font"
 msgstr ""
 
-#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:913
+#: framework/premium/extensions/post-types-extra/includes/dynamic-data.php:915
 msgid "%s %s Color"
 msgstr ""
 
@@ -4662,6 +4668,7 @@ msgid "Full Page"
 msgstr ""
 
 #: framework/premium/features/content-blocks/options/archive.php:28,
+#: framework/premium/features/content-blocks/options/hook.php:256,
 #: framework/premium/features/content-blocks/options/single.php:126
 msgid "Dynamic Content Preview"
 msgstr ""
@@ -4697,7 +4704,7 @@ msgid "Page Structure"
 msgstr ""
 
 #: framework/premium/features/content-blocks/options/archive.php:207,
-#: framework/premium/features/content-blocks/options/hook.php:256,
+#: framework/premium/features/content-blocks/options/hook.php:270,
 #: framework/premium/features/content-blocks/options/popup.php:314,
 #: framework/premium/features/content-blocks/options/single.php:161
 msgid "Expiration Date/Time"
@@ -4713,23 +4720,29 @@ msgstr ""
 msgid "Location & Priority"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/hook.php:283
+#: framework/premium/features/content-blocks/options/hook.php:262
+msgid ""
+"Select a post/page to preview it's content inside the editor while building "
+"the hook."
+msgstr ""
+
+#: framework/premium/features/content-blocks/options/hook.php:297
 msgid "Block Position"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/hook.php:290
+#: framework/premium/features/content-blocks/options/hook.php:304
 msgid "Fixed"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/hook.php:300
+#: framework/premium/features/content-blocks/options/hook.php:314
 msgid "Location"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/hook.php:313
+#: framework/premium/features/content-blocks/options/hook.php:327
 msgid "Top Offset"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/hook.php:317
+#: framework/premium/features/content-blocks/options/hook.php:331
 msgid "Bottom Offset"
 msgstr ""
 
@@ -4882,43 +4895,53 @@ msgid "Popup Offset"
 msgstr ""
 
 #: framework/premium/features/content-blocks/options/popup.php:415
-msgid "Container Overflow"
+msgid "Scroll Lock"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:422
-msgid "Hidden"
+#: framework/premium/features/content-blocks/options/popup.php:419
+msgid ""
+"Enable this option if you want to lock the page scroll while the popup is "
+"triggered."
 msgstr ""
 
 #: framework/premium/features/content-blocks/options/popup.php:423
+msgid "Container Overflow"
+msgstr ""
+
+#: framework/premium/features/content-blocks/options/popup.php:430
+msgid "Hidden"
+msgstr ""
+
+#: framework/premium/features/content-blocks/options/popup.php:431
 msgid "Visible"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:424
+#: framework/premium/features/content-blocks/options/popup.php:432
 msgid "Scroll"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:426
+#: framework/premium/features/content-blocks/options/popup.php:434
 msgid ""
 "Control what happens to the content that is too big to fit into the popup."
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:430
+#: framework/premium/features/content-blocks/options/popup.php:438
 msgid "Close Button"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:438
+#: framework/premium/features/content-blocks/options/popup.php:446
 msgid "Inside"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:439
+#: framework/premium/features/content-blocks/options/popup.php:447
 msgid "Outside"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:513
+#: framework/premium/features/content-blocks/options/popup.php:521
 msgid "Popup Background"
 msgstr ""
 
-#: framework/premium/features/content-blocks/options/popup.php:527
+#: framework/premium/features/content-blocks/options/popup.php:535
 msgid "Popup Backdrop Background"
 msgstr ""
 
@@ -5189,9 +5212,9 @@ msgstr ""
 
 #: framework/extensions/newsletter-subscribe/dashboard-static/js/EditCredentials.js:158
 msgid ""
-"More info on how to generate an API key for Mailerlite can be found %shere"
-"%s. Please note that we require at least one group to be created in your "
-"account for the integration to work. More info on how to create a group "
+"More info on how to generate an API key for Mailerlite can be found "
+"%shere%s. Please note that we require at least one group to be created in "
+"your account for the integration to work. More info on how to create a group "
 "%shere%s."
 msgstr ""
 

@@ -1,4 +1,4 @@
-import { enable, disable } from './overlay/no-bounce'
+import { scrollLockManager } from './overlay/no-bounce'
 import ctEvents from 'ct-events'
 import { mount as mountMobileMenu } from './overlay/mobile-menu'
 
@@ -94,7 +94,7 @@ const showOffcanvas = (settings) => {
 		settings.computeScrollContainer ||
 		settings.container.querySelector('.ct-panel-content')
 	) {
-		disable(
+		scrollLockManager().disable(
 			settings.computeScrollContainer
 				? settings.computeScrollContainer()
 				: settings.container.querySelector('.ct-panel-content')
@@ -175,7 +175,7 @@ const hideOffcanvas = (settings, args = {}) => {
 		document.body.removeAttribute('data-panel')
 		ctEvents.trigger('ct:modal:closed', settings.container)
 
-		enable(
+		scrollLockManager().enable(
 			settings.computeScrollContainer
 				? settings.computeScrollContainer()
 				: settings.container.querySelector('.ct-panel-content')
@@ -190,7 +190,7 @@ const hideOffcanvas = (settings, args = {}) => {
 					document.body.removeAttribute('data-panel')
 					ctEvents.trigger('ct:modal:closed', settings.container)
 
-					enable(
+					scrollLockManager().enable(
 						settings.computeScrollContainer
 							? settings.computeScrollContainer()
 							: settings.container.querySelector(

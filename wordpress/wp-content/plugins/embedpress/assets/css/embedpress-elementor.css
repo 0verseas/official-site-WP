@@ -55,6 +55,10 @@
     margin: 0 auto;
 }
 
+.emebedpress-unit-percent iframe{
+    width: 100%;
+}
+
 .embedpress-el-powered {
     text-align: center;
     margin: 0 auto;
@@ -342,3 +346,14 @@
     }
 }
 /*End meetup*/
+
+.wistia_embed {
+    max-width: 100%;
+}
+
+@media only screen and (max-width: 850px){  
+    .emebedpress-unit-percent.embedpress-document-embed {
+        width: 100%!important;
+    }
+    
+}

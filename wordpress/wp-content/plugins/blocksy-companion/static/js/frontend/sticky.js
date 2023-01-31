@@ -36,6 +36,7 @@ let cachedStartPosition = null
 let cachedContainerInitialHeight = {}
 let cachedHeaderInitialHeight = null
 let cachedStickyContainerHeight = null
+let forcedHeightSetForStickyContainer = false
 
 const clearCache = () => {
 	clearShrinkCache()
@@ -45,6 +46,7 @@ const clearCache = () => {
 	cachedHeaderInitialHeight = null
 	cachedStickyContainerHeight = null
 	prevScrollY = null
+	forcedHeightSetForStickyContainer = false
 }
 
 ctEvents.on('blocksy:sticky:compute', () => {
@@ -55,12 +57,19 @@ ctEvents.on('blocksy:sticky:compute', () => {
 })
 
 if (window.wp && wp.customize && wp.customize.selectiveRefresh) {
+	let shouldSkipNext = false
 	wp.customize.selectiveRefresh.bind(
 		'partial-content-rendered',
 		(placement) => {
+			if (shouldSkipNext) {
+				return
+			}
+			shouldSkipNext = true
 			setTimeout(() => {
 				clearCache()
+				forcedHeightSetForStickyContainer = true
 				compute()
+				shouldSkipNext = false
 			}, 500)
 		}
 	)
@@ -71,7 +80,7 @@ const getStartPositionFor = (stickyContainer) => {
 		stickyContainer.dataset.sticky.indexOf('shrink') === -1 &&
 		stickyContainer.dataset.sticky.indexOf('auto-hide') === -1
 	) {
-		return stickyContainer.parentNode.getBoundingClientRect().height + 200
+		// return stickyContainer.parentNode.getBoundingClientRect().height + 200
 	}
 
 	const headerRect = stickyContainer.closest('header').getBoundingClientRect()
@@ -93,6 +102,13 @@ const getStartPositionFor = (stickyContainer) => {
 				stickyOffset -= element.getBoundingClientRect().height
 			}
 		}
+	}
+
+	if (
+		stickyContainer.dataset.sticky.indexOf('shrink') === -1 &&
+		stickyContainer.dataset.sticky.indexOf('auto-hide') === -1
+	) {
+		stickyOffset += 200
 	}
 
 	const row = stickyContainer.parentNode
@@ -160,6 +176,9 @@ const compute = () => {
 	let containerInitialHeight =
 		cachedContainerInitialHeight[currentScreenWithTablet]
 
+	const shouldSetHeight =
+		!containerInitialHeight || forcedHeightSetForStickyContainer
+
 	if (!containerInitialHeight) {
 		cachedContainerInitialHeight[currentScreenWithTablet] = [
 			...stickyContainer.querySelectorAll('[data-row]'),
@@ -169,7 +188,10 @@ const compute = () => {
 
 		containerInitialHeight =
 			cachedContainerInitialHeight[currentScreenWithTablet]
+	}
 
+	if (shouldSetHeight) {
+		forcedHeightSetForStickyContainer = false
 		stickyContainer.parentNode.style.height = `${containerInitialHeight}px`
 	}
 

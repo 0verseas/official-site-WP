@@ -79,6 +79,13 @@ abstract class WPCode_Admin_Page {
 	public $views = array();
 
 	/**
+	 * If the submenu for the page should be hidden, set this to true.
+	 *
+	 * @var bool
+	 */
+	public $hide_menu = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -107,6 +114,7 @@ abstract class WPCode_Admin_Page {
 		add_action( 'admin_enqueue_scripts', array( $this, 'page_scripts' ) );
 		add_filter( 'admin_body_class', array( $this, 'page_specific_body_class' ) );
 		add_filter( 'wpcode_admin_js_data', array( $this, 'maybe_add_library_data' ) );
+		add_action( 'admin_init', array( $this, 'maybe_redirect_to_click' ) );
 
 		$this->setup_views();
 		$this->set_current_view();
@@ -1208,8 +1216,8 @@ abstract class WPCode_Admin_Page {
 			return;
 		}
 
-		$data   = wpcode()->library->get_data();
-		$count  = 0;
+		$data  = wpcode()->library->get_data();
+		$count = 0;
 		if ( ! empty( $data['snippets'] ) ) {
 			$count = count( $data['snippets'] );
 		}
@@ -1234,5 +1242,23 @@ abstract class WPCode_Admin_Page {
 			</div>
 		</script>
 		<?php
+	}
+
+	/**
+	 * On any of the plugin pages, if the user installed the plugin from the
+	 * deploy a snippet flow, redirect to the 1-click page to allow them to continue that process.
+	 *
+	 * @return void
+	 */
+	public function maybe_redirect_to_click() {
+		if ( 'wpcode-click' === $this->page_slug ) {
+			// Don't redirect this page to avoid an infinite loop.
+			return;
+		}
+		if ( false !== get_transient( 'wpcode_deploy_snippet_id' ) ) {
+			// Don't delete the transient here, it will be deleted in the 1-click page.
+			wp_safe_redirect( admin_url( 'admin.php?page=wpcode-click' ) );
+			exit;
+		}
 	}
 }

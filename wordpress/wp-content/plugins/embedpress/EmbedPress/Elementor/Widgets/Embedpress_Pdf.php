@@ -164,18 +164,24 @@ class Embedpress_Pdf extends Widget_Base
                 'label'     => __('Width', 'embedpress'),
                 'type'      => Controls_Manager::SLIDER,
                 'separator' => 'before',
+                'size_units' => [ 'px', '%' ],
                 'default'   => [
                     'unit' => 'px',
                     'size' => 600,
                 ],
                 'range'     => [
+                    '%' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
                     'px' => [
                         'min' => 6,
                         'max' => 1000,
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .embedpress-document-embed iframe'               => 'width: {{SIZE}}{{UNIT}} !important; max-width: 100%',
+                    '{{WRAPPER}} .embedpress-document-embed iframe'               => 'width: {{SIZE}}{{UNIT}}; max-width: 100%',
+                    '{{WRAPPER}} .embedpress-document-embed' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%',
                     '{{WRAPPER}} .embedpress-document-embed .pdfobject-container' => 'width: {{SIZE}}{{UNIT}} !important; max-width: 100%',
                 ],
                 'render_type' => 'template',
@@ -455,14 +461,18 @@ class Embedpress_Pdf extends Widget_Base
 
     public function _render($url, $settings, $id)
     {
+        $unitoption = 'emebedpress-unit-px';
+        if($settings['embedpress_elementor_document_width']['unit'] === '%'){
+            $unitoption = 'emebedpress-unit-percent';
+        }
         $id = 'embedpress-pdf-' . $id;
-        $dimension = "width: {$settings['embedpress_elementor_document_width']['size']}px;height: {$settings['embedpress_elementor_document_height']['size']}px";
+        $dimension = "width: {$settings['embedpress_elementor_document_width']['size']}{$settings['embedpress_elementor_document_width']['unit']};height: {$settings['embedpress_elementor_document_height']['size']}px";
         $this->add_render_attribute('embedpres-pdf-render', [
             'class'     => ['embedpress-embed-document-pdf', $id],
             'data-emid' => $id
         ]);
         $this->add_render_attribute('embedpress-document', [
-            'class' => ['embedpress-document-embed', 'ep-doc-' . md5($id), 'ose-document'],
+            'class' => ['embedpress-document-embed', 'ep-doc-' . md5($id), 'ose-document', $unitoption ],
             'data-thememode' => $settings['embedpress_theme_mode'],
             'data-toolbar' => $settings['pdf_toolbar'],
             'data-toolbar-position' =>  $settings['pdf_toolbar_position'],

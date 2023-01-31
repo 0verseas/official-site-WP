@@ -1059,9 +1059,14 @@ span.ep-nft-rank {
         width: 100%;
     }
 }
+
 @media screen and (max-width: 537px) {
     .ep-nft-single-item-wraper sub.ep-usd-price {
         margin-bottom: 15px;
         display: block;
     }
+}
+
+.emebedpress-unit-percent iframe{
+    width: 100%!important;
 }

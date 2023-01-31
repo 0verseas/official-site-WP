@@ -106,6 +106,8 @@ class WPCode_Admin_Page_Snippet_Manager extends WPCode_Admin_Page {
 		add_action( 'admin_init', array( $this, 'set_code_type' ) );
 		add_filter( 'wpcode_admin_js_data', array( $this, 'add_conditional_rules_to_script' ) );
 		add_filter( 'admin_body_class', array( $this, 'maybe_show_tinymce' ) );
+		add_filter( 'admin_body_class', array( $this, 'maybe_editor_height_auto' ) );
+		add_filter( 'admin_head', array( $this, 'maybe_editor_height' ) );
 	}
 
 	/**
@@ -1096,6 +1098,43 @@ class WPCode_Admin_Page_Snippet_Manager extends WPCode_Admin_Page {
 		}
 
 		return $body_class;
+	}
+
+	/**
+	 * If the editor should grow with the code, add a body class.
+	 *
+	 * @param string $body_class The body class.
+	 *
+	 * @return string
+	 */
+	public function maybe_editor_height_auto( $body_class ) {
+		$height_auto = wpcode()->settings->get_option( 'editor_height_auto' );
+		if ( false !== $height_auto ) {
+			$body_class .= ' wpcode-editor-auto ';
+		}
+
+		return $body_class;
+	}
+
+	/**
+	 * If we have a custom height set, output the styles to change that.
+	 * Also, check if the auto-height is set.
+	 *
+	 * @return void
+	 */
+	public function maybe_editor_height() {
+		// Let's check if the auto-height is not enabled.
+		$height_auto = wpcode()->settings->get_option( 'editor_height_auto' );
+		if ( false !== $height_auto ) {
+			return;
+		}
+
+		$height = wpcode()->settings->get_option( 'editor_height' );
+		if ( ! $height ) {
+			return;
+		}
+
+		echo '<style>.CodeMirror {height: ' . absint( $height ) . 'px;}</style>';
 	}
 
 	/**

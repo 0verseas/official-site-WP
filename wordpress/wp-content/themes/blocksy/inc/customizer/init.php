@@ -426,7 +426,7 @@ function blocksy_customizer_register_options(
 
 			$args = [
 				'title' => empty( $opt['option']['title'] )
-					? blocksy_id_to_title( $opt['id'] )
+					? $opt['id']
 					: $opt['option']['title'],
 				'description' => empty( $opt['option']['desc'] )
 					? ''
@@ -512,7 +512,7 @@ function blocksy_customizer_register_options(
 
 			$args_control = [
 				'label' => empty($opt['option']['label'])
-					? blocksy_id_to_title($opt['id'])
+					? $opt['id']
 					: $opt['option']['label'],
 				'description' => empty($opt['option']['desc'])
 					? ''

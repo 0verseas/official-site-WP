@@ -3,7 +3,7 @@
 Plugin Name: Disable XML-RPC-API
 Plugin URI: https://neatma.com/dsxmlrpc-plugin/
 Description: Lightweight plugin to disable XML-RPC API and Pingbacks,Trackbacks for faster and more secure website.
-Version: 2.1.4.5
+Version: 2.1.4.7
 Tested up to: 6.1
 Requires at least: 3.5
 Author: Neatma
@@ -50,8 +50,6 @@ class xmlrpcSecurity
         // Deactivation hook
         register_deactivation_hook(DSXMLRPC_FILE, [$this, 'pluginDeactivated']);
 
-        // Uninstall hook
-        register_uninstall_hook(DSXMLRPC_FILE, 'uninstall_action');
 
         add_action('admin_init', ['PAnD', 'init']);
         add_filter('wp_xmlrpc_server_class', [$this, 'disable_wp_xmlrpc']);
@@ -281,16 +279,6 @@ allow from all
         }
     }
 
-    /**
-     * Unistallation actions
-     */
-    public function uninstall_action()
-    {
-        delete_option('dsxmlrpc-settings');
-        delete_option('pand-' . md5('wpsg-notice'));
-        delete_option('pand-' . md5('dsxmlrpc-notice'));
-
-    }
 
     /**
      * @param $upgrader_object

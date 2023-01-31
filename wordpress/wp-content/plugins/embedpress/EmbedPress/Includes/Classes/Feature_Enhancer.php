@@ -58,9 +58,78 @@ class Feature_Enhancer
 			'thumbnail_quality' => isset($_POST['thumbnail_quality']) ? sanitize_text_field($_POST['thumbnail_quality']) : null,
 		]);
 
+		wp_send_json($result);
+	}
+
+
+	//Check is YouTube single video
+	public function ytValidateUrl(String $url)
+    {
+        return (bool) (preg_match('~v=(?:[a-z0-9_\-]+)~i', (string) $url));
+    }
+	
+	
+	//Check is Wistia validate url
+	public function wistiaValidateUrl(String $url)
+    {
+        return (bool) (preg_match('#\/medias\\\?\/([a-z0-9]+)\.?#i', (string) $url ));
+    }
+
+	// Get wistia block attributes 
+	public function get_wistia_block_attributes($attributes) {
+
+		// Embed Options
+		$embedOptions = new \stdClass;
+		$embedOptions->videoFoam = false;
+		$embedOptions->fullscreenButton = (isset($attributes['wfullscreen']) && (bool) $attributes['wfullscreen'] === true);
+		$embedOptions->playbar = (isset($attributes['playbar']) && (bool) $attributes['playbar'] === true);
+
+		$embedOptions->playButton = (isset($attributes['playbutton']) && (bool) $attributes['playbutton'] === true);
+		$embedOptions->smallPlayButton = (isset($attributes['smallplaybutton']) && (bool) $attributes['smallplaybutton'] === true);
+
+		$embedOptions->autoPlay = (isset($attributes['wautoplay']) && (bool) $attributes['wautoplay'] === true);
+		$embedOptions->resumable = (isset($attributes['resumable']) && (bool) $attributes['resumable'] === true);
+
+		$embedOptions->time = isset($attributes['wstarttime']) ? $attributes['wstarttime'] : '';
+
+		if ( is_embedpress_pro_active() ) {
+			$embedOptions->volumeControl = (isset($attributes['volumecontrol']) && (bool) $attributes['volumecontrol'] === true);
+
+			$volume = isset($attributes['volume']) ? (float) $attributes['volume'] : 0;
+
+			if ( $volume > 1 ) {
+				$volume = $volume / 100;
+			}
+			$embedOptions->volume = $volume;
+		}
+
+		$pluginList = [];
+
+		if (isset($attributes['scheme'])) {
+			$color = $attributes['scheme'];
+			if (null !== $color) {
+				$embedOptions->playerColor = $color;
+			}
+		}	
+
+		// Closed Captions plugin
+		if ( $attributes['captions'] === true ) {
+			$isCaptionsEnabled          = ( $attributes['captions'] === true );
+			$isCaptionsEnabledByDefault = ( $attributes['captions'] === true );
+			if ( $isCaptionsEnabled ) {
+				$pluginList['captions-v1'] = [
+					'onByDefault' => $isCaptionsEnabledByDefault,
+				];
+			}
+			$embedOptions->captions        = $isCaptionsEnabled;
+			$embedOptions->captionsDefault = $isCaptionsEnabledByDefault;
+		}
+
+		$embedOptions->plugin = $pluginList;
 		
 
-		wp_send_json($result);
+
+		return json_encode($embedOptions);
 	}
 
 	public function gutenberg_embed($embedHTML, $attributes)
@@ -68,6 +137,7 @@ class Feature_Enhancer
 
 		if (!empty($attributes['url'])) {
 			$youtube = new Youtube($attributes['url']);
+			
 			$is_youtube = $youtube->validateUrl($youtube->getUrl(false));
 			if ($is_youtube) {
 				$atts = [
@@ -80,14 +150,135 @@ class Feature_Enhancer
 				];
 
 				$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
+
 				if (!empty($urlInfo->embed)) {
 					$embedHTML = $urlInfo->embed;
 				}
 			}
+
+			// echo $this->ytValidateUrl($attributes['url']);
+			
+			if($this->ytValidateUrl($attributes['url'])){
+				
+				$atts = [
+					'url'	=> $attributes['url'],
+					'starttime'    => !empty($attributes['starttime']) ? $attributes['starttime'] : '',
+					'endtime'   => !empty($attributes['endtime']) ? $attributes['endtime'] : '',
+					'autoplay'   => !empty($attributes['autoplay']) ? 1 : 0,
+					'controls'   => isset($attributes['controls']) ? $attributes['controls'] : '1',
+					'fullscreen'   => !empty($attributes['fullscreen']) ? 1 : 0,
+					'videoannotations'   => !empty($attributes['videoannotations']) ? 1 : 0,
+					'progressbarcolor'   => !empty($attributes['progressbarcolor']) ? $attributes['progressbarcolor'] : 'red',
+					'closedcaptions'   => !empty($attributes['closedcaptions']) ? 1 : 0,
+					'modestbranding'   => !empty($attributes['modestbranding']) ? $attributes['modestbranding'] : '',
+					'relatedvideos'   => !empty($attributes['relatedvideos']) ? 1 : 0,
+					'customlogo'   => !empty($attributes['customlogo']) ? $attributes['customlogo'] : '',
+					'logoX' => !empty($attributes['logoX']) ? $attributes['logoX'] : 5,
+					'logoY' => !empty($attributes['logoY']) ? $attributes['logoY'] : 10,
+					'customlogoUrl' => !empty($attributes['customlogoUrl']) ? $attributes['customlogoUrl'] : '',
+					'logoOpacity' => !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : 0.6,
+				];
+
+				$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
+
+				if (!empty($urlInfo->embed)) {
+					$embedHTML = $urlInfo->embed;
+				}
+
+				if(isset( $urlInfo->embed ) && preg_match( '/src=\"(.+?)\"/', $urlInfo->embed, $match )){
+					$url_full = $match[1];
+					$query = parse_url( $url_full, PHP_URL_QUERY );
+					parse_str( $query, $params );
+
+					$params['controls']       = isset($attributes['controls']) ? $attributes['controls']: '1';
+					$params['iv_load_policy'] = !empty($attributes['videoannotations']) ? 1 : 0;
+					$params['fs']             = !empty($attributes['fullscreen']) ? 1 : 0;
+					$params['rel']             = !empty($attributes['relatedvideos']) ? 1 : 0;
+					$params['end']            = !empty($attributes['endtime']) ? $attributes['endtime'] : '';
+					$params['autoplay'] 		= !empty($attributes['autoplay']) ? 1 : 0;
+					$params['start'] 			= !empty($attributes['starttime']) ? $attributes['starttime'] : '';
+					$params['color'] = !empty($attributes['progressbarcolor']) ? $attributes['progressbarcolor'] : 'red';
+					$params['modestbranding'] = empty($attributes['modestbranding']) ? 0 : 1; // Reverse the condition value for modestbranding. 0 = display, 1 = do not display
+					$params['cc_load_policy'] = !empty($attributes['closedcaptions']) ? 0 : 1;
+
+					preg_match( '/(.+)?\?/', $url_full, $url );
+
+					if ( empty( $url) ) {
+						return $embedHTML;
+					}
+					
+					$url = $url[1];
+
+					// Reassemble the url with the new variables.
+					$url_modified = $url . '?';
+
+					foreach ( $params as $paramName => $paramValue ) {
+						
+						$and = '&';
+						if(array_key_last($params) === $paramName){
+							$and = '';
+						}
+						
+						if(isset($paramValue) && $paramValue !== ''){
+							$url_modified .= $paramName . '=' . $paramValue . $and;
+						}
+					}
+
+					// Replaces the old url with the new one.
+					$embedHTML = str_replace( $url_full, rtrim( $url_modified, '&' ), $urlInfo->embed );
+					
+				}
+
+			}
+
+		}
+
+		if (!empty($attributes['url']) && $this->wistiaValidateUrl($attributes['url'])) {
+
+
+			$embedOptions = $this->get_wistia_block_attributes($attributes);
+
+			// Get the video ID
+			$videoId = $this->getVideoIDFromURL($attributes['url']);
+			$shortVideoId = substr($videoId, 0, 3);
+
+			// Responsive?
+
+			$class = array(
+				'wistia_embed',
+				'wistia_async_' . $videoId
+			);
+
+			$attribs = array(
+				sprintf('id="wistia_%s"', $videoId),
+				sprintf('class="%s"', join(' ', $class)),
+				sprintf('style="width:%spx; height:%spx;"', $attributes['width'], $attributes['height'])
+			);
+
+			$labels = array(
+				'watch_from_beginning' => __('Watch from the beginning', 'embedpress'),
+				'skip_to_where_you_left_off' => __('Skip to where you left off', 'embedpress'),
+				'you_have_watched_it_before' => __(
+					'It looks like you\'ve watched<br />part of this video before!',
+					'embedpress'
+				),
+			);
+			$labels = json_encode($labels);
+
+			preg_match('/ose-uid-([a-z0-9]*)/', $attributes['embedHTML'], $matches);
+			$uid = $matches[1];
+
+			$html = "<div class=\"embedpress-wrapper ose-wistia ose-uid-{$uid} responsive\">";
+			$html .= '<script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>';
+			$html .= "<script>window.pp_embed_wistia_labels = {$labels};</script>\n";
+			$html .= "<script>window._wq = window._wq || []; _wq.push({\"{$shortVideoId}\": {$embedOptions}});</script>\n";
+			$html .= '<div ' . join(' ', $attribs) . "></div>\n";
+			$html .= '</div>';
+			$embedHTML = $html;
 		}
 
 
-		return $embedHTML;
+		return $embedHTML ;
 	}
 
 
@@ -142,6 +333,7 @@ class Feature_Enhancer
 		];
 		return apply_filters('emebedpress_get_options', $options);
 	}
+
 	public function get_youtube_params($options)
 	{
 		$params = [];
@@ -202,9 +394,12 @@ class Feature_Enhancer
 		}
 		return apply_filters('embedpress_vimeo_params', $params);
 	}
+
 	//--- For CLASSIC AND BLOCK EDITOR
 	public function enhance_youtube($embed)
 	{
+		
+
 		$isYoutube = (isset($embed->provider_name) && strtoupper($embed->provider_name) === 'YOUTUBE') || (isset($embed->url) && isset($embed->{$embed->url}) && isset($embed->{$embed->url}['provider_name']) && strtoupper($embed->{$embed->url}['provider_name']) === 'YOUTUBE');
 
 		if (
@@ -214,6 +409,7 @@ class Feature_Enhancer
 
 			// for compatibility only, @TODO; remove later after deep testing.
 			$options = $this->getOptions('youtube', $this->get_youtube_settings_schema());
+			
 			// Parse the url to retrieve all its info like variables etc.
 			$url_full = $match[1];
 			$query = parse_url($url_full, PHP_URL_QUERY);
@@ -269,7 +465,6 @@ class Feature_Enhancer
 				unset($params['iv_load_policy']);
 			}
 
-
 			// pro controls will be handled by the pro so remove it from the free.
 			$pro_controls = ['cc_load_policy', 'modestbranding'];
 			foreach ($pro_controls as $pro_control) {
@@ -278,9 +473,23 @@ class Feature_Enhancer
 				}
 			}
 
-
 			preg_match('/(.+)?\?/', $url_full, $url);
 			$url = $url[1];
+
+			if(is_object($embed->attributes) && !empty($embed->attributes)){
+				$attributes = (array) $embed->attributes;
+				
+				$params['controls']       = isset($attributes['data-controls']) ? $attributes['data-controls'] : '1';
+				$params['iv_load_policy'] = !empty($attributes['data-videoannotations']) && ($attributes['data-videoannotations'] == 'true') ? 1 : 0;
+				$params['fs']             = !empty($attributes['data-fullscreen']) && ($attributes['data-fullscreen'] == 'true') ? 1 : 0;
+				$params['rel']             = !empty($attributes['data-relatedvideos']) && ($attributes['data-relatedvideos'] == 'true') ? 1 : 0;
+				$params['end']            = !empty($attributes['data-endtime']) ? $attributes['data-endtime'] : '';
+				$params['autoplay'] 		= !empty($attributes['data-autoplay']) && ($attributes['data-autoplay'] == 'true') ? 1 : 0;
+				$params['start'] 			= !empty($attributes['data-starttime']) ? $attributes['data-starttime'] : '';
+				$params['color'] = !empty($attributes['data-progressbarcolor']) ? $attributes['data-progressbarcolor'] : 'red';
+				$params['modestbranding'] = empty($attributes['data-modestbranding']) ? 0 : 1; // Reverse the condition value for modestbranding. 0 = display, 1 = do not display
+				$params['cc_load_policy'] = !empty($attributes['data-closedcaptions']) && ($attributes['data-closedcaptions'] == 'true') ? 0 : 1;
+			}
 
 			// Reassemble the url with the new variables.
 			$url_modified = $url . '?';
@@ -294,6 +503,7 @@ class Feature_Enhancer
 
 		return $embed;
 	}
+	
 	public function enhance_vimeo($embed)
 	{
 		if (
@@ -355,6 +565,7 @@ class Feature_Enhancer
 			foreach ($params as $param => $value) {
 				$url_modified = add_query_arg($param, $value, $url_modified);
 			}
+
 			if (isset($options['start_time'])) {
 				$url_modified .= '#t=' . $options['start_time'];
 			}
@@ -366,8 +577,10 @@ class Feature_Enhancer
 
 		return $embed;
 	}
+
 	public function enhance_wistia($embed)
 	{
+		
 		if (
 			isset($embed->provider_name)
 			&& strtoupper($embed->provider_name) === 'WISTIA, INC.'
@@ -388,9 +601,10 @@ class Feature_Enhancer
 			$embed->attributes->class = str_replace('{provider_alias}', 'wistia', $embed->attributes->class);
 			$embed->embed = str_replace('ose-wistia, inc.', 'ose-wistia', $embed->embed);
 
+
 			// Embed Options
 			$embedOptions = new \stdClass;
-			$embedOptions->videoFoam = true;
+			$embedOptions->videoFoam = false;
 			$embedOptions->fullscreenButton = (isset($options['display_fullscreen_button']) && (bool) $options['display_fullscreen_button'] === true);
 			$embedOptions->playbar = (isset($options['display_playbar']) && (bool) $options['display_playbar'] === true);
 
@@ -454,6 +668,7 @@ class Feature_Enhancer
 				}
 			}
 			$embedOptions->plugin = $pluginList;
+			
 			$embedOptions = json_encode($embedOptions);
 
 			// Get the video ID
@@ -497,6 +712,7 @@ class Feature_Enhancer
 
 		return $embed;
 	}
+
 	public function enhance_twitch($embed_content)
 	{
 		$e          = isset($embed_content->url) && isset($embed_content->{$embed_content->url}) ? $embed_content->{$embed_content->url} : [];
@@ -827,6 +1043,8 @@ class Feature_Enhancer
 			),
 		);
 	}
+	
+
 	public function getVideoIDFromURL($url)
 	{
 		// https://fast.wistia.com/embed/medias/xf1edjzn92.jsonp
@@ -858,6 +1076,9 @@ class Feature_Enhancer
 		$html = '<script src="https://fast.wistia.com/assets/external/E-v1.js"></script>';
 		$html .= "<script>window.pp_embed_wistia_labels = {$labels};</script>\n";
 		$html .= "<script>wistiaEmbed = Wistia.embed( \"{$shortVideoId}\", {$embedOptions} );</script>\n";
+
+
+
 		echo $html;
 	}
 	public function embedpress_wistia_pro_get_options()
@@ -865,7 +1086,7 @@ class Feature_Enhancer
 		$options = $this->getOptions('wistia', $this->get_wistia_settings_schema());
 		// Embed Options
 		$embedOptions = new \stdClass;
-		$embedOptions->videoFoam        = true;
+		// $embedOptions->videoFoam        = true;
 		$embedOptions->fullscreenButton = (isset($options['display_fullscreen_button']) && (bool) $options['display_fullscreen_button'] === true);
 		$embedOptions->smallPlayButton  = (isset($options['small_play_button']) && (bool) $options['small_play_button'] === true);
 		$embedOptions->autoPlay         = (isset($options['autoplay']) && (bool) $options['autoplay'] === true);
@@ -919,6 +1140,8 @@ class Feature_Enhancer
 		$embedOptions         = json_encode($embedOptions);
 		return apply_filters('embedpress_wistia_params_after_encode', $embedOptions);
 	}
+
+	
 	public function get_twitch_settings_schema()
 	{
 		return [
