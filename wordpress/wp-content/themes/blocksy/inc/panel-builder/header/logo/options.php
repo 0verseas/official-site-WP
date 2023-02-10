@@ -140,7 +140,6 @@ $options = [
 						'design' => 'block',
 						'disableRevertButton' => true,
 						'value' => get_option('blogname'),
-						'disableRevertButton' => true,
 					],
 
 					'blogname_visibility' => [

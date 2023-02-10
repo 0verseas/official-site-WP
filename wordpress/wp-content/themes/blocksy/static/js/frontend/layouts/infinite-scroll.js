@@ -10,10 +10,18 @@ InfiniteScroll.imagesLoaded = (fragment, fn) => fn()
 InfiniteScroll.Button.prototype.hide = () => {}
 
 export const mount = (paginationContainer) => {
-	let layoutEl = [...paginationContainer.parentNode.children].find(
-		(c) =>
-			c.classList.contains('products') || c.classList.contains('entries')
-	)
+	let layoutEl = [...paginationContainer.parentNode.children]
+		.reduce(
+			(a, c) => {
+				return [...a, ...c.children]
+			},
+			[...paginationContainer.parentNode.children]
+		)
+		.find(
+			(c) =>
+				c.classList.contains('products') ||
+				c.classList.contains('entries')
+		)
 
 	if (!paginationContainer) return
 
@@ -60,7 +68,14 @@ export const mount = (paginationContainer) => {
 				}, 100)
 			})
 
-			this.on('append', () => watchLayoutContainerForReveal(layoutEl))
+			this.on('append', () => {
+				watchLayoutContainerForReveal(layoutEl)
+				;[...layoutEl.querySelectorAll('[srcset]')].forEach((el) => {
+					const prev = el.srcset
+					el.srcset = ''
+					el.srcset = prev
+				})
+			})
 
 			this.on('request', () => {
 				paginationContainer
@@ -94,7 +109,11 @@ function getAppendSelectorFor(layoutEl) {
 			: `.ct-posts-shortcode:nth-child(${layoutIndex + 1}) .entries > *`
 	}
 
-	return layoutEl.classList.contains('products')
-		? `#main .products > li`
-		: `section > .entries > *`
+	if (layoutEl.classList.contains('products')) {
+		let layoutIndex = [...layoutEl.parentNode.children].indexOf(layoutEl)
+
+		return `#main .products:nth-child(${layoutIndex + 1}) > li`
+	}
+
+	return `section > .entries > *`
 }

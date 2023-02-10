@@ -177,8 +177,10 @@ if (! function_exists('blc_get_trending_posts_value')) {
 }
 
 if (! function_exists('blc_get_trending_block')) {
-function blc_get_trending_block($forced = false) {
-	$result = blc_get_trending_posts_value();
+function blc_get_trending_block($result = null) {
+	if (! $result) {
+		$result = blc_get_trending_posts_value();
+	}
 
 
 	if (empty($result['posts'])) {

@@ -572,6 +572,7 @@ add_action(
 require get_template_directory() . '/inc/classes/print.php';
 require get_template_directory() . '/inc/helpers.php';
 require get_template_directory() . '/inc/helpers/html.php';
+require get_template_directory() . '/inc/classes/hooks-manager.php';
 require get_template_directory() . '/inc/classes/blocksy-walker-page.php';
 require get_template_directory() . '/inc/classes/translations-manager.php';
 require get_template_directory() . '/inc/classes/screen-manager.php';

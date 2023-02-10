@@ -55,10 +55,10 @@
 
 // indicator spacing
 .blocksy-hook-indicator {
-	margin: 15px var(--hookSideMargin, 0);
+	margin: 15px var(--hook-side-margin, 0);
 
 	&[data-type*="full"] {
-		--hookSideMargin: 15px;
+		--hook-side-margin: 15px;
 	}
 
 	&:not([data-type*="top-margin"]) {
@@ -74,10 +74,11 @@
 	}
 }
 
+.ct-container {
 
-.blocksy-hook-indicator[data-type*="full"] {
-	margin-left: 15px;
-	margin-right: 15px;
+	.blocksy-hook-indicator[data-type*="full"] {
+		--hook-side-margin: 0;
+	}
 }
 
 

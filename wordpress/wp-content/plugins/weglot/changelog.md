@@ -3,6 +3,27 @@
 
 # Change Log
 
+##3.9.1 (30/01/2023) =
+* Bug: add english in destination language list during installation if original language is different
+* Update: Prevent using empty .json settings file during install
+
+##3.9 (17/01/2023) =
+* Update: Add whitelist mode
+* Update: Add notices messages if other translate plugin is active
+* Update: Add index text for translate ldjson
+* Update: Translate pdf from Germanized pdf plugins
+* Bug: Fix cookie issue with WP Rocket (mandatory cookies)
+* Bug: Check if index query exist before use it
+* Update: Fix wp vip code issue (wp parse url instead of native parse_url)
+* Update: Check WPLANG on first install instead of put 'en' by default
+* Bug: Add filter to prevent issue with Gform upload input ajax
+* Bug: Fix issue with FluentCRM, WP social Ninja and Fluent Support
+
+##3.8.3 (15/11/2022) =
+* Bug: Prevent Ajax call from original lang to original lang
+* Bug: Fix PHP Warning on class-replace-url-service line 192
+* Update: Add index 'text' to ld+json translated value
+
 ##3.8.2 (08/11/2022) =
 * Bug: Update cdn url for pageviews replace cdn-api-weglot.com by cdn-api.weglot.com
 

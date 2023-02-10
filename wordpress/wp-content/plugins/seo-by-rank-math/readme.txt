@@ -5,7 +5,7 @@ Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
 Tested up to: 6.1
 Requires at least: 5.6
 Requires PHP: 7.4
-Stable tag: 1.0.106
+Stable tag: 1.0.108
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -583,13 +583,10 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.106 [Jan 11, 2023] =
-- Added: Social Media Settings now include an option for [Additional Profile URLs](https://rankmath.com/kb/titles-and-meta/#additional-profiles) that will be added to the `sameAs` property of the Organization Schema.
-- Added: User Profile now includes an option for Additional Profile URLs that will be added to the `sameAs` property of the [Author Schema Entities](https://rankmath.com/kb/author-schema-entity/#sameas).
-- Improved: Token regeneration method for Google Search Console to avoid data import issues in the [Analytics Module](https://rankmath.com/kb/analytics/) was revised to ensure proper regeneration on all setups.
-- Fixed: Analytics data is now updating correctly on all setups after the last update.
-- Fixed: Compatibility issues with the ACF's Link type field, where the title added from the Link modal was not getting saved.
-- Fixed: `uploadDate` error in [Video Schema](https://rankmath.com/kb/video-schema/) that occurred when the site's Timezone was set to a non-UTC value is now resolved.
-- Fixed: An error that occurred on some setups after [clearing the SEO Analysis data](https://rankmath.com/kb/rank-math-status-and-tools/#clear-seo-analysis-data) from Database tools has been resolved.
+= 1.0.108 [Feb 09, 2023] =
+- Added: Support for WebP image format to use with [Facebook's Open Graph](https://rankmath.com/kb/sharing-content-on-social-media/#facebook)
+- Improved: `autoload` data for [SEO Analysis](https://rankmath.com/kb/seo-analysis) & [Database Tools](https://rankmath.com/kb/rank-math-status-and-tools/#database-tools) have now been set to `false`
+- Fixed: Compatibility issues with the ACF's Link type field, where the title added from the Link modal was not saved
+- Fixed: [Analytics](https://rankmath.com/kb/analytics/) was showing zero search traffic on some setups because of the cache
 
 Full changelog can be found here - **[Rank Math changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**

@@ -399,7 +399,7 @@ class Option_Service_Weglot {
 		if ( Helper_Is_Admin::is_wp_admin() && $api_key_private && $is_weglot_settings_page ) {
 			$response = $this->get_options_from_api_with_api_key( $api_key_private );
 		} else {
-			if ( ( ! Helper_Is_Admin::is_wp_admin() && $api_key ) || ( Helper_Is_Admin::is_wp_admin() && ! $is_weglot_settings_page ) ) {
+			if ( ( ! Helper_Is_Admin::is_wp_admin() && $api_key ) || ( Helper_Is_Admin::is_wp_admin() && ! $is_weglot_settings_page && $api_key) ) {
 				$response = $this->get_options_from_cdn_with_api_key( $api_key );
 			} else {
 				return $this->get_options_from_v2();

@@ -40,22 +40,29 @@ function blocksy_entry_title( $tag = 'h2' ) {
  * @param number $length Number of words allowed in excerpt.
  */
 if (! function_exists('blocksy_entry_excerpt')) {
-	function blocksy_entry_excerpt(
-		$length = 40, $class = 'entry-excerpt', $post_id = null,
+	function blocksy_entry_excerpt($args = []) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'length' => 40,
+				'container_tag' => 'div',
+				'class' => 'entry-excerpt',
+				'post_id' => null,
 
-		// excerpt | full | custom
-		$source = 'excerpt',
-		$custom_exceprt = '' // for custom only
-	) {
+				// excerpt | full | custom
+				'source' => 'excerpt',
+				'custom_exceprt' => '' // for custom only
+			]
+		);
 		ob_start();
-		$post_excerpt = get_the_excerpt($post_id);
+		$post_excerpt = get_the_excerpt($args['post_id']);
 		$excerpt_additions = ob_get_clean();
 
-		if ($source === 'excerpt' && empty(trim($post_excerpt))) {
+		if ($args['source'] === 'excerpt' && empty(trim($post_excerpt))) {
 			return '';
 		}
 
-		$post = get_post($post_id);
+		$post = get_post($args['post_id']);
 
 		$has_native_excerpt = $post->post_excerpt;
 
@@ -64,7 +71,7 @@ if (! function_exists('blocksy_entry_excerpt')) {
 
 		$excerpt = null;
 
-		if ($source === 'excerpt') {
+		if ($args['source'] === 'excerpt') {
 			if ($has_native_excerpt && ! $is_product) {
 				$excerpt = $post_excerpt;
 				$excerpt = apply_filters('blocksy:excerpt:output', $excerpt);
@@ -72,12 +79,12 @@ if (! function_exists('blocksy_entry_excerpt')) {
 
 			if (! $excerpt) {
 				ob_start();
-				blocksy_trim_excerpt($post_excerpt, $length);
+				blocksy_trim_excerpt($post_excerpt, $args['length']);
 				$excerpt = ob_get_clean();
 			}
 		}
 
-		if ($source === 'full') {
+		if ($args['source'] === 'full') {
 			ob_start();
 			the_content(
 				sprintf(
@@ -98,18 +105,18 @@ if (! function_exists('blocksy_entry_excerpt')) {
 			$excerpt = apply_filters('blocksy:excerpt:output', $excerpt);
 		}
 
-		if ($source === 'custom') {
+		if ($args['source'] === 'custom') {
 			ob_start();
-			blocksy_trim_excerpt($custom_exceprt, $length);
+			blocksy_trim_excerpt($args['custom_exceprt'], $args['length']);
 			$excerpt = ob_get_clean();
 
 			$excerpt = apply_filters('blocksy:excerpt:output', $excerpt);
 		}
 
 		return blocksy_html_tag(
-			'div',
+			$args['container_tag'],
 			[
-				'class' => esc_attr($class)
+				'class' => esc_attr($args['class'])
 			],
 			$excerpt_additions . do_shortcode($excerpt)
 		);
@@ -336,9 +343,22 @@ function blocksy_related_posts($location = null) {
 
 		if ($all_taxonomies) {
 			foreach ($all_taxonomies as $current_taxonomy) {
-				if (isset($current_taxonomy->term_id)) {
-					$all_taxonomy_ids[] = $current_taxonomy->term_id;
+				if (! isset($current_taxonomy->term_id)) {
+					continue;
 				}
+
+				$current_term_id = $current_taxonomy->term_id;
+
+				if (function_exists('pll_get_term')) {
+					$current_lang = blocksy_get_current_language();
+					$current_term_id = pll_get_term($current_term_id, $current_lang);
+				}
+
+				if (! $current_term_id) {
+					continue;
+				}
+
+				$all_taxonomy_ids[] = $current_term_id;
 			}
 		}
 	}

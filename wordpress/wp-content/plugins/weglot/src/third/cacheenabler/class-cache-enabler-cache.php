@@ -48,7 +48,7 @@ class Cache_Enabler_Cache implements Hooks_Interface_Weglot {
 			return;
 		}
 
-		add_filter( 'bypass_cache', array( $this, 'bypass_cache' ) );
+		add_filter( 'cache_enabler_bypass_cache', array( $this, 'bypass_cache' ) );
 		add_action( 'wp_head', array( $this, 'buffer_start' ) );
 	}
 

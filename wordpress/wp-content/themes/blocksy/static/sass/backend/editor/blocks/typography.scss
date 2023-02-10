@@ -11,8 +11,10 @@
 	h6,
 	pre,
 	code,
-	.wp-block-pullquote p,
-	.wp-block-quote.is-style-large p {
+	// .wp-block-pullquote p,
+	// .wp-block-quote.is-style-large p,
+	.wp-block-quote,
+	.wp-block-pullquote {
 		font-family: var(--fontFamily);
 		font-size: var(--fontSize);
 		font-weight: var(--fontWeight);

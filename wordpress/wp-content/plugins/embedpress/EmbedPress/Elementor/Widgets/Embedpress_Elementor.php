@@ -1235,6 +1235,10 @@ class Embedpress_Elementor extends Widget_Base
 				'label_block'  => false,
 				'return_value' => 'yes',
 				'default'      => 'no',
+				'description'  => __(
+					'Automatically stop the current video from playing when another one starts.',
+					'embedpress'
+				),
 				'condition'    => [
 					'embedpress_pro_embeded_source' => 'vimeo'
 				]
@@ -1334,6 +1338,10 @@ class Embedpress_Elementor extends Widget_Base
 				'label_block'  => false,
 				'return_value' => 'yes',
 				'default'      => 'no',
+				'description'  => __(
+					'Automatically stop the current video from playing when another one starts.',
+					'embedpress'
+				),
 				'condition'    => [
 					'embedpress_pro_embeded_source' => 'vimeo'
 				],
@@ -1350,7 +1358,7 @@ class Embedpress_Elementor extends Widget_Base
 				'return_value' => 'yes',
 				'default'      => 'yes',
 				'description'  => __(
-					'Set this parameter to "yes" will block the player from tracking any session data, including all cookies',
+					'Set this parameter to "yes" will block tracking any session data, including cookies. If Auto Pause is enabled this will not work.',
 					'embedpress'
 				),
 				'condition'    => [
@@ -1410,7 +1418,7 @@ class Embedpress_Elementor extends Widget_Base
 				'min' => 1,
 				'max' => 100,
 				'step' => 1,
-				'default' => 9,
+				'default' => 20,
 				'condition'   => [
 					'embedpress_pro_embeded_nft_type' => ['collection'],
 					'embedpress_pro_embeded_source!' => [
@@ -1425,6 +1433,8 @@ class Embedpress_Elementor extends Widget_Base
 				],
 			]
 		);
+		
+		
 		$this->add_control(
 			'orderby',
 			[
@@ -1744,6 +1754,51 @@ class Embedpress_Elementor extends Widget_Base
 				'condition' => [
 					'nftbutton' => 'yes',
 				]
+			]
+		);
+
+		$this->add_control(
+			'loadmore',
+			[
+				'label'        => sprintf(__('Load More %s', 'embedpress'), $this->pro_text),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_block'  => false,
+				'return_value' => 'yes',
+				'default'      => '',
+				'label_off'    => __('Hide', 'embedpress'),
+				'label_on'     => __('Show', 'embedpress'),
+				'default'      => '',
+				'classes'     => $this->pro_class,
+				'condition'  => [
+					'embedpress_pro_embeded_nft_type' => ['collection']
+				],
+			]
+		);
+		$this->add_control(
+			'itemperpage',
+			[
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'label' => esc_html__( 'Item Per Page', 'embedpress' ),
+				'placeholder' => '9',
+				'min' => 1,
+				'max' => 100,
+				'step' => 1,
+				'default' => 9,
+				'condition'    => [
+					'loadmore' => 'yes'
+				],
+			]
+		);
+		$this->add_control(
+			'loadmorelabel',
+			[
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'label' => esc_html__( 'Load More Label', 'embedpress' ),
+				'placeholder' => 'Load More',
+				'default' => 'Load More',
+				'condition'    => [
+					'loadmore' => 'yes'
+				],
 			]
 		);
 
@@ -2071,6 +2126,60 @@ class Embedpress_Elementor extends Widget_Base
 				'selector' => '{{WRAPPER}} .ep-nft-gallery-wrapper.ep-nft-gallery-r1a5mbx .ep_nft_button a',
 			]
 		);
+		$this->add_control(
+			'nft_loadmore_style',
+			[
+				'label' => esc_html__( 'Load More', 'embedpress' ),
+				'type' => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+				'condition' => [
+					'loadmore' => 'yes',
+					'embedpress_pro_embeded_nft_type' => 'collection'
+				]
+			]
+		);
+		
+		$this->add_control(
+			'nft_loadmore_color',
+			[
+				'label' => esc_html__( 'Text Color', 'embedpress' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .nft-loadmore' => 'color: {{VALUE}}!important;',
+					'{{WRAPPER}} .nft-loadmore svg' => 'fill: {{VALUE}}!important;',
+				],
+				'condition' => [
+					'loadmore' => 'yes',
+					'embedpress_pro_embeded_nft_type' => 'collection'
+				]
+			]
+		);
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'nft_loadmore_typography',
+				'selector' => '{{WRAPPER}} .nft-loadmore, {{WRAPPER}} .nft-loadmore svg',
+				'condition' => [
+					'loadmore' => 'yes',
+					'embedpress_pro_embeded_nft_type' => 'collection'
+				]
+			]
+		);
+		$this->add_control(
+			'nft_loadmore_bgcolor',
+			[
+				'label' => esc_html__( 'Background Color', 'embedpress' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .nft-loadmore' => 'background-color: {{VALUE}}!important;',
+				],
+				'condition' => [
+					'loadmore' => 'yes',
+					'embedpress_pro_embeded_nft_type' => 'collection'
+				]
+			]
+		);
+
 		$this->add_control(
 			'nftrank_heading',
 			[

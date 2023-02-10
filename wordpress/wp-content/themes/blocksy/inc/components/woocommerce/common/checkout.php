@@ -15,7 +15,7 @@ add_action('elementor/widget/before_render_content', function($widget) {
 		global $ct_skip_checkout;
 		$ct_skip_checkout = true;
 	}
-}, 10 , 1);
+}, 10, 1);
 
 add_action('woocommerce_before_checkout_form', function () {
 	add_action('sellkit_checkout_one_page_express_methods', function() {

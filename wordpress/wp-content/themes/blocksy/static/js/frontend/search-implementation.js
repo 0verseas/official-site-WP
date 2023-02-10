@@ -33,12 +33,28 @@ const getPreviewElFor = ({
 		link: href,
 		_embedded = {},
 		product_price = 0,
+		placeholder_image = null,
 	},
 }) => {
 	const decodedTitle = decodeHTMLEntities(rendered)
+
+	const defaultMediaDetails = {
+		sizes: {
+			thumbnail: {
+				source_url: placeholder_image,
+			},
+		},
+	}
+
+	const sizes =
+		(
+			_embedded['wp:featuredmedia']?.[0]?.media_details ||
+			defaultMediaDetails
+		).sizes || {}
+
 	return (
 		<a className="ct-search-item" role="option" key={href} {...{ href }}>
-			{_embedded['wp:featuredmedia'] && hasThumbs && (
+			{(_embedded['wp:featuredmedia'] || placeholder_image) && hasThumbs && (
 				<span
 					{...{
 						class: classnames({
@@ -47,28 +63,9 @@ const getPreviewElFor = ({
 					}}>
 					<img
 						{...{
-							src: (
-								(
-									_embedded['wp:featuredmedia'][0]
-										.media_details || {
-										sizes: {},
-									}
-								).sizes || {}
-							).thumbnail
-								? (
-										_embedded['wp:featuredmedia'][0]
-											.media_details || {
-											sizes: [],
-										}
-								  ).sizes.thumbnail.source_url
-								: values(
-										(
-											_embedded['wp:featuredmedia'][0]
-												.media_details || {
-												sizes: [],
-											}
-										).sizes || {}
-								  ).reduce(
+							src: sizes.thumbnail
+								? sizes?.thumbnail.source_url
+								: values(sizes).reduce(
 										(currentSmallest, current) =>
 											current.width <
 											currentSmallest.width
@@ -87,7 +84,7 @@ const getPreviewElFor = ({
 				{decodedTitle}
 				{product_price ? (
 					<span
-						className="ct-search-item-price"
+						className="price"
 						dangerouslySetInnerHTML={{
 							__html: product_price,
 						}}
@@ -169,7 +166,9 @@ export const mount = (formEl, args = {}) => {
 				options.productPrice === 'true' || options.productPrice === true
 					? `product_price=${options.productPrice}&`
 					: ``
-			}search=${e.target.value}`
+			}search=${e.target.value}${
+				ct_localizations.lang ? `&lang=${ct_localizations.lang}` : ''
+			}`
 		).then((response) => {
 			let totalAmountOfPosts = parseInt(
 				response.headers.get('X-WP-Total'),

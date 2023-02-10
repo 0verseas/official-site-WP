@@ -7,7 +7,7 @@ if (! function_exists('blocksy_render_archive_cards')) {
 $shortcode_class = 'ct-posts-shortcode';
 
 if (! empty($args['class'])) {
-	$shortcode_class .= ' ' . $args['class'];
+	$shortcode_class .= ' ' . esc_attr($args['class']);
 }
 
 $query_args = [
@@ -18,6 +18,14 @@ $query_args = [
 	'posts_per_page' => $args['limit'],
 	'ignore_sticky_posts' => $args['ignore_sticky_posts'] === 'yes'
 ];
+
+if (! empty($args['meta_value'])) {
+	$query_args['meta_value'] = $args['meta_value'];
+}
+
+if (! empty($args['meta_key'])) {
+	$query_args['meta_key'] = $args['meta_key'];
+}
 
 if ($args['has_pagination'] === 'yes') {
 	if (get_query_var('paged')) {
@@ -177,6 +185,8 @@ if ($args['view'] === 'slider') {
 
 	if (
 		$args['filtering']
+		&&
+		$args['filtering'] === 'yes'
 		&&
 		function_exists('blc_cpt_extra_filtering_output')
 	) {

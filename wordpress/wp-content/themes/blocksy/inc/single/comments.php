@@ -64,6 +64,8 @@ add_filter('comment_form_defaults', function ($defaults) {
 		has_action('set_comment_cookies', 'wp_set_comment_cookies')
 		&&
 		get_option('show_comments_cookies_opt_in')
+		&&
+		! is_user_logged_in()
 	) {
 		$consent = empty($commenter['comment_author_email']) ? '' : ' checked="checked"';
 

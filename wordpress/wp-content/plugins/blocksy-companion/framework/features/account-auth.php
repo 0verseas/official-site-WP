@@ -33,6 +33,20 @@ class AccountAuth {
 			'wp_ajax_nopriv_blc_implement_user_lostpassword',
 			[$this, 'blc_implement_user_lostpassword']
 		);
+
+		add_filter('bm_rgn_is_modal', function ($value) {
+			$render = new \Blocksy_Header_Builder_Render();
+
+			if (
+				$render->contains_item('account')
+				||
+				is_customize_preview()
+			) {
+				return true;
+			}
+
+			return $value;
+		});
 	}
 
 	public function blc_implement_user_lostpassword() {
@@ -90,7 +104,7 @@ class AccountAuth {
 				sprintf(
 					/* translators: %s: Link to the login page. */
 					__(
-						'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.',
+						'Check your email for the confirmation link, then visit the <a href="%s" data-login="yes">login page</a>.',
 						'blocksy-companion'
 					),
 					wp_login_url()
@@ -215,7 +229,7 @@ class AccountAuth {
 			if ($this->has_woo_register_flow()) {
 				$error_message = sprintf(
 					__(
-						'Your account was created successfully. Your login details have been sent to your email address. Please visit the <a href="%s">login page</a>.',
+						'Your account was created successfully. Your login details have been sent to your email address. Please visit the <a href="%s" data-login="yes">login page</a>.',
 						'blocksy-companion'
 					),
 					wp_login_url()
@@ -224,7 +238,7 @@ class AccountAuth {
 				if ('yes' === get_option('woocommerce_registration_generate_password')) {
 					$error_message = sprintf(
 						__(
-							'Your account was created successfully and a password has been sent to your email address. Please visit the <a href="%s">login page</a>.',
+							'Your account was created successfully and a password has been sent to your email address. Please visit the <a href="%s" data-login="yes">login page</a>.',
 							'blocksy-companion'
 						),
 						wp_login_url()
@@ -237,7 +251,7 @@ class AccountAuth {
 					'registered',
 					sprintf(
 						/* translators: %s: Link to the login page. */
-						__('Registration complete. Please check your email, then visit the <a href="%s">login page</a>.'),
+						__('Registration complete. Please check your email, then visit the <a href="%s" data-login="yes">login page</a>.'),
 						wp_login_url()
 					),
 					'message'

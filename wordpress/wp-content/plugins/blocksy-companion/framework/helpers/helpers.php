@@ -196,7 +196,11 @@ function blc_get_contacts_output($args = []) {
 									&&
 									strpos($link, 'mailto:') !== false
 								) {
-									$content = blocksy_safe_antispambot($content);
+									$content = apply_filters(
+										'blocksy:frontend:contact:email:obfuscated-content',
+										blocksy_safe_antispambot($content),
+										$content
+									);
 								}
 
 								echo $content;

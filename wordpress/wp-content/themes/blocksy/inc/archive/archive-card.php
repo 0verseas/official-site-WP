@@ -365,27 +365,22 @@ if (! function_exists('blocksy_render_archive_card')) {
 						$featured_image_args['size'],
 						''
 					),
-					'excerpt' => blocksy_entry_excerpt(
-						intval(
+					'excerpt' => blocksy_entry_excerpt([
+						'length' => intval(
 							blocksy_default_akg( 'excerpt_length', $excerpt_settings, '40' )
 						),
-						'entry-excerpt',
-						null,
-						blocksy_default_akg(
+						'source' => blocksy_default_akg(
 							'excerpt_source',
 							$excerpt_settings,
 							'excerpt'
 						)
-					),
+					]),
 
 					'read_more' => blocksy_html_tag(
 						'a',
 						[
-							'class' => 'entry-button' . (
-								$button_type === 'background' ? ' ct-button' : ''
-							),
+							'class' => 'entry-button' . ($button_type === 'background' ? ' ct-button' : ''),
 							'data-type' => $button_type,
-							'data-alignment' => blocksy_default_akg( 'read_more_alignment', $read_more_settings, 'left' ),
 							'href' => esc_url( get_permalink() )
 						],
 						$read_more_text

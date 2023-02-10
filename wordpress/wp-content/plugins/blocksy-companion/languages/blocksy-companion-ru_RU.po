@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Blocksy Companion Pro package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-05-17 12:29:04+0000\n"
+"PO-Revision-Date: 2023-01-31 23:01:54+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,182 +13,182 @@ msgstr ""
 
 #: framework/features/conditions-manager.php:723
 msgid "Privacy Policy Page"
-msgstr ""
+msgstr "Страница политики конфиденциальности"
 
 #: framework/features/conditions-manager.php:735
 msgid "Author Archives"
-msgstr ""
+msgstr "Архивы авторов"
 
 #: framework/features/conditions-manager.php:745
 msgid "WooCommerce"
-msgstr ""
+msgstr "WooCommerce"
 
 #: framework/features/conditions-manager.php:749
 msgid "Shop Home"
-msgstr ""
+msgstr "Главная магазина"
 
 #: framework/features/conditions-manager.php:754
 msgid "Single Product"
-msgstr ""
+msgstr "Отдельный товар"
 
 #: framework/features/conditions-manager.php:759
 msgid "Product Archives"
-msgstr ""
+msgstr "Архивы товаров"
 
 #: framework/features/conditions-manager.php:764
 msgid "Product Categories"
-msgstr ""
+msgstr "Категории товаров"
 
 #: framework/features/conditions-manager.php:769
 msgid "Product Tags"
-msgstr ""
+msgstr "Метки товаров"
 
 #: framework/features/conditions-manager.php:777
 msgid "Custom Post Types"
-msgstr ""
+msgstr "Произвольные типы записей"
 
 #: framework/features/conditions-manager.php:826
 msgid "Current Language"
-msgstr ""
+msgstr "Текущий язык"
 
 #: framework/features/conditions-manager.php:834
 msgid "bbPress"
-msgstr ""
+msgstr "bbPress"
 
 #: framework/features/conditions-manager.php:838
 msgid "Profile"
-msgstr ""
+msgstr "Профиль"
 
 #: framework/features/google-analytics.php:87
 msgid "Google Analytics v3 (Legacy)"
-msgstr ""
+msgstr "Google Analytics v3 (устаревший)"
 
 #: framework/features/google-analytics.php:93
 msgid "Please note: this option will be deprecated soon and we strongly reccommend switching to GA4, more info  can be fount %shere%s."
-msgstr ""
+msgstr "Эта опция скоро устареет, и настоятельно рекомендуется перейти на GA4. Подробную информацию можно найти %sздесь%s."
 
 #: framework/extensions/newsletter-subscribe/helpers.php:165
 msgid "First name"
-msgstr ""
+msgstr "Имя"
 
 #: framework/extensions/trending/customizer.php:288
 msgid "Display Location"
-msgstr ""
+msgstr "Место отображения"
 
 #: framework/extensions/trending/customizer.php:296
 msgid "Before Footer"
-msgstr ""
+msgstr "Перед подвалом"
 
 #: framework/extensions/trending/customizer.php:301
 msgid "After Footer"
-msgstr ""
+msgstr "После подвала"
 
 #: framework/extensions/trending/customizer.php:306
 msgid "After Header"
-msgstr ""
+msgstr "После шапки"
 
 #: framework/extensions/trending/customizer.php:323
 msgid "Trending Block Display Conditions"
-msgstr ""
+msgstr "Условия отображения блока популярных"
 
 #: framework/extensions/trending/customizer.php:324
 msgid "Add one or more conditions to display the trending block."
-msgstr ""
+msgstr "Добавьте одно или несколько условий для отображения блока популярных записей."
 
 #: framework/premium/features/content-blocks.php:132
 msgid "Hide Hooks"
-msgstr ""
+msgstr "Спрятать вебзацепы"
 
 #: framework/premium/features/content-blocks.php:133
 msgid "Show Hooks"
-msgstr ""
+msgstr "Показать вебзацепы"
 
 #: framework/premium/features/content-blocks.php:189
 msgid "Hide Theme Hooks"
-msgstr ""
+msgstr "Спрятать вебзацепы темы"
 
 #: framework/premium/features/content-blocks.php:190
 msgid "Show Theme Hooks"
-msgstr ""
+msgstr "Показать вебзацепы темы"
 
 #: framework/premium/features/content-blocks.php:198
 msgid "Hide WooCommerce Hooks"
-msgstr ""
+msgstr "Спрятать вебзацепы WooCommerce"
 
 #: framework/premium/features/content-blocks.php:199
 msgid "Show WooCommerce Hooks"
-msgstr ""
+msgstr "Показать вебзацепы WooCommerce"
 
 #: framework/features/header/modal/register.php:52
 msgid "A link to set a new password will be sent to your email address."
-msgstr ""
+msgstr "Ссылка для установки нового пароля будет отправлена на ваш Email."
 
 #: framework/premium/extensions/code-snippets/extension.php:31,
 #: framework/premium/extensions/code-snippets/extension.php:78,
 #: framework/premium/extensions/code-snippets/extension.php:123
 msgid "Header scripts"
-msgstr ""
+msgstr "Скрипты в шапке"
 
 #: framework/premium/extensions/code-snippets/extension.php:53,
 #: framework/premium/extensions/code-snippets/extension.php:100,
 #: framework/premium/extensions/code-snippets/extension.php:145
 msgid "Footer scripts"
-msgstr ""
+msgstr "Скрипты в подвале"
 
 #: framework/premium/extensions/mega-menu/options.php:364,
 #: framework/premium/extensions/mega-menu/options.php:371
 msgid "Select Content Block"
-msgstr ""
+msgstr "Выберите блок содержимого"
 
 #: framework/premium/extensions/mega-menu/options.php:367
 msgid "Create a new content Block/Hook"
-msgstr ""
+msgstr "Создать блок содержимого/вебзацепа"
 
 #: framework/premium/extensions/mega-menu/options.php:596
 msgid "Heading Font"
-msgstr ""
+msgstr "Шрифт заголовка"
 
 #: framework/premium/features/content-blocks/admin-ui.php:17
 msgid "Enable"
-msgstr ""
+msgstr "Включить"
 
 #: framework/premium/features/content-blocks/admin-ui.php:18
 msgid "Disable"
-msgstr ""
+msgstr "Выключить"
 
 #: framework/premium/features/content-blocks/admin-ui.php:69
 msgid "Enabled %s content block."
 msgid_plural "Enabled %s content blocks."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Включен %s блок содержимого."
+msgstr[1] "Включено %s блока содержимого."
+msgstr[2] "Включено %s блоков содержимого."
 
 #: framework/premium/features/content-blocks/admin-ui.php:94
 msgid "Disabled %s content block."
 msgid_plural "Disabled %s content blocks."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Выключен %s блок содержимого."
+msgstr[1] "Выключено %s блока содержимого."
+msgstr[2] "Выключено %s блоков содержимого."
 
 #: framework/premium/features/content-blocks/admin-ui.php:122
 msgid "404 Page"
-msgstr ""
+msgstr "Страница 404"
 
 #: framework/premium/features/content-blocks/admin-ui.php:125
 msgid "Archive"
-msgstr ""
+msgstr "Архив"
 
 #: framework/premium/features/content-blocks/admin-ui.php:126
 msgid "Single"
-msgstr ""
+msgstr "Отдельная запись"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:39
 msgid "WP body open"
-msgstr ""
+msgstr "Открытие body WP"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:308
 msgid "Before related posts"
-msgstr ""
+msgstr "Перед связанными записями"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:309,
 #: framework/premium/features/content-blocks/hooks-manager.php:316,
@@ -201,127 +201,127 @@ msgstr ""
 #: framework/premium/features/content-blocks/hooks-manager.php:366,
 #: framework/premium/features/content-blocks/hooks-manager.php:373
 msgid "Related posts"
-msgstr ""
+msgstr "Связанные записи"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:315
 msgid "Related posts top"
-msgstr ""
+msgstr "Верх связанных записей"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:336
 msgid "Card top"
-msgstr ""
+msgstr "Верх карты"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:343
 msgid "Before featured image"
-msgstr ""
+msgstr "Перед изображением записи"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:350
 msgid "After featured image"
-msgstr ""
+msgstr "После изображения записи"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:357
 msgid "Card bottom"
-msgstr ""
+msgstr "Низ карты"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:365
 msgid "Related posts bottom"
-msgstr ""
+msgstr "Низ связанных записей"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:372
 msgid "After related posts"
-msgstr ""
+msgstr "После связанных записей"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:536
 msgid "Offcanvas Filters Top"
-msgstr ""
+msgstr "Верх плавающего блока фильтров"
 
 #: framework/premium/features/content-blocks/hooks-manager.php:542
 msgid "Offcanvas Filters Bottom"
-msgstr ""
+msgstr "Низ плавающего блока фильтров"
 
 #: framework/premium/features/content-blocks/options/archive.php:11,
 #: framework/premium/features/content-blocks/options/single.php:11
 msgid "Replacement Behavior"
-msgstr ""
+msgstr "Поведение замены"
 
 #: framework/premium/features/content-blocks/options/archive.php:17
 msgid "Only Card"
-msgstr ""
+msgstr "Только карта"
 
 #: framework/premium/features/content-blocks/options/archive.php:18,
 #: framework/premium/features/content-blocks/options/single.php:18
 msgid "Full Page"
-msgstr ""
+msgstr "Вся страница"
 
 #: framework/premium/features/content-blocks/options/archive.php:91
 msgid "Page Structure"
-msgstr ""
+msgstr "Структура страницы"
 
 #: framework/premium/features/content-blocks/options/hook.php:313
 msgid "Top Offset"
-msgstr ""
+msgstr "Верхнее смещение"
 
 #: framework/premium/features/content-blocks/options/hook.php:317
 msgid "Bottom Offset"
-msgstr ""
+msgstr "Нижнее смещение"
 
 #: framework/premium/features/content-blocks/options/single.php:17
 msgid "Content Area"
-msgstr ""
+msgstr "Область содержимого"
 
 #: framework/premium/features/content-blocks/options/single.php:79
 msgid "Content Area Vel Spacing"
-msgstr ""
+msgstr "Отступы области содержимого"
 
 #: framework/premium/extensions/post-types-extra/includes/filtering/customizer.php:82
 msgid "Filter Source"
-msgstr ""
+msgstr "Источник фильтра"
 
 #: framework/premium/features/premium-header/items/contacts/options.php:369
 msgid "Items Direction"
-msgstr ""
+msgstr "Направление элементов"
 
 #: framework/premium/features/premium-header/items/contacts/options.php:375
 msgid "Horizontal"
-msgstr ""
+msgstr "Горизонтальное"
 
 #: framework/premium/features/premium-header/items/contacts/options.php:376
 msgid "Vertical"
-msgstr ""
+msgstr "Вертикальное"
 
 #: framework/premium/features/premium-header/items/contacts/options.php:730,
 #: framework/premium/features/premium-header/items/contacts/options.php:772,
 #: framework/premium/features/premium-header/items/contacts/options.php:811,
 #: framework/premium/features/premium-header/items/contacts/options.php:850
 msgid "Icons Background Color"
-msgstr ""
+msgstr "Цвет фона значков"
 
 #: framework/premium/features/premium-header/items/contacts/options.php:734,
 #: framework/premium/features/premium-header/items/contacts/options.php:776,
 #: framework/premium/features/premium-header/items/contacts/options.php:815,
 #: framework/premium/features/premium-header/items/contacts/options.php:854
 msgid "Icons Border Color"
-msgstr ""
+msgstr "Цвет границ значков"
 
 #: framework/premium/static/js/options/IconPicker/CustomIcon.js:22
 msgid "Click to upload"
-msgstr ""
+msgstr "Нажмите, чтобы загрузить"
 
 #: framework/premium/static/js/options/IconPicker/Modal.js:135
 msgid "All Icons"
-msgstr ""
+msgstr "Все значки"
 
 #: static/js/options/ConditionsManager.js:306
 msgid "All authors"
-msgstr ""
+msgstr "Все авторы"
 
 #: static/js/screens/DemoInstall/components/Error.js:16
 msgid "Can't Import Starter Site"
-msgstr ""
+msgstr "Не удаётся импортировать стартовый сайт"
 
 #: static/js/screens/DemoInstall/components/Error.js:18
 msgid "Unfortunately, your hosting configuration doesn't meet the minimum requirements for importing a starter site."
-msgstr ""
+msgstr "Конфигурация вашего хостинга не соответствует минимальным требованиям для импорта начального сайта."
 
 #: framework/premium/features/premium-header.php:50
 msgid "Mobile Menu 1"
@@ -793,7 +793,7 @@ msgstr "Создать новую шапку"
 
 #: framework/premium/static/js/header/CreateHeader.js:53
 msgid "Create a new header and assign it to different pages or posts based on your conditions."
-msgstr "Создайте новую шапку и назначьте её различным страницам или записям."
+msgstr "Создайте новую шапку и назначьте её различным стран��цам или записям."
 
 #: framework/premium/static/js/header/CreateHeader.js:71
 msgid "Header name"
@@ -870,7 +870,7 @@ msgstr "Загрузить значок"
 
 #: framework/premium/static/js/options/IconPicker/CustomIcon.js:34
 msgid "For performance and customization reasons, only SVG files are allowed."
-msgstr "Ради производительности и настраиваемости р��зрешены только SVG-файлы."
+msgstr "Ради производительности и настраиваемости разрешены только SVG-файлы."
 
 #: framework/premium/static/js/options/IconPicker/IconsList.js:24
 msgid "Search icon"
@@ -899,7 +899,7 @@ msgstr "Сохранить условия"
 
 #: static/js/header/EditConditions.js:107
 msgid "Add one or more conditions in order to display your header."
-msgstr "Добавьте одно или несколько условий для отображения шапки сайта."
+msgstr "Добавьте одно ��ли несколько условий для отображения шапки сайта."
 
 #: static/js/header/PanelsManager.js:167
 msgid "Remove header"
@@ -967,7 +967,7 @@ msgstr "Добавить условие отображения"
 
 #: static/js/options/ConditionsManager.js:388
 msgid "Add User Condition"
-msgstr "Добавить условие состояния пользователя"
+msgstr "Условие состояния пользователя"
 
 #: framework/features/conditions-manager.php:850
 #: static/js/options/ConditionsManager.js:105
@@ -1083,7 +1083,7 @@ msgstr "Загрузка стартовых сайтов..."
 
 #: static/js/screens/DemoInstall.js:133
 msgid "The connection to our <b>demo.creativethemes.com</b> server didn't worked. This connection is required for importing the starter sites from our demo content server. All you have to do is to contact your hosting provider and ask them to white list our demo server address."
-msgstr "Подключение к нашему серверу <b>demo.creativethemes.com</b> не сработало. Это соединение требуется для импорта стартовых сайтов с нашего сервера демонстрационного контента. Всё, что вам нужно сделать, это связаться с вашим хостинг-провайдером и попросить его внести в белый список адрес нашего демонстрационного сервера."
+msgstr "Подключение к нашему серверу <b>demo.creativethemes.com</b> не сработало. Это соединение требуется для импорта ст��ртовых сайтов с нашего сервера демонстрационного контента. Всё, что вам нужно сделать, это связаться с вашим хостинг-провайдером и попросить его внести в белый список адрес нашего демонстрационного сервера."
 
 #: static/js/screens/DemoInstall/components/Progress.js:29
 msgid "Installing"
@@ -1159,7 +1159,7 @@ msgstr "загрузка демонстрационных виджетов"
 
 #: static/js/screens/DemoInstall/Installer/messages.js:38
 msgid "installing demo widgets"
-msgstr "установка демон��трационных виджетов"
+msgstr "установка демонстрационных виджетов"
 
 #: static/js/screens/DemoInstall/Installer/messages.js:42
 msgid "downloading demo options"
@@ -1560,7 +1560,7 @@ msgstr "Цвет значка"
 
 #: framework/premium/extensions/post-types-extra/config.php:6
 msgid "Enables support for Custom Fields inside archive cards and single page post title, adds a reading progress bar for your posts and lets you set featured images and colors for your categories archives."
-msgstr "Включает поддержку настраиваемых полей внутри карточек архива и заголовка отельной страницы записи, добавляет индикатор хода чтения для записей и позволяет устанавливать изображения и цвета для архивов категорий."
+msgstr "Включает поддержку настраиваемых полей внутри карточек архива и заголовка отел��ной страницы записи, добавляет индикатор хода чтения для записей и позволяет устанавли��ать изображения и цвета для архивов категорий."
 
 #: framework/premium/extensions/post-types-extra/readme.php:4
 msgid "After activating this extension you will be able to enable the read progress bar for your single posts, add a featured image and set different colors to each taxonomy, add custom fields to your archive cards or page/post title section with the help of ACF, MetaBox and Toolset plugins, and also add taxonomies archive filters."
@@ -1770,7 +1770,7 @@ msgstr "Создать сайдбар"
 #: framework/premium/extensions/sidebars/form.php:3
 #: framework/premium/extensions/sidebars/static/js/main.js:42
 msgid "Create Sidebar/Widget Area"
-msgstr "Создать сайдбар/область ��иджетов"
+msgstr "Создать сайдбар/область виджетов"
 
 #: framework/premium/extensions/sidebars/form.php:6
 msgid "In order to create a new sidebar/widget area simply enter a name in the input below and click the Create Sidebar button."
@@ -3481,7 +3481,7 @@ msgstr "Скорость анимации"
 
 #: framework/premium/features/content-blocks/options/popup.php:144
 msgid "Entrance Value"
-msgstr "Входное значение"
+msgstr "Вход��ое значение"
 
 #: framework/premium/features/content-blocks/options/popup.php:156
 msgid "Trigger Condition"
@@ -4193,7 +4193,7 @@ msgstr "Установка бета-обновлений на рабочий с�
 
 #: framework/premium/static/js/components/BetaConsent.js:83
 msgid "Even having your website completely broken is not excluded. Please proceed with caution."
-msgstr "Не исключена д��же полная поломка сайта. Пожалуйста, действуйте с осторожностью."
+msgstr "Не исключена даже полная поломка сайта. Пожалуйста, действуйте с осторожностью."
 
 #: framework/premium/static/js/footer/CloneItem.js:65
 #: framework/premium/static/js/header/CloneItem.js:65
@@ -6105,7 +6105,7 @@ msgstr "Характеристики"
 
 #: framework/extensions/newsletter-subscribe/helpers.php:168
 msgid "Email address"
-msgstr ""
+msgstr "Email"
 
 #: framework/features/header/modal/login.php:33,
 #: framework/features/header/modal/register.php:42
@@ -6139,7 +6139,7 @@ msgstr "Имя пользователя"
 
 #: framework/features/header/modal/register.php:76
 msgid "Registration confirmation will be emailed to you."
-msgstr ""
+msgstr "Подтверждение регистрации будет отправлено на ваш Email."
 
 #: framework/features/header/modal/register.php:82
 msgid "Register"

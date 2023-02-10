@@ -34,7 +34,7 @@ if ($has_live_results === 'yes') {
 
 	$live_results_attr = !empty($args['live_results_attr']) ? [$args['live_results_attr']] : [];
 
-	if ( $show_product_price ) {
+	if ($show_product_price) {
 		array_push($live_results_attr, 'product_price');
 	}
 
@@ -111,11 +111,11 @@ if (isset($args['icon'])) {
 	</button>
 
 	<?php if (count($any) === 1) { ?>
-		<input type="hidden" name="post_type" value="<?php echo $any[0] ?>">
+		<input type="hidden" name="post_type" value="<?php echo esc_attr($any[0]) ?>">
 	<?php } ?>
 
 	<?php if (count($any) > 1) { ?>
-		<input type="hidden" name="ct_post_type" value="<?php echo implode(':', $any) ?>">
+		<input type="hidden" name="ct_post_type" value="<?php echo esc_attr(implode(':', $any)) ?>">
 	<?php } ?>
 
 	<?php if ($show_product_price || is_customize_preview()) { ?>

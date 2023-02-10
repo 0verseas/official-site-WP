@@ -219,8 +219,10 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 				}
 			);
 		}
-		foreach ( $switchers as $switcher ) {
-			$options['custom_settings']['switchers'][] = $switcher;
+		if(!empty($switchers)){
+			foreach ( $switchers as $switcher ) {
+				$options['custom_settings']['switchers'][] = $switcher;
+			}
 		}
 		return $options;
 	}

@@ -14,18 +14,20 @@ if (!defined('ABSPATH')) {
 //Custom Logo 
 function customLogo($embedHTML, $atts){
 
-	// print_r($atts); die;
+	
+
 
 	$x = !empty($atts['logoX']) ? $atts['logoX'] : 0;
 	$y = !empty($atts['logoY']) ? $atts['logoY'] : 0;
-	$uniqid = '.ose-uid-' . md5($atts['url']);
+	$uniqid = !empty($atts['url'])? '.ose-uid-' . md5($atts['url']): '';
 	
 	$brandUrl = !empty($atts['customlogoUrl']) ? $atts['customlogoUrl'] : '';
 	$opacity = !empty($atts['logoOpacity']) ? $atts['logoOpacity'] : '';
 	
 	$cssClass = !empty( $atts['url'] ) ? '.ose-uid-' . md5( $atts['url'] ) : '.ose-youtube';
 
-	
+
+
 	ob_start(); ?>
 	<style type="text/css">
 		<?php echo esc_html($cssClass); ?>
@@ -112,11 +114,11 @@ function customLogo($embedHTML, $atts){
 
 function embedpress_render_block($attributes)
 {
-
+	
 
 	if (!empty($attributes['embedHTML'])) {
 		$embed         = apply_filters('embedpress_gutenberg_embed', $attributes['embedHTML'], $attributes);
-		
+	
 		$aligns = [
 			'left' => 'alignleft',
 			'right' => 'alignright',
@@ -129,18 +131,17 @@ function embedpress_render_block($attributes)
 		} else {
 			$alignment = 'aligncenter'; // default alignment is center in js, so keeping same here
 		}
-
 		$embed = customLogo($embed, $attributes);
-
 
 		ob_start();
 		?>
 		<div class="embedpress-gutenberg-wrapper">
-			<div class="wp-block-embed__wrapper <?php echo esc_attr($alignment) ?>">
+			<div class="wp-block-embed__wrapper <?php echo esc_attr($alignment) ?> <?php if($attributes['videosize'] == 'responsive') echo 'ep-video-responsive'; ?>">
 				<?php echo $embed; ?>
 			</div>
 		</div>
 <?php
+
 
 
 		echo embedpress_render_block_style($attributes);
@@ -156,7 +157,7 @@ function embedpress_render_block($attributes)
 function embedpress_render_block_style($attributes)
 {
 	
-	$uniqid = '.ose-uid-' . md5($attributes['url']);
+	$uniqid = !empty($attributes['url']) ? '.ose-uid-' . md5($attributes['url']) : '';
 
 	$_iscustomlogo = '';
 
@@ -198,6 +199,35 @@ function embedpress_render_block_style($attributes)
 
 
 	</style>';
+
+	if($attributes['videosize'] == 'responsive') {
+		$youtubeStyles = '<style>
+		' . esc_attr($uniqid) . ' {
+			position: relative;
+			width: ' . esc_attr($attributes['width']) . 'px !important;
+			height: 0;
+			padding-top: 56.25%;
+			max-width: 100%;
+		  }
+		
+		  ' . esc_attr($uniqid) . ' > iframe {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		  }
+
+		  .ep-video-responsive{
+			display: inline-block!important;
+			max-width: 100%;
+		  }
+		  '.$uniqid.' img.watermark{
+				display: none;
+			}
+		  '.$_iscustomlogo.'
+	</style>';
+	}
 
 	return $youtubeStyles;
 }

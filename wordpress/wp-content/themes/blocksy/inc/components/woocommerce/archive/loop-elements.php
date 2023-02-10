@@ -21,11 +21,10 @@ add_action('woocommerce_after_subcategory', function ( $category ) {
 		return;
 	}
 
-	echo blocksy_entry_excerpt(
-		get_theme_mod('excerpt_length', '40'),
-		'entry-excerpt',
-		null,
-		'custom',
-		$category->description
-	);
+	echo blocksy_entry_excerpt([
+		'length' => get_theme_mod('excerpt_length', '40'),
+		'class' => 'entry-excerpt',
+		'source' => 'custom',
+		'custom_exceprt' => $category->description
+	]);
 }, 15 );

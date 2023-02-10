@@ -159,8 +159,16 @@ function embedpress_gutenberg_register_all_block()
 								'type' => 'string',
 								'default' => '600'
 							],
+							'videosize' => [
+								'type' => 'string',
+								'default' => 'fixed'
+							],
 							
 							'isGutenberg' => [
+								'type' => 'boolean',
+								'default' => false
+							],
+							'loadmore' => [
 								'type' => 'boolean',
 								'default' => false
 							],
@@ -250,6 +258,42 @@ function embedpress_gutenberg_register_all_block()
 							'wfullscreen' => [
 								'type' => 'boolean',
 								'default' => true
+							],
+
+							// Vimeo attributes
+							'vstarttime' => [
+								'type' => 'string',
+							],
+							'vautoplay' => [
+								'type' => 'boolean',
+								'default' => false
+							],
+							'vscheme' => [
+								'type' => 'string',
+							],
+							'vtitle' => [
+								'type' => 'boolean',
+								'default' => true
+							],
+							'vauthor' => [
+								'type' => 'boolean',
+								'default' => true
+							],
+							'vavatar' => [
+								'type' => 'boolean',
+								'default' => true
+							],
+							'vloop' => [
+								'type' => 'boolean',
+								'default' => false
+							],
+							'vautopause' => [
+								'type' => 'boolean',
+								'default' => false
+							],
+							'vdnt' => [
+								'type' => 'boolean',
+								'default' => false
 							],
 
 						),

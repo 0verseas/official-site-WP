@@ -12,6 +12,8 @@
 
 	.ct-entry-content {
 		align-self: center;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.ct-post-title {

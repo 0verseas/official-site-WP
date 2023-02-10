@@ -177,6 +177,10 @@ if (! function_exists('blocksy_sidebar_position_unfiltered')) {
 			return 'none';
 		}
 
+		if (! $prefix) {
+			return 'none';
+		}
+
 		$blog_post_structure = blocksy_listing_page_structure([
 			'prefix' => $prefix
 		]);

@@ -5,7 +5,7 @@ Requires PHP: 7.0
 Tested up to: 6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 1.8.66
+Stable tag: 1.8.73
 
 == Description ==
 
@@ -23,6 +23,35 @@ It runs and adds its enhancements only if the Blocksy theme is installed and act
 2. Activate the plugin by going to **Plugins** page in WordPress admin and clicking on **Activate** link.
 
 == Changelog ==
+1.8.73: 2023-02-09
+- Improvement: Integrate B2B market with account modal
+- Improvement: Newsletter subscribe extensions retrieve correctly all subscribers lists
+- Improvement: More robust import of XML post data in starter sites
+
+1.8.72: 2023-02-02
+- Improvement: General fixes and improvements
+
+1.8.71: 2023-01-26
+- Improvement: General fixes and improvements
+
+1.8.70: 2023-01-26
+- Improvement: Smarter handling of login links in the account modal
+- Improvement: Small improvement for filter argument in posts shortcode
+- Improvement: Dont trigger WooCommerce actions in account modal when it is not active
+- Improvement: Add image size option to posts widget
+
+1.8.69: 2023-01-20
+- Improvement: General fixes and improvements
+
+1.8.68: 2023-01-20
+- Improvement: Escape class attr for blocksy_posts shortcode
+- Improvement: Introduce filter for controlling obfuscation process in the contacts link item
+
+1.8.67: 2023-01-19
+- Improvement: Ensure admin_body_class filter is called correctly
+- Improvement: Earlier computation of trending posts results
+- Improvement: Pass meta_value and meta_key fields to the blocksy_posts shortcode query
+
 1.8.66: 2023-01-11
 - Improvement: Better header sticky calculation with very high elements in the rows
 - Fix: Negative margin should not break sticky header calculations

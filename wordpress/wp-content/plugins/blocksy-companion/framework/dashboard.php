@@ -39,7 +39,7 @@ class Dashboard {
 
 		add_action('admin_body_class', function ($class) {
 			if (! function_exists('blocksy_get_wp_parent_theme')) {
-				return;
+				return $class;
 			}
 
 			if (function_exists('blc_fs') && blc_fs()->is_activation_mode()) {

@@ -22,7 +22,11 @@ if (
 ?>
 
 <form name="registerform" id="registerform" class="register" action="#" method="post" novalidate="novalidate">
-	<?php do_action('woocommerce_register_form_start') ?>
+	<?php
+		if (function_exists('WC')) {
+			do_action('woocommerce_register_form_start');
+		}
+	?>
 	<?php do_action('blocksy:account:modal:register:start'); ?>
 
 	<?php if ($has_username) { ?>
@@ -72,7 +76,9 @@ if (
 	}
 
 	do_action('register_form');
-	do_action('woocommerce_register_form');
+	if (function_exists('WC')) {
+		do_action('woocommerce_register_form');
+	}
 	?>
 
 	<?php if (!\Blocksy\Plugin::instance()->account_auth->has_woo_register_flow()) { ?>
@@ -116,6 +122,10 @@ if (
 	</p>
 
 	<?php do_action('blocksy:account:modal:register:end'); ?>
-	<?php do_action('woocommerce_register_form_end') ?>
+	<?php
+		if (function_exists('WC')) {
+			do_action('woocommerce_register_form_end');
+		}
+	?>
 	<?php wp_nonce_field('blocksy-register', 'blocksy-register-nonce'); ?>
 </form>

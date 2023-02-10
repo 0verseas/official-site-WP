@@ -39,6 +39,14 @@ if (
 			get_post_type() === 'topic'
 			||
 			get_post_type() === 'reply'
+			||
+			get_query_var('post_type') === 'forum'
+			||
+			bbp_is_topic_tag()
+			||
+			bbp_is_topic_tag_edit()
+			||
+			is_bbpress()
 		)
 	) && ! (get_post_type() === 'elementor_library')
 ) {
@@ -134,7 +142,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 
 		if (
 			(
-				is_singular() || blocksy_is_page()
+				is_singular() || blocksy_is_page() || $prefix === 'bbpress_single'
 			) && ! is_search()
 		) {
 			if (! $post_id) {
@@ -144,7 +152,6 @@ foreach ($hero_elements as $index => $single_hero_element) {
 			if (! empty(get_the_title($post_id))) {
 				$title = get_the_title($post_id);
 			}
-
 		} else {
 			if (! is_search()) {
 				if (! empty(get_the_archive_title())) {
@@ -281,7 +288,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 
 		if (
 			(
-				is_singular() || $is_page
+				is_singular() || $is_page || $prefix === 'bbpress_single'
 			) && ! is_search()
 		) {
 			if (! $post_id) {
@@ -296,11 +303,11 @@ foreach ($hero_elements as $index => $single_hero_element) {
 			}
 
 			if (has_excerpt($post_id)) {
-				$description = blocksy_entry_excerpt(
-					40,
-					$description_class,
-					$post_id
-				);
+				$description = blocksy_entry_excerpt([
+					'length' => 40,
+					'class' => $description_class,
+					'post_id' => $post_id
+				]);
 			}
 		} else {
 			if (! is_search()) {

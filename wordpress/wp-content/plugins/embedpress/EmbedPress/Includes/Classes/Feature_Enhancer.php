@@ -26,6 +26,7 @@ class Feature_Enhancer
 		add_action('embedpress_gutenberg_wistia_block_after_embed', array($this, 'embedpress_wistia_block_after_embed'));
 		add_action('elementor/widget/embedpres_elementor/skins_init', [$this, 'elementor_setting_init']);
 		add_action('wp_ajax_youtube_rest_api', [$this, 'youtube_rest_api']);
+		add_action('wp_ajax_nopriv_youtube_rest_api', [$this, 'youtube_rest_api']);
 		add_action('embedpress_gutenberg_embed', [$this, 'gutenberg_embed'], 10, 2);
 
 		add_action('embedpress:isEmbra', [$this, 'isEmbra'], 10, 3);
@@ -63,17 +64,25 @@ class Feature_Enhancer
 
 
 	//Check is YouTube single video
-	public function ytValidateUrl(String $url)
+	public function ytValidateUrl($url)
     {
         return (bool) (preg_match('~v=(?:[a-z0-9_\-]+)~i', (string) $url));
     }
 	
 	
 	//Check is Wistia validate url
-	public function wistiaValidateUrl(String $url)
+	public function wistiaValidateUrl($url)
     {
         return (bool) (preg_match('#\/medias\\\?\/([a-z0-9]+)\.?#i', (string) $url ));
     }
+
+	//Check is Wistia validate url
+	public function vimeoValidateUrl($url)
+    {
+		return (bool)preg_match('/https?:\/\/(www\.)?vimeo\.com\/\d+/', (string) $url);
+    }
+
+
 
 	// Get wistia block attributes 
 	public function get_wistia_block_attributes($attributes) {
@@ -134,7 +143,7 @@ class Feature_Enhancer
 
 	public function gutenberg_embed($embedHTML, $attributes)
 	{
-
+	
 		if (!empty($attributes['url'])) {
 			$youtube = new Youtube($attributes['url']);
 			
@@ -155,10 +164,8 @@ class Feature_Enhancer
 					$embedHTML = $urlInfo->embed;
 				}
 			}
-
-			// echo $this->ytValidateUrl($attributes['url']);
 			
-			if($this->ytValidateUrl($attributes['url'])){
+			if(!empty($attributes['url']) && $this->ytValidateUrl($attributes['url'])){
 				
 				$atts = [
 					'url'	=> $attributes['url'],
@@ -277,6 +284,79 @@ class Feature_Enhancer
 			$embedHTML = $html;
 		}
 
+		if(!empty($attributes['url']) && $this->vimeoValidateUrl($attributes['url'])){
+			$atts = [
+				'url'	=> $attributes['url'],
+				'vstarttime'    => !empty($attributes['vstarttime']) ? $attributes['vstarttime'] : '',
+				'vscheme'   => !empty($attributes['vscheme']) ? $attributes['vscheme'] : 'red',
+				'vautoplay'   => !empty($attributes['vautoplay']) ? 1 : 0,
+				'vtitle'   => !empty($attributes['vtitle']) ? 1 : 0,
+				'vauthor'   => !empty($attributes['vauthor']) ? 1 : 0,
+				'vavatar'   => !empty($attributes['vavatar']) ? 1 : 0,
+				'vautopause'   => !empty($attributes['vautopause']) ? 1 : 0,
+				'vdnt'   => !empty($attributes['vdnt']) ? 1 : 0,
+				'customlogo'   => !empty($attributes['customlogo']) ? $attributes['customlogo'] : '',
+				'logoX' => !empty($attributes['logoX']) ? $attributes['logoX'] : 5,
+				'logoY' => !empty($attributes['logoY']) ? $attributes['logoY'] : 10,
+				'customlogoUrl' => !empty($attributes['customlogoUrl']) ? $attributes['customlogoUrl'] : '',
+				'logoOpacity' => !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : 0.6,
+			];
+
+			$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
+
+			if (!empty($urlInfo->embed)) {
+				$embedHTML = $urlInfo->embed;
+			}
+
+			if(isset( $urlInfo->embed ) && preg_match( '/src=\"(.+?)\"/', $urlInfo->embed, $match )){
+				$url_full = $match[1];
+				$query = parse_url( $url_full, PHP_URL_QUERY );
+				parse_str( $query, $params );
+
+				
+				unset($params['amp;dnt']);
+
+				$params['title'] = !empty($attributes['vtitle']) ? 1 : 0;
+				$params['byline']             = !empty($attributes['vauthor']) ? 1 : 0;
+				$params['portrait']             = !empty($attributes['vavatar']) ? 1 : 0;
+				$params['autoplay'] 		= !empty($attributes['vautoplay']) ? 1 : 0;
+				$params['loop'] 		= !empty($attributes['vloop']) ? 1 : 0;
+				$params['autopause'] 		= !empty($attributes['vautopause']) ? 1 : 0;
+				if(empty($attributes['vautopause'])) :
+					$params['dnt'] 		= !empty($attributes['vdnt']) ? 1 : 0;
+				endif;
+				$params['color'] = !empty($attributes['vscheme']) ? str_replace("#", "", $attributes['vscheme']) : '00ADEF';
+
+				if(!empty($attributes['vstarttime'])) : 
+					$params['t'] 			= !empty($attributes['vstarttime']) ? $attributes['vstarttime'] : '';
+				endif;
+
+				preg_match( '/(.+)?\?/', $url_full, $url );
+
+				if ( empty( $url) ) {
+					return $embedHTML;
+				}
+				
+				$url = $url[1];
+
+				// Reassemble the url with the new variables.
+				$url_modified = $url . '?';
+
+				// print_r($url_modified);
+
+				
+
+				foreach ($params as $param => $value) {
+					$url_modified = add_query_arg($param, $value, $url_modified);
+				}
+
+				$url_modified = str_replace("&t=", "#t=", $url_modified);
+
+				// Replaces the old url with the new one.
+				$embedHTML = str_replace( $url_full, rtrim( $url_modified, '&' ), $urlInfo->embed );
+				
+			}
+		}
 
 		return $embedHTML ;
 	}
@@ -368,6 +448,7 @@ class Feature_Enhancer
 
 		return apply_filters('embedpress_youtube_params', $params);
 	}
+	
 	public function get_vimeo_params($options)
 	{
 		$params   = [];
@@ -505,7 +586,9 @@ class Feature_Enhancer
 	}
 	
 	public function enhance_vimeo($embed)
-	{
+	{ 
+		
+
 		if (
 			isset($embed->provider_name)
 			&& strtoupper($embed->provider_name) === 'VIMEO'
@@ -560,19 +643,56 @@ class Feature_Enhancer
 					unset($params[$pro_control]);
 				}
 			}
-			// Reassemble the url with the new variables.
-			$url_modified = $url_full;
-			foreach ($params as $param => $value) {
-				$url_modified = add_query_arg($param, $value, $url_modified);
+
+			if(!empty($params['autopause'])){
+				unset($params['dnt']);
+				unset($params['amp;dnt']);
 			}
 
-			if (isset($options['start_time'])) {
-				$url_modified .= '#t=' . $options['start_time'];
+			// Reassemble the url with the new variables.
+			$url_modified = str_replace("&amp;dnt=1", "", $url_full);
+
+			if(is_object($embed->attributes) && !empty($embed->attributes)){
+				$attributes = (array) $embed->attributes;
+				$attributes = stringToBoolean($attributes);
+
+				$params['title'] = !empty($attributes['data-vtitle']) ? 1 : 0;
+				$params['byline']             = !empty($attributes['data-vauthor'])  ? 1 : 0;
+				$params['portrait']             = !empty($attributes['data-vavatar']) ? 1 : 0;
+				$params['autoplay'] 		= !empty($attributes['data-vautoplay']) ? 1 : 0;
+				$params['loop'] 		= !empty($attributes['data-vloop']) ? 1 : 0;
+				$params['autopause'] 		= !empty($attributes['data-vautopause']) ? 1 : 0;
+				if(empty($attributes['data-vautopause'])) :
+					$params['dnt'] 		= !empty($attributes['data-vdnt']) ? 1 : 0;
+				endif;
+				$params['color'] = !empty($attributes['data-vscheme']) ? str_replace("#", "", $attributes['data-vscheme']) : '00ADEF';
+
+				if(!empty($attributes['data-vstarttime'])) :
+					$params['t'] 			= !empty($attributes['data-vstarttime']) ? $attributes['data-vstarttime'] : '';
+				endif;
+			
+				foreach ($params as $param => $value) {
+					$url_modified = add_query_arg($param, $value, $url_modified);
+				}
+				
+				$url_modified = str_replace("&t=", "#t=", $url_modified);
+
+			}
+			else{
+				foreach ($params as $param => $value) {
+					$url_modified = add_query_arg($param, $value, $url_modified);
+				}
+	
+				if (empty($attributes['data-vstarttime']) && isset($options['start_time'])) {
+					$url_modified .= '#t=' . $options['start_time'];
+				}
 			}
 
 			do_action('embedpress_after_modified_url', $url_modified, $url_full, $params);
+			
 			// Replaces the old url with the new one.
 			$embed->embed = str_replace($url_full, $url_modified, $embed->embed);
+
 		}
 
 		return $embed;

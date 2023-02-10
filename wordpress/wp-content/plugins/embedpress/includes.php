@@ -22,7 +22,7 @@ if ( ! defined('EMBEDPRESS_PLG_NAME')) {
 }
 
 if ( ! defined('EMBEDPRESS_VERSION')) {
-	define('EMBEDPRESS_VERSION', "3.6.4");
+	define('EMBEDPRESS_VERSION', "3.6.6");
 	/**
 	 * @deprecated 2.2.0
 	 */
@@ -131,6 +131,25 @@ if ( ! defined('EMBEDPRESS_IS_LOADED')) {
 	require_once EMBEDPRESS_PATH_BASE . "autoloader.php";
 }
 
+// Update string attributes values to boleen
+if (!function_exists('stringToBoolean')){
+    function stringToBoolean($attributes) {
+        if(is_array($attributes)) {
+            foreach ($attributes as $key => $value) {
+                if(!empty($value) && $value === 'true'){
+                    $attributes[$key] = true;
+                }
+				else if(!empty($value) && $value === 'false'){
+                    $attributes[$key] = false;
+                }
+            }
+		}
+        return $attributes;
+    }
+}
+
+  
+ 
 // Includes the Gutenberg blocks for EmbedPress
 require_once __DIR__ . '/Gutenberg/plugin.php';
 

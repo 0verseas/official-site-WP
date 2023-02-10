@@ -139,6 +139,11 @@ class Blocksy_Db_Versioning {
 			[
 				'version' => '1.8.38',
 				'cb' => [$this, 'v_1_8_38']
+			],
+
+			[
+				'version' => '1.8.67',
+				'cb' => [$this, 'v_1_8_67']
 			]
 		];
 	}
@@ -1398,6 +1403,15 @@ class Blocksy_Db_Versioning {
 		) {
 			\Elementor\Plugin::$instance->files_manager->clear_cache();
 		}
+	}
+
+	public function v_1_8_67() {
+		$this->migrate_options([
+			[
+				'old' => 'blockquote',
+				'new' => 'pullquote'
+			],
+		]);
 	}
 
 	private function transform_tags_in_layers($list, $post_type) {

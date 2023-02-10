@@ -80,8 +80,10 @@ class Translate_Page_Weglot implements Hooks_Interface_Weglot {
 	public function hooks() {
 
 		$referer = wp_parse_url( wp_get_referer() );
-		if ( wp_is_json_request() && ( str_contains( $referer['query'], 'action=edit' ) ) ) {
-			return;
+		if ( wp_is_json_request() && isset($referer['query'])  ) {
+			if( strpos( $referer['query'], 'action=edit' ) !== false ){
+				return;
+			}
 		}
 
 		if ( Helper_Is_Admin::is_wp_admin() || 'wp-login.php' === $GLOBALS['pagenow'] ) {
@@ -128,6 +130,7 @@ class Translate_Page_Weglot implements Hooks_Interface_Weglot {
 				'el_check_user_login', // Event list plugin.
 				'wcfm_ajax_controller', // wcfm_ajax_controller.
 				'jet_ajax_search', // jet_ajax_search.
+				'woofc_update_qty', // jet_ajax_search.
 			)
 		);
 
@@ -291,6 +294,9 @@ class Translate_Page_Weglot implements Hooks_Interface_Weglot {
 			}
 		}
 
-		echo $this->href_lang_services->generate_href_lang_tags(); //phpcs:ignore
+		$add_href_lang = apply_filters( 'weglot_add_hreflang', true );
+		if ( $add_href_lang ) {
+			echo $this->href_lang_services->generate_href_lang_tags(); //phpcs:ignore
+		}
 	}
 }

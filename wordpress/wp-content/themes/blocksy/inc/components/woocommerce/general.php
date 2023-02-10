@@ -308,15 +308,29 @@ add_action('rest_api_init', function () {
 		return;
 	}
 
-	if (
-		isset($_GET['post_type'])
-		&&
+	if ( 
+		!isset($_GET['post_type']) 
+		||
 		(
-			str_contains($_GET['post_type'], 'product')
-			||
-			$_GET['post_type'] === 'ct_forced_any'
+			!str_contains($_GET['post_type'], 'product')
+			&&
+			$_GET['post_type'] !== 'ct_forced_any'
 		)
-		&&
+	) {
+		return;
+	}
+
+	register_rest_field('post', 'placeholder_image', array(
+		'get_callback' => function ($post, $field_name, $request) {
+			if ($post['type'] !== 'product') {
+				return null;
+			}
+
+			return wc_placeholder_img_src('thumbnail');
+		}
+	));
+
+	if (
 		isset($_GET['product_price'])
 		&&
 		$_GET['product_price'] === 'true'
@@ -329,6 +343,7 @@ add_action('rest_api_init', function () {
 
 				$product = wc_get_product($post['id']);
 				$price = $product->get_regular_price();
+				$sale = $product->get_sale_price();
 
 				if ($product->is_taxable()) {
 					if (defined('WC_ABSPATH')) {
@@ -356,12 +371,39 @@ add_action('rest_api_init', function () {
 					}
 
 					$tax_display_mode = get_option('woocommerce_tax_display_shop');
-
+					
 					if ($tax_display_mode === 'incl') {
-						$price = wc_get_price_including_tax($product);
+						$price = wc_get_price_including_tax($product, ['price' => $price]);
+						$sale = wc_get_price_including_tax($product, ['price' => $sale]);
 					} else {
-						$price = wc_get_price_excluding_tax($product);
+						$price = wc_get_price_excluding_tax($product, ['price' => $price]);
+						$sale = wc_get_price_excluding_tax($product, ['price' => $sale]);
 					}
+				}
+
+				if ( $sale && $product->is_on_sale() ) {
+	
+					$sale_html = $sale? blocksy_html_tag(
+						'ins',
+						[
+							'aria-hidden' => 'true'
+						],
+						wc_price($sale)
+					) : '';
+
+					$price_html = blocksy_html_tag(
+						'del',
+						[],
+						wc_price($price)
+					);
+
+					return $price ? blocksy_html_tag(
+						'span',
+						[
+							'class' => 'sale-price'
+						],
+						$price_html . $sale_html
+					) : 0;
 				}
 
 				return $price ? wc_price($price) : 0;

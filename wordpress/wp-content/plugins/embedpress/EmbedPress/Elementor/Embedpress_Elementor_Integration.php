@@ -115,9 +115,9 @@ class Embedpress_Elementor_Integration {
         );
     }
 
-    public function editor_enqueue_scripts(){
-
-    }
+    public function editor_enqueue_scripts() {
+        
+    }  
 
     public function addOEmbedProviders( $providers ) {
         if (Compatibility::isWordPress5() && ! Compatibility::isClassicalEditorActive()) {

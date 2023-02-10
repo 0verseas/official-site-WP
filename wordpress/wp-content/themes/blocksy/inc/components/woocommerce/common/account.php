@@ -1,7 +1,37 @@
 <?php
 
+add_action('elementor/widget/before_render_content', function($widget) {
+	if (! class_exists('ElementorPro\Modules\Woocommerce\Widgets\My_Account')) {
+		return;
+	}
+
+	if ($widget instanceof ElementorPro\Modules\Woocommerce\Widgets\My_Account) {
+		global $ct_skip_account;
+		$ct_skip_account = true;
+	}
+}, 10, 1);
+
+add_filter('elementor/widget/render_content', function($content, $widget) {
+	if (! class_exists('ElementorPro\Modules\Woocommerce\Widgets\My_Account')) {
+		return $content;
+	}
+
+	if ($widget instanceof ElementorPro\Modules\Woocommerce\Widgets\My_Account) {
+		global $ct_skip_account;
+		$ct_skip_account = false;
+	}
+
+	return $content;
+}, 10, 2);
+
 if (! function_exists('blocksy_woocommerce_has_account_customizations')) {
 	function blocksy_woocommerce_has_account_customizations() {
+		global $ct_skip_account;
+
+		if ($ct_skip_account) {
+			return false;
+		}
+
 		return ! defined('YITH_WCMAP');
 	}
 }
