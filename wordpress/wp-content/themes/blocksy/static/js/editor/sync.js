@@ -54,7 +54,11 @@ const performSelectorsReplace = () => {
 		;[...maybeIframe.contentDocument.querySelectorAll('style')].map(
 			(style) => {
 				if (
-					style.innerText.indexOf('narrow-container-max-width') === -1
+					!style.innerText ||
+					(style.innerText &&
+						style.innerText.indexOf(
+							'narrow-container-max-width'
+						) === -1)
 				) {
 					return
 				}
@@ -107,10 +111,13 @@ if (oldFn) {
 		...args
 	) => {
 		oldFn(...args)
-		setTimeout(() => {
+
+		const cb = () => {
 			overrideStylesWithAst()
 			performSelectorsReplace()
-		}, 200)
+		}
+
+		;[0, 200, 300, 400, 500].map((time) => setTimeout(cb, time))
 	}
 
 	wp.data.dispatch('core/edit-post').toggleFeature = (...args) => {

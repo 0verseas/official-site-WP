@@ -79,7 +79,8 @@ if (! function_exists('blocksy_main_menu_fallback')) {
 							'class' => 'ct-toggle-dropdown-desktop-ghost',
 							'aria-label' => __('Expand dropdown menu', 'blocksy'),
 							'aria-haspopup' => 'true',
-							'aria-expanded' => 'false'
+							'aria-expanded' => 'false',
+							'role' => 'menuitem'
 						],
 						''
 					);
@@ -240,7 +241,8 @@ if (! function_exists('blocksy_handle_nav_menu_start_el')) {
 						'class' => $toggle_ghost_class,
 						'aria-label' => __('Expand dropdown menu', 'blocksy'),
 						'aria-haspopup' => 'true',
-						'aria-expanded' => 'false'
+						'aria-expanded' => 'false',
+						'role' => 'menuitem'
 					],
 					$toggle_ghost_content
 				);

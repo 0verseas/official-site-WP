@@ -10,10 +10,9 @@
 	min-height: 65px;
 	clear: both;
 	border-radius: 5px;
+	margin-bottom: 2rem;
 	background: var(--background-color);
 
-	// --listItemSpacing: 0;
-	--listItemSpacing: 0.3em;
 	--listStyleType: none;
 	--linkInitialColor: var(--color);
 
@@ -28,16 +27,9 @@
 		padding-inline-start: 55px;
 	}
 
-	@include media-breakpoint-down (md) {
-		margin-bottom: 30px;
-	}
-
-	@include media-breakpoint-up (lg) {
-		margin-bottom: 45px;
-	}
-
 	li {
 		width: 100%;
+		margin-bottom: 0.3em;
 	}
 
 	.button,
@@ -49,11 +41,11 @@
 		--button-padding: 5px 20px;
 
 		@include media-breakpoint-down (xs) {
-			margin-top: 15px;
+			margin-top: 10px !important;
 		}
 
 		@include media-breakpoint-up (sm) {
-			margin-inline-start: auto;
+			margin-inline-start: auto !important;
 		}
 	}
 
@@ -85,17 +77,15 @@
 }
 
 
-ul.woocommerce-error {
+.woocommerce ul.woocommerce-error {
 	flex-direction: column;
 	justify-content: center;
+	margin-bottom: 2rem;
 
 	li {
 		display: flex;
 		align-items: center;
-		column-gap: 0.3em;
-
-		@include media-breakpoint-down (xs) {
-			flex-wrap: wrap;
-		}
+		flex-wrap: wrap;
+		gap: 0.3em;
 	}
 }

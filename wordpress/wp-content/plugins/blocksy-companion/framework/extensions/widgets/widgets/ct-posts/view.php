@@ -12,7 +12,8 @@ $post_type = blocksy_default_akg('post_type_source', $atts, 'post');
 $query_args = [
 	'order' => 'DESC',
 	'ignore_sticky_posts' => true,
-	'post_type' => $post_type
+	'post_type' => $post_type,
+	'post_status' => 'publish'
 ];
 
 if ($post_type !== 'page') {

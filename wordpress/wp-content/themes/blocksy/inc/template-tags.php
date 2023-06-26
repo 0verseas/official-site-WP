@@ -85,19 +85,26 @@ if (! function_exists('blocksy_entry_excerpt')) {
 		}
 
 		if ($args['source'] === 'full') {
+			$args['class'] .= ' entry-content';
+
 			ob_start();
 			the_content(
 				sprintf(
 					wp_kses(
-						/* translators: %s: Name of current post. Only visible to screen readers */
-						__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'blocksy' ),
+						/* translators: 1: span open 2: Name of current post. Only visible to screen readers 3: span closing */
+						__(
+							'Continue reading%1$s "%2$s"%3$s',
+							'blocksy'
+						),
 						array(
 							'span' => array(
 								'class' => array(),
 							),
 						)
 					),
-					get_the_title()
+					'<span class="screen-reader-text">',
+					get_the_title(),
+					'</span>'
 				)
 			);
 			$excerpt = ob_get_clean();
@@ -176,6 +183,8 @@ function blocksy_post_navigation() {
 		]
 	));
 
+	$thumb_size = get_theme_mod($prefix . '_post_nav_thumb_size', 'medium');
+
 	$thumb_class = '';
 
 	$thumb_class .= ' ' . blocksy_visibility_classes(get_theme_mod(
@@ -217,6 +226,7 @@ function blocksy_post_navigation() {
 					'attachment_id' => get_post_thumbnail_id($next_post),
 					'post_id' => $next_post->ID,
 					'ratio' => '1/1',
+					'size' => $thumb_size,
 					'class' => $thumb_class,
 					'inner_content' => '<svg width="20px" height="15px" viewBox="0 0 20 15"><polygon points="0,7.5 5.5,13 6.4,12.1 2.4,8.1 20,8.1 20,6.9 2.4,6.9 6.4,2.9 5.5,2 "/></svg>',
 					'tag_name' => 'figure'
@@ -236,6 +246,7 @@ function blocksy_post_navigation() {
 					'attachment_id' => get_post_thumbnail_id($previous_post),
 					'post_id' => $previous_post->ID,
 					'ratio' => '1/1',
+					'size' => $thumb_size,
 					'class' => $thumb_class,
 					'inner_content' => '<svg width="20px" height="15px" viewBox="0 0 20 15"><polygon points="14.5,2 13.6,2.9 17.6,6.9 0,6.9 0,8.1 17.6,8.1 13.6,12.1 14.5,13 20,7.5 "/></svg>',
 					'tag_name' => 'figure'
@@ -407,11 +418,13 @@ function blocksy_related_posts($location = null) {
 		$prefix
 	);
 
-	$label = apply_filters(
-		'blocksy:related-posts:module-label',
-		get_theme_mod(
-			$prefix . '_related_label',
-			__( 'Related Posts', 'blocksy')
+	$label = do_shortcode(
+		apply_filters(
+			'blocksy:related-posts:module-label',
+			get_theme_mod(
+				$prefix . '_related_label',
+				__( 'Related Posts', 'blocksy')
+			)
 		)
 	);
 

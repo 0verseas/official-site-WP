@@ -30,7 +30,7 @@ CacheKeyModify -qs:_ga
 ## LITESPEED WP CACHE PLUGIN - Do not edit the contents of this block! ##
 # END NON_LSCACHE
 # BEGIN WordPress
-
+Header always edit Set-Cookie (.*) "$1;HttpOnly;Secure"
 Options -Indexes
 
 <Files .htaccess>

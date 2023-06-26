@@ -5,6 +5,11 @@
  * @license     GPLv2 or later
  * @since       1.7.0
  */
+
+
+
+let epGlobals = {};
+
 (function ($) {
     'use strict';
     // function equivalent to jquery ready()
@@ -28,7 +33,9 @@
                 PDFObject.embed(src, "." + id, option);
             }));
         }
-        youtubeChannelGallery();
+        if (typeof epGlobals.youtubeChannelGallery === 'function') {
+            epGlobals.youtubeChannelGallery();
+        }
     });
 
     /**
@@ -159,7 +166,8 @@
         }
         return xmlhttp;
     }
-    function youtubeChannelGallery() {
+
+    epGlobals.youtubeChannelGallery = function () {
         var playerWraps = document.getElementsByClassName("ep-player-wrap");
         if (playerWraps && playerWraps.length) {
             for (var i = 0, im = playerWraps.length; im > i; i++) {
@@ -167,6 +175,7 @@
             }
         }
     }
+
     function youtubeChannelEvents(playerWrap) {
 
         delegate(playerWrap, "click", ".item", function (event) {
@@ -275,10 +284,10 @@
 
     //Load more for OpenaSea collection
     const epLoadMore = () => {
-       
+
         $('.embedpress-gutenberg-wrapper .ep-nft-gallery-wrapper').each(function () {
             let selctorEl = `[data-nftid='${$(this).data('nftid')}']`;
-            
+
             let loadmorelabel = $(selctorEl).data('loadmorelabel');
             let iconcolor = $(selctorEl + " .nft-loadmore").data('iconcolor');
 
@@ -311,11 +320,89 @@
         epLoadMore();
     }
 
+    // Content protection system function 
+    const unlockSubmitHander = (perentSel, that) => {
+        var ep_client_id = jQuery(that).closest('form').find('input[name="ep_client_id"]').val();
+        var password = jQuery(`input[name="pass_${ep_client_id}"]`).val();
+        var epbase = jQuery(`input[name="ep_base_${ep_client_id}"]`).val();
+        var hash_key = jQuery(`input[name="hash_key_${ep_client_id}"]`).val();
+        const buttonText = jQuery(that).closest('.password-form-container').find('input[type="submit"]').val();
+        const unlokingText = jQuery(that).data('unlocking-text');
+
+
+        var data = {
+            'action': 'lock_content_form_handler',
+            'client_id': ep_client_id,
+            'password': password,
+            'hash_key': hash_key,
+            'epbase': epbase
+        };
+
+        jQuery('#' + perentSel + '-' + ep_client_id + ' .password-form input[type="submit"]').val(unlokingText);
+
+        jQuery.post(eplocalize.ajaxurl, data, function (response) {
+            if (response.success) {
+                if (!response.embedHtml) {
+
+                    jQuery('#' + perentSel + '-' + ep_client_id + ' .password-form input[type="submit"]').val(buttonText);
+                    jQuery('#' + perentSel + '-' + ep_client_id + ' .password-form input[type="password"]').val('');
+                    jQuery(that).closest('.password-form-container').find('.error-message').removeClass('hidden');
+                }
+                else {
+                    jQuery('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper').html(response.embedHtml);
+
+                    if (jQuery('#' + perentSel + '-' + ep_client_id + ' .ose-youtube').length > 0) {
+                        epGlobals.youtubeChannelGallery();
+                    }
+
+                    if ($('.embedpress-gutenberg-wrapper .ep-nft-gallery-wrapper').length > 0) {
+                        epLoadMore();
+                    }
+                    
+                    // Custom player initialization when content protection enabled
+                    document.querySelector('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper').classList.remove('plyr-initialized');
+
+                    initPlayer(document.querySelector('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper'));
+
+                }
+            } else {
+                jQuery('#password-error_' + ep_client_id).html(response.form);
+                jQuery('#password-error_' + ep_client_id).show();
+            }
+        }, 'json');
+    }
+
+    // unlockSubmitHander called for gutentberg
+    jQuery('.ep-gutenberg-content .password-form').submit(function (e) {
+        e.preventDefault(); // Prevent the default form submission
+        unlockSubmitHander('ep-gutenberg-content', this);
+    });
+
+    window.addEventListener('load', function (e) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const hash = urlParams.get('hash');
+
+        // find the element with the matching id
+        const element = document.getElementById(hash);
+
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+
+    });
+
+
 })(jQuery);
 
 
 jQuery(window).on("elementor/frontend/init", function () {
+
     var filterableGalleryHandler = function ($scope, $) {
+
+        // Get the Elementor unique selector for this widget
+        let classes = $scope[0].className;
+        let selectorEl = '.' + classes.split(' ').join('.');
+
         const epElLoadMore = () => {
 
             const spinicon = '<svg width="18" height="18" fill="#fff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_GuJz{transform-origin:center;animation:spinner_STY6 1.5s linear infinite}@keyframes spinner_STY6{100%{transform:rotate(360deg)}}</style><g class="spinner_GuJz"><circle cx="3" cy="12" r="2"/><circle cx="21" cy="12" r="2"/><circle cx="12" cy="21" r="2"/><circle cx="12" cy="3" r="2"/><circle cx="5.64" cy="5.64" r="2"/><circle cx="18.36" cy="18.36" r="2"/><circle cx="5.64" cy="18.36" r="2"/><circle cx="18.36" cy="5.64" r="2"/></g></svg>';
@@ -351,6 +438,70 @@ jQuery(window).on("elementor/frontend/init", function () {
             epElLoadMore();
         }
 
+        // Content protection system function 
+        const unlockElSubmitHander = (perentSel, that) => {
+            var ep_client_id = jQuery(that).closest('form').find('input[name="ep_client_id"]').val();
+            var password = jQuery(`input[name="pass_${ep_client_id}"]`).val();
+            var epbase = jQuery(`input[name="ep_base_${ep_client_id}"]`).val();
+            var hash_key = jQuery(`input[name="hash_key_${ep_client_id}"]`).val();
+            const buttonText = jQuery(that).closest('.password-form-container').find('input[type="submit"]').val();
+            const unlokingText = jQuery(that).data('unlocking-text');
+
+            var data = {
+                'action': 'lock_content_form_handler',
+                'client_id': ep_client_id,
+                'password': password,
+                'hash_key': hash_key,
+                'epbase': epbase
+            };
+
+            jQuery('#' + perentSel + '-' + ep_client_id + ' .password-form input[type="submit"]').val(unlokingText);
+
+            jQuery.post(eplocalize.ajaxurl, data, function (response) {
+                if (response.success) {
+                    if (!response.embedHtml) {
+                        jQuery('#' + perentSel + '-' + ep_client_id + ' .password-form input[type="submit"]').val(buttonText);
+                        jQuery('#' + perentSel + '-' + ep_client_id + ' .password-form input[type="password"]').val('');
+                        jQuery(that).closest('.password-form-container').find('.error-message').removeClass('hidden');
+                    }
+                    else {
+                        if ($('.ep-content-locked').has('#' + perentSel + '-' + ep_client_id).length) {
+                            $('.ep-content-locked').removeClass('ep-content-locked');
+                        }
+
+                        jQuery('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper').html(response.embedHtml);
+
+                        $('#' + perentSel + '-' + ep_client_id).removeClass('ep-content-protection-enabled');
+
+                        if (jQuery('#' + perentSel + '-' + ep_client_id + ' .ose-youtube').length > 0) {
+                            epGlobals.youtubeChannelGallery();
+                        }
+
+                        if ($('.elementor-widget-container .ep-nft-gallery-wrapper').length > 0) {
+                            epElLoadMore();
+                        }
+                    }
+                } else {
+                    jQuery('#password-error_' + ep_client_id).html(response.form);
+                    jQuery('#password-error_' + ep_client_id).show();
+                }
+            }, 'json');
+        }
+
+        // unlockElSubmitHander called for Elementor
+        jQuery('.ep-elementor-content .password-form').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            unlockElSubmitHander('ep-elementor-content', this);
+        });
     };
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", filterableGalleryHandler);
+    elementorFrontend.hooks.addAction("frontend/element_ready/embedpress_pdf.default", filterableGalleryHandler);
+    elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_document.default", filterableGalleryHandler);
 });
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     testHellowWorld();
+// });
+
+// testHellowWorld();

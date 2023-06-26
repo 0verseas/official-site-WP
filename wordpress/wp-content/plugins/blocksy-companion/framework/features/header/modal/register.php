@@ -11,17 +11,22 @@ if (
 	$has_username = false;
 }
 
-if (
-	\Blocksy\Plugin::instance()->account_auth->has_woo_register_flow()
-	&&
-	'no' === get_option('woocommerce_registration_generate_password')
-) {
-	$has_password = true;
+$class = "register";
+$password_class = 'account-password-input';
+
+if (\Blocksy\Plugin::instance()->account_auth->has_woo_register_flow()) {
+	if ('no' === get_option('woocommerce_registration_generate_password')) {
+		$has_password = true;
+	}
+
+    $class .= " woocommerce-form-register";
+    $password_class .= " password-input";
 }
+
 
 ?>
 
-<form name="registerform" id="registerform" class="register" action="#" method="post" novalidate="novalidate">
+<form name="registerform" id="registerform" class="<?php echo $class ?>" action="#" method="post" novalidate="novalidate">
 	<?php
 		if (function_exists('WC')) {
 			do_action('woocommerce_register_form_start');
@@ -32,21 +37,20 @@ if (
 	<?php if ($has_username) { ?>
 		<p>
 			<label for="user_login_register"><?php echo __('Username', 'blocksy-companion') ?></label>
-			<input type="text" name="user_login" id="user_login_register" class="input" value="" size="20" autocapitalize="off">
+			<input type="text" name="user_login" id="user_login_register" class="input" value="" size="20" autocomplete="username" autocapitalize="off">
 		</p>
 	<?php } ?>
 
 	<p>
-		<label for="user_email"><?php echo __('Email', 'blocksy-companion') ?></label>
-		<input type="email" name="user_email" id="user_email" class="input" value="" size="25">
+		<label for="ct_user_email"><?php echo __('Email', 'blocksy-companion') ?></label>
+		<input type="email" name="user_email" id="ct_user_email" class="input" value="" size="20" autocomplete="email">
 	</p>
 
 	<?php if ($has_password) { ?>
 		<p>
 			<label for="user_pass_register"><?php echo __('Password', 'blocksy-companion') ?></label>
-			<span class="account-password-input">
+			<span class="<?php echo $password_class ?>">
 				<input type="password" name="user_pass" id="user_pass_register" class="input" value="" size="20" autocapitalize="off" autocomplete="new-password">
-				<span class="show-password-input"></span>
 			</span>
 		</p>
 	<?php } ?>

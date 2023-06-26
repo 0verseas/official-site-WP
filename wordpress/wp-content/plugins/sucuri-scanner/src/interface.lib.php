@@ -63,14 +63,6 @@ class SucuriScanInterface
      */
     public static function enqueueScripts()
     {
-		wp_register_style(
-			'sucuriscan-google-fonts',
-			'https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i|Roboto+Slab:700|Titillium+Web:wght@400,700,900|Roboto:wght@400&amp;display=swap',
-			array(),
-			false
-		);
-        wp_enqueue_style( 'sucuriscan-google-fonts' );
-
         wp_register_style(
             'sucuriscan',
             SUCURISCAN_URL . '/inc/css/styles.css',
@@ -234,19 +226,6 @@ class SucuriScanInterface
 
         /* update the version number in the plugin settings. */
         SucuriScanOption::updateOption(':plugin_version', SUCURISCAN_VERSION);
-
-        /**
-         * Suggest re-activation of the API communication.
-         *
-         * Check if the API communication has been disabled due to issues with
-         * the previous version of the code, in this case we will display a
-         * message at the top of the admin dashboard suggesting the user to
-         * enable it once again expecting to see have a better performance with
-         * the new code.
-         */
-        if (SucuriScanOption::isDisabled(':api_service')) {
-            self::info(__('API service communication is disabled, if you just updated the plugin this might be a good opportunity to test this feature once again with the new code. Enable it again from the "API Service" panel located in the settings page.', 'sucuri-scanner'));
-        }
 
         /**
          * Invite website owner to subscribe to our security newsletter.

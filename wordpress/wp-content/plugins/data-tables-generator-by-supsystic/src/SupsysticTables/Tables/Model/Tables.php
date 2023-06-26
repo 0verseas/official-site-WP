@@ -273,12 +273,11 @@ class SupsysticTables_Tables_Model_Tables extends SupsysticTables_Core_BaseModel
 	public function sanitizeString($str) {
 			$allowedHtml = $this->getAllowedHtml();
 			if (!empty($str) && is_string($str)) {
-				$str = htmlspecialchars_decode($str);
+                $str = htmlspecialchars_decode((string)$str, ENT_COMPAT);
 				$str = wp_kses($str, $allowedHtml);
 				$str = str_replace('"&#039;', "&#39;", $str);
 				$str = str_replace('&#039;"', "&#39;", $str);
-				$str = html_entity_decode($str);
-				//error_log('KSES: '.$str);
+                $str = html_entity_decode($str, ENT_COMPAT);
 			}
 			return $str;
 	}
@@ -395,7 +394,21 @@ class SupsysticTables_Tables_Model_Tables extends SupsysticTables_Core_BaseModel
                     'class' => 1,
                     'data-quantity' => 1,
                     'data-product_id' => 1,
+                    'data-product_sku'=> 1,
+                    'add_to_cart_button ajax_add_to_cart' => 1,
+                    'ajax_add_to_cart' => 1,
+                    'add_to_cart_button' => 1,
 
+
+				),
+                'href' => array(
+                    'class' => 1,
+                    'data-quantity' => 1,
+                    'data-product_id' => 1,
+                    'data-product_sku'=> 1,
+                    'add_to_cart_button ajax_add_to_cart' => 1,
+                    'ajax_add_to_cart' => 1,
+                    'add_to_cart_button' => 1,
 				),
 				'hr' => array(
 					'align' => 1,
@@ -1007,10 +1020,10 @@ class SupsysticTables_Tables_Model_Tables extends SupsysticTables_Core_BaseModel
 				}
 				foreach ($data['cells'] as &$cell) {
 					if (isset($cell['comment']) && isset($cell['comment']['value'])) {
-						$cell['comment']['value'] = htmlspecialchars_decode($cell['comment']['value'], ENT_QUOTES);
+						$cell['comment']['value'] = htmlspecialchars_decode((string)$cell['comment']['value'], ENT_QUOTES);
 					}
 					if (!empty($cell['calculatedValue'])) {
-						$cell['calculatedValue'] = htmlspecialchars_decode($cell['calculatedValue'], ENT_QUOTES);
+						$cell['calculatedValue'] = htmlspecialchars_decode((string)$cell['calculatedValue'], ENT_QUOTES);
 					}
 					if (!empty($cell['formattedValue'])) {
 						$cell['formattedValue'] = htmlspecialchars_decode((string)$cell['formattedValue'], ENT_QUOTES);
@@ -1605,12 +1618,12 @@ class SupsysticTables_Tables_Model_Tables extends SupsysticTables_Core_BaseModel
 			return $table;
 		}
 		if(!empty($table->history_settings)) {
-			$table->historySettings = htmlspecialchars_decode($table->history_settings);
+			$table->historySettings = htmlspecialchars_decode((string)$table->history_settings);
 			$table->historySettings = $this->fixIncorrectSerialize($table->historySettings);
 			$table->historySettings = unserialize($table->historySettings);
 		}
 		if(!empty($table->woo_settings)) {
-			$table->woo_settings = htmlspecialchars_decode($table->woo_settings);
+			$table->woo_settings = htmlspecialchars_decode((string)$table->woo_settings);
 			$table->woo_settings = $this->fixIncorrectSerialize($table->woo_settings);
 			$table->woo_settings = unserialize($table->woo_settings);
 		}
@@ -1696,7 +1709,7 @@ class SupsysticTables_Tables_Model_Tables extends SupsysticTables_Core_BaseModel
 		}
 		if(!empty($result)) {
 			$result = $result[0]->settings;
-			$resultWithSlashes = htmlspecialchars_decode($result, ENT_QUOTES);
+			$resultWithSlashes = htmlspecialchars_decode((string)$result, ENT_QUOTES);
 			$resultWithSlashes = $this->fixIncorrectSerialize($resultWithSlashes);
 			$result = unserialize($resultWithSlashes);
 		}
@@ -1717,7 +1730,7 @@ class SupsysticTables_Tables_Model_Tables extends SupsysticTables_Core_BaseModel
         }
         if (!empty($result)) {
 			$result = $result[0]->meta;
-			$resultWithSlashes = htmlspecialchars_decode($result, ENT_QUOTES);
+			$resultWithSlashes = htmlspecialchars_decode((string)$result, ENT_QUOTES);
 			$resultWithSlashes = $this->fixIncorrectSerialize($resultWithSlashes);
 			$result = unserialize($resultWithSlashes);
         }

@@ -2,88 +2,204 @@
 # This file is distributed under the same license as the Plugins - Enable Media Replace - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-09-08 17:00:16+0000\n"
+"PO-Revision-Date: 2023-04-24 17:17:29+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: GlotPress/4.0.0-alpha.1\n"
+"X-Generator: GlotPress/4.0.0-alpha.4\n"
 "Language: zh_TW\n"
 "Project-Id-Version: Plugins - Enable Media Replace - Stable (latest release)\n"
 
-#: views/prepare-remove-background.php:148
+#: classes/ViewController.php:105
+msgid "This error is shown because you try to move the image to another folder, which already has this file"
+msgstr "由於嘗試將圖片移動至其他資料夾，而目標資料夾已有這個檔案，因此顯示這個錯誤。"
+
+#: classes/ViewController.php:123
+msgid "Path: %s is not within basedir reported as: %s"
+msgstr "路徑 %s 不在系統回報為 %s 的 basedir 內"
+
+#: views/success.php:26
+msgid "( %s ) or %s click here to continue %s"
+msgstr "(%s) 或%s點擊這裡以繼續%s"
+
+#: views/success.php:25
+msgid "You will be redirect to the image screen in a few seconds."
+msgstr "即將將你重新導向至圖片畫面。"
+
+#: views/success.php:23
+msgid "Try the %sShortPixel Image Optimizer%s plugin!"
+msgstr "請試試 %sShortPixel Image Optimizer%s 外掛。"
+
+#: views/success.php:21
+msgid "Did you know that you can also optimize the images on your website to make them load faster?"
+msgstr "接下來還可以將網站上的圖片最佳化，讓載入圖片更快速。"
+
+#: views/success.php:19
+msgid "Your image has been successfully replaced!"
+msgstr "圖片已成功取代！"
+
+#: views/success.php:17
+msgid "Your image has been replaced!"
+msgstr "圖片已取代。"
+
+#: views/screen.php:232
+msgid "File is offloaded and can't be moved to other directory"
+msgstr "檔案已移轉，且無法移動至其他目錄。"
+
+#: views/screen.php:173
+msgid "Options"
+msgstr "選項"
+
+#: views/screen.php:69
+msgid "\t\t\tYou are about to replace %s in your media library. This will be %spermanent%s. %s You can click on the new image panel and select a file from your computer. You can also drag and drop a file into this window"
+msgstr "即將更換媒體庫中的 %s，這項操作%s無法還原%s。%s點擊新圖片面板並從個人裝置選取檔案，或將檔案拖放至新圖片區域。"
+
+#: views/screen.php:41
+msgid "Drop File"
+msgstr "置放檔案"
+
+#: views/prepare-remove-background.php:71
+msgid "Replace this image with another one instead!"
+msgstr "使用其他圖片更換這張圖片"
+
+#: views/error.php:30
+msgid "If you need help, please see the plugin %sdocumentation%s. It contains clear solutions to most of the problems you may encounter when using our plugin."
+msgstr "如需協助，請參考外掛的%s線上說明%s，其中包含使用我們的外掛時遇到問題時的明確解決方案。"
+
+#: views/error.php:26
+msgid "You can return to %s previous page %s"
+msgstr "請返回%s上一頁%s"
+
+#: views/error.php:18
+msgid "An error occured"
+msgstr "發生錯誤。"
+
+#: classes/ViewController.php:141
+msgid "An unknown error has occured"
+msgstr "發生未知的錯誤。"
+
+#: classes/ViewController.php:137
+msgid "Replacement Image could not be downloaded or does not exist"
+msgstr "更換檔案無法下載或不存在。"
+
+#: classes/ViewController.php:132
+msgid "This can happen when the window is open for a long time and/or there has been a timeout.  You can go back to previous screen and try again. If this happens each time when replacing, contact us"
+msgstr "視窗開啟過久或逾時時，便可能會發生這種狀況，請返回上一個畫面然後再試一次。如果更換圖片時持續發生這種狀況，請與我們聯絡。"
+
+#: classes/ViewController.php:131
+msgid "Fail to validate form nonce. Please try again"
+msgstr "單次有效隨機碼驗證失敗，請再試一次。"
+
+#: classes/ViewController.php:114
+msgid "Error updating WordPress post in the database"
+msgstr "更新資料庫中的 WordPress 文章時發生錯誤。"
+
+#: classes/ViewController.php:111
+msgid "Copying replacement file to destination failed"
+msgstr "複製更換檔案至目標位置時發生錯誤。"
+
+#: classes/ViewController.php:108
+msgid "Something went wrong while writing the file or directory"
+msgstr "寫入檔案或目錄時發生錯誤。"
+
+#: classes/ViewController.php:104
+msgid "The target file already exists in this directory. Please try another name / directory"
+msgstr "目標檔案已存在於這個目錄中，請使用其他名稱或目錄。"
+
+#: classes/ViewController.php:101
+msgid "The upload from your browser seem to have failed"
+msgstr "從瀏覽器上傳時發生錯誤。"
+
+#: classes/ViewController.php:98
+msgid "The file upload has been rejected for security reason. WordPress might not allow uploading this extension or filetype"
+msgstr "基於安全性考量，拒絕檔案上傳。WordPress 不接受上傳這種副檔名或檔案類型的檔案。"
+
+#: classes/ViewController.php:95
+msgid "Updating the WordPress attachment failed"
+msgstr "更新 WordPress 附件時發生錯誤。"
+
+#: classes/ViewController.php:92
+msgid "The custom time format submitted is invalid"
+msgstr "送出的自訂時間格式無效。"
+
+#: classes/ViewController.php:89
+msgid "The form submitted is missing various fields"
+msgstr "提交的表單缺少多個欄位。"
+
+#: classes/ViewController.php:86
+msgid "You don't have permission to edit this image"
+msgstr "目前的登入身分沒有編輯這張圖片的權限。"
+
+#: classes/ViewController.php:83
+msgid "You don't have permission to upload images. Please refer to your administrator"
+msgstr "目前的登入身分沒有上傳圖片的權限。請向網站管理員洽詢。"
+
+#: classes/uihelper.php:428
+msgid "Current"
+msgstr "目前圖片"
+
+#: classes/uihelper.php:423
+msgid "Click here to upload or drop file in area"
+msgstr "點擊這裡以上傳或將檔案拖放至這個區域"
+
+#: classes/uihelper.php:420
+msgid "New"
+msgstr "新圖片"
+
+#: classes/external/wp-offload.php:49 classes/external/wp-offload.php:59
+msgid "Your S3-Offload plugin version doesn't seem to be compatible. Please upgrade the S3-Offload plugin"
+msgstr "這個網站的 S3 移轉外掛版本似乎不相容，請更新 S3 移轉外掛。"
+
+#: classes/api.php:73
+msgid "No permission for user"
+msgstr "目前的使用者沒有權限。"
+
+#: views/prepare-remove-background.php:121
 msgid "Replace"
 msgstr "更換"
 
-#: views/prepare-remove-background.php:147
+#: classes/uihelper.php:428 views/prepare-remove-background.php:120
 msgid "Preview"
 msgstr "預覽"
 
-#: views/prepare-remove-background.php:142
-msgid "The shrunk image will be identical with the original and smaller in size. Use this when you do not want to loose any of the original image's details. Works best for technical drawings, clip art and comics."
-msgstr "壓縮過的圖片會與原始圖片完全相同，但檔案大小較小。如果不想失去原始圖片的細節，請使用這個壓縮方式。這種壓縮方式最適合用於技術繪圖、美工圖案​​及漫畫的圖片。"
-
-#: views/prepare-remove-background.php:139
-msgid "Lossless compression"
-msgstr "無損壓縮"
-
-#: views/prepare-remove-background.php:133
-msgid "Creates images that are almost pixel-perfect identical to the originals. Best option for photographers and other professionals that use very high quality images on their sites and want best compression while keeping the quality untouched."
-msgstr "這種壓縮方式能產生與原始圖片幾乎完全相同的圖片，是攝影師及其他專業人士的最佳選擇，它能讓網站上使用極高品質圖片及並想要最佳壓縮結果時保持圖片品質不變。"
-
-#: views/prepare-remove-background.php:130
-msgid "Glossy compression"
-msgstr "平衡壓縮"
-
-#: views/prepare-remove-background.php:124
-msgid "Lossy has a better compression rate than lossless compression. The resulting image is not 100% identical with the original. Works well for photos taken with your camera."
-msgstr "有損壓縮有著比無損壓縮更好的壓縮率，產生的圖片不會與原始圖片 100% 相同。這種壓縮方式適用於以相機拍攝的相片。"
-
-#: views/prepare-remove-background.php:121
-msgid "Lossy compression"
-msgstr "有損壓縮"
-
-#: views/prepare-remove-background.php:117
-msgid "Image Compression"
-msgstr "圖片壓縮"
-
-#: views/prepare-remove-background.php:106
+#: views/prepare-remove-background.php:108
 msgid "Opacity:"
 msgstr "不透明度:"
 
-#: views/prepare-remove-background.php:100
+#: views/prepare-remove-background.php:98
 msgid "Background Color:"
 msgstr "背景色彩:"
 
-#: views/prepare-remove-background.php:96
+#: views/prepare-remove-background.php:94
 msgid "If you select this option, the image will have a solid color background and you can choose the color code from the color picker below."
 msgstr "啟用這項設定後，使用者便能在下方色彩選擇器中選取色彩代碼，並產生對應色彩的純色背景圖片。"
 
-#: views/prepare-remove-background.php:93
+#: views/prepare-remove-background.php:91
 msgid "Solid background"
 msgstr "純色背景"
 
-#: views/prepare-remove-background.php:87
+#: views/prepare-remove-background.php:85
 msgid "Returns a transparent background if it is a PNG image, or a white one if it is a JPG image."
 msgstr "如果是 PNG 圖片，就產生透明背景；如果是 JPG 圖片，就產生白色背景。"
 
-#: views/prepare-remove-background.php:84
+#: views/prepare-remove-background.php:82
 msgid "Transparent/white background"
 msgstr "透明/白色背景"
 
-#: views/prepare-remove-background.php:80
+#: views/prepare-remove-background.php:78
 msgid "If a CDN is used, remember to clear the cache for this image!"
 msgstr "如果這個網站使用 CDN，請記得清除這張圖片的快取。"
 
-#: views/prepare-remove-background.php:77
+#: views/prepare-remove-background.php:75
 msgid "Background Removal Options"
 msgstr "背景移除選項"
 
-#: views/prepare-remove-background.php:68
+#: views/prepare-remove-background.php:64
 msgid "Report bad background removal"
 msgstr "回報移除背景功能未臻完善"
 
-#: views/prepare-remove-background.php:60
+#: views/prepare-remove-background.php:56
 msgid "Remove Media Background"
 msgstr "移除媒體背景"
 
@@ -95,118 +211,106 @@ msgstr "你好！%s在此向你回報外掛的背景移除功能未臻完善！%
 msgid "Bad remove of background report"
 msgstr "移除背景功能未臻完善報告"
 
-#: views/popup.php:239
+#: views/screen.php:227
 msgid "Place the newly uploaded file in this folder: "
 msgstr "新上傳檔案的儲存資料夾: "
 
-#: views/popup.php:167
+#: views/screen.php:147
 msgid "Note: This option requires you to upload a file of the same type (%s) as the file you want to replace. The attachment name will remain the same (%s) regardless of what the file you upload is called. If a CDN is used, remember to clear the cache for this image!"
 msgstr "注意事項: 使用這項設定需要使用者上傳與要更換的檔案相同檔案類型 (%s) 的檔案。無論上傳檔案的檔案名稱為何，附件名稱會保持不變 (%s)。如果這個網站使用 CDN，請記得清除這張圖片的快取。"
 
-#: views/popup.php:152
-msgid "Replace Options"
-msgstr "更換選項"
-
-#: views/popup.php:145
+#: views/screen.php:125
 msgid "Remove the background after replacing this image!"
 msgstr "更換這張圖片後移除背景"
 
-#: views/popup.php:141
+#: views/screen.php:121
 msgid "New! Click here to remove the background of this image!"
 msgstr "全新功能: 點擊這裡便能移除這張圖片的背景"
 
-#: views/popup.php:92
+#: views/screen.php:77
 msgid "The replacement file does not have the same file type. This can lead to unexpected issues ( %s )"
 msgstr "用於更換的檔案的檔案類型不相符。這會造成發生未預期的問題 (%s)。"
 
-#: views/popup.php:81
+#: views/screen.php:60
 msgid "Select Replacement Media"
 msgstr "選取要更換的媒體"
 
-#: views/do-replace-background.php:64
+#: views/do-replace-background.php:54
 msgid "Temp file does not exist"
 msgstr "暫存檔案不存在"
 
-#: views/do-replace-background.php:22
+#: views/do-replace-background.php:15
 msgid "Error while sending form (no key). Please try again."
 msgstr "傳送表單時發生錯誤 (沒有金鑰)。請再試一次。"
 
-#: views/do-replace-background.php:15
-msgid "Nonce in form failed. Go back, refresh and try again."
-msgstr "表單中的單次隨機碼失敗。請返回，重新整理並再試一次。"
-
-#: classes/uihelper.php:485
+#: classes/uihelper.php:518
 msgid "%s New Beta Feature! %s %s Enable Media Replace now gives you the ability to remove the background of any image. Try it out in the Media Library: hover over an image and click on Remove Background. Or just click on Remove background from the image editing window! %s  "
 msgstr "%s全新測試版功能！%s%sEnable Media Replace 現在可以讓網站擁有移除任何圖片背景的功能。請在 [媒體庫] 中使用這項功能，將游標暫留於圖片上，然後點擊 [移除背景]，或在圖片編輯視窗中點擊 [移除背景]。%s"
 
-#: classes/uihelper.php:434
+#: classes/uihelper.php:467
 msgid "Removing background..."
 msgstr "正在移除背景..."
 
-#: classes/replacer.php:334
+#: classes/replacer.php:345 classes/ViewController.php:117
 msgid "Specificed directory is outside the upload directory. This is not allowed for security reasons"
 msgstr "指定的目錄位於 uploads 目錄之外。基於安全性考量，不接受這樣的設定。"
 
-#: classes/emr-plugin.php:514
+#: classes/emr-plugin.php:577
 msgid "Remove  background"
 msgstr "移除背景"
 
-#: classes/emr-plugin.php:468
+#: classes/emr-plugin.php:531
 msgid "To remove the background, click the link."
 msgstr "如需移除背景，請點擊上方 [移除背景] 按鈕。"
 
-#: classes/emr-plugin.php:397
+#: classes/emr-plugin.php:461
 msgid "To remove the background, click the link and select the options."
 msgstr "如需移除背景，請點擊上方 [移除背景] 按鈕，並選取相關選項。"
 
-#: classes/emr-plugin.php:132 classes/emr-plugin.php:397
-#: classes/emr-plugin.php:466 classes/emr-plugin.php:468
+#: classes/emr-plugin.php:167 classes/emr-plugin.php:461
+#: classes/emr-plugin.php:529 classes/emr-plugin.php:531
 msgid "Remove background"
 msgstr "移除背景"
 
-#: classes/api.php:217
+#: classes/api.php:226
 msgid "Download failed"
 msgstr "下載時發生錯誤"
 
-#: classes/api.php:206
+#: classes/api.php:215
 msgid "This file seems not available anymore. Please try again"
 msgstr "這個檔案似乎無法再提供使用。請再試一次。"
 
-#: classes/api.php:182
+#: classes/api.php:191
 msgid "The background could not be removed in a reasonable amount of time. The file might be too big, or the API could be busy. Please try again later!"
 msgstr "無法在合理的時間內移除圖片背景，可能的原因為檔案太大或 API 處於忙碌的狀態，請稍後再試。"
 
-#: classes/api.php:64
+#: classes/api.php:66
 msgid "No attachment ID given"
 msgstr "找不到對應的附件 ID"
 
-#: build/shortpixel/notices/src/NoticeModel.php:229
+#: build/shortpixel/notices/src/NoticeModel.php:283
 msgid "Dismiss this notice"
 msgstr "關閉這項通知"
 
-#: views/upsell.php:135
+#: views/upsell.php:146
 msgid "Get Pro"
 msgstr "取得 Pro 版"
 
-#: views/upsell.php:128
+#: views/upsell.php:139
 msgid "Envira Gallery activated!"
 msgstr "Envira Gallery 已啟用。"
 
-#: views/upsell.php:126
+#: views/upsell.php:137
 msgid "Activate"
 msgstr "啟用"
 
-#: views/upsell.php:124
+#: views/upsell.php:135
 msgid "Install now"
 msgstr "立即安裝"
 
-#: views/upsell.php:115
+#: views/upsell.php:126
 msgid "Create beautiful, fast-loading photo & video galleries for your site in minutes."
 msgstr "僅需幾分鐘，便能為網站建立美觀、可快速載入的相片及影片圖庫"
-
-#: views/upsell.php:104
-msgid "GET AN ASSESSMENT FOR %s YOUR WEBSITE %s AND %s %s FIND OUT HOW TO MAKE IT FASTER %s"
-msgstr "獲得網站評估結果並找出為網站加速的方式"
 
 #: views/upsell.php:94
 msgid "Shortpixel Adaptive Images activated!"
@@ -248,23 +352,24 @@ msgstr "網站變慢了嗎？"
 msgid "ShortPixel Image Optimizer"
 msgstr "ShortPixel Image Optimizer"
 
-#: views/do-replace-background.php:27 views/upload.php:28
+#: views/do-replace-background.php:20
 msgid "Error in request. Please try again"
 msgstr "要求時發生錯誤。請再試一次。"
 
-#: views/popup.php:227
+#: views/screen.php:207
 msgid "Now"
 msgstr "現在時間"
 
-#: views/popup.php:211
+#: views/screen.php:191
 msgid "Replace the date with the current date %s(%s)%s"
 msgstr "使用目前日期 %s(%s)%s 取代舊版檔案日期"
 
-#: views/popup.php:170
+#: views/screen.php:150
 msgid "If you replace the file with a different filetype, this file might become unreadable and / or cause unexpected issues"
 msgstr "如果要將檔案更換為不同檔案類型，更換過後的檔案可能無法讀取或會造成未預期的問題。"
 
-#: views/do-replace-background.php:33 views/popup.php:35 views/upload.php:33
+#: classes/ViewController/ReplaceViewController.php:38
+#: views/do-replace-background.php:26
 msgid "You do not have permission to upload files for this author."
 msgstr "目前的登入身分沒有為這個作者上傳檔案的權限。"
 
@@ -272,202 +377,162 @@ msgstr "目前的登入身分沒有為這個作者上傳檔案的權限。"
 msgid "There was an error installing the addon. Please try again."
 msgstr "安裝附加元件時時發生錯誤。請再試一次。"
 
-#: classes/emr-plugin.php:271
+#: classes/emr-plugin.php:313
 msgid "Installing ..."
 msgstr "正在安裝..."
 
-#: views/popup.php:184
+#: views/screen.php:164
 msgid "Note: If you enable this option, the name and type of the file you are uploading will replace the old file. All links pointing to the current file (%s) will be updated to point to the new file name. (If other websites link directly to the file, those links will no longer work. Be careful!)"
 msgstr "注意事項: 啟用這項設定後，之後上傳的檔案的檔案名稱及檔案類型會更換舊版檔案。指向目前檔案 %s 的全部檔案都會重新指向新的檔案名稱。任何外部網站如果直接連結至舊版檔案，這些連結都會失效，請審慎使用。"
 
-#: views/popup.php:102
-msgid "Drop File Here"
-msgstr "將用於更換的檔案拖曳到這裡"
-
-#: build/shortpixel/notices/src/NoticeModel.php:220
+#: build/shortpixel/notices/src/NoticeModel.php:274
 msgid "Hide Details"
 msgstr "隱藏詳細資料"
 
-#: build/shortpixel/notices/src/NoticeModel.php:216
+#: build/shortpixel/notices/src/NoticeModel.php:270
 msgid "See Details"
 msgstr "查看詳細資料"
 
-#: classes/emr-plugin.php:582
+#: classes/emr-plugin.php:617
 msgid "Replaced By"
 msgstr "更換媒體檔案上傳者:"
 
-#: classes/replacer.php:393
+#: classes/replacer.php:404
 msgid "EMR could not establish a proper destination for replacement"
 msgstr "Enable Media Replace 無法為更換項目建立適當的目的地。"
 
-#: classes/replacer.php:363
+#: classes/replacer.php:374
 msgid "In specificied directory there is already a file with the same name. Can't replace."
 msgstr "指定目錄中已有相同檔名的檔案。無法更換檔案。"
 
-#: classes/replacer.php:340
+#: classes/replacer.php:351 classes/ViewController.php:127
 msgid "Specificed new directory does not exist. Path must be a relative path from the upload directory and exist"
 msgstr "指定目錄不存在。路徑必須是上傳目錄中已存在的相對路徑"
 
-#: views/upsell.php:106
-msgid "FIND OUT MORE"
-msgstr "進一步了解"
-
-#: views/popup.php:217
+#: views/screen.php:197
 msgid "Custom Date"
 msgstr "自訂日期"
 
-#: views/popup.php:213
+#: views/screen.php:193
 msgid "Set a Custom Date"
 msgstr "使用自訂日期"
 
-#: views/popup.php:212
+#: views/screen.php:192
 msgid "Keep the date %s(%s)%s"
 msgstr "使用舊版檔案日期%s(%s)%s"
 
-#: views/popup.php:209
+#: views/screen.php:189
 msgid "When replacing the media, do you want to:"
 msgstr "更換媒體檔案後的日期處理方式:"
 
-#: views/popup.php:193
-msgid "Date Options"
-msgstr "日期選項"
+#: views/screen.php:132
+msgid "Replacement Options"
+msgstr "更換方式選項"
 
-#: views/popup.php:96
+#: views/screen.php:81
 msgid "The replacement file type does not seem to be allowed by WordPress. This can lead to unexpected issues"
 msgstr "WordPress 不允許用於更換的媒體檔案的檔案類型。這會造成發生未預期的問題。"
 
-#: views/popup.php:89
+#: views/screen.php:74
 msgid "%s f %s exceeds the maximum upload size for this site."
 msgstr "%s f %s 超過這個網站的上傳檔案大小上限。"
 
-#: views/popup.php:88
+#: views/screen.php:73
 msgid "Maximum file size: <strong>%s</strong>"
 msgstr "檔案大小上限: <strong>%s</strong>"
 
-#: views/do-replace-background.php:82 views/upload.php:182
+#: views/do-replace-background.php:72
 msgid "File successfully replaced"
 msgstr "媒體檔案已成功更換。"
-
-#: views/upload.php:176
-msgid "File Upload seems to have failed. No files were returned by system"
-msgstr "檔案上傳已失敗。系統未傳回任何檔案。"
-
-#: views/upload.php:87
-msgid "Invalid Custom Date. Please check the custom date values: (%s)"
-msgstr "無效的自訂日期。請確認自訂日期的值是否正確 (%s)"
 
 #: build/shortpixel/log/src/DebugItem.php:35
 msgid "[Data]"
 msgstr "[Data]"
 
-#: views/popup.php:249 views/prepare-remove-background.php:149
+#: views/prepare-remove-background.php:122 views/screen.php:244
 msgid "Cancel"
 msgstr "取消"
 
-#: views/popup.php:248
+#: views/screen.php:243
 msgid "Upload"
 msgstr "上傳"
 
-#: views/popup.php:186
+#: views/screen.php:166
 msgid "Please note that if you upload a new image, only the embeds/links of the original size image will be replaced in your posts."
 msgstr "請注意，如果上傳新圖片，只會更換網站內容中原始尺寸圖片的內嵌內容/連結。"
 
-#: views/popup.php:181
+#: views/screen.php:161
 msgid "Replace the file, use the new file name, and update all links"
 msgstr "更換檔案，同時使用新的檔案名稱並更新全部連結"
 
-#: views/popup.php:163
+#: views/screen.php:143
 msgid "Just replace the file"
 msgstr "僅更換檔案"
 
-#: views/popup.php:87
-msgid "Choose a file to upload from your computer"
-msgstr "從個人裝置選取檔案以上傳"
-
-#: views/popup.php:83
+#: views/screen.php:63
 msgid "NOTE: You are about to replace the media file \"%s\". There is no undo. Think about it!"
 msgstr "注意: 即將更換媒體檔案 %s。這項操作無法復原，請詳加確認！"
 
-#: views/popup.php:66
+#: views/screen.php:43
 msgid "Replace Media Upload"
 msgstr "上傳用於更換的媒體檔案"
 
-#: classes/emr-plugin.php:571
+#: classes/emr-plugin.php:606
 msgid "Revised"
 msgstr "修改日期"
 
-#: classes/emr-plugin.php:568
+#: classes/emr-plugin.php:603
 msgid "M j, Y @ H:i"
 msgstr "Y 年 n 月 j 日a g:i"
 
-#: classes/emr-plugin.php:422 views/popup.php:229
+#: classes/emr-plugin.php:486 views/screen.php:209
 msgid "Original"
 msgstr "原始"
 
-#: classes/emr-plugin.php:412
+#: classes/emr-plugin.php:476
 msgid "Thumbnails were not generated"
 msgstr "縮圖未產生。"
 
-#: classes/emr-plugin.php:386 classes/emr-plugin.php:458
+#: classes/emr-plugin.php:450 classes/emr-plugin.php:521
 msgid "To replace the current file, click the link and upload a replacement file."
 msgstr "如需更換目前的媒體檔案，請點擊上方 [上傳新檔案] 按鈕，並上傳要用於更換的媒體檔案。"
 
-#: classes/emr-plugin.php:386 classes/emr-plugin.php:458
+#: classes/emr-plugin.php:450 classes/emr-plugin.php:521
 msgid "Upload a new file"
 msgstr "上傳新檔案"
 
-#: classes/emr-plugin.php:131 classes/emr-plugin.php:456
-#: classes/emr-plugin.php:510
+#: classes/emr-plugin.php:166 classes/emr-plugin.php:519
+#: classes/emr-plugin.php:573
 msgid "Replace media"
 msgstr "更換媒體檔案"
 
-#: classes/emr-plugin.php:371
+#: classes/emr-plugin.php:435
 msgid "Replaced Thumbnails Preview"
 msgstr "已更換圖片的縮圖預覽"
 
-#: classes/emr-plugin.php:368
+#: classes/emr-plugin.php:432
 msgid "Replace Media"
 msgstr "更換媒體檔案"
 
-#: classes/replacer.php:586
+#: build/shortpixel/replacer/src/Replacer.php:174 classes/replacer.php:612
 msgid "There was an issue with updating your image URLS: Search and replace have different amount of values. Aborting updating thumbnails"
 msgstr "更新圖片網址時發生問題: 搜尋及取代的值數量不同。中止更新縮圖。"
 
-#: classes/replacer.php:509
+#: build/shortpixel/replacer/src/Replacer.php:97 classes/replacer.php:519
 msgid "Fail Safe :: Source Location returned empty string. Not replacing content"
 msgstr "安全模式 :: 來源位置傳回空字串。沒有更換任何內容。"
 
-#: classes/replacer.php:502
+#: build/shortpixel/replacer/src/Replacer.php:90 classes/replacer.php:512
 msgid "Fail Safe :: Source Location seems to be a directory."
 msgstr "安全模式 :: 來源位置為目錄。"
 
-#: classes/replacer.php:142
+#: classes/replacer.php:148
 msgid "The uploaded file could not be moved to %1$s. This is most likely an issue with permissions, or upload failed."
 msgstr "無法將上傳的媒體檔案移動至 %1$s。可能的原因為權限問題或上傳失敗。"
 
-#: views/upload.php:135
-msgid "File type does not meet security guidelines. Try another."
-msgstr "檔案類型不符合安全性指導方針，請使用其他檔案。"
-
-#: views/popup.php:23 views/upload.php:13
+#: views/screen.php:28
 msgid "You do not have permission to upload files."
 msgstr "目前的登入身分沒有上傳檔案的權限。"
-
-#: views/notice.php:11
-msgid "More info"
-msgstr "進一步了解"
-
-#: views/notice.php:8
-msgid "<a href=\"https://shortpixel.com/wp/af/VKG6LYN28044\" target=\"_blank\">ShortPixel</a> is an image optimization plugin and if you have it activated, upon replacing an image in Enable Media Replace, the image will be also automatically optimized."
-msgstr "<a href=\"https://shortpixel.com/wp/af/VKG6LYN28044\" target=\"_blank\">ShortPixel</a> 是一款圖片最佳化外掛，安裝並啟用這個外掛後，在 Enable Media Replace 更換舊版圖片的同時，上傳的新版本圖片也會自動最佳化。"
-
-#: views/notice.php:6
-msgid "Enable Media Replace is now compatible with ShortPixel!"
-msgstr "Enable Media Replace 已與 ShortPixel 相容！"
-
-#: views/notice.php:2
-msgid "Dismiss"
-msgstr "關閉"
 
 #. Author URI of the plugin
 msgid "https://shortpixel.com"
@@ -486,5 +551,6 @@ msgid "https://wordpress.org/plugins/enable-media-replace/"
 msgstr "https://tw.wordpress.org/plugins/enable-media-replace/"
 
 #. Plugin Name of the plugin
+#: views/error.php:15 views/success.php:15
 msgid "Enable Media Replace"
 msgstr "Enable Media Replace"

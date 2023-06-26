@@ -83,6 +83,8 @@ function blocksy_render_sidebar() {
 
 				if (get_theme_mod('has_sticky_sidebar', 'no') === 'yes') {
 					if ($sidebar_stick_behavior === 'last_n_widgets') {
+						$sidebars_widgets = wp_get_sidebars_widgets();
+
 						$has_last_n_widgets = true;
 					}
 				}
@@ -130,10 +132,14 @@ if (! function_exists('blocksy_sidebar_render_dynamic_sidebar_hook')) {
 
 		$widget_index = array_search($widget_id, $reversed_widgets);
 
-		$sticky_widget_number = intval(get_theme_mod(
-			'sticky_widget_number',
-			1
-		));
+
+		$sticky_widget_number = min(
+			intval(get_theme_mod(
+				'sticky_widget_number',
+				1
+			)),
+			count($reversed_widgets)
+		);
 
 		if ($widget_index + 1 === $sticky_widget_number) {
 			echo '<div class="ct-sticky-widgets">';

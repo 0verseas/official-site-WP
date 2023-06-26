@@ -2,33 +2,7 @@
 define( 'WP_CACHE', true );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/** Enable W3 Total Cache */
-
-/** Enable W3 Total Cache */
-
-
-/** Enable W3 Total Cache */
-/** Enable W3 Total Cache */
-/**
+/*
  * The base configuration for WordPress
  *
  * The wp-config.php creation script uses this file during the installation.
@@ -150,9 +124,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
 
-define( 'DISALLOW_FILE_EDIT', true );   
+//define( 'DISALLOW_FILE_EDIT', true );   
+//@ini_set('session.cookie_httponly', true); 
+//@ini_set('session.cookie_secure', true); 
+//@ini_set('session.use_only_cookies', true);
 
+//define( 'COOKIE_DOMAIN', 'cmn-hant.overseas.ncnu.edu.tw' );
+//define( 'FORCE_SSL_ADMIN', true );
+//define( 'COOKIE_SECURE', true );
+//define( 'COOKIE_HTTPONLY', true );
 
+//define('FORCE_SSL_ADMIN', true);
+//define('ADMIN_COOKIE_PATH', '/wp-admin');
+//define('SECURE_AUTH_COOKIE', 'secure_auth');
+//define('LOGGED_IN_COOKIE', 'logged_in');
+//define('AUTH_COOKIE', 'auth');
+//define('TEST_COOKIE', 'test_cookie');
+//define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
+//define('COOKIEPATH', '/');
+//define('SITECOOKIEPATH', '/');
 
 
 

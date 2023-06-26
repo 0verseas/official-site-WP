@@ -195,6 +195,8 @@ wp.customize.bind('preview-ready', () => {
 			})
 
 			clearAstCache()
+
+			ctEvents.trigger('ct:sync:dynamic-css:updated')
 		}
 	)
 

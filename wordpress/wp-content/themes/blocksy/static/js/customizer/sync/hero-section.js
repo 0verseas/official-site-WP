@@ -14,7 +14,7 @@ const getMetaSpacingVariables = ({ prefix }) =>
 	[
 		{
 			key: 'author_social_channels',
-			selector: `[data-prefix="${prefix}"] .hero-section .author-box-social`,
+			selector: `[data-prefix="${prefix}"] .hero-section .author-box-socials`,
 		},
 
 		{
@@ -439,6 +439,18 @@ watchOptionsWithPrefix({
 						responsiveClassesFor(
 							singleLayer.description_visibility,
 							description
+						)
+					}
+				}
+
+				if (singleLayer.id === 'breadcrumbs') {
+					let breadcrumbs =
+						heroElementsContainer.querySelector('.ct-breadcrumbs')
+
+					if (singleLayer.enabled && breadcrumbs) {
+						responsiveClassesFor(
+							singleLayer.breadcrumbs_visibility,
+							breadcrumbs
 						)
 					}
 				}

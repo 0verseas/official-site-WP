@@ -210,6 +210,8 @@ add_filter(
 		$current_screen = get_current_screen();
 
 		if (
+			! $post
+			||
 			! $current_screen->is_block_editor()
 			||
 			get_current_screen()->base === 'widgets'
@@ -359,7 +361,7 @@ add_filter(
 
 		return [
 			'body' => $css,
-			'headers' => new Requests_Utility_CaseInsensitiveDictionary(),
+			'headers' => [],
 			'response' => [
 				'code' => 200,
 				'message' => 'OK',

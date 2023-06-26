@@ -27,10 +27,11 @@ function openPDLTab(evt, tabName) {
         $(document).on('click', '.pdl_notice .notice-dismiss, .pdl_notice .dismiss', function (event) {
             let data = {
                 action: 'pdl_dismiss_notice',
-                id: $(this).closest('div').attr('id')
+                id: $(this).closest('div').attr('id'),
+                nonce: pdl_notice.nonce
             };
 
-            $.post(ajaxurl, data, function (response) {
+            $.post(pdl_notice.ajaxurl, data, function (response) {
                 console.log(response, 'DONE!');
                 location.reload();
             });
@@ -38,10 +39,11 @@ function openPDLTab(evt, tabName) {
         $(document).on('click', '.pdl_notice .remind', function (event) {
             let data = {
                 action: 'pdl_later_notice',
-                id: $(this).closest('div').attr('id')
+                id: $(this).closest('div').attr('id'),
+                nonce: pdl_notice.nonce
             };
 
-            $.post(ajaxurl, data, function (response) {
+            $.post(pdl_notice.ajaxurl, data, function (response) {
                 console.log(response, 'DONE!');
                 location.reload();
             });

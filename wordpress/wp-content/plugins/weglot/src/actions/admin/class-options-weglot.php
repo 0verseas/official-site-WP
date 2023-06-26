@@ -50,7 +50,7 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 		add_action( 'admin_post_weglot_save_settings', array( $this, 'weglot_save_settings' ) );
 		$api_key = $this->option_services->get_api_key( true );
 		if ( empty( $api_key ) && ( ! isset( $_GET['page'] ) || strpos( $_GET['page'], 'weglot-settings' ) === false) ) { // phpcs:ignore
-			//We don't show the notice if we are on Weglot configuration
+			// We don't show the notice if we are on Weglot configuration.
 			add_action( 'admin_notices', array( '\WeglotWP\Notices\No_Configuration_Weglot', 'admin_notice' ) );
 		}
 	}

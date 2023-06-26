@@ -95,8 +95,7 @@ class SupsysticTables_Core_Module extends SupsysticTables_Core_BaseModule
 
       $environment = $this->getEnvironment();
       $path = $environment->getConfig()->get('plugin_url').'/app/assets/js/dtgsnonce.js';
-
-      if ( is_admin() && ( (current_user_can('administrator') || $userCanEdit) || empty($settings['access_roles']) ) ) {
+      if ( is_admin() && (current_user_can('administrator') || $userCanEdit) ) {
         $nonce = wp_create_nonce('dtgs_nonce');
         wp_register_script( 'dtgs_nonce', $path, array(), '0.01', true );
         wp_enqueue_script( 'dtgs_nonce' );

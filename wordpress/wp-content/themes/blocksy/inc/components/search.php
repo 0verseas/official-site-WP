@@ -1,5 +1,25 @@
 <?php
 
+function blocksy_isolated_get_search_form($args) {
+	if (class_exists('IS_Admin_Public')) {
+		remove_filter(
+			'get_search_form',
+			[\IS_Admin_Public::getInstance(), 'get_search_form'],
+			9999999
+		);
+	}
+
+	get_search_form($args);
+
+	if (class_exists('IS_Admin_Public')) {
+		add_filter(
+			'get_search_form',
+			[\IS_Admin_Public::getInstance(), 'get_search_form'],
+			9999999
+		);
+	}
+}
+
 add_filter(
 	'rest_post_query',
 	function ($args, $request) {
@@ -70,11 +90,7 @@ add_filter(
 				$args['meta_query'] = $meta_query;
 			}
 
-			if (
-				function_exists('wc_get_product_visibility_term_ids')
-				&&
-				count($args['post_type']) === 1
-			) {
+			if (function_exists('wc_get_product_visibility_term_ids')) {
 				$product_visibility_term_ids = wc_get_product_visibility_term_ids();
 
 				$tax_query = [];
@@ -160,6 +176,29 @@ if (!is_admin()) {
 						);
 
 						$query->set('meta_query', $meta_query);
+					}
+
+					if (function_exists('wc_get_product_visibility_term_ids')) {
+						$product_visibility_term_ids = wc_get_product_visibility_term_ids();
+
+						$tax_query = [];
+
+						if (! empty($query->get('tax_query'))) {
+							$tax_query = $query->get('tax_query');
+						}
+
+						$tax_query['relation'] = 'AND';
+
+						$tax_query[] = [
+							[
+								'taxonomy' => 'product_visibility',
+								'field' => 'term_taxonomy_id',
+								'terms' => $product_visibility_term_ids['exclude-from-search'],
+								'operator' => 'NOT IN',
+							]
+						];
+
+						$query->set('tax_query', $tax_query);
 					}
 				}
 			}

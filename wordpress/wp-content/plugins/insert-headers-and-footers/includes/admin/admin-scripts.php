@@ -1,6 +1,8 @@
 <?php
 /**
  * Load scripts for the admin area.
+ *
+ * @package WPCode
  */
 
 add_action( 'admin_enqueue_scripts', 'wpcode_admin_scripts' );
@@ -53,6 +55,8 @@ function wpcode_admin_scripts() {
 /**
  * Scripts needed outside the WPCode admin area (e.g. metabox).
  *
+ * @param string $version The version of the scripts to load. Default is 'lite'.
+ *
  * @return void
  */
 function wpcode_admin_scripts_global( $version = 'lite' ) {
@@ -78,19 +82,6 @@ function wpcode_admin_scripts_global( $version = 'lite' ) {
 	wp_enqueue_style( 'wpcode-admin-global-css', WPCODE_PLUGIN_URL . "build/admin-global-{$version}.css", null, $asset['version'] );
 
 	wp_enqueue_script( 'wpcode-admin-global-js', WPCODE_PLUGIN_URL . "build/admin-global-{$version}.js", $asset['dependencies'], $asset['version'], true );
-
-	wp_localize_script(
-		'wpcode-admin-global-js',
-		'wpcode',
-		apply_filters(
-			'wpcode_admin_global_js_data',
-			array(
-				'nonce'            => wp_create_nonce( 'wpcode_admin' ),
-				'post_id'          => get_the_ID(),
-				'locations_number' => wpcode_get_auto_insert_locations_with_number(),
-			)
-		)
-	);
 }
 
 /**

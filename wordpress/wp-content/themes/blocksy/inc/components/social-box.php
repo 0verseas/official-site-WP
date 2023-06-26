@@ -9,7 +9,12 @@ if (! function_exists('blocksy_social_icons')) {
 				'type' => 'simple',
 				'size' => 'custom',
 				'fill' => false,
-				'hide_labels' => true,
+				'label_attr' => [],
+				'label_visibility' => [
+				  'desktop' => false,
+				  'tablet' => false,
+				  'mobile' => false,
+				],
 				'links_target' => false,
 				'links_rel' => false
 			]
@@ -33,7 +38,8 @@ if (! function_exists('blocksy_social_icons')) {
 		return blocksy_get_social_box([
 			'attr' => $attr,
 			'socials' => $socials_descriptor,
-			'hide_labels' => $args['hide_labels'],
+			'label_attr' => $args['label_attr'],
+			'label_visibility' => $args['label_visibility'],
 			'links_target' => $args['links_target'],
 			'links_rel' => $args['links_rel']
 		]);
@@ -902,6 +908,8 @@ function blocksy_get_social_metadata($args = []) {
 			$args['social'] === 'email'
 			&&
 			strpos($single_metadata['url'], 'mailto:') === false
+			&&
+			strpos($single_metadata['url'], '@') !== false
 		) {
 			$single_metadata['url'] = 'mailto:' . $single_metadata['url'];
 		}
@@ -1087,7 +1095,12 @@ function blocksy_get_social_box($args = []) {
 
 			'after_links_content' => '',
 			'has_count' => false,
-			'hide_labels' => false,
+			'label_attr' => [],
+			'label_visibility' => [
+				'desktop' => false,
+				'tablet' => false,
+				'mobile' => false,
+			],
 			'root_class' => 'ct-social-box',
 			'force_output' => false,
 			'custom_share_url' => '',
@@ -1301,11 +1314,21 @@ function blocksy_get_social_box($args = []) {
 						$attr['rel'] = trim($attr['rel']);
 					}
 
-					$label_attr = ['class' => 'ct-label'];
+					$class = 'ct-label';
 
-					if ($args['hide_labels']) {
-						$label_attr['hidden'] = '';
+					if (isset($args['label_attr']['class'])) {
+						if (! empty($args['label_attr']['class'])) {
+							$class .= ' ' . $args['label_attr']['class'];
+						}
 					}
+
+					$class .= ' ' . blocksy_visibility_classes(
+						$args['label_visibility']
+					);
+
+					$label_attr = $args['label_attr'];
+
+					$label_attr['class'] = $class;
 				?>
 
 				<a <?php echo blocksy_attr_to_html($attr) ?>>
@@ -1341,11 +1364,17 @@ function blocksy_get_social_box($args = []) {
 							echo $icon;
 
 							if ($args['type'] === 'url') {
-								echo blocksy_html_tag(
-									'span',
-									$label_attr,
-									$metadata['name']
-								);
+								if (
+									blocksy_some_device($args['label_visibility'])
+									||
+									is_customize_preview()
+								) {
+									echo blocksy_html_tag(
+										'span',
+										$label_attr,
+										$metadata['name']
+									);
+								}
 							}
 						}
 					?>

@@ -2,9 +2,9 @@
 Contributors: remyb92, gmulti, wysija, wpr0ck, glx77
 Tags: translate, multilingual, language, translation, localization, multilingual SEO, languages, translator, website translation, multilanguage, international, traduction
 Requires at least: 4.5
-Tested up to: 6.0
+Tested up to: 6.2
 Requires PHP: 7.0
-Stable tag: 3.9.2
+Stable tag: 4.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -210,8 +210,10 @@ See changelog for upgrade changes.
 
 == Changelog ==
 
-= 3.9.2 (30/01/2023) =
-* Bug: hotfix js file
+= 4.0.2 (30/05/2023) =
+* Update: Change PHP_INT_MAX to 200 in class-pages-weglot.php
+* Bug: Add esc_url to $_SERVER['REQUEST_URI'] on class-translate-paghe-weglot.com
+* Bug: Aria-expanded label remains true when it should say false on switcher
 
 = Older versions =
 

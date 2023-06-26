@@ -110,6 +110,15 @@ if (blocksy_default_akg('header_button_nofollow', $atts, 'no') === 'yes') {
 	$link_attr['rel'] = trim($link_attr['rel']);
 }
 
+if (blocksy_default_akg('header_button_sponsored', $atts, 'no') === 'yes') {
+	if (! isset($link_attr['rel'])) {
+		$link_attr['rel'] = '';
+	}
+
+	$link_attr['rel'] .= ' sponsored';
+	$link_attr['rel'] = trim($link_attr['rel']);
+}
+
 
 $button_class = 'ct-button';
 

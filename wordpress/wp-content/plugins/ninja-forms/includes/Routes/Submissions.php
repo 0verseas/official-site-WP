@@ -174,7 +174,7 @@ final class NF_Routes_Submissions extends NF_Abstracts_Routes
             ],
             'callback' => [ $this, 'delete_download_file' ],
             // Uses the same permissions as the `download-all` request
-            'permission_callback' => [ $this, 'get_submissions_permission_callback' ],
+            'permission_callback' => [ $this, 'delete_submissions_files_permission_callback' ],
         ));
 
         register_rest_route('ninja-forms-submissions', 'set-submissions-settings', array(
@@ -329,6 +329,37 @@ final class NF_Routes_Submissions extends NF_Abstracts_Routes
 		 * @param WP_REST_Request $request The current request
 		 */
 		return apply_filters( 'ninja_forms_api_allow_handle_extra_submission', $allowed, $request );
+    }
+
+    /**
+     * Secure endpoint to allowed users and uploads folder
+     * 
+     * Used to delete files from the uploads directory. Tmp file in our case
+     *
+     * @since 3.6.25
+     *
+     * Already passed Nonce validation via wp_rest and x_wp_nonce header checked
+     * against rest_cookie_check_errors()
+     */
+    public function delete_submissions_files_permission_callback(WP_REST_Request $request) {
+        
+        //Set default to false
+        $allowed = false;
+
+        // Allow users with manage_options capability and only within wp_upload_dir
+        $permissionLevel = 'manage_options'; 
+        $dir = wp_get_upload_dir();
+        $fileinfo = pathinfo(json_decode($request->get_body())->file_path);
+        $allowed_dir = $dir['basedir'] . '/ninja-forms-tmp' === $fileinfo['dirname'];
+        $allowed = \current_user_can($permissionLevel) && $allowed_dir;
+        
+		/**
+		 * Filter permissions for deleting files from the uploads directory. Tmp file in our case
+		 *
+		 * @param bool $allowed Is request authorized?
+		 * @param WP_REST_Request $request The current request
+		 */
+		return apply_filters( 'ninja_forms_api_allow_delete_current_uploads_file', $allowed, $request );
     }
 
     /**
@@ -526,12 +557,33 @@ final class NF_Routes_Submissions extends NF_Abstracts_Routes
         if( !isset($data) || empty($form) || empty($sub) ) {
             return new WP_Error( 'malformed_request', __('This request is missing data', 'ninja-forms') );
         }
+
+        $data_send = [
+            'fields'    => [],
+            'fields_by_key' => []
+        ];
+        foreach($field_values as $index => $field_value){   
+            $id = str_replace('_field_', '', $index);
+            $model = Ninja_Forms()->form($data->formID)->get_field( $id );
+            $settings = $model->get_settings();
+            if($id === $index){
+                $data_send['fields_by_key'][$id] = $settings;
+                $data_send['fields_by_key'][$id]['settings'] = $settings;
+                $data_send['fields_by_key'][$id]['value'] = $field_value;
+                $data_send['fields_by_key'][$id]['settings']['value'] = $field_value;
+            } else {
+                $data_send['fields'][$id] = $settings;
+                $data_send['fields'][$id]['settings'] = $settings;
+                $data_send['fields'][$id]['value'] = $field_value;
+                $data_send['fields'][$id]['settings']['value'] = $field_value;
+            }
+        }
         
         //Process Merge tags       
         $action_settings = $this->process_merge_tags( $data->action_settings, $data->formID, $sub );
         //Process Email Action
         $email_action = new NF_Actions_Email();
-        $result = $email_action->process( (array) $action_settings, $data->formID, (array) $field_values );
+        $result = $email_action->process( (array) $action_settings, $data->formID, $data_send );
 
         //Return true if wp_mail returned true or the submission ID if it failed.
         $return = !empty($result['actions']['email']['sent']) && true === $result['actions']['email']['sent'] ? $result['actions']['email']['sent'] : $sub->get_seq_num();
@@ -557,13 +609,13 @@ final class NF_Routes_Submissions extends NF_Abstracts_Routes
         //Process Fields Merge Tags
         $fields = Ninja_Forms()->form( $form_id )->get_fields();
         $fields = new NF_Adapters_SubmissionsSubmission( $fields, $form_id, $sub );
-        foreach( $fields as $field_id => $field){
+        foreach( $fields as $field ){
             $fields_merge_tag_object->add_field( $field );
         }
         //Add All Fields merge tags
         $fields_merge_tag_object->include_all_fields_merge_tags();
         //include fields to the {all_fields_table} and {fields_table} mrerge tags
-        foreach( $fields as $field_id => $field){
+        foreach( $fields as $field ){
             $fields_merge_tag_object->add_field( $field );
         }
         //Loop through Action settings and apply merge tags

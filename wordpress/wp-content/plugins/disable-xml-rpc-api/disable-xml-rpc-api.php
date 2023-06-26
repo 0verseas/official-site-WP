@@ -3,9 +3,9 @@
 Plugin Name: Disable XML-RPC-API
 Plugin URI: https://neatma.com/dsxmlrpc-plugin/
 Description: Lightweight plugin to disable XML-RPC API and Pingbacks,Trackbacks for faster and more secure website.
-Version: 2.1.4.7
-Tested up to: 6.1
-Requires at least: 3.5
+Version: 2.1.4.8
+Tested up to: 6.2
+Requires at least: 4.8
 Author: Neatma
 Author URI: https://neatma.com/
 License: GPLv2
@@ -449,7 +449,7 @@ allow from all
         if ($this->get_option('slow-heartbeat')) {
             add_filter('heartbeat_settings', [$this, 'slow_heartbeat']);
         }
-
+		
         /* Disable wp-json rest api */
         if ($this->get_option('json-rest-api')) {
             add_filter('rest_authentication_errors', function ($result) {
@@ -457,7 +457,7 @@ allow from all
                     return $result;
                 }
                 if (!is_user_logged_in()) {
-                    return new WP_Error('restx_logged_out', 'Sorry, you must be logged in to make a request.', array('status' => 401));
+                    return new \WP_Error('restx_logged_out', 'Sorry, you must be logged in to make a request.', array('status' => 401));
                 }
                 return $result;
             });

@@ -104,12 +104,12 @@ class Shortcode
         if ($plgSettings->enableGlobalEmbedResize) {
             $default = [
                 'width'  => $plgSettings->enableEmbedResizeWidth,
-                'height' => $plgSettings->enableEmbedResizeHeight
+                'height' => $plgSettings->enableEmbedResizeHeight,
+                'powered_by' => !empty($plgSettings->embedpress_document_powered_by) ? $plgSettings->embedpress_document_powered_by : 'no',
             ];
         }
         $attributes = wp_parse_args($attributes, $default);
         $embed = self::parseContent($subject, true, $attributes);
-
 
         return is_object($embed) ? $embed->embed : $embed;
     }
@@ -145,14 +145,6 @@ class Shortcode
 
             $content_uid = md5($url);
 
-            //$hash = 'embedpress_'.$content_uid . md5( implode( ':', array_values( $customAttributes)));
-
-            // check if we have data cached
-            //@TODO; add caching later and remove caching on settings save
-            //if ( $embed = get_transient( $hash) ) {
-            //    $embed = apply_filters( 'embedpress:onAfterEmbed', $embed );
-            //	return $embed;
-            //}
             self::$ombed_attributes = self::parseContentAttributes($customAttributes, $content_uid);
 
 
@@ -197,8 +189,12 @@ class Shortcode
             //foreach ( self::$ombed_attributes as $attrName => $attrValue ) {
             //    $attributesHtml[] = $attrName . '="' . $attrValue . '"';
             //}
+            if (isset($customAttributes['height'])) {
+                $height = $customAttributes['height']; 
+            }
+
             if (isset($customAttributes['width'])) {
-                $attributesHtml[] = "style=\"width:{$customAttributes['width']}px; max-width:100%; height: 100%; display:inline-block;\"";
+                $attributesHtml[] = "style=\"width:{$customAttributes['width']}px; height:{$customAttributes['height']}px; max-height:{$height}px; max-width:100%; display:inline-block;\"";
             }
 
             // Check if $url is a google shortened url and tries to extract from it which Google service it refers to.
@@ -345,6 +341,16 @@ KAMAL;
 
                 $embed = self::modify_spotify_content($embed);
                 $embed = apply_filters('embedpress:onAfterEmbed', $embed);
+
+                // Attributes to remove
+                $attributesToRemove = 'autoplay;';
+            
+                // New attribute to add
+                $newAttribute = 'encrypted-media;'.'accelerometer;'.'autoplay;'.'clipboard-write;'.'gyroscope;'.'picture-in-picture';
+                
+                // Remove existing attributes
+                $embed->embed = str_replace($attributesToRemove, $newAttribute, $embed->embed);
+                
                 return $embed;
             }
         }
@@ -900,9 +906,15 @@ KAMAL;
             'presentation' => isset($attributes['presentation']) ? $attributes['presentation'] : 'true',
             'download' => isset($attributes['download']) ? $attributes['download'] : 'true',
             'copy_text' => isset($attributes['copy_text']) ? $attributes['copy_text'] : 'true',
+            'add_text' => isset($attributes['add_text']) ? $attributes['add_text'] : 'true',
+            'draw' => isset($attributes['draw']) ? $attributes['draw'] : 'true',
             'doc_rotation' => isset($attributes['doc_rotation']) ? $attributes['doc_rotation'] : 'true',
             'doc_details' => isset($attributes['doc_details']) ? $attributes['doc_details'] : 'true',
         );
+
+        if($urlParamData['themeMode'] == 'custom') {
+            $urlParamData['customColor'] = isset($attributes['custom_color']) ? $attributes['custom_color'] : '#333333';
+        }
 
         return "#". http_build_query($urlParamData);
     }
@@ -911,12 +923,18 @@ KAMAL;
     {
         $plgSettings = Core::getSettings();
 
-
         $default = [
             'width'  => $plgSettings->enableEmbedResizeWidth,
-            'height' => $plgSettings->enableEmbedResizeHeight,
-            'powered_by' => 'no',
+            'height' => $plgSettings->enableEmbedResizeHeight, 
+            'powered_by' => !empty($plgSettings->embedpress_document_powered_by) ? $plgSettings->embedpress_document_powered_by : 'no',
         ];
+
+        if(!empty($plgSettings->pdf_custom_color_settings)){
+             $default['theme_mode'] = 'custom';
+        }
+        if(isset($default['theme_mode']) && $default['theme_mode'] == 'custom' ){
+            $default['custom_color'] = $plgSettings->custom_color;
+        }
 
         $attributes = wp_parse_args($attributes, $default);
 
@@ -935,20 +953,22 @@ KAMAL;
                 <?php if ($url != '') {
                             if (self::is_pdf($url) && !self::is_external_url($url)) {
                                 $renderer = Helper::get_pdf_renderer();
-                                $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . $url.self::getParamData($attributes);
+                                $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($url).self::getParamData($attributes);
                                 ?>
-                        <iframe style="<?php echo esc_attr($dimension); ?>; max-width:100%; display: inline-block" data-emsrc="<?php echo esc_attr($url); ?>" data-emid="<?php echo esc_attr($id); ?>" class="embedpress-embed-document-pdf <?php echo esc_attr($id); ?>" src="<?php echo esc_attr($src); ?>" frameborder="0"></iframe>
+                        <iframe title="<?php echo esc_attr(Helper::get_file_title($url)); ?>" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" title="" style="<?php echo esc_attr($dimension); ?>; max-width:100%; display: inline-block" data-emsrc="<?php echo esc_attr($url); ?>" data-emid="<?php echo esc_attr($id); ?>" class="embedpress-embed-document-pdf <?php echo esc_attr($id); ?>" src="<?php echo esc_attr($src); ?>" frameborder="0"></iframe>
                     <?php
 
                                 } else {
                                     ?>
                         <div>
-                            <iframe allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" style="<?php echo esc_attr($dimension); ?>; max-width:100%;" src="<?php echo esc_url($url); ?>" data-emsrc="<?php echo esc_attr($url); ?>" data-emid="<?php echo esc_attr($id); ?>" class="embedpress-embed-document-pdf <?php echo esc_attr($id); ?>"></iframe>
+                            <iframe title="<?php echo esc_attr(Helper::get_file_title($url)); ?>" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" style="<?php echo esc_attr($dimension); ?>; max-width:100%;" src="<?php echo esc_url($url); ?>" data-emsrc="<?php echo esc_attr($url); ?>" data-emid="<?php echo esc_attr($id); ?>" class="embedpress-embed-document-pdf <?php echo esc_attr($id); ?>"></iframe>
                         </div>
 
                 <?php
+               
                             }
-                            if ($attributes['powered_by'] === 'yes') {
+                            
+                            if (!empty($attributes['powered_by']) && $attributes['powered_by'] === 'yes') {
                                 printf('<p class="embedpress-el-powered">%s</p>', __('Powered By EmbedPress', 'embedpress'));
                             }
                         }

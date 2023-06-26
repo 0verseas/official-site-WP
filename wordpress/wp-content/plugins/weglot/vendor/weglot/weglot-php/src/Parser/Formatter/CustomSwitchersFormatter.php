@@ -73,8 +73,8 @@ class CustomSwitchersFormatter {
     public function handle( $dom, $switchers ) {
         $temp_switcher = "";
         foreach ( $switchers as $switcher ) {
-            $location = $switcher['location'];
-            if ( ! empty( $location ) ) {
+            $location      = ! empty( $switcher['location'] ) ? $switcher['location'] : '';
+            if ( ! empty( $location ) && ! isset( $switcher['template'] ) ) {
                 //we check if we find the target location
                 if ( $dom->find( $location['target'] ) && is_array( $dom->find( $location['target'] ) ) ) {
                     foreach ( $dom->find( $location['target'] ) as $target ) {

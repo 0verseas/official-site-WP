@@ -42,16 +42,14 @@ class Helper_Flag_Type {
 		switch ( (int) $number ) {
 			case 0:
 				return self::RECTANGLE_MAT;
-				break;
 			case 1:
 				return self::SHINY;
-				break;
 			case 2:
 				return self::SQUARE;
-				break;
 			case 3:
 				return self::CIRCLE;
-				break;
+			default:
+				return self::RECTANGLE_MAT;
 		}
 	}
 
@@ -70,6 +68,8 @@ class Helper_Flag_Type {
 				return 2;
 			case self::CIRCLE:
 				return 3;
+			default:
+				return 0;
 		}
 	}
 

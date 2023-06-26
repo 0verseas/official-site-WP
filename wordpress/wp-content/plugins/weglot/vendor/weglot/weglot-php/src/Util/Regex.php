@@ -9,7 +9,16 @@ use Weglot\Util\Regex\RegexEnum;
  * @package Weglot\Util
  */
 class Regex {
-	/**
+    /**
+     * @var string
+     */
+    private $type;
+    /**
+     * @var string
+     */
+    private $value;
+
+    /**
 	 * @param string $type
 	 * @param string $value
 	 */

@@ -35,7 +35,18 @@ add_action('cfw_checkout_main_container_start', function($widget) {
 }, 10, 1);
 
 add_action('wp', function () {
+	$has_custom_checkout = true;
+
 	if (class_exists('FluidCheckout')) {
+		$has_custom_checkout = false;
+	}
+
+	$has_custom_checkout = apply_filters(
+		'blocksy:woocommerce:checkout:has-custom-markup',
+		$has_custom_checkout
+	);
+
+	if (! $has_custom_checkout) {
 		return;
 	}
 

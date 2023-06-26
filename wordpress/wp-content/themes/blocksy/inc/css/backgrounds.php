@@ -2,14 +2,28 @@
 
 if (! function_exists('blocksy_values_are_similar')) {
 	function blocksy_values_are_similar($actual, $expected) {
-		if (!is_array($expected) || !is_array($actual)) return $actual === $expected;
+		if (! is_array($expected) || ! is_array($actual)) {
+			return $actual === $expected;
+		}
 
 		foreach ($expected as $key => $value) {
-			if (! blocksy_values_are_similar($actual[$key], $expected[$key])) return false;
+			if (! isset($actual[$key]) && ! $value) {
+				$actual[$key] = $value;
+			}
+
+			if (! blocksy_values_are_similar($actual[$key], $expected[$key])) {
+				return false;
+			}
 		}
 
 		foreach ($actual as $key => $value) {
-			if (! blocksy_values_are_similar($actual[$key], $expected[$key])) return false;
+			if (! isset($expected[$key]) && ! $value) {
+				$expected[$key] = $value;
+			}
+
+			if (! blocksy_values_are_similar($actual[$key], $expected[$key])) {
+				return false;
+			}
 		}
 
 		return true;

@@ -20,7 +20,7 @@ $pages = get_pages(
 $page_choices_result = [];
 
 $page_choices = array(
-	'' => __('No page set', 'woocommerce')
+	'' => __('No page set', 'blocksy')
 ) + array_combine(
 	array_map(
 		'strval',
@@ -1077,7 +1077,7 @@ $options = [
 							'value' => sprintf(
 								__(
 									'I have read and agree to the website %s',
-									'woocommerce'
+									'blocksy'
 								),
 								'[terms]'
 							),

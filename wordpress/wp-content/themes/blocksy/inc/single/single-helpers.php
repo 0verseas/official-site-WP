@@ -182,9 +182,13 @@ if (! function_exists('blocksy_author_social_channels')) {
 		echo blocksy_html_tag(
 			'div',
 			[
-				'class' => 'author-box-social'
+				'class' => 'author-box-socials'
 			],
-			implode(' ', $outputs)
+			blocksy_html_tag(
+				'span',
+				[],
+				implode(' ', $outputs)
+			)
 		);
 	}
 }

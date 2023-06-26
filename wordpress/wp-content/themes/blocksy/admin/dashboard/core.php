@@ -35,22 +35,6 @@ class Blocksy_Dashboard_Page {
 			5
 		);
 
-		add_action('admin_init', function () {
-			global $pagenow;
-
-			if ("themes.php" == $pagenow && is_admin() && isset($_GET['activated'])) {
-				$url = apply_filters(
-					'blocksy:dashboard:redirect-after-activation',
-					add_query_arg(
-						'page',
-						$this->page_slug, admin_url('themes.php')
-					)
-				);
-
-				wp_redirect(esc_url_raw($url));
-			}
-		});
-
 		if (is_admin() && defined('DOING_AJAX') && DOING_AJAX) {
 			$plugins_api = new Blocksy_Admin_Dashboard_API_Premium_Plugins();
 			$plugins_api->attach_ajax_actions();

@@ -36,6 +36,15 @@ abstract class WPCode_Conditional_Type {
 	 */
 	public function __construct() {
 		$this->register_type();
+		$this->hooks();
+	}
+
+	/**
+	 * Register conditional-logic hooks specific to each type (e.g. ajax callbacks).
+	 *
+	 * @return void
+	 */
+	public function hooks() {
 	}
 
 	/**
@@ -185,6 +194,9 @@ abstract class WPCode_Conditional_Type {
 			}
 
 			return in_array( $value2, $value1 );
+		}
+		if ( is_array( $value2 ) ) {
+			return in_array( $value1, $value2 );
 		}
 
 		return $value1 == $value2;

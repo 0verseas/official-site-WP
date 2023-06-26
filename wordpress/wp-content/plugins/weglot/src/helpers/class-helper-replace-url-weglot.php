@@ -27,6 +27,8 @@ class Helper_Replace_Url_Weglot {
 			'canonical' => '/<link rel="canonical"(.*?)?href=(\"|\')([^\s\>]+?)(\"|\')/',
 			'amp'       => '/<link rel="amphtml"(.*?)?href=(\"|\')([^\s\>]+?)(\"|\')/',
 			'meta'      => '/<meta property="og:url"(.*?)?content=(\"|\')([^\s\>]+?)(\"|\')/',
+			'next' => '/<link rel="next"(.*?)?href=(\"|\')([^\s\>]+?)(\"|\')/',
+			'prev' => '/<link rel="prev"(.*?)?href=(\"|\')([^\s\>]+?)(\"|\')/',
 		);
 
 		return apply_filters( 'weglot_get_replace_modify_link', $data );

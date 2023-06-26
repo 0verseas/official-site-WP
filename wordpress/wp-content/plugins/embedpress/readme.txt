@@ -1,12 +1,12 @@
-=== EmbedPress – Embed Google Docs, YouTube, Maps, Vimeo, Wistia Videos & Upload PDF, PPT in Gutenberg & Elementor ===
+=== EmbedPress - Embed PDF, YouTube, Google Docs, Vimeo, Wistia Videos, Audios, Maps & Any Documents in Gutenberg & Elementor ===
 Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, seakashdiu, alimuzzamanalim
 Author: WPDeveloper
 Author URI: https://wpdeveloper.com
 Tags: embed, embed youtube, gutenberg embed, pdf, doc, docs, ppt, elementor embed, video embed, Google Doc, map embed, youTube Embed, content embed, iframes, vimeo embed, wistia, google sheet, youtube player, block editor, embed wordpress, elementor, WPML, Meetup, Boomplay, PDF Logo
 Requires at least: 4.6
-Tested up to: 6.1
+Tested up to: 6.2
 Requires PHP: 5.6
-Stable tag: 3.6.6
+Stable tag: 3.8.0
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -14,7 +14,7 @@ EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC
 
 == Description ==
 
-= EMBEDPRESS – EMBED ANYTHING FROM 150+ SOURCES -  YOUTUBE, GOOGLE DOCS, DRIVE, MAPS, VIMEO, WISTIA, SPOTIFY, BOOMPLAY, PDF, PPT ETC & DISPLAY IT USING ELEMENTOR, BLOCK EDITOR, CLASSIC EDITOR & MORE =
+= EMBEDPRESS – EMBED ANYTHING FROM 150+ SOURCES -  EMBED YOUTUBE, GOOGLE DOCS, DRIVE, MAPS, VIMEO, WISTIA, SPOTIFY, BOOMPLAY, PDF, PPT ETC & DISPLAY IT USING ELEMENTOR, BLOCK EDITOR, CLASSIC EDITOR & MORE =
 
 [EmbedPress](https://embedpress.com/) lets you embed any engaging and interactive multimedia content such as videos, images, posts, audio, maps, documents, PDF, and much more into your WordPress site with one click and showcase it beautifully for your website visitors.
 
@@ -382,8 +382,56 @@ Not at all. You can set up everything your team needs without any coding knowled
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+= [3.8.0] - 2023-06-25 =
+* Added: Custom Video/Audio player.
+* Added: Self hosted audio/video embedding support. 
+* Fixed: PHP 8.2 compatibility issues.
+* Fixed: Spotify country restricted videos aren’t playing.
+* Improved: Password protected content for Security Enhancement (Reported by Wordfence on 23rd June). 
+* Few minor bug fixes and improvements. 
+
+= [3.7.3] - 2023-06-06 =
+* Added: Github Gist Embedding.
+* Added: NRK Radio Embedding.
+* Added: ACF support for Elementor dynamic fields.
+* Improved: PDF embedding download controls.
+* Few minor bug fix and improvements.
+
+= [3.7.2] - 2023-05-25 =
+* Fixed: Youtube channel embedding issues.
+* Improved: Documents embedding in both Gutenberg & Elementor.
+* Few minor bug fix and improvements.
+
+= [3.7.1] - 2023-05-08 =
+* Added: Youtube live stream embedding with channel handler. 
+* Fixed: Social Share redirection.
+* Fixed: Height width wasn’t working in Elementor documents widget.
+* Fixed: Conflict with Ninja table pro plugin. 
+* Few minor bug fix and improvements.
+
+= [3.7.0] - 2023-04-17 =
+* Added: Social Share for all Embedded contents.
+* Added: Images/Videos embedding from google drive. 
+* Fixed: Google spreadsheet embedding wasn't working in Elementor.
+* Few minor bug fix and improvements.
+
+= [3.6.8] - 2023-03-29 =
+* Added: Custom Google map embedding support.
+* Fixed: OpenSea long token design broken issue.
+* Fixed: Responsive issues for Youtube Channel embedding.
+* Fixed: Branding text control wasn’t working for Classic Editor.
+* Improved: Disabled PDF print/download using keyboard shortcut.
+* Few minor bug fix and improvements.
+
+= [3.6.7] - 2023-03-09 =
+* Added: Draw, Text & Toolbar color changing control in PDF embedding.
+* Fixed: Wistia height-wight issues.
+* Fixed: MeetUp embedding issues.
+* Improvement: iFrame Titles & Accessibility.
+* Few minor bug fixes and improvements.
+
 = [3.6.6] - 2023-02-07 =
-* Fixed: Conflict with few Elementor based plugins. 
+* Fixed: Conflict with few Elementor based plugins.
 * Few minor bug fixes and improvements.
 
 = [3.6.5] - 2023-02-06 =
@@ -403,9 +451,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Few minor bug fixes and improvements.
 
 = [3.6.3] - 2022-12-14 =
-* Added: OpenSea single asset with advanced controls. 
-* Fixed: Print & Download button wasnt showing with Shortcode. 
-* Fixed: PDF control wasnt working while embeding PDF from multiple sources.  
+* Added: OpenSea single asset with advanced controls.
+* Fixed: Print & Download button wasnt showing with Shortcode.
+* Fixed: PDF control wasnt working while embeding PDF from multiple sources.
 * Fixed: Instagram embidding in Classic Editor.
 * Few minor bug fixes and improvements.
 

@@ -425,7 +425,7 @@ class Parser {
 
         // checkers
         if(!empty( $this->whiteList)){
-            list( $nodes, $regexes ) = $this->checkers( $dom, $source, true );
+            list( $nodes, $regexes ) = $this->checkers( $dom, $source );
         }else{
             list( $nodes, $regexes ) = $this->checkers( $dom, $source );
         }

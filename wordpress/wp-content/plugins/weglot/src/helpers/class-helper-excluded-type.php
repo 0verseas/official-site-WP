@@ -44,6 +44,8 @@ class Helper_Excluded_Type {
 				return __( 'URL is exactly', 'weglot' );
 			case RegexEnum::MATCH_REGEX:
 				return __( 'URL matches regex', 'weglot' );
+			default:
+				return '';
 		}
 	}
 }

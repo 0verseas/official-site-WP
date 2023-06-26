@@ -7,7 +7,7 @@ Author: Weglot Translate team
 Author URI: https://weglot.com/
 Text Domain: weglot
 Domain Path: /languages/
-Version: 3.9.2
+Version: 4.0.2
 */
 
 /**
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WEGLOT_NAME', 'Weglot' );
 define( 'WEGLOT_SLUG', 'weglot-translate' );
 define( 'WEGLOT_OPTION_GROUP', 'group-weglot-translate' );
-define( 'WEGLOT_VERSION', '3.9.2' );
+define( 'WEGLOT_VERSION', '4.0.2' );
 define( 'WEGLOT_PHP_MIN', '5.6' );
 define( 'WEGLOT_BNAME', plugin_basename( __FILE__ ) );
 define( 'WEGLOT_DIR', __DIR__ );
@@ -96,7 +96,8 @@ function weglot_is_compatible() {
 function gtranslate_is_active() {
 	// Check gtranslate is active.
 	if ( is_plugin_active( 'gtranslate/gtranslate.php' ) ) {
-		add_action( 'admin_notices', 'weglot_gtranslate_activate' );
+		remove_action( 'admin_notices', 'gt_admin_notices');
+		add_action( 'admin_notices', 'weglot_gtranslate_activate', PHP_INT_MAX );
 	}
 }
 

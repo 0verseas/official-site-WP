@@ -112,7 +112,14 @@ function getAppendSelectorFor(layoutEl) {
 	if (layoutEl.classList.contains('products')) {
 		let layoutIndex = [...layoutEl.parentNode.children].indexOf(layoutEl)
 
-		return `#main .products:nth-child(${layoutIndex + 1}) > li`
+		const hasMoreThanOneProductsList =
+			layoutEl.closest('#main').querySelectorAll('.products').length > 1
+
+		if (hasMoreThanOneProductsList) {
+			return `#main .products:nth-child(${layoutIndex + 1}) > li`
+		}
+
+		return `#main .products > li`
 	}
 
 	return `section > .entries > *`

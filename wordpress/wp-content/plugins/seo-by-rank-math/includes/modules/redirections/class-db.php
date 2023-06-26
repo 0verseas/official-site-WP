@@ -81,6 +81,7 @@ class DB {
 		if ( ! empty( $args['search'] ) ) {
 			$table->whereLike( 'sources', $args['search'] );
 			$table->orWhereLike( 'url_to', $args['search'] );
+			$table->where( 'status', $status[0], $status[1] );
 		}
 
 		if ( ! empty( $args['orderby'] ) && in_array( $args['orderby'], [ 'id', 'url_to', 'header_code', 'hits', 'created', 'last_accessed' ], true ) ) {
@@ -310,7 +311,7 @@ class DB {
 	/**
 	 * Get stats for dashboard widget.
 	 *
-	 * @return int
+	 * @return object
 	 */
 	public static function get_stats() {
 		return self::table()->selectCount( '*', 'total' )->selectSum( 'hits', 'hits' )->one();

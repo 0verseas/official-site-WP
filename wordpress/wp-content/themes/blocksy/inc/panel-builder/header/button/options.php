@@ -92,6 +92,12 @@ $options = [
 							'value' => 'no',
 						],
 
+						'header_button_sponsored' => [
+							'type'  => 'ct-switch',
+							'label' => __( 'Set link to sponsored', 'blocksy' ),
+							'value' => 'no',
+						],
+
 					],
 				],
 

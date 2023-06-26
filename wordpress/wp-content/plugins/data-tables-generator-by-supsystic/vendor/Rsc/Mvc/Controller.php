@@ -1,6 +1,6 @@
 <?php
 
-
+#[AllowDynamicProperties]
 class RscDtgs_Mvc_Controller
 {
 

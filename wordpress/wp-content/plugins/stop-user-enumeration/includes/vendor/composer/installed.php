@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'fullworks/stop-user-enumeration',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '4c2918dfff1cb1b93d20fbcb6083644537abc733',
+        'pretty_version' => '1.4.7.x-dev',
+        'version' => '1.4.7.9999999-dev',
+        'reference' => 'd767c399d1eb56e8534f0105b1fecd53d75c44dd',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'alanef/plugindonation_lib' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '6fe8152ef59ef20616b2828a2b21db5e0b541f8c',
+            'reference' => 'b1fec29bbe5575c3ad8a87a6db7626dee1042a44',
             'type' => 'library',
             'install_path' => __DIR__ . '/../alanef/plugindonation_lib',
             'aliases' => array(
@@ -31,9 +31,9 @@
             'dev_requirement' => false,
         ),
         'fullworks/stop-user-enumeration' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '4c2918dfff1cb1b93d20fbcb6083644537abc733',
+            'pretty_version' => '1.4.7.x-dev',
+            'version' => '1.4.7.9999999-dev',
+            'reference' => 'd767c399d1eb56e8534f0105b1fecd53d75c44dd',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../../',
             'aliases' => array(),
@@ -46,9 +46,9 @@
             ),
         ),
         'squizlabs/php_codesniffer' => array(
-            'pretty_version' => '3.7.1',
-            'version' => '3.7.1.0',
-            'reference' => '1359e176e9307e906dc3d890bcc9603ff6d90619',
+            'pretty_version' => '3.7.2',
+            'version' => '3.7.2.0',
+            'reference' => 'ed8e00df0a83aa96acf703f8c2979ff33341f879',
             'type' => 'library',
             'install_path' => __DIR__ . '/../squizlabs/php_codesniffer',
             'aliases' => array(),

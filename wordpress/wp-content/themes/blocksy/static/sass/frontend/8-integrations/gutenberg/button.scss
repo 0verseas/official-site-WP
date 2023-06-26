@@ -5,3 +5,12 @@
 		padding: var(--button-padding);
 	}
 }
+
+
+// inherit font weight from button options
+.wp-block-button[style*="font-weight"] {
+
+	.wp-block-button__link {
+		font-weight: inherit;
+	}
+}

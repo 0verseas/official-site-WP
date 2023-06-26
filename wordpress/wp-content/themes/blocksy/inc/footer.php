@@ -57,5 +57,5 @@ add_action('wp_body_open', function () {
 	if (! is_admin()) {
 		blocksy_output_drawer_canvas();
 	}
-});
+}, 60);
 

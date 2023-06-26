@@ -31,7 +31,11 @@ add_action('woocommerce_post_class', function ($classes) {
 
 	$ajax_add_to_cart_id = 'has_ajax_add_to_cart';
 
-	if (get_theme_mod($ajax_add_to_cart_id, 'no') === 'yes') {
+	if (
+		get_theme_mod($ajax_add_to_cart_id, 'no') === 'yes'
+		&&
+		get_option('woocommerce_cart_redirect_after_add', 'no') === 'no'	
+	) {
 		$classes[] = 'ct-ajax-add-to-cart';
 	}
 

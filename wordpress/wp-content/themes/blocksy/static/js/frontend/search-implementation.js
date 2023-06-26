@@ -3,6 +3,7 @@ import { h } from 'dom-chef'
 import classnames from 'classnames'
 
 import { loadStyle } from '../helpers'
+import { isIosDevice } from './helpers/is-ios-device'
 
 let alreadyRunning = false
 
@@ -306,7 +307,9 @@ export const mount = (formEl, args = {}) => {
 								})
 						}
 
-						window.scrollTo(0, 0)
+						if (isIosDevice()) {
+							window.scrollTo(0, 0)
+						}
 					}
 
 					alreadyRunning = false

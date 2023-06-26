@@ -37,7 +37,7 @@ class Front_Enqueue_Weglot implements Hooks_Interface_Weglot {
 	public function hooks() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'weglot_wp_enqueue_scripts' ) );
 		add_action( 'login_enqueue_scripts', array( $this, 'weglot_wp_enqueue_scripts' ) );
-		add_action( 'wp_footer', array( $this, 'weglot_pageviews_script' ) );
+		add_action( 'wp_footer', array( $this, 'weglot_pageviews_script' ) ); // @phpstan-ignore-line
 	}
 
 	/**
@@ -47,11 +47,9 @@ class Front_Enqueue_Weglot implements Hooks_Interface_Weglot {
 	 */
 	public function weglot_pageviews_script() {
 		$options = $this->option_services->get_options();
-		if ( $options['page_views_enabled'] ) {
-			?>
-			<script>
+		$pageviews_script = "<script>
 				var request = new XMLHttpRequest();
-				var url = 'ht' + 'tps:' + '//' + 'cdn-api.weglot.com/' + 'pageviews?api_key=' + '<?php echo esc_js( $options['api_key'] )?>';
+				var url = 'ht' + 'tps:' + '//' + 'cdn-api.weglot.com/' + 'pageviews?api_key=' + 'esc_js(" . $options['api_key'] . " )';
 				var data = JSON.stringify({
 						url: location.protocol + '//' + location.host + location.pathname,
 						language: document.getElementsByTagName('html')[0].getAttribute('lang'),
@@ -60,8 +58,12 @@ class Front_Enqueue_Weglot implements Hooks_Interface_Weglot {
 				);
 				request.open('POST', url , true);
 				request.send(data);
-			</script>
-		<?php }
+			</script>";
+		if ( $options['page_views_enabled'] ) {
+			return $pageviews_script;
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -71,7 +73,7 @@ class Front_Enqueue_Weglot implements Hooks_Interface_Weglot {
 	 * @see wp_enqueue_scripts
 	 */
 	public function weglot_wp_enqueue_scripts() {
-		// Add JS
+		// Add JS.
 		wp_register_script( 'wp-weglot-js', WEGLOT_URL_DIST . '/front-js.js', false, WEGLOT_VERSION, false );
 		wp_enqueue_script( 'wp-weglot-js' );
 

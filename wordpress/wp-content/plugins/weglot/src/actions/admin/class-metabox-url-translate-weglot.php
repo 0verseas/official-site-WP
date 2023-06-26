@@ -68,6 +68,6 @@ class Metabox_Url_Translate_Weglot implements Hooks_Interface_Weglot {
 		if ( ! $post ) {
 			return;
 		}
-		echo sprintf( esc_html__( 'The translation URL feature is now available in your Weglot account (Requires Advanced plan minimum) : %1$sTranslate URL slugs%2$s.', 'weglot' ), '<a target="_blank" href="https://dashboard.weglot.com/translations/slugs/">', '</a>' );
+		echo sprintf( esc_html__( 'The translation URL feature is now available in your Weglot account (Requires Pro plan minimum) : %1$sTranslate URL slugs%2$s.', 'weglot' ), '<a target="_blank" href="https://dashboard.weglot.com/translations/slugs/">', '</a>' );
 	}
 }

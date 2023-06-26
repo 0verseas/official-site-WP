@@ -1,8 +1,8 @@
 <?php
+
+use EmbedPress\Includes\Classes\Helper;
+
 // Exit if accessed directly.
-
-use EmbedPress\Providers\Youtube;
-
 if (!defined('ABSPATH')) {
 	exit;
 }
@@ -11,114 +11,158 @@ if (!defined('ABSPATH')) {
  * @param array $attributes
  */
 
-//Custom Logo 
-function customLogo($embedHTML, $atts){
+if(!function_exists('lock_content_form_handler')){
+	add_action('wp_ajax_lock_content_form_handler', 'lock_content_form_handler');
+	add_action('wp_ajax_nopriv_lock_content_form_handler', 'lock_content_form_handler');
 
-	
+	function lock_content_form_handler() {
+		// print_r($embedHTML);
 
+		$client_id = isset($_POST['client_id']) ? $_POST['client_id'] : '';
+		$password = isset($_POST['password']) ? $_POST['password'] : '';
+		$epbase64 = isset($_POST['epbase']) ? $_POST['epbase'] : '';
+		$hash_key = isset($_POST['hash_key']) ? $_POST['hash_key'] : '';
 
-	$x = !empty($atts['logoX']) ? $atts['logoX'] : 0;
-	$y = !empty($atts['logoY']) ? $atts['logoY'] : 0;
-	$uniqid = !empty($atts['url'])? '.ose-uid-' . md5($atts['url']): '';
-	
-	$brandUrl = !empty($atts['customlogoUrl']) ? $atts['customlogoUrl'] : '';
-	$opacity = !empty($atts['logoOpacity']) ? $atts['logoOpacity'] : '';
-	
-	$cssClass = !empty( $atts['url'] ) ? '.ose-uid-' . md5( $atts['url'] ) : '.ose-youtube';
-
+		// echo $client_id;
 
 
-	ob_start(); ?>
-	<style type="text/css">
-		<?php echo esc_html($cssClass); ?>
-		{
-			position: relative;
+		// Set the decryption key and initialization vector (IV)
+		$key = Helper::get_hash();
+
+		// Decode the base64 encoded cipher
+		$cipher = base64_decode($epbase64);
+		// Decrypt the cipher using AES-128-CBC encryption
+
+		$wp_pass_key = hash('sha256', wp_salt(32) . md5($password));
+		$iv = substr($wp_pass_key, 0, 16);
+
+		if ($wp_pass_key === $hash_key) {
+			setcookie("password_correct_", $password, time()+3600);
+
+			$embed = openssl_decrypt($cipher, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv) . '<script>
+			var now = new Date();
+			var time = now.getTime();
+			var expireTime = time + 1000 * 60 * 60 * 24 * 30;
+			now.setTime(expireTime);
+			document.cookie = "password_correct_'.$client_id.'='.$hash_key.'; expires=" + now.toUTCString() + "; path=/";
+		</script>';
+
 		}
-		
-		<?php echo esc_html($cssClass); ?> .watermark {
-			border: 0;
-			position: absolute;
-			bottom: <?php echo esc_html($y); ?>%;
-			right: <?php echo esc_html($x); ?>%;
-			max-width: 150px;
-			max-height: 75px;
-			opacity: 0.25;
-			z-index: 5;
-			-o-transition: opacity 0.5s ease-in-out;
-			-moz-transition: opacity 0.5s ease-in-out;
-			-webkit-transition: opacity 0.5s ease-in-out;
-			transition: opacity 0.5s ease-in-out;
-			opacity: <?php echo esc_html($opacity); ?>;
+		else{
+			$embed = 0;
 		}
 
-		<?php echo esc_html($cssClass); ?>
-		.watermark:hover {
-			opacity: 1;
-		}
-	</style>
-	<?php 
+		// Process the form data and return a response
+		$response = array(
+		'success' => true,
+		'password' => $password,
+		'embedHtml' => $embed
+		);
 
+		echo json_encode($response);
 
-	$style = ob_get_clean();
-
-	if ( ! class_exists( '\simple_html_dom' ) ) {
-		include_once EMBEDPRESS_PATH_CORE . 'simple_html_dom.php';
+		wp_die();
 	}
-
-	$cta    = '';
-	$img = '';
-
-	if(!empty($atts['customlogo'])){
-		$img = '<img src="'.esc_url($atts['customlogo']).'"/>';
-
-		$imgDom = str_get_html( $img );
-		$imgDom = $imgDom->find( 'img', 0 );
-		$imgDom->setAttribute( 'class', 'watermark ep-custom-logo' );
-		$imgDom->removeAttribute( 'style' );
-		$imgDom->setAttribute( 'width', 'auto' );
-		$imgDom->setAttribute( 'height', 'auto' );
-		ob_start();
-		echo $imgDom;
-
-		$cta .= ob_get_clean();
-
-		$imgDom->clear();
-		unset( $img, $imgDom );	
-
-		if ( !empty($brandUrl) ) {
-			$cta = '<a href="'.esc_url($brandUrl).'" target="_blank">'.$cta.'</a>';
-		}
-		$dom     = str_get_html( $embedHTML );		
-
-		$wrapDiv = $dom->find( $uniqid, 0 );		
-
-		if ( ! empty( $wrapDiv ) && is_object( $wrapDiv ) ) {
-			$wrapDiv->innertext .= $cta;
-		}
-
-		ob_start();
-		echo $wrapDiv;
-		
-		$markup = ob_get_clean();
-		
-		$dom->clear();
-		unset( $dom, $wrapDiv );
-
-		$embedHTML = $style . $markup;
-
-	}
-
-	return $embedHTML;
-
 }
+
 
 function embedpress_render_block($attributes)
 {
-	
+
+	$client_id = !empty($attributes['clientId']) ? md5($attributes['clientId']) : '';
+	$block_id = !empty($attributes['clientId']) ? $attributes['clientId'] : '';
+	$custom_player = !empty($attributes['customPlayer']) ? $attributes['customPlayer'] : 0;
+
+
+	$_custom_player = '';
+	$_player_options = '';
+
+	if (!empty($custom_player)) {
+
+		$is_self_hosted = Helper::check_media_format($attributes['url']);
+
+
+		$_custom_player = 'data-playerid="' . esc_attr($client_id) . '"';
+		$player_preset = !empty($attributes['playerPreset']) ? $attributes['playerPreset'] : 'preset-default';
+		$player_color = !empty($attributes['playerColor']) ? $attributes['playerColor'] : '';
+		$poster_thumbnail = !empty($attributes['posterThumbnail']) ? $attributes['posterThumbnail'] : '';
+		$player_pip = !empty($attributes['playerPip']) ? true : false;
+		$player_restart = !empty($attributes['playerRestart']) ? true : false;
+		$player_rewind = !empty($attributes['playerRewind']) ? true : false;
+		$player_fastForward = !empty($attributes['playerFastForward']) ? true : false;
+		$player_tooltip = !empty($attributes['playerTooltip']) ? true : false;
+		$player_hide_controls = !empty($attributes['playerHideControls']) ? true : false;
+		$player_download = !empty($attributes['playerDownload']) ? true : false;
+
+		$playerOptions = [
+			'rewind' => $player_rewind,
+			'restart' => $player_restart,
+			'pip' => $player_pip,
+			'poster_thumbnail' => $poster_thumbnail,
+			'player_color' => $player_color,
+			'player_preset' => $player_preset,
+			'fast_forward' => $player_fastForward,
+			'player_tooltip' => $player_tooltip,
+			'hide_controls' => $player_hide_controls,
+			'download' => $player_download,
+		];
+
+		if(!empty($attributes['fullscreen'])){
+			$playerOptions['fullscreen'] = $attributes['fullscreen'];
+		}
+
+		if(!empty($is_self_hosted['selhosted'])){
+			$playerOptions['self_hosted'] = $is_self_hosted['selhosted'];
+			$playerOptions['hosted_format'] = $is_self_hosted['format'];
+		}
+
+		//Youtube options
+		if(!empty($attributes['starttime'])){
+			$playerOptions['start'] = $attributes['starttime'];
+		}
+		if(!empty($attributes['endtime'])){
+			$playerOptions['end'] = $attributes['endtime'];
+		}
+		if(!empty($attributes['relatedvideos'])){
+			$playerOptions['rel'] = $attributes['relatedvideos'];
+		}
+
+		//vimeo options
+		if(!empty($attributes['vstarttime'])){
+			$playerOptions['t'] = $attributes['vstarttime'];
+		}
+		if(!empty($attributes['vautoplay'])){
+			$playerOptions['vautoplay'] = $attributes['vautoplay'];
+		}
+		if(!empty($attributes['vautopause'])){
+			$playerOptions['autopause'] = $attributes['vautopause'];
+		}
+		if(!empty($attributes['vdnt'])){
+			$playerOptions['dnt'] = $attributes['vdnt'];
+		}
+
+		$playerOptionsString = json_encode($playerOptions);
+		$_player_options = 'data-options=\'' . htmlentities($playerOptionsString, ENT_QUOTES) . '\'';
+	}
+
+	$pass_hash_key = isset($attributes['contentPassword']) ? md5($attributes['contentPassword']): '';
 
 	if (!empty($attributes['embedHTML'])) {
-		$embed         = apply_filters('embedpress_gutenberg_embed', $attributes['embedHTML'], $attributes);
-	
+		$embed  = apply_filters('embedpress_gutenberg_embed', $attributes['embedHTML'], $attributes);
+
+		$content_share_class = '';
+		$share_position_class = '';
+		$share_position = isset($attributes['sharePosition']) ? $attributes['sharePosition'] : 'right';
+
+		if(!empty($attributes['contentShare'])) {
+			$content_share_class = 'ep-content-share-enabled';
+			$share_position_class = 'ep-share-position-'.$share_position;
+		}
+		$content_protection_class = '';
+		if(!empty($attributes['lockContent']) && !empty($attributes['contentPassword'])) {
+			$content_protection_class = 'ep-content-protection-enabled';
+		}
+
 		$aligns = [
 			'left' => 'alignleft',
 			'right' => 'alignright',
@@ -131,22 +175,49 @@ function embedpress_render_block($attributes)
 		} else {
 			$alignment = 'aligncenter'; // default alignment is center in js, so keeping same here
 		}
-		$embed = customLogo($embed, $attributes);
+		$embed = Helper::customLogo($embed, $attributes);
+		$url = !empty($attributes['href']) ? $attributes['href'] : '';
 
 		ob_start();
 		?>
-		<div class="embedpress-gutenberg-wrapper">
-			<div class="wp-block-embed__wrapper <?php echo esc_attr($alignment) ?> <?php if($attributes['videosize'] == 'responsive') echo 'ep-video-responsive'; ?>">
-				<?php echo $embed; ?>
+		<div class="embedpress-gutenberg-wrapper <?php echo  esc_attr( $alignment.' '.$content_share_class.' '.$share_position_class.' '.$content_protection_class);  ?>" id="<?php echo esc_attr($block_id); ?>">
+			<?php
+				$share_position = isset($attributes['sharePosition']) ? $attributes['sharePosition'] : 'right';
+				$custom_thumbnail = isset($attributes['customThumbnail']) ? $attributes['customThumbnail'] : '';
+			?>
+			<div class="wp-block-embed__wrapper <?php if(!empty($attributes['contentShare'])) echo esc_attr( 'position-'.$share_position.'-wraper'); ?>  <?php if($attributes['videosize'] == 'responsive') echo esc_attr( 'ep-video-responsive' ); ?>">
+				<div id="ep-gutenberg-content-<?php echo esc_attr( $client_id )?>" class="ep-gutenberg-content">
+					<div class="ep-embed-content-wraper <?php !empty($custom_player) ? esc_attr_e($player_preset) : ''; ?>" <?php echo $_custom_player; ?> <?php echo $_player_options; ?>>
+						<?php
+							$hash_pass = hash('sha256', wp_salt(32) . md5($attributes['contentPassword']));
+							$password_correct = isset($_COOKIE['password_correct_'.$client_id]) ? $_COOKIE['password_correct_'.$client_id] : '';
+							if(empty($attributes['lockContent']) || empty($attributes['contentPassword'])  || (!empty(Helper::is_password_correct($client_id)) && ($hash_pass === $password_correct)) ){
+
+								if(!empty($attributes['contentShare'])) {
+									$content_id = $attributes['clientId'];
+									$embed .= Helper::embed_content_share($content_id, $attributes);
+								}
+								echo $embed;
+							} else {
+								if(!empty($attributes['contentShare'])) {
+									$content_id = $attributes['clientId'];
+									$embed .= Helper::embed_content_share($content_id, $attributes);
+								}
+								Helper::display_password_form($client_id, $embed, $pass_hash_key, $attributes);
+							}
+						?>
+					</div>
+				</div>
 			</div>
 		</div>
-<?php
-
-
+		<?php
 
 		echo embedpress_render_block_style($attributes);
 
+
 		return ob_get_clean();
+
+
 	}
 }
 
@@ -156,8 +227,61 @@ function embedpress_render_block($attributes)
 
 function embedpress_render_block_style($attributes)
 {
-	
+
 	$uniqid = !empty($attributes['url']) ? '.ose-uid-' . md5($attributes['url']) : '';
+	$client_id = !empty($attributes['clientId']) ? $attributes['clientId'] : '';
+
+	$custom_player = !empty($attributes['customPlayer']) ? $attributes['customPlayer'] : 0;
+	$player_color = !empty($attributes['playerColor']) ? $attributes['playerColor'] : '';
+	$player_pip = !empty($attributes['playerPip']) ? 'block' : 'none';
+	$logoX = !empty($attributes['logoX']) ? $attributes['logoX'] : 5;
+	$logoY = !empty($attributes['logoY']) ? $attributes['logoX'] : 10;
+	$player_pip = !empty($attributes['playerPip']) ? 'block' : 'none';
+
+	$playerStyle = '';
+
+	if (!empty($custom_player)) {
+		$playerStyle = '
+		[data-playerid="' . md5($client_id). '"] {
+			--plyr-color-main: ' . ($player_color && strlen($player_color) === 7
+				? 'rgba(' . hexdec(substr($player_color, 1, 2)) . ', ' . hexdec(substr($player_color, 3, 2)) . ', ' . hexdec(substr($player_color, 5, 2)) . ', .8)!important;'
+				: 'rgba(0, 0, 0, .8)!important;'
+			) . ';
+		}
+		[data-playerid="' . md5($client_id). '"].custom-player-preset-3, [data-playerid="' . md5($client_id). '"].custom-player-preset-4 {
+			--plyr-color-main: ' . ($player_color && strlen($player_color) === 7
+				? 'rgb(' . hexdec(substr($player_color, 1, 2)) . ', ' . hexdec(substr($player_color, 3, 2)) . ', ' . hexdec(substr($player_color, 5, 2)) . ')!important;'
+				: 'rgba(0, 0, 0, .8)!important;'
+			) . ';
+		}
+		[data-playerid="' . md5($client_id). '"] [data-plyr="pip"] {
+			display: '.$player_pip.';
+		}
+
+		[data-playerid="' . md5($client_id). '"] .plyr{
+			width: ' . esc_attr($attributes['width']) . 'px !important;
+			height: ' . esc_attr($attributes['height']) . 'px!important;
+			max-height: ' . esc_attr($attributes['height']) . 'px!important;
+		}
+
+		[data-playerid="' . md5($client_id). '"] img.watermark {
+			border: 0;
+			position: absolute;
+			bottom: '.$logoY.'%;
+			right: '.$logoX.'%;
+			max-width: 150px;
+			max-height: 75px;
+			opacity: 1;
+			-o-transition: opacity 0.5s ease-in-out;
+			-moz-transition: opacity 0.5s ease-in-out;
+			-webkit-transition: opacity 0.5s ease-in-out;
+			transition: opacity 0.5s ease-in-out;
+			z-index:1;
+		}
+
+		';
+	}
+
 
 	$_iscustomlogo = '';
 
@@ -196,26 +320,33 @@ function embedpress_render_block_style($attributes)
 			display: none;
 		}
 		'.$_iscustomlogo.'
-
+		'.$playerStyle.'
 
 	</style>';
 
 	if($attributes['videosize'] == 'responsive') {
+
+		$width = isset($attributes['width']) ? $attributes['width'] : 600;
+		$height = $width * (9/16);
+
+
 		$youtubeStyles = '<style>
 		' . esc_attr($uniqid) . ' {
 			position: relative;
 			width: ' . esc_attr($attributes['width']) . 'px !important;
-			height: 0;
-			padding-top: 56.25%;
+			height: ' . esc_attr($height) . 'px !important;
 			max-width: 100%;
 		  }
-		
+
+		  .ose-wistia{
+			height: auto !important;
+			padding-top: 0;
+		  }
+
 		  ' . esc_attr($uniqid) . ' > iframe {
-			position: absolute;
-			top: 0;
-			left: 0;
 			width: 100%;
 			height: 100%;
+			max-height:100%;
 		  }
 
 		  .ep-video-responsive{
@@ -226,8 +357,11 @@ function embedpress_render_block_style($attributes)
 				display: none;
 			}
 		  '.$_iscustomlogo.'
+		'.$playerStyle.'
+
 	</style>';
 	}
 
 	return $youtubeStyles;
 }
+?>

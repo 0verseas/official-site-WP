@@ -317,3 +317,21 @@ if (! function_exists('blocksy_get_all_image_sizes')) {
 	}
 }
 
+if (! function_exists('blocksy_debug')) {
+	function blocksy_debug_log($message, $object = null) {
+		if (
+			! defined('WP_DEBUG')
+			||
+			! WP_DEBUG
+		) {
+			return;
+		}
+
+		if (is_null($object)) {
+			error_log($message);
+		} else {
+			error_log($message . ': ' . print_r($object, true));
+		}
+	}
+}
+

@@ -532,22 +532,59 @@ $overridable_card_options = [
 					'value' => 30,
 				],
 
-				$prefix . 'card_spacing' => [
-					'label' => __( 'Card Inner Spacing', 'blocksy' ),
-					'type' => 'ct-slider',
-					'min' => 0,
-					'max' => 100,
-					'responsive' => true,
-					'value' => 30,
-					'divider' => 'top',
-					'sync' => 'live',
+				blocksy_rand_md5() => [
+					'type' => 'ct-condition',
+					'condition' => [
+						$prefix . 'structure' => '!gutenberg',
+						$prefix . 'card_type' => 'cover|boxed',
+					],
+					'perform_replace' => array_merge([
+						'condition' => $has_card_matching_template ? [
+							$prefix . 'structure' => '!__never__'
+						] : [
+							$prefix . 'structure' => 'simple'
+						],
+						'key' => $prefix . 'card_type',
+						'from' => 'cover',
+						'to' => 'boxed'
+					], $has_card_matching_template ? [
+						[
+							'condition' => [
+								$prefix . 'structure' => '!__never__'
+							],
+							'key' => $prefix . 'structure',
+							'from' => 'simple',
+							'to' => 'grid'
+						],
+
+						[
+							'condition' => [
+								$prefix . 'structure' => '!__never__'
+							],
+							'key' => $prefix . 'structure',
+							'from' => 'gutenberg',
+							'to' => 'grid'
+						]
+					] : []),
+					'options' => $has_card_matching_template ? [] : [
+						$prefix . 'card_spacing' => [
+							'label' => __( 'Card Inner Spacing', 'blocksy' ),
+							'type' => 'ct-slider',
+							'min' => 0,
+							'max' => 100,
+							'responsive' => true,
+							'value' => 30,
+							'divider' => 'top',
+							'sync' => 'live',
+						],
+					],
 				],
 			],
 
 			$has_card_matching_template ? [] : [
 				$prefix . 'content_horizontal_alignment' => [
 					'type' => $has_card_matching_template ? 'hidden' : 'ct-radio',
-					'label' => __( 'Content Alignment', 'blocksy' ),
+					'label' => __( 'Horizontal Alignment', 'blocksy' ),
 					'view' => 'text',
 					'design' => 'block',
 					'divider' => 'top',
@@ -566,9 +603,19 @@ $overridable_card_options = [
 			blocksy_rand_md5() => [
 				'type' => 'ct-condition',
 				'condition' => [
-					$prefix . 'structure' => '!gutenberg'
+					$prefix . 'structure' => '!gutenberg',
+					$prefix . 'card_type' => 'cover',
 				],
-				'perform_replace' => $has_card_matching_template ? [
+				'perform_replace' => array_merge([
+					'condition' => $has_card_matching_template ? [
+						$prefix . 'structure' => '!__never__'
+					] : [
+						$prefix . 'structure' => 'simple'
+					],
+					'key' => $prefix . 'card_type',
+					'from' => 'cover',
+					'to' => 'boxed'
+				], $has_card_matching_template ? [
 					[
 						'condition' => [
 							$prefix . 'structure' => '!__never__'
@@ -586,7 +633,7 @@ $overridable_card_options = [
 						'from' => 'gutenberg',
 						'to' => 'grid'
 					]
-				] : [],
+				] : []),
 				'options' => $has_card_matching_template ? [] : [
 					$prefix . 'content_vertical_alignment' => [
 						'type' => 'ct-radio',

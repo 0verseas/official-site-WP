@@ -35,16 +35,6 @@ ctEvents.on(
 				important: true,
 			},
 
-			socialsLabelVisibility: handleResponsiveSwitch({
-				selector: assembleSelector(
-					mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.ct-label',
-					})
-				),
-			}),
-
 			...typographyOption({
 				id: 'socials_label_font',
 
@@ -405,34 +395,18 @@ ctEvents.on(
 			)
 		}
 
+		if (optionId === 'socialsLabelVisibility') {
+			updateAndSaveEl(selector, (el) => {
+				;[...el.querySelectorAll('.ct-label')].map((label) => {
+					responsiveClassesFor(optionValue, label)
+				})
+			})
+		}
+
 		if (optionId === 'visibility') {
 			updateAndSaveEl(selector, (el) =>
 				responsiveClassesFor({ ...optionValue, desktop: true }, el)
 			)
-		}
-
-		if (optionId === 'socialsLabelVisibility') {
-			const socialsLabelVisibility = values.socialsLabelVisibility || {
-				desktop: false,
-				tablet: false,
-				mobile: false,
-			}
-
-			updateAndSaveEl(selector, (el) => {
-				if (
-					socialsLabelVisibility.desktop ||
-					socialsLabelVisibility.tablet ||
-					socialsLabelVisibility.mobile
-				) {
-					;[...el.querySelectorAll('span.ct-label')].map((el) =>
-						el.removeAttribute('hidden')
-					)
-				} else {
-					;[...el.querySelectorAll('span.ct-label')].map((el) =>
-						el.setAttribute('hidden', '')
-					)
-				}
-			})
 		}
 	}
 )

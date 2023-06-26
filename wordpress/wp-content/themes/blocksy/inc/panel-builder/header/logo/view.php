@@ -137,13 +137,6 @@ $site_title_class = 'site-title ' . blocksy_visibility_classes(
 );
 
 $tag = 'span';
-
-// if (is_home() || is_front_page()) {
-// 	if ($device !== 'mobile') {
-// 		$tag = 'h1';
-// 	}
-// }
-
 $tag = apply_filters('blocksy:' . $panel_type . ':logo:tag', $tag);
 $wrapper_tag = apply_filters('blocksy:' . $panel_type . ':logo:wrapper-tag', 'div');
 
@@ -168,7 +161,15 @@ if (
 	$logo_position = 'data-logo="' . $logo_position_v[$device] . '"';
 }
 
-$class = trim('site-branding' . ' ' . blocksy_visibility_classes(
+$wrapper_class = 'site-branding';
+
+$wrapper_class = trim($wrapper_class . ' ' . blocksy_default_akg(
+	'header_logo_class',
+	$atts,
+	''
+));
+
+$wrapper_class = trim($wrapper_class . ' ' . blocksy_visibility_classes(
 	blocksy_akg('visibility', $atts, [
 		'desktop' => true,
 		'tablet' => true,
@@ -179,7 +180,7 @@ $class = trim('site-branding' . ' ' . blocksy_visibility_classes(
 ?>
 
 <<?php echo $wrapper_tag ?>
-	class="<?php echo $class ?>"
+	class="<?php echo $wrapper_class ?>"
 	<?php echo blocksy_attr_to_html($attr) ?>
 	<?php echo $logo_position ?>
 	<?php echo blocksy_schema_org_definitions('logo', ['condition' => $device === 'desktop']) ?>>

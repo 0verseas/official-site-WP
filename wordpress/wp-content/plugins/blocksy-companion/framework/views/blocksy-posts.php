@@ -16,7 +16,8 @@ $query_args = [
 	'post_type' => explode(',', $args['post_type']),
 	'orderby' => $args['orderby'],
 	'posts_per_page' => $args['limit'],
-	'ignore_sticky_posts' => $args['ignore_sticky_posts'] === 'yes'
+	'ignore_sticky_posts' => $args['ignore_sticky_posts'] === 'yes',
+	'post_status' => 'publish'
 ];
 
 if (! empty($args['meta_value'])) {

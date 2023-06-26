@@ -23,7 +23,15 @@ add_action('parse_tax_query', function ($query) {
 
 	$prefix = blocksy_manager()->screen->get_prefix();
 
-	if ($prefix === 'bbpress_single' || $prefix === 'courses_archive') {
+	if (
+		$prefix === 'bbpress_single'
+		||
+		(
+			$prefix === 'courses_archive'
+			&&
+			function_exists('tutor')
+		)
+	) {
 		return;
 	}
 
@@ -32,7 +40,8 @@ add_action('parse_tax_query', function ($query) {
 			'blog',
 			'categories',
 			'woo_categories',
-			'search'
+			'search',
+			'author'
 		],
 		'default_prefix' => 'blog'
 	]);

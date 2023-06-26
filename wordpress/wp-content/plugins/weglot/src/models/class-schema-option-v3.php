@@ -12,8 +12,8 @@ use WeglotWP\Helpers\Helper_Flag_Type;
 class Schema_Option_V3 {
 
 	/**
-	 * @since 3.0.0
 	 * @return array
+	 * @since 3.0.0
 	 */
 	public static function get_schema_options_v3_compatible() {
 		$schema = array(
@@ -26,7 +26,7 @@ class Schema_Option_V3 {
 			'translation_engine'        => 'translation_engine',
 			'destination_language'      => (object) array(
 				'path' => 'languages',
-				'fn'   => function( $languages ) {
+				'fn'   => function ( $languages ) {
 					$destinations = array();
 					if ( ! $languages ) {
 						return $destinations;
@@ -46,7 +46,7 @@ class Schema_Option_V3 {
 			),
 			'private_mode'              => (object) array(
 				'path' => 'languages',
-				'fn'   => function( $languages ) {
+				'fn'   => function ( $languages ) {
 					$private = array();
 					foreach ( $languages as $item ) {
 						if ( ! $item['enabled'] ) {
@@ -64,7 +64,7 @@ class Schema_Option_V3 {
 			'exclude_urls'              => 'excluded_paths',
 			'exclude_blocks'            => (object) array(
 				'path' => 'excluded_blocks',
-				'fn'   => function( $excluded_blocks ) {
+				'fn'   => function ( $excluded_blocks ) {
 					$excluded = array();
 					if ( ! $excluded_blocks ) {
 						return $excluded;
@@ -72,6 +72,7 @@ class Schema_Option_V3 {
 					foreach ( $excluded_blocks as $item ) {
 						$excluded[] = $item['value'];
 					}
+
 					return $excluded;
 				},
 			),
@@ -82,7 +83,7 @@ class Schema_Option_V3 {
 			'with_flags'                => 'custom_settings.button_style.with_flags',
 			'type_flags'                => (object) array(
 				'path' => 'custom_settings.button_style.flag_type',
-				'fn'   => function( $flag_type ) {
+				'fn'   => function ( $flag_type ) {
 					if ( $flag_type ) {
 						return $flag_type;
 					}
@@ -98,7 +99,7 @@ class Schema_Option_V3 {
 			'show_box_first_settings'   => 'show_box_first_settings',
 			'custom_urls'               => (object) array(
 				'path' => 'custom_urls',
-				'fn'   => function( $custom_urls ) {
+				'fn'   => function ( $custom_urls ) {
 					if ( $custom_urls ) {
 						return $custom_urls;
 					}
@@ -106,6 +107,8 @@ class Schema_Option_V3 {
 					return array();
 				},
 			),
+			'media_enabled'             => 'media_enabled',
+			'external_enabled'          => 'external_enabled',
 			'page_views_enabled'        => 'page_views_enabled',
 			'flag_css'                  => 'flag_css',
 			'menu_switcher'             => 'menu_switcher',

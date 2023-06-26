@@ -447,7 +447,15 @@ var MonsterInsights = function () {
           }
           maybePreventBeforeUnload();
           __gtagTrackerHitBackRun = true;
-          window.location.href = link;
+
+          if ( el.attributes.download ) {
+            var linkTag = document.createElement('a');
+            linkTag.href = el.href;
+            linkTag.download = el.download;
+            linkTag.click();
+          } else {
+            window.location.href = link;
+          }
         };
 
         var __gtagTrackerNoRedirectExternal = function () {

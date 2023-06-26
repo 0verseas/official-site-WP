@@ -42,20 +42,16 @@ class Replacer
   {
       $this->post_id = $post_id;
 
+			$source_file = false;
       if (function_exists('wp_get_original_image_path')) // WP 5.3+
       {
           $source_file = wp_get_original_image_path($post_id);
+			}
 
-          if ($source_file === false) // if it's not an image, returns false, use the old way.
-					{
-            $source_file = trim(get_attached_file($post_id, apply_filters( 'emr_unfiltered_get_attached_file', true )));
-					}
-					else {
-						$this->source_is_scaled = true;
-					}
-      }
-      else
-      	$source_file = trim(get_attached_file($post_id, apply_filters( 'emr_unfiltered_get_attached_file', true )));
+			if (false === $source_file)
+			{
+				$source_file = trim(get_attached_file($post_id, apply_filters( 'emr_unfiltered_get_attached_file', true )));
+			}
 
       /* It happens that the SourceFile returns relative / incomplete when something messes up get_upload_dir with an error something.
          This case shoudl be detected here and create a non-relative path anyhow..
@@ -215,6 +211,7 @@ class Replacer
         delete_post_meta($this->post_id, '_emr_replace_author');
       }
 
+
       if ($this->replaceMode == self::MODE_SEARCHREPLACE)
       {
          // Write new image title.
@@ -247,6 +244,8 @@ class Replacer
 
       }  // SEARCH REPLACE MODE
 
+
+// FROM HERE STATS THE MODULE
       $args = array(
           'thumbnails_only' => ($this->replaceMode == self::MODE_SEARCHREPLACE) ? false : true,
       );
@@ -437,7 +436,6 @@ class Replacer
     }
 
     return $url;
-    //$this->targetFile
 
   }
 

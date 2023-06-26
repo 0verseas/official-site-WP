@@ -23,7 +23,7 @@ const showOffcanvas = (settings) => {
 		trigger.setAttribute('aria-expanded', 'true')
 	})
 
-	if (settings.focus && !isTouchDevice()) {
+	if (settings.focus) {
 		setTimeout(() => {
 			settings.container.querySelector('input') &&
 				settings.container.querySelector('input').focus()
@@ -246,7 +246,8 @@ export const handleClick = (e, settings) => {
 					isInsidePanelContent) ||
 				(!settings.isModal &&
 					(isPanelContentItself || isInsidePanelContent)) ||
-				event.target.closest('[class*="select2-container"]')
+				event.target.closest('[class*="select2-container"]') ||
+				!event.target.closest('.ct-panel')
 			) {
 				return
 			}
@@ -313,6 +314,10 @@ export const handleClick = (e, settings) => {
 
 				if (event.target.closest('a')) {
 					maybeA = event.target.closest('a')
+				}
+
+				if (!maybeA.closest('.ct-panel')) {
+					return
 				}
 
 				if (!maybeA.closest('.ct-panel').classList.contains('active')) {

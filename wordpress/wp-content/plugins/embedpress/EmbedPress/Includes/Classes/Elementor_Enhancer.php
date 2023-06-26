@@ -5,8 +5,10 @@ namespace EmbedPress\Includes\Classes;
 use Elementor\Group_Control_Image_Size;
 use Elementor\Utils;
 use SplMinHeap;
+use EmbedPress\Includes\Classes\Helper;
 
 class Elementor_Enhancer {
+	
 	public static function youtube( $embed, $setting ) {
 		if ( isset( $setting['embedpress_pro_embeded_source'] ) && 'youtube' === $setting['embedpress_pro_embeded_source'] && isset( $embed->embed ) && preg_match( '/src=\"(.+?)\"/', $embed->embed, $match ) ) {
 
@@ -56,6 +58,7 @@ class Elementor_Enhancer {
 	}
 
 	public static function apply_cta_markup( $embed, $settings, $provider_name = '' ) {
+		
 		if ( empty( $settings["embedpress_pro_{$provider_name}_logo"] ) || empty( $settings["embedpress_pro_{$provider_name}_logo"]['url'] ) ) {
 			return $embed;
 		}
@@ -67,29 +70,25 @@ class Elementor_Enhancer {
 		$cta    = '';
 		$url    = '';
 		$target = '';
-		$x      = ! empty( $settings["embedpress_pro_{$provider_name}_logo_xpos"] ) && ! empty( $settings["embedpress_pro_{$provider_name}_logo_xpos"]['unit'] ) ? $settings["embedpress_pro_{$provider_name}_logo_xpos"]['unit'] . $settings["embedpress_pro_{$provider_name}_logo_xpos"]['size'] : '10%';
+		$x      = ! empty( $settings["embedpress_pro_{$provider_name}_logo_xpos"] ) && ! empty( $settings["embedpress_pro_{$provider_name}_logo_xpos"]['unit'] ) ? $settings["embedpress_pro_{$provider_name}_logo_xpos"]['size'] . $settings["embedpress_pro_{$provider_name}_logo_xpos"]['unit'] : '10%';
 
-		$y        = ! empty( $settings["embedpress_pro_{$provider_name}_logo_ypos"] ) && ! empty( $settings["embedpress_pro_{$provider_name}_logo_ypos"]['unit'] ) ? $settings["embedpress_pro_{$provider_name}_logo_ypos"]['unit'] . $settings["embedpress_pro_{$provider_name}_logo_ypos"]['size'] : '10%';
+		$y        = ! empty( $settings["embedpress_pro_{$provider_name}_logo_ypos"] ) && ! empty( $settings["embedpress_pro_{$provider_name}_logo_ypos"]['unit'] ) ?  $settings["embedpress_pro_{$provider_name}_logo_ypos"]['size'] . $settings["embedpress_pro_{$provider_name}_logo_ypos"]['unit'] : '10%';
 		$cssClass = isset( $embed->url ) ? '.ose-uid-' . md5( $embed->url ) : ".ose-{$provider_name}";
 		ob_start();
 		?>
         <style type="text/css">
-            <?php echo esc_html($cssClass); ?>
-            {
-                text-align: left
-            ;
-                position: relative
-            ;
+            .ep-embed-content-wraper .watermark {
+                text-align: left;
+                position: relative;
             }
-            <?php echo esc_html($cssClass); ?>
-            .watermark {
+            .ep-embed-content-wraper .watermark {
                 border: 0;
                 position: absolute;
-                bottom: <?php echo esc_html($y); ?>;
-                right: <?php echo esc_html($x); ?>;
+                bottom: 10%;
+                right: 5%;
                 max-width: 150px;
                 max-height: 75px;
-                opacity: 0.25;
+                opacity: 0.35!important;
                 z-index: 5;
                 -o-transition: opacity 0.5s ease-in-out;
                 -moz-transition: opacity 0.5s ease-in-out;
@@ -97,9 +96,13 @@ class Elementor_Enhancer {
                 transition: opacity 0.5s ease-in-out;
             }
 
-            <?php echo esc_html($cssClass); ?>
-            .watermark:hover {
-                opacity: 1;
+			<?php echo esc_html($cssClass); ?> .watermark {
+				bottom: <?php echo esc_html($y); ?>;
+                right: <?php echo esc_html($x); ?>;
+			}	
+
+			.ep-embed-content-wraper .watermark:hover {
+                opacity: 1!important;
             }
         </style>
 		<?php
@@ -258,7 +261,9 @@ class Elementor_Enhancer {
 		$embedOptions->autoPlay         = ( $setting['embedpress_pro_wistia_auto_play'] === 'yes' );
 		$embedOptions->playerColor      = $setting['embedpress_pro_wistia_color'];
 		$embedOptions->playbar          = ( $setting['embedpress_pro_wistia_playbar'] === 'yes' );
-		$embedOptions->time             = $setting['embedpress_pro_video_start_time'];
+		if($setting['embedpress_pro_video_start_time']){
+			$embedOptions->time             = $setting['embedpress_pro_video_start_time'];
+		}
 		if ( is_embedpress_pro_active() ) {
 			$embedOptions->volumeControl = ( $setting['embedpress_pro_wistia_volume_control'] === 'yes' );
 
@@ -348,7 +353,7 @@ class Elementor_Enhancer {
 		$attribs = [
 			sprintf( 'id="wistia_%s"', $videoId ),
 			sprintf( 'class="%s"', join( ' ', $class ) ),
-			sprintf( 'style="width:%spx; height:%spx;"', $embed->attributes->{'data-width'}, $embed->attributes->{'data-width'} ),
+			sprintf( 'style="width:%spx; height:%spx;"', $embed->attributes->{'data-width'}, $embed->attributes->{'data-height'} ),
 		];
 
 		$labels = [

@@ -179,9 +179,11 @@ const performInPlaceUpdate = ({
 	// Attempt slide to image
 
 	if (container.querySelector(`.flexy-pills > *`)) {
-		let maybePillImage = container.querySelector(
-			`.flexy-items [srcset*="${nextImage.src}"]`
-		)
+		let maybePillImage =
+			container.querySelector(
+				`.flexy-items [srcset*="${nextImage.src}"]`
+			) ||
+			container.querySelector(`.flexy-items [src*="${nextImage.src}"]`)
 
 		if (maybePillImage) {
 			let pillIndex = [

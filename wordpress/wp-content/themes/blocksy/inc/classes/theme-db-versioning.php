@@ -3,11 +3,9 @@
 /**
  * Theme Update
  *
- * @package     Astra
- * @author      Astra
- * @copyright   Copyright (c) 2019, Astra
- * @link        https://wpastra.com/
- * @since       Astra 1.0.0
+ * @copyright 2019-present Creative Themes
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU General Public License
+ * @package   Blocksy
  */
 
 class Blocksy_Db_Versioning {
@@ -144,6 +142,11 @@ class Blocksy_Db_Versioning {
 			[
 				'version' => '1.8.67',
 				'cb' => [$this, 'v_1_8_67']
+			],
+
+			[
+				'version' => '1.8.91',
+				'cb' => [$this, 'v_1_8_91']
 			]
 		];
 	}
@@ -1412,6 +1415,14 @@ class Blocksy_Db_Versioning {
 				'new' => 'pullquote'
 			],
 		]);
+	}
+
+	public function v_1_8_91() {
+		$maybe_google_fonts = get_option('blocksy_google_fonts', '__EMPTY__');
+
+		if ($maybe_google_fonts !== '__EMPTY__') {
+			delete_option('blocksy_google_fonts');
+		}
 	}
 
 	private function transform_tags_in_layers($list, $post_type) {

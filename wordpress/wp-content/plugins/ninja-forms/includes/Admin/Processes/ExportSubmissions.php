@@ -184,10 +184,21 @@ class NF_Admin_Processes_ExportSubmissions extends NF_Abstracts_BatchProcess
             $aggregatedKey = $this->indexedLookup[$this->currentPosition];
             $row = $this->csvObject->constructRow($aggregatedKey);
 
-            $constructed = $this->enclosure . implode($glue, $row) . $this->enclosure . $this->terminator;
-            fwrite($file, $constructed);
+            //Catch reference to an array or repeated fieldsets of repeater field to display each entry as a row
+            if( array_key_exists('repeater', $row) && is_array($row['repeater']) ){
+                foreach($row['repeater'] as $eachRow){
+                    $constructed = $this->enclosure . implode($glue, $eachRow) . $this->enclosure . $this->terminator;
+                    fwrite($file, $constructed);        
+                }
+                $this->currentPosition++;
+            } else {
+                $constructed = $this->enclosure . implode($glue, $row) . $this->enclosure . $this->terminator;
+                fwrite($file, $constructed);
 
-            $this->currentPosition++;
+                $this->currentPosition++;
+            }
+
+            
         }
     }
     /**
@@ -246,9 +257,12 @@ class NF_Admin_Processes_ExportSubmissions extends NF_Abstracts_BatchProcess
     {
         $filename = time() . base64_encode( 'form-' . $this->form . '-all-subs' );
         $upload_dir = wp_upload_dir();
-        $file_path = trailingslashit($upload_dir['path']) . $filename . '.' . $this->format;
+        if (!file_exists($upload_dir['basedir'] . '/ninja-forms-tmp')) {
+            mkdir($upload_dir['basedir'] . '/ninja-forms-tmp', 0777, true);
+        }
 
-        $this->fileUrl = trailingslashit($upload_dir['url']) . $filename . '.' . $this->format;
+        $file_path = trailingslashit($upload_dir['basedir']) . 'ninja-forms-tmp/' . $filename . '.' . $this->format;
+        $this->fileUrl = trailingslashit($upload_dir['baseurl']) . 'ninja-forms-tmp/' . $filename . '.' . $this->format;
         return $file_path;
     }
 

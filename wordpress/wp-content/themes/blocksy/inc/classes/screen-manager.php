@@ -191,9 +191,6 @@ class Blocksy_Screen_Manager {
 			'default_prefix' => null
 		]);
 
-		if (isset($_GET['blocksy_prefix'])) {
-			return $_GET['blocksy_prefix'];
-		}
 
 		if (function_exists('is_lifterlms') && is_lifterlms()) {
 			return 'lms';
@@ -350,6 +347,10 @@ class Blocksy_Screen_Manager {
 
 		if (is_author()) {
 			$actual_prefix = 'author';
+		}
+
+		if (isset($_GET['blocksy_prefix'])) {
+			$actual_prefix = $_GET['blocksy_prefix'];
 		}
 
 		return $this->process_allowed_prefixes($actual_prefix, $args);

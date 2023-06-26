@@ -1,6 +1,6 @@
 <?php // phpcs:ignore
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -12,8 +12,7 @@ use WeglotWP\Bootstrap_Weglot;
  *
  * @since 2.0
  */
-abstract class Context_Weglot
-{
+abstract class Context_Weglot {
 
 	/**
 	 * @static
@@ -26,18 +25,17 @@ abstract class Context_Weglot
 	 * Create context if not exist
 	 *
 	 * @static
-	 * @return void
+	 * @return object
 	 * @since 2.0
 	 */
-	public static function weglot_get_context()
-	{
-		if (null !== self::$context) {
+	public static function weglot_get_context() {
+		if ( null !== self::$context ) {
 			return self::$context;
 		}
 
 		self::$context = new Bootstrap_Weglot();
 
-		// If PHP > 5.6, it will be possible to autoload the classes without listing them
+		// If PHP > 5.6, it will be possible to autoload the classes without listing them.
 		$services = array(
 			'\WeglotWP\Services\Button_Service_Weglot',
 			'\WeglotWP\Services\Request_Url_Service_Weglot',
@@ -75,11 +73,13 @@ abstract class Context_Weglot
 			'\WeglotWP\Third\WpOptimize\Wp_Optimize_Active',
 			'\WeglotWP\Third\CacheEnabler\Cache_Enabler_Active',
 			'\WeglotWP\Third\Wprocket\Wprocket_Active',
+			'\WeglotWP\Third\Wprentals\Wprentals_Active',
+			'\WeglotWP\Third\Stackable\Stackable_Active',
 		);
 
-		self::$context->set_services($services);
+		self::$context->set_services( $services );
 
-		// If PHP > 5.6, it will be possible to autoload the classes without listing them
+		// If PHP > 5.6, it will be possible to autoload the classes without listing them.
 		$actions = array(
 			'\WeglotWP\Actions\Email_Translate_Weglot',
 			'\WeglotWP\Actions\Register_Widget_Weglot',
@@ -117,9 +117,11 @@ abstract class Context_Weglot
 			'\WeglotWP\Third\WpOptimize\Wp_Optimize_Cache',
 			'\WeglotWP\Third\CacheEnabler\Cache_Enabler_Cache',
 			'\WeglotWP\Third\Wprocket\Wprocket_Cache',
+			'\WeglotWP\Third\Wprentals\Wprentals_translate_calendar',
+			'\WeglotWP\Third\Stackable\Stackable_Translate',
 		);
 
-		self::$context->set_actions($actions);
+		self::$context->set_actions( $actions );
 
 		return self::$context;
 	}
@@ -132,24 +134,22 @@ abstract class Context_Weglot
  * @version 2.0.1
  * @since 2.0
  */
-function weglot_init()
-{
-	//add filter to prevent load weglot if not needed
+function weglot_init() {
+	// add filter to prevent load weglot if not needed.
 	$cancel_init = apply_filters( 'weglot_cancel_init', false );
 
-	if( $cancel_init ){
+	if ( $cancel_init ) {
 		return;
 	}
 
-	if (!function_exists('curl_version') || !function_exists('curl_exec')) {
-		add_action('admin_notices', array('\WeglotWP\Notices\Curl_Weglot', 'admin_notice'));
+	if ( ! function_exists( 'curl_version' ) || ! function_exists( 'curl_exec' ) ) {
+		add_action( 'admin_notices', array( '\WeglotWP\Notices\Curl_Weglot', 'admin_notice' ) );
 	}
 
-	if (!function_exists('json_last_error')) {
-		add_action('admin_notices', array('\WeglotWP\Notices\Json_Function_Weglot', 'admin_notice'));
+	if ( ! function_exists( 'json_last_error' ) ) {
+		add_action( 'admin_notices', array( '\WeglotWP\Notices\Json_Function_Weglot', 'admin_notice' ) );
 	}
 
-	load_plugin_textdomain('weglot', false, WEGLOT_DIR_LANGUAGES);
-
+	load_plugin_textdomain( 'weglot', false, WEGLOT_DIR_LANGUAGES );
 	Context_Weglot::weglot_get_context()->init_plugin();
 }

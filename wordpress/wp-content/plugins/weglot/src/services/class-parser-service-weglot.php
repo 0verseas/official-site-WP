@@ -99,6 +99,24 @@ class Parser_Service_Weglot {
 		$ignored_nodes = apply_filters( 'weglot_get_parser_ignored_nodes', $parser->getIgnoredNodesFormatter()->getIgnoredNodes() );
 		$parser->getIgnoredNodesFormatter()->setIgnoredNodes( $ignored_nodes );
 
+		$media_enabled    = $this->option_services->get_option_button( 'media_enabled' );
+		$external_enabled = $this->option_services->get_option_button( 'external_enabled' );
+
+		// remove media and/or externalLink checker if not enable.
+		$remove_checker = array();
+		if ( ! $external_enabled ) {
+			$remove_checker[] = '\Weglot\Parser\Check\Dom\ExternalLinkHref';
+		}
+
+		if ( ! $media_enabled ) {
+			$remove_checker[] = '\Weglot\Parser\Check\Dom\ImageDataSource';
+			$remove_checker[] = '\Weglot\Parser\Check\Dom\ImageSource';
+		}
+
+		if ( ! empty( $remove_checker ) ) {
+			$parser->getDomCheckerProvider()->removeCheckers( $remove_checker );
+		}
+
 		return $parser;
 	}
 }

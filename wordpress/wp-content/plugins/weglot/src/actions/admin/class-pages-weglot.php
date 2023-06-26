@@ -76,7 +76,7 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 	 */
 	public function hooks() {
 		add_action( 'admin_menu', array( $this, 'weglot_plugin_menu' ) );
-		add_action( 'admin_bar_menu', array( $this, 'add_admin_bar_menu' ), PHP_INT_MAX );
+		add_action( 'admin_bar_menu', array( $this, 'add_admin_bar_menu' ), 200 );
 	}
 
 	/**

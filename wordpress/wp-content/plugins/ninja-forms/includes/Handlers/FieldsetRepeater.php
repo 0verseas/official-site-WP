@@ -271,10 +271,7 @@ class NF_Handlers_FieldsetRepeater
     public function parseSubmissionIndex($submissionIndex)
     {
 
-        $return = array(
-            'fieldsetFieldId' => -1,
-            'submissionIndex' => 0 // if no index present, set as 0 for an un-repeated fieldset
-        );
+        $return = [];
 
         $exploded = explode($this->submissionIndexDelimiter, $submissionIndex);
 
@@ -282,6 +279,8 @@ class NF_Handlers_FieldsetRepeater
 
         if (isset($exploded[1])) {
             $submissionIndex=$exploded[1];
+        } else {
+            $submissionIndex = 0; // if no index present, set as -1 for an un-repeated fieldset
         }
 
         $return = array(
@@ -381,8 +380,16 @@ class NF_Handlers_FieldsetRepeater
     {
         $return = [];
 
+        if(is_string($fieldSubmissionValue)){
+            $fieldSubmissionValue = maybe_unserialize($fieldSubmissionValue);
+        }
+
         if (!is_array($fieldSubmissionValue)) {
             return $return;
+        }
+
+        if(is_null($fieldSettings)){
+            $fieldSettings = Ninja_Forms()->form()->get_field( $fieldId )->get_settings();
         }
 
         if(''!==$fieldId and []!== $fieldSettings){
@@ -399,6 +406,14 @@ class NF_Handlers_FieldsetRepeater
         // $completeFieldsetID is in format {fieldsetRepeaterFieldId}{fieldsetDelimiter}{fieldsetFieldId}{submissionIndexDelimiter}{submissionIndex}
         foreach ($fieldSubmissionValue as $completeFieldsetId => $incomingValueArray) {
 
+            //Extract value from upload field
+            if(isset($incomingValueArray["files"])){
+                $field_files_names = [];
+                foreach($incomingValueArray["files"] as $file_data){
+                    $field_files_names[] = '<a href="' .  $file_data["data"]["file_url"] . '" title="' . $file_data["data"]["upload_id"] . '">' . $file_data["name"] . '</a>';
+                }
+                $incomingValueArray['value'] = implode(" , ", $field_files_names);
+            }
             // value is expected to be keyed inside incoming value array
             if (isset($incomingValueArray['value'])) {
                 $value = $incomingValueArray['value'];
@@ -439,11 +454,14 @@ class NF_Handlers_FieldsetRepeater
                 $fieldsetFieldLabel = $fieldsetLabelLookup[$idKey];
             }
 
-
             $array = [];
             $array['value'] = $value;
             $array['type'] = $fieldsetFieldType;
             $array['label'] = $fieldsetFieldLabel;
+            
+            if(!empty( $incomingValueArray['files'] ) ){
+                $array['files'] = $incomingValueArray['files'];
+            }
 
             $return[$submissionIndex][$fieldsetFieldId] = $array;
         }

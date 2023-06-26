@@ -21,7 +21,7 @@ class Register_Widget_Weglot implements Hooks_Interface_Weglot {
 	 * @see HooksInterface
 	 */
 	public function hooks() {
-		add_action( 'widgets_init', array( $this, 'register_a_widget_weglot' ) );
+		add_action( 'widgets_init', array( $this, 'register_a_widget_weglot' ) ); // @phpstan-ignore-line
 		add_action( 'init', array( $this, 'weglot_widget_block' ) );
 		add_action( 'init', array( $this, 'weglot_menu_block' ) );
 		// Hook the enqueue functions into the editor.
@@ -33,7 +33,7 @@ class Register_Widget_Weglot implements Hooks_Interface_Weglot {
 	 * @since 2.0
 	 */
 	public function register_a_widget_weglot() {
-		register_widget( 'WeglotWP\Widgets\Widget_Selector_Weglot' );
+		register_widget( 'WeglotWP\Widgets\Widget_Selector_Weglot' ); // @phpstan-ignore-line
 	}
 
 
@@ -58,12 +58,12 @@ class Register_Widget_Weglot implements Hooks_Interface_Weglot {
 
 		if ( 'widget' === $type_block ) {
 			$button = $button_service->get_html( 'weglot-widget weglot-widget-block' );
-			$button = str_replace('name="menu" ', 'name="menu" value=""', $button);
-			$button = str_replace('data-wg-notranslate=""', '', $button);
+			$button = str_replace( 'name="menu" ', 'name="menu" value=""', $button );
+			$button = str_replace( 'data-wg-notranslate=""', '', $button );
 		} elseif ( 'menu' === $type_block ) {
 			$button = $button_service->get_html( 'weglot-menu weglot-menu-block' );
-			$button = str_replace('name="menu" ', 'name="menu" value=""', $button);
-			$button = str_replace('data-wg-notranslate=""', '', $button);
+			$button = str_replace( 'name="menu" ', 'name="menu" value=""', $button );
+			$button = str_replace( 'data-wg-notranslate=""', '', $button );
 		}
 
 		return $button;

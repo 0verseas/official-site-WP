@@ -351,20 +351,28 @@ if (! function_exists('blocksy_render_archive_card')) {
 			}
 
 			if (! $outputs) {
+				$featured_image_output = '';
+
+				if (
+					get_the_post_thumbnail($featured_image_args['attachment_id'])
+					||
+					wp_get_attachment_image_url($featured_image_args['attachment_id'])
+				) {
+					$featured_image_output = blocksy_image($featured_image_args);
+				}
+
 				$outputs = apply_filters('blocksy:archive:render-card-layers', [
 					'title' => blocksy_entry_title(blocksy_default_akg('heading_tag', $title_settings, 'h2')),
-					'featured_image' => (
-						! get_the_post_thumbnail($featured_image_args['attachment_id'])
-						&&
-						! wp_get_attachment_image_url($featured_image_args['attachment_id'])
-					) ? '' : apply_filters(
+
+					'featured_image' => apply_filters(
 						'post_thumbnail_html',
-						blocksy_image($featured_image_args),
+						$featured_image_output,
 						get_the_ID(),
 						$featured_image_args['attachment_id'],
 						$featured_image_args['size'],
 						''
 					),
+
 					'excerpt' => blocksy_entry_excerpt([
 						'length' => intval(
 							blocksy_default_akg( 'excerpt_length', $excerpt_settings, '40' )
@@ -387,7 +395,7 @@ if (! function_exists('blocksy_render_archive_card')) {
 					),
 
 					'divider' => '<div class="entry-divider"></div>'
-				], $args['prefix']);
+				], $args['prefix'], $featured_image_args);
 			}
 
 			if (isset($outputs[$single_component['id']])) {

@@ -37,10 +37,22 @@
 		text-decoration: var(--buttonTextDecoration);
 	}
 
-	.edit-post-visual-editor__post-title-wrapper > h1 {
-		font-size: 2.44em;
-		font-weight: 700;
-		line-height: 1.4;
-		color: var(--headings-color);
+	.wp-block-button[style*="font-weight"] {
+
+		.wp-block-button__link {
+			font-weight: inherit;
+		}
+	}
+
+	// page/post title
+	.edit-post-visual-editor__post-title-wrapper {
+		font-size: initial;
+
+		> h1 {
+			font-size: 2.44em;
+			font-weight: 700;
+			line-height: 1.4;
+			color: var(--headings-color);
+		}
 	}
 }

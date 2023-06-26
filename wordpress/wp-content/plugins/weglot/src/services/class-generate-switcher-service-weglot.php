@@ -97,9 +97,6 @@ class Generate_Switcher_Service_Weglot {
 	 */
 	public function render_switcher_editor_button( $dom, $switchers ) {
 
-		$original_language = $this->language_services->get_original_language()->getInternalCode();
-		$current_language  = $this->request_url_services->get_current_language()->getInternalCode();
-
 		// get translate dom and add custom switcher in.
 		$dom = \WGSimpleHtmlDom\str_get_html(
 			$dom,
@@ -118,7 +115,7 @@ class Generate_Switcher_Service_Weglot {
 		foreach ( $switchers as $switcher ) {
 
 			$location = $this->option_services->get_switcher_editor_option( 'location', $switcher );
-			if ( ! empty( $location ) ) {
+			if ( ! empty( $location ) && !isset( $switcher['template'] ) ) {
 				$button_html = $this->button_services->get_html( 'weglot-custom-switcher', $switcher );
 				$key         = $location['target'] . ( ! empty( $location['sibling'] ) ? ' ' . $location['sibling'] : '' );
 				if ( strpos( $dom, '<div data-wg-position="' . $key . '"></div>' ) !== false ) {
@@ -133,9 +130,11 @@ class Generate_Switcher_Service_Weglot {
 				}
 			} else {
 				// if the location is empty we place the button at default position.
-				$button_html = $this->button_services->get_html( 'weglot-default', $switcher );
-				$dom         = str_replace( '</body>', $button_html, $dom );
-				$find_location    = true;
+				if(!isset($switcher['template'])){
+					$button_html = $this->button_services->get_html( 'weglot-default', $switcher );
+					$dom         = str_replace( '</body>', $button_html, $dom );
+				}
+				$find_location = true;
 			}
 		}
 		if ( ! $find_location ) {

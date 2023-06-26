@@ -4,6 +4,8 @@ namespace EmbedPress\Includes\Classes;
 
 use \EmbedPress\Providers\Youtube;
 use EmbedPress\Shortcode;
+use EmbedPress\Includes\Classes\Helper;
+use \Elementor\Controls_Manager;
 
 class Feature_Enhancer
 {
@@ -17,21 +19,60 @@ class Feature_Enhancer
 		add_filter('embedpress:onAfterEmbed', [$this, 'enhance_twitch'], 90);
 		add_filter('embedpress:onAfterEmbed', [$this, 'enhance_dailymotion'], 90);
 		add_filter('embedpress:onAfterEmbed', [$this, 'enhance_soundcloud'], 90);
+		add_filter('embedpress:onAfterEmbed', [$this, 'enhance_missing_title'], 90);
 
 		add_filter(
 			'embedpress_gutenberg_youtube_params',
 			[$this, 'embedpress_gutenberg_register_block_youtube']
 		);
+
 		add_action('init', array($this, 'embedpress_gutenberg_register_block_vimeo'));
 		add_action('embedpress_gutenberg_wistia_block_after_embed', array($this, 'embedpress_wistia_block_after_embed'));
 		add_action('elementor/widget/embedpres_elementor/skins_init', [$this, 'elementor_setting_init']);
 		add_action('wp_ajax_youtube_rest_api', [$this, 'youtube_rest_api']);
 		add_action('wp_ajax_nopriv_youtube_rest_api', [$this, 'youtube_rest_api']);
 		add_action('embedpress_gutenberg_embed', [$this, 'gutenberg_embed'], 10, 2);
-
+		add_action( 'wp_ajax_save_source_data', [$this, 'save_source_data'] );
+		add_action( 'wp_ajax_nopriv_save_source_data', [$this, 'save_source_data'] );
+		add_action( 'save_post', [$this, 'save_source_data_on_post_update'], 10, 3 );
+		add_action( 'wp_ajax_delete_source_data', [$this, 'delete_source_data'] );
+		add_action( 'wp_ajax_nopriv_delete_source_data', [$this, 'delete_source_data'] );
+		add_action( 'load-post.php', [$this, 'delete_source_temp_data_on_reload'] );
 		add_action('embedpress:isEmbra', [$this, 'isEmbra'], 10, 3);
+		add_action( 'elementor/editor/after_save', [$this, 'save_el_source_data_on_post_update'] );
+		
+		add_action('wp_head', [$this, 'embedpress_generate_social_share_meta']);
+	}
+
+	public function save_source_data(){
+
+		$source_url = $_POST['source_url'];
+		$blockid = $_POST['block_id'];
+
+		Helper::get_source_data($blockid, $source_url, 'gutenberg_source_data', 'gutenberg_temp_source_data');
+	}
+
+	function save_el_source_data_on_post_update( $post_id ) {
+		Helper::get_save_source_data_on_post_update('elementor_source_data', 'elementor_temp_source_data');	
+	}
+
+	function save_source_data_on_post_update( $post_id, $post, $update ) {
+		if (!empty(strpos($post->post_content, 'wp:embedpress'))) {
+			Helper::get_save_source_data_on_post_update('gutenberg_source_data', 'gutenberg_temp_source_data');	
+		}
+	}
+	
+	public function delete_source_data() {
+		$blockid = $_POST['block_id'];
+		Helper::get_delete_source_data($blockid, 'gutenberg_source_data', 'gutenberg_temp_source_data');
+	}
+
+	public function delete_source_temp_data_on_reload() {
+		Helper::get_delete_source_temp_data_on_reload('gutenberg_temp_source_data');
 
 	}
+		 
+	
 
 	public function isEmbra($isEmbra, $url, $atts)
 	{
@@ -68,6 +109,12 @@ class Feature_Enhancer
     {
         return (bool) (preg_match('~v=(?:[a-z0-9_\-]+)~i', (string) $url));
     }
+
+	//Check is YouTube live video
+	public function ytValidateLiveUrl($url)
+    {
+        return (bool) (preg_match('/^https?:\/\/(?:www\.)?youtube\.com\/(?:channel\/[\w-]+|@[\w-]+)\/live$/', (string) $url));
+    }
 	
 	
 	//Check is Wistia validate url
@@ -99,7 +146,9 @@ class Feature_Enhancer
 		$embedOptions->autoPlay = (isset($attributes['wautoplay']) && (bool) $attributes['wautoplay'] === true);
 		$embedOptions->resumable = (isset($attributes['resumable']) && (bool) $attributes['resumable'] === true);
 
-		$embedOptions->time = isset($attributes['wstarttime']) ? $attributes['wstarttime'] : '';
+		if(!empty($attributes['wstarttime'])){
+			$embedOptions->time = isset($attributes['wstarttime']) ? $attributes['wstarttime'] : '';
+		}
 
 		if ( is_embedpress_pro_active() ) {
 			$embedOptions->volumeControl = (isset($attributes['volumecontrol']) && (bool) $attributes['volumecontrol'] === true);
@@ -143,12 +192,11 @@ class Feature_Enhancer
 
 	public function gutenberg_embed($embedHTML, $attributes)
 	{
-	
 		if (!empty($attributes['url'])) {
 			$youtube = new Youtube($attributes['url']);
 			
 			$is_youtube = $youtube->validateUrl($youtube->getUrl(false));
-			if ($is_youtube) {
+			if ($is_youtube && empty($this->ytValidateLiveUrl($attributes['url']))) {
 				$atts = [
 					'width'    => intval($attributes['width']),
 					'height'   => intval($attributes['height']),
@@ -165,7 +213,7 @@ class Feature_Enhancer
 				}
 			}
 			
-			if(!empty($attributes['url']) && $this->ytValidateUrl($attributes['url'])){
+			if(!empty($attributes['url']) && ($this->ytValidateUrl($attributes['url']) || $this->ytValidateLiveUrl($attributes['url']))){
 				
 				$atts = [
 					'url'	=> $attributes['url'],
@@ -344,8 +392,7 @@ class Feature_Enhancer
 
 				// print_r($url_modified);
 
-				
-
+			
 				foreach ($params as $param => $value) {
 					$url_modified = add_query_arg($param, $value, $url_modified);
 				}
@@ -732,7 +779,9 @@ class Feature_Enhancer
 
 			$embedOptions->autoPlay = (isset($options['autoplay']) && (bool) $options['autoplay'] === true);
 
-			$embedOptions->time = isset($options['start_time']) ? $options['start_time'] : 0;
+			if(!empty($options['start_time'])){
+				$embedOptions->time = isset($options['start_time']) ? $options['start_time'] : 0;
+			}
 
 			if (isset($options['player_color'])) {
 				$color = $options['player_color'];
@@ -845,9 +894,9 @@ class Feature_Enhancer
 			$content_id = $e['content_id'];
 			$channel    = 'channel' === $type ? $content_id : '';
 			$video      = 'video' === $type ? $content_id : '';
-			$muted = ('yes' === $settings['embedpress_pro_twitch_mute']) ? 'true' : 'false';
-			$full_screen = ('yes' === $settings['embedpress_pro_fs']) ? 'true' : 'false';
-			$autoplay = ('yes' === $settings['embedpress_pro_twitch_autoplay']) ? 'true' : 'false';
+			$muted = isset($settings['embedpress_pro_twitch_mute']) && ('yes' === $settings['embedpress_pro_twitch_mute']) ? 'true' : 'false';
+			$full_screen = isset($settings['embedpress_pro_fs']) && ('yes' === $settings['embedpress_pro_fs']) ? 'true' : 'false';
+			$autoplay = isset($settings['embedpress_pro_twitch_autoplay']) && ('yes' === $settings['embedpress_pro_twitch_autoplay']) ? 'true' : 'false';
 			$theme      = !empty($settings['embedpress_pro_twitch_theme']) ? $settings['embedpress_pro_twitch_theme'] : 'dark';
 
 			$layout     = 'video';
@@ -1381,5 +1430,147 @@ class Feature_Enhancer
 		];
 	}
 
+	public function enhance_missing_title($embed){
+
+
+		$embed_arr = get_object_vars($embed);
+
+		$url = $embed->url;
+
+		if (strpos($url, 'gettyimages') !== false) {
+			$title = $embed_arr[$url]['title'];
+		} else {
+			$title = '';
+		}
+
+
+		$embed->embed = $embed->embed . "
+			<script>
+				if (typeof gie === 'function') {
+					gie(function(){
+						var iframe = document.querySelector('.ose-embedpress-responsive iframe');
+						if(iframe && !iframe.getAttribute('title')){
+							iframe.setAttribute('title', '$title')
+						}
+					});
+				}
+			</script>
+		";
+		return $embed;
+	}
+
+	
+	public function embedpress_generate_social_share_meta()
+	{
+		$post_id = get_the_ID(); 
+		$post = get_post($post_id);
+		$tags = '';
+
+		$thumbnail_url = get_the_post_thumbnail_url($post_id);
+
+		if (!empty($_GET['hash'])) {
+
+			$id_value = $_GET['hash'];
+			$url = get_the_permalink( $post_id );
+
+			if (class_exists('Elementor\Plugin') && \Elementor\Plugin::$instance->db->is_built_with_elementor(get_the_ID())) {
+				$page_settings = get_post_meta( $post_id, '_elementor_data', true );
+				
+				$ep_settings = Helper::ep_get_elementor_widget_settings($page_settings, $id_value, 'embedpres_elementor');
+				$pdf_settings = Helper::ep_get_elementor_widget_settings($page_settings, $id_value, 'embedpress_pdf');
+				$doc_settings = Helper::ep_get_elementor_widget_settings($page_settings, $id_value, 'embedpres_document');
+
+
+			
+				if (is_array($ep_settings) && !empty($ep_settings)) {
+					$title = !empty($ep_settings['settings']['embedpress_content_title']) ? $ep_settings['settings']['embedpress_content_title'] : '';
+
+					$description = !empty($ep_settings['settings']['embedpress_content_descripiton']) ? $ep_settings['settings']['embedpress_content_descripiton'] : '';
+
+					$image_url = !empty($ep_settings['settings']['embedpress_content_share_custom_thumbnail']['url']) ? $ep_settings['settings']['embedpress_content_share_custom_thumbnail']['url'] : '';
+				}
+				else if (is_array($pdf_settings) && !empty($pdf_settings)) {
+					$title = !empty($pdf_settings['settings']['embedpress_pdf_content_title']) ? $pdf_settings['settings']['embedpress_pdf_content_title'] : '';
+
+					$description = !empty($pdf_settings['settings']['embedpress_pdf_content_descripiton']) ? $pdf_settings['settings']['embedpress_pdf_content_descripiton'] : '';
+
+					$image_url = !empty($pdf_settings['settings']['embedpress_pdf_content_share_custom_thumbnail']['url']) ? $pdf_settings['settings']['embedpress_pdf_content_share_custom_thumbnail']['url'] : '';
+				}
+				else if (is_array($doc_settings) && !empty($doc_settings)) {
+					$title = !empty($doc_settings['settings']['embedpress_doc_content_title']) ? $doc_settings['settings']['embedpress_doc_content_title'] : '';
+
+					$description = !empty($doc_settings['settings']['embedpress_doc_content_descripiton']) ? $doc_settings['settings']['embedpress_doc_content_descripiton'] : '';
+
+					$image_url = !empty($doc_settings['settings']['embedpress_doc_content_share_custom_thumbnail']['url']) ? $doc_settings['settings']['embedpress_doc_content_share_custom_thumbnail']['url'] : '';
+				}
+
+				// Search for the regex pattern in the string and extract the href value
+				if (!empty($image_url)) {
+					$tags .= "<meta name='twitter:image' content='$image_url'/>\n";
+					$tags .= "<meta property='og:image' content='$image_url'/>\n";
+					$tags .= "<meta property='og:url' content='$url?hash=$id_value'/>\n";
+				}
+				else if(!empty($thumbnail_ur)){
+					$tags .= "<meta name='twitter:image' content='$image_url'/>\n";
+					$tags .= "<meta property='og:image' content='$image_url'/>\n";
+				}
+
+				if (!empty($title)) {
+					$title = json_decode('"' . $title . '"', JSON_UNESCAPED_UNICODE);
+					$tags .= "<meta property='og:title' content='$title'/>\n";
+					$tags .= "<meta name='title' property='og:title' content='$title'>\n";
+					$tags .= "<meta name='twitter:title' content='$title'/>\n";
+				}
+				if (!empty($description)) {
+					$description = json_decode('"' . $description . '"', JSON_UNESCAPED_UNICODE);
+					$tags .= "<meta property='og:description' content='$description'/>\n";
+					$tags .= "<meta name='twitter:description' content='$description'/>\n";
+				}
+				
+			} else {
+
+				$block_content = $post->post_content;
+				
+				// Regular expression to match the id and href keys and their values
+				$thumb = '/(?:"id":"' . $id_value . '"|"clientId":"' . $id_value . '").*?"customThumbnail":"(.*?)"/';
+				$title = '/(?:"id":"' . $id_value . '"|"clientId":"' . $id_value . '").*?"customTitle":"(.*?)"/';
+				$description = '/(?:"id":"' . $id_value . '"|"clientId":"' . $id_value . '").*?"customDescription":"(.*?)"/';
+
+				// Search for the regex pattern in the string and extract the href value
+				if (preg_match($thumb, $block_content, $matches1)) {
+					$image_url = $matches1[1];
+					$tags .= "\n<meta name='twitter:image' content='$image_url'/>\n";
+					$tags .= "<meta property='og:image' content='$image_url'/>\n";
+					$tags .= "<meta property='og:url' content='$url?hash=$id_value'/>\n";
+				}
+				else if(!empty($thumbnail_url)){
+					$tags .= "\n<meta name='twitter:image' content='$thumbnail_url'/>\n";
+					$tags .= "<meta property='og:image' content='$thumbnail_url'/>\n";
+				}
+
+				if (preg_match($title, $block_content, $matches2)) {
+					$title = json_decode('"' . $matches2[1] . '"', JSON_UNESCAPED_UNICODE);
+					$tags .= "<meta property='og:title' content='$title'/>\n";
+					$tags .= "<meta name='title' property='og:title' content='$title'>\n";
+					$tags .= "<meta name='twitter:title' content='$title'/>\n";
+				}
+				
+				if (preg_match($description, $block_content, $matches3)) {	
+					$description = json_decode('"' . $matches3[1] . '"', JSON_UNESCAPED_UNICODE);
+					$tags .= "<meta property='og:description' content='$description'/>\n";
+					$tags .= "<meta name='twitter:description' content='$description'/>\n";
+				}
+			}
+			
+			$tags .= "<meta name='twitter:card' content='summary_large_image'/>\n";
+
+			remove_action('wp_head', 'rel_canonical');
+
+			echo $tags;
+
+		}
+	}
+
+	
 
 }

@@ -179,6 +179,44 @@ class Replace_Link_Service_Weglot {
 	}
 
 	/**
+	 * Replace link next attribute
+	 *
+	 * @since 2.0
+	 * @param string $translated_page
+	 * @param string $current_url
+	 * @param string $quote1
+	 * @param string $quote2
+	 * @param string $sometags
+	 * @param string $sometags2
+	 * @return string
+	 */
+	public function replace_next( $translated_page, $current_url, $quote1, $quote2, $sometags = null, $sometags2 = null ) {
+		$current_language = $this->request_url_services->get_current_language();
+		$translated_page  = preg_replace( '/<link rel="next"' . preg_quote( $sometags, '/' ) . 'href=' . preg_quote( $quote1 . $current_url . $quote2, '/' ) . '/', '<link rel="next"' . $sometags . 'href=' . $quote1 . $this->replace_url( $current_url, $current_language ) . $quote2, $translated_page );
+
+		return $translated_page;
+	}
+
+	/**
+	 * Replace link prev attribute
+	 *
+	 * @since 2.0
+	 * @param string $translated_page
+	 * @param string $current_url
+	 * @param string $quote1
+	 * @param string $quote2
+	 * @param string $sometags
+	 * @param string $sometags2
+	 * @return string
+	 */
+	public function replace_prev( $translated_page, $current_url, $quote1, $quote2, $sometags = null, $sometags2 = null ) {
+		$current_language = $this->request_url_services->get_current_language();
+		$translated_page  = preg_replace( '/<link rel="prev"' . preg_quote( $sometags, '/' ) . 'href=' . preg_quote( $quote1 . $current_url . $quote2, '/' ) . '/', '<link rel="prev"' . $sometags . 'href=' . $quote1 . $this->replace_url( $current_url, $current_language ) . $quote2, $translated_page );
+
+		return $translated_page;
+	}
+
+	/**
 	 * Replace amphtml attribute
 	 *
 	 * @since 2.0

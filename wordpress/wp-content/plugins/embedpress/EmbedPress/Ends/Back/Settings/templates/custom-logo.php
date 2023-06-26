@@ -92,7 +92,7 @@ function embedpress_print_branding_controls($provider='', $prefix='') {
     $px_cta_url = "{$prefix}_cta_url";
     switch ($provider){
         case 'vimeo':
-            $preview_video = '<iframe loading="lazy" src="https://player.vimeo.com/video/463346733" frameborder="0"></iframe>';
+            $preview_video = '<iframe title="" loading="lazy" src="https://player.vimeo.com/video/463346733" frameborder="0"></iframe>';
             break;
         case 'wistia':
 
@@ -122,7 +122,7 @@ KAMAL;
 	    case 'document':
 	        $pdf_url = EMBEDPRESS_SETTINGS_ASSETS_URL . 'embedpress.pdf';
 		    $renderer = Helper::get_pdf_renderer();
-		    $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . $pdf_url;
+		    $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($pdf_url);
 	        ob_start(); ?>
             <iframe class="embedpress-embed-document-pdf ep-pdf-sample" style="width:500px; max-width:100%; height: 300px; display: inline-block"  src="<?php echo esc_attr(  $src); ?>" ></iframe>
         <?php

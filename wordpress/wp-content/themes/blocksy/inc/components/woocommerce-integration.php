@@ -84,6 +84,8 @@ add_action('wp_enqueue_scripts', function () {
 }, 100);
 
 add_action('wp_enqueue_scripts', function () {
+	wp_enqueue_script('wc-cart-fragments');
+
 	// return;
 	if (! function_exists('is_shop')) return;
 

@@ -56,9 +56,10 @@ $options_available = [
 		<?php echo esc_html__( 'Language button design', 'weglot' ) . ' ' . esc_html__( '(Optional)', 'weglot' ); ?>
 	</h3>
 	<hr/>
-
-	<table class="form-table">
-		<tbody>
+<?php } ?>
+<table class="form-table">
+	<tbody>
+	<?php if ( empty( $this->option_services->get_switchers_editor_button() ) ) { ?>
 		<tr valign="top">
 			<th scope="row" class="titledesc">
 				<label>
@@ -227,7 +228,7 @@ $options_available = [
 				</div>
 				<textarea id="flag_css"
 						  name="<?php echo esc_attr( sprintf( '%s[%s]', WEGLOT_SLUG, $options_available['flag_css']['key'] ) ); ?>"
-						  style="display:none;"><?php echo esc_attr( $this->options['flag_css'] ); ?></textarea>
+						  style="display:none;"><?php echo esc_html( $this->options['flag_css'] ); ?></textarea>
 			</td>
 		</tr>
 		<tr valign="top">
@@ -262,15 +263,16 @@ $options_available = [
 				<p class="description"><?php echo esc_html( $options_available['is_fullname']['description'] ); ?></p>
 			</td>
 		</tr>
-		<tr valign="top">
-			<th scope="row" class="titledesc">
-				<label for="<?php echo esc_attr( $options_available['override_css']['key'] ); ?>">
-					<?php echo esc_html( $options_available['override_css']['label'] ); ?>
-				</label>
-				<p class="sub-label"><?php echo esc_html( $options_available['override_css']['description'] ); ?></p>
-			</td>
-			</th>
-			<td class="forminp forminp-text">
+	<?php } ?>
+	<tr valign="top">
+		<th scope="row" class="titledesc">
+			<label for="<?php echo esc_attr( $options_available['override_css']['key'] ); ?>">
+				<?php echo esc_html( $options_available['override_css']['label'] ); ?>
+			</label>
+			<p class="sub-label"><?php echo esc_html( $options_available['override_css']['description'] ); ?></p>
+		</td>
+		</th>
+		<td class="forminp forminp-text">
 				<textarea
 					class="wg-input-textarea"
 					id="<?php echo esc_attr( $options_available['override_css']['key'] ); ?>"
@@ -281,9 +283,10 @@ $options_available = [
 					placeholder=".country-selector {
   margin-bottom: 20px;
 }"><?php echo $this->options[ $options_available['override_css']['key'] ]; //phpcs:ignore?></textarea>
-		</tr>
-		</tbody>
-	</table>
+	</tr>
+	<?php if ( empty( $this->option_services->get_switchers_editor_button() ) ) { ?>
+	</tbody>
+</table>
 <?php } ?>
 
 <h3>

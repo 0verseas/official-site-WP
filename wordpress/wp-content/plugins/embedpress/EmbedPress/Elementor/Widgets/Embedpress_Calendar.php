@@ -9,6 +9,7 @@ use \Elementor\Widget_Base as Widget_Base;
 use \Elementor\Plugin;
 use EmbedPress\Includes\Traits\Branding;
 use Embedpress_Google_Helper;
+use EmbedPress\Includes\Classes\Helper;
 
 ( defined( 'ABSPATH' ) ) or die( "No direct script access allowed." );
 
@@ -124,7 +125,7 @@ class Embedpress_Calendar extends Widget_Base
 
 	protected function register_controls()
 	{
-		$this->pro_class = is_embedpress_pro_active() ? '': 'embedpress-pro-control';
+		$this->pro_class = is_embedpress_pro_active() ? '': 'embedpress-pro-control not-active';
 		$this->pro_text = is_embedpress_pro_active() ? '': '<sup class="embedpress-pro-label" style="color:red">'.__('Pro', 'embedpress').'</sup>';
 		/**
 		 * EmbedPress Content Settings
@@ -310,7 +311,7 @@ class Embedpress_Calendar extends Widget_Base
 					<div <?php echo $this->get_render_attribute_string( 'embedpress-calendar-render' ); ?>>
                         <?php if ( !empty( $settings['embedpress_public_cal_link']) && !empty( $settings['embedpress_calendar_type']) && 'public' === $settings['embedpress_calendar_type'] ) {
                             ?>
-                            <iframe style="<?php echo esc_attr( $dimension); ?>; max-width:100%; display: inline-block"  src="<?php echo esc_attr(  $settings['embedpress_public_cal_link']); ?>"
+                            <iframe title="" style="<?php echo esc_attr( $dimension); ?>; max-width:100%; display: inline-block"  src="<?php echo esc_attr(  $settings['embedpress_public_cal_link']); ?>"
                                     frameborder="0"></iframe>
                         <?php
                         } else {

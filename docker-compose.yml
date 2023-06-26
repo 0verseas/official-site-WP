@@ -1,7 +1,7 @@
 version: "3.3"
 services:
     wp-mariadb:
-        image: mariadb:latest
+        image: mariadb:10.5.5
         container_name: ${DB_HOST}
         restart: always
         ports:
@@ -42,7 +42,7 @@ services:
     wp-web:
         links:
           - wp-php
-        image: nginx:latest
+        image: nginx:1.23.4
         container_name: wp-web
         restart: always
         environment:

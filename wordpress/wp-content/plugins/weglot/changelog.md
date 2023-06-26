@@ -3,6 +3,37 @@
 
 # Change Log
 
+## 4.0.1 (02/05/2023) =
+* Bug: Fix call to undefined revert_callback value on class RegexCheckerProvider
+* Update: Update message about translated url option (available with Pro plan and more)
+
+## 4.0 (25/04/2023) =
+* Add: Add switcher gallery implementation
+* Add: Add PHP 8 compatibility fix deprecated (PHPStan)
+* Add: Add external_enabled to translate external links
+* Add: Add language subdirectory to the rel=”prev” and rel=”next” links on WordPress
+* Add: Add filter to manage hreflang
+* Add: Manage media_enabled and external_enabled options
+* Add: Add compatibility with wp rentals plugin and theme
+* Add: Add mPDF Engine for translate pdf (WP Overnight)
+* Add: Don't translate link when the target is excluded
+* Update: Improve filter active translation
+* Update: Hide Language Switcher when all language pairs are set to private
+* Bug: Fix call to .json call to prevent create empty settings
+* Bug: Fix empty slug issue : prevent (do not save empty slug on transient)
+* Bug: Fix issue with Klaviyo plugin
+* Bug: Don't hide custom css block when custom switcher is added
+* Bug: getInternalCode() is called on an element that is ‘null’
+* Bug: Duplicate ID when multiple language switchers are present on the same page
+* Fix: PHP Notice on third party cache enabler
+* Fix: PHP Notice Undefined array key “SERVER_PROTOCOL” when running Cron
+* Fix: Fix accessibility issue on the switcher
+* Fix: Fix issue from wp vip go standard
+* Fix: PHP Notice Undefined property: stdClass::$post_name
+
+##3.9.2 (30/01/2023) =
+* Bug: hotfix js file
+
 ##3.9.1 (30/01/2023) =
 * Bug: add english in destination language list during installation if original language is different
 * Update: Prevent using empty .json settings file during install

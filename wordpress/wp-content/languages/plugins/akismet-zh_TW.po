@@ -1,15 +1,27 @@
-# Translation of Plugins - Akismet Spam Protection - Stable (latest release) in Chinese (Taiwan)
-# This file is distributed under the same license as the Plugins - Akismet Spam Protection - Stable (latest release) package.
+# Translation of Plugins - Akismet Anti-Spam: Spam Protection - Stable (latest release) in Chinese (Taiwan)
+# This file is distributed under the same license as the Plugins - Akismet Anti-Spam: Spam Protection - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-07-11 20:08:55+0000\n"
+"PO-Revision-Date: 2023-04-27 19:43:36+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: GlotPress/4.0.0-alpha.3\n"
+"X-Generator: GlotPress/4.0.0-alpha.4\n"
 "Language: zh_TW\n"
-"Project-Id-Version: Plugins - Akismet Spam Protection - Stable (latest release)\n"
+"Project-Id-Version: Plugins - Akismet Anti-Spam: Spam Protection - Stable (latest release)\n"
+
+#. Author of the plugin
+msgid "Automattic - Anti Spam Team"
+msgstr "Automattic - 反垃圾留言團隊"
+
+#. Plugin Name of the plugin
+msgid "Akismet Anti-Spam: Spam Protection"
+msgstr "Akismet Anti-Spam: 垃圾留言防護"
+
+#: views/config.php:65
+msgid "Akismet is active and ready to stop spam. Your site&#8217;s spam statistics will be displayed here."
+msgstr "Akismet 已啟用並已完成阻擋垃圾留言的準備。這個網站的垃圾留言統計資料會顯示在這裡。"
 
 #: views/notice.php:32
 msgid "WP-Cron has been disabled using the DISABLE_WP_CRON constant. Comment rechecks may not work properly."
@@ -28,46 +40,46 @@ msgstr "(在新分頁中開啟)"
 
 #. translators: The placeholder is the name of a subscription level, like
 #. "Plus" or "Enterprise" .
-#: views/notice.php:282
+#: views/notice.php:248
 msgid "Upgrade to %s"
 msgstr "升級至 %s 方案"
 
-#: views/notice.php:277
+#: views/notice.php:243
 msgid "Upgrade your Subscription Level"
 msgstr "升級目前的約期授權等級"
 
-#: views/notice.php:238 views/notice.php:246 views/notice.php:254
-#: views/notice.php:263
+#: views/notice.php:204 views/notice.php:212 views/notice.php:220
+#: views/notice.php:229
 msgid "Learn more about usage limits."
 msgstr "進一步了解使用量上限"
 
 #. translators: The first placeholder is a date, the second is a (formatted)
 #. number, the third is another formatted number.
-#: views/notice.php:230
+#: views/notice.php:196
 msgid "Since %1$s, your account made %2$s API calls, compared to your plan&#8217;s limit of %3$s."
 msgstr "目前方案的使用量上限為可呼叫 %3$s 次，從 %1$s 年開始，你的 Akismet 帳號已呼叫 %2$s 次 API。"
 
-#: views/notice.php:260
+#: views/notice.php:226
 msgid "Your Akismet usage has been over your plan&#8217;s limit for three consecutive months. We have restricted your account for the rest of the month. Upgrade your plan so Akismet can continue blocking spam."
 msgstr "你的 Akismet 帳號已經連續 3 個月超過目前方案的使用量上限。這個帳號在剩下的授權約期期間均會受到限制。請升級目前的使用方案，讓 Akismet 能夠繼續封鎖垃圾留言。"
 
-#: views/notice.php:251
+#: views/notice.php:217
 msgid "Your Akismet usage is nearing your plan&#8217;s limit for the third consecutive month. We will restrict your account after you reach the limit. Upgrade your plan so Akismet can continue blocking spam."
 msgstr "你的 Akismet 帳號已經連續 3 個月接近目前方案的使用量上限。這個帳號在達到使用量上限後，便會受到限制。請升級目前的使用方案，讓 Akismet 能夠繼續封鎖垃圾留言。"
 
-#: views/notice.php:243
+#: views/notice.php:209
 msgid "Your Akismet usage has been over your plan&#8217;s limit for two consecutive months. Next month, we will restrict your account after you reach the limit. Please consider upgrading your plan."
 msgstr "你的 Akismet 帳號已經連續 2 個月超過目前方案的使用量上限。這個帳號在下個月達到使用量上限後，便會受到限制。請考慮升級目前的使用方案。"
 
-#: views/notice.php:217
+#: views/notice.php:183
 msgid "Your account has been restricted"
 msgstr "你的 Akismet 帳號已受到限制。"
 
-#: views/notice.php:213
+#: views/notice.php:179
 msgid "Your Akismet account usage is approaching your plan&#8217;s limit"
 msgstr "你的 Akismet 帳號使用量已接近目前方案的使用量上限。"
 
-#: views/notice.php:210
+#: views/notice.php:176
 msgid "Your Akismet account usage is over your plan&#8217;s limit"
 msgstr "你的 Akismet 帳號使用量已超過目前方案的使用量上限。"
 
@@ -107,7 +119,7 @@ msgstr "Akismet 無法檢查這則留言，稍後會自動重試。"
 msgid "Comment was caught by %s."
 msgstr "留言已由 %s 進行判定。"
 
-#: class.akismet.php:639
+#: class.akismet.php:675
 msgid "Akismet is not configured. Please enter an API key."
 msgstr "Akismet 尚未完成設定，請輸入 API 金鑰。"
 
@@ -123,7 +135,7 @@ msgstr "設定不同帳號"
 msgid "Set up your Akismet account to enable spam filtering on this site."
 msgstr "為外掛設定 Akismet 帳號，便能為這個網站啟用垃圾留言篩選功能。"
 
-#: class.akismet-admin.php:1146
+#: class.akismet-admin.php:1140
 msgid "Akismet could not recheck your comments for spam."
 msgstr "Akismet 不會重新檢查已判定為垃圾留言的項目。"
 
@@ -163,7 +175,7 @@ msgstr "Akismet 隱私權聲明"
 msgid "Privacy"
 msgstr "隱私權"
 
-#: class.akismet.php:1745
+#: class.akismet.php:1780
 msgid "This site uses Akismet to reduce spam. <a href=\"%s\" target=\"_blank\" rel=\"nofollow noopener\">Learn how your comment data is processed</a>."
 msgstr "這個網站採用 Akismet 服務減少垃圾留言。<a href=\"%s\" target=\"_blank\" rel=\"nofollow noopener\">進一步了解 Akismet 如何處理網站訪客的留言資料</a>。"
 
@@ -171,7 +183,7 @@ msgstr "這個網站採用 Akismet 服務減少垃圾留言。<a href=\"%s\" tar
 msgid "We collect information about visitors who comment on Sites that use our Akismet anti-spam service. The information we collect depends on how the User sets up Akismet for the Site, but typically includes the commenter's IP address, user agent, referrer, and Site URL (along with other information directly provided by the commenter such as their name, username, email address, and the comment itself)."
 msgstr "Akismet 公司會在採用 Akismet 反垃圾留言服務的網站上，對進行留言的訪客收集相關資料。Akismet 公司收集的資訊取決於網站管理員在這個網站上為 Akismet 服務所進行的設定，但通常會包含留言者的 IP 地址、使用者代理程式，參照網址及網站網址，以及由留言者直接提供的其他資訊，例如姓名、使用者名稱、電子郵件地址及留言內容評論本身。"
 
-#: class.akismet.php:276
+#: class.akismet.php:312
 msgid "Comment discarded."
 msgstr "留言已捨棄。"
 
@@ -222,10 +234,9 @@ msgid "On this page, you are able to update your Akismet settings and view spam 
 msgstr "網站管理員可以在這個頁面中為 Akismet 外掛變更設定並檢視垃圾留言統計資料。"
 
 #. Description of the plugin
-msgid "Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. It keeps your site protected even while you sleep. To get started: activate the Akismet plugin and then go to your Akismet Settings page to set up your API key."
-msgstr "數以百萬的使用者採用 Akismet，它是<strong>保護網站遠離垃圾留言</strong>的絕佳方式，也為你的網站提供不間斷的保護。使用方式很簡單，啟用 Akismet 外掛後前往 Akismet 設定頁，輸入 Akismet 的 API 金鑰後儲存設定。"
+msgid "Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. Akismet anti spam keeps your site protected even while you sleep. To get started: activate the Akismet plugin and then go to your Akismet Settings page to set up your API key."
+msgstr "數以百萬的使用者採用 Akismet，它是<strong>保護網站遠離垃圾留言</strong>的絕佳方式，也為這個網站提供不間斷的保護。使用方式很簡單，啟用 Akismet 外掛後前往 [Akismet 設定] 頁面，輸入 Akismet 的 API 金鑰後儲存設定。"
 
-#. Plugin Name of the plugin
 #: class.akismet-admin.php:114 class.akismet-admin.php:117
 msgid "Akismet Anti-Spam"
 msgstr "Akismet Anti-Spam"
@@ -272,33 +283,33 @@ msgstr "詳細統計資料"
 msgid "Statistics"
 msgstr "統計資料"
 
-#: class.akismet-admin.php:1250
+#: class.akismet-admin.php:1244
 msgid "Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. It keeps your site protected even while you sleep. To get started, just go to <a href=\"admin.php?page=akismet-key-config\">your Akismet Settings page</a> to set up your API key."
-msgstr "數以百萬的使用者採用 Akismet，它是<strong>保護網站遠離垃圾留言</strong>的絕佳方式，也為這個網站提供不間斷的保護。使用方式很簡單，僅需前往 [<a href=\"admin.php?page=akismet-key-config\">Akismet 設定</a>] 頁面中設定 API 金鑰。"
+msgstr "數以百萬的使用者採用 Akismet，它是<strong>保護網站遠離垃圾留言</strong>的絕佳方式，也為這個網站提供不間斷的保護。使用方式很簡單，僅需前往 [<a href=\"admin.php?page=akismet-key-config\">Akismet 設定</a>] 頁面，輸入 Akismet 的 API 金鑰後儲存設定。"
 
-#: class.akismet-admin.php:1247
+#: class.akismet-admin.php:1241
 msgid "Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. Your site is fully configured and being protected, even while you sleep."
 msgstr "數以百萬的使用者採用 Akismet，它是<strong>保護網站遠離垃圾留言</strong>的絕佳方式，這個網站已完成完整設定，並由 Akismet 提供不間斷的保護。"
 
-#: class.akismet-admin.php:1139
+#: class.akismet-admin.php:1133
 msgid "%s comment was caught as spam."
 msgid_plural "%s comments were caught as spam."
 msgstr[0] "已判定 %s 則留言為垃圾留言。"
 
-#: class.akismet-admin.php:1136
+#: class.akismet-admin.php:1130
 msgid "No comments were caught as spam."
 msgstr "沒有留言遭判定為垃圾留言。"
 
-#: class.akismet-admin.php:1132
+#: class.akismet-admin.php:1126
 msgid "Akismet checked %s comment."
 msgid_plural "Akismet checked %s comments."
 msgstr[0] "Akismet 已檢查 %s 則留言。"
 
-#: class.akismet-admin.php:1129
+#: class.akismet-admin.php:1123
 msgid "There were no comments to check. Akismet will only check comments awaiting moderation."
 msgstr "沒有可供檢查的留言。Akismet 目前僅會檢查在 [待審閱] 清單中的留言。"
 
-#: class.akismet.php:645
+#: class.akismet.php:681
 msgid "Comment not found."
 msgstr "沒有留言。"
 
@@ -387,15 +398,6 @@ msgstr[0] "Akismet 為網站管理員節省了 %s 天的清理時間！"
 msgid "Akismet filters out spam, so you can focus on more important things."
 msgstr "Akismet 會自動篩選垃圾留言，所以網站管理員可以專注於更重要的事情。"
 
-#: views/notice.php:193
-msgid "To continue your service, <a href=\"%s\" target=\"_blank\">upgrade to an Enterprise subscription</a>, which covers an unlimited number of sites."
-msgstr "如需繼續使用這項服務，請<a href=\"%s\" target=\"_blank\">升級至 Enterprise 約期授權方案</a>，該授權可為不限數量的網站提供保護。"
-
-#. translators: The placeholder is a URL.
-#: views/notice.php:175
-msgid "Your Plus subscription allows the use of Akismet on only one site. Please <a href=\"%s\" target=\"_blank\">purchase additional Plus subscriptions</a> or upgrade to an Enterprise subscription that allows the use of Akismet on unlimited sites."
-msgstr "你的 Plus 約期授權方案僅允許將 Akismet 使用於單一網站。請<a href=\"%s\" target=\"_blank\">購買額外的 Plus 約期授權方案</a>或升級至可於不限數量網站使用 Akismet 的 Enterprise 約期授權方案。"
-
 #. translators: The placeholder is a URL.
 #: views/notice.php:151
 msgid "The connection to akismet.com could not be established. Please refer to <a href=\"%s\" target=\"_blank\">our guide about firewalls</a> and check your server configuration."
@@ -405,7 +407,7 @@ msgstr "無法與 akismet.com 建立連線。請參閱<a href=\"%s\" target=\"_b
 msgid "The API key you entered could not be verified."
 msgstr "無法驗證你輸入的 API 金鑰。"
 
-#: views/notice.php:94 views/notice.php:188 views/notice.php:195
+#: views/notice.php:94
 msgid "Please <a href=\"%s\" target=\"_blank\">contact our support team</a> with any questions."
 msgstr "如有任何問題，請<a href=\"%s\" target=\"_blank\">聯絡 Akismet 技術支援團隊</a>。"
 
@@ -453,10 +455,6 @@ msgstr "這則留言已回報為垃圾留言。"
 msgid "https://automattic.com/wordpress-plugins/"
 msgstr "https://automattic.com/wordpress-plugins/"
 
-#. Author of the plugin
-msgid "Automattic"
-msgstr "Automattic"
-
 #. Plugin URI of the plugin
 msgid "https://akismet.com/"
 msgstr "https://akismet.com/"
@@ -482,14 +480,6 @@ msgstr "已暫停 %s 的約期授權。"
 #: views/connect-jp.php:36
 msgid "Your subscription for %s is cancelled."
 msgstr "已取消 %s 的約期授權。"
-
-#: views/notice.php:191
-msgid "You&#8217;re using Akismet on far too many sites for your Plus subscription."
-msgstr "你在太多的網站上使用了這個 Akismet Plus 約期授權方案。"
-
-#: views/notice.php:168
-msgid "You&#8217;re using your Akismet key on more sites than your Plus subscription allows."
-msgstr "使用你的 Akismet 金鑰的網站數超過了 Plus 約期授權方案所允許的上限。"
 
 #: views/notice.php:117
 msgid "The key you entered is invalid. Please double-check it."
@@ -627,11 +617,11 @@ msgstr[0] "已阻擋的垃圾留言"
 msgid "Past six months"
 msgstr "過去六個月"
 
-#: class.akismet.php:1504
+#: class.akismet.php:1539
 msgid "Please <a href=\"%1$s\">upgrade WordPress</a> to a current version, or <a href=\"%2$s\">downgrade to version 2.4 of the Akismet plugin</a>."
 msgstr "請將 <a href=\"%1$s\">WordPress 升級</a>至最新版本，或<a href=\"%2$s\">將 Akismet 外掛程式降級至 2.4 版</a>。"
 
-#: class.akismet.php:1504
+#: class.akismet.php:1539
 msgid "Akismet %s requires WordPress %s or higher."
 msgstr "Akismet %s 需要 WordPress %s 版或更新版本。"
 
@@ -931,7 +921,7 @@ msgstr "正在移除..."
 msgid "Remove this URL"
 msgstr "移除這個網址"
 
-#: class.akismet-admin.php:87 class.akismet-admin.php:1265
+#: class.akismet-admin.php:87 class.akismet-admin.php:1259
 msgid "Akismet"
 msgstr "Akismet"
 

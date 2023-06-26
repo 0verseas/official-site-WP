@@ -6,16 +6,16 @@
             "version_normalized": "dev-master",
             "source": {
                 "type": "git",
-                "url": "git@github.com:alanef/plugindonation_lib.git",
-                "reference": "6fe8152ef59ef20616b2828a2b21db5e0b541f8c"
+                "url": "https://github.com/alanef/plugindonation_lib.git",
+                "reference": "b1fec29bbe5575c3ad8a87a6db7626dee1042a44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alanef/plugindonation_lib/zipball/6fe8152ef59ef20616b2828a2b21db5e0b541f8c",
-                "reference": "6fe8152ef59ef20616b2828a2b21db5e0b541f8c",
+                "url": "https://api.github.com/repos/alanef/plugindonation_lib/zipball/b1fec29bbe5575c3ad8a87a6db7626dee1042a44",
+                "reference": "b1fec29bbe5575c3ad8a87a6db7626dee1042a44",
                 "shasum": ""
             },
-            "time": "2022-03-17T14:01:32+00:00",
+            "time": "2023-03-22T21:01:53+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",
@@ -34,6 +34,10 @@
                 }
             ],
             "description": "Module for adding donation support to free plugins",
+            "support": {
+                "source": "https://github.com/alanef/plugindonation_lib/tree/master",
+                "issues": "https://github.com/alanef/plugindonation_lib/issues"
+            },
             "install-path": "../alanef/plugindonation_lib"
         },
         {
@@ -129,17 +133,17 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.7.1",
-            "version_normalized": "3.7.1.0",
+            "version": "3.7.2",
+            "version_normalized": "3.7.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "1359e176e9307e906dc3d890bcc9603ff6d90619"
+                "reference": "ed8e00df0a83aa96acf703f8c2979ff33341f879"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/1359e176e9307e906dc3d890bcc9603ff6d90619",
-                "reference": "1359e176e9307e906dc3d890bcc9603ff6d90619",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/ed8e00df0a83aa96acf703f8c2979ff33341f879",
+                "reference": "ed8e00df0a83aa96acf703f8c2979ff33341f879",
                 "shasum": ""
             },
             "require": {
@@ -151,7 +155,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
             },
-            "time": "2022-06-18T07:21:10+00:00",
+            "time": "2023-02-22T23:07:41+00:00",
             "bin": [
                 "bin/phpcs",
                 "bin/phpcbf"
@@ -177,7 +181,8 @@
             "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
             "keywords": [
                 "phpcs",
-                "standards"
+                "standards",
+                "static analysis"
             ],
             "support": {
                 "issues": "https://github.com/squizlabs/PHP_CodeSniffer/issues",

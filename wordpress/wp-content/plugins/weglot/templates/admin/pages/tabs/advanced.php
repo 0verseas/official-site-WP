@@ -210,7 +210,7 @@ $options_available = array(
 		>
 			<?php foreach ( Helper_Excluded_Type::get_excluded_type() as $ex_type ) : ?>
 				<option
-					value="<?php echo esc_attr( $ex_type ); ?>"><?php echo esc_attr( Helper_Excluded_Type::get_label_type( $ex_type ) ); ?></option>
+					value="<?php echo esc_attr( $ex_type ); ?>"><?php echo esc_html( Helper_Excluded_Type::get_label_type( $ex_type ) ); ?></option>
 			<?php endforeach; ?>
 		</select>
 		<input

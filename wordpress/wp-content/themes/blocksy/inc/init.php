@@ -570,6 +570,7 @@ add_action(
 );
 
 require get_template_directory() . '/inc/classes/print.php';
+require get_template_directory() . '/inc/classes/archive-title-renderer.php';
 require get_template_directory() . '/inc/helpers.php';
 require get_template_directory() . '/inc/helpers/html.php';
 require get_template_directory() . '/inc/classes/hooks-manager.php';

@@ -20,11 +20,9 @@ class SupsysticTables_Migrationfree_Model_Exporter extends SupsysticTables_Core_
 			$tableName = $this->getTable('tables');
 			$fields = $this->selectFields($tableName);
 
-			sprintf("INSERT INTO `%prefix%tables` ('.$fields.') %s VALUES %s ; %s SET @table_id = (SELECT last_insert_id()); %s", PHP_EOL, $this->selectValues($tableName, $fields, 'id', $id), $delimEOL, $delimEOL);
-
-			// print 'INSERT INTO `%prefix%tables` ('.$fields.')'.PHP_EOL.
-			// 	'VALUES'.$this->selectValues($tableName, $fields, 'id', $id).';'.$delimEOL.
-			// 	'SET @table_id = (SELECT last_insert_id());'.$delimEOL;
+			print 'INSERT INTO `%prefix%tables` ('.$fields.')'.PHP_EOL.
+				'VALUES'.$this->selectValues($tableName, $fields, 'id', $id).';'.$delimEOL.
+				'SET @table_id = (SELECT last_insert_id());'.$delimEOL;
 
 			$fieldWhere = 'table_id';
 			$limit = 400;
@@ -39,19 +37,18 @@ class SupsysticTables_Migrationfree_Model_Exporter extends SupsysticTables_Core_
 						$values = $this->selectValues($tableName, $fields, $fieldWhere, $id, '@table_id,', $limit, $offset);
 
 						if(!empty($values)) {
-							sprintf("INSERT INTO `%prefix%%s` (`table_id`,%s) %s VALUES", $table, $fields, PHP_EOL);
+							print 'INSERT INTO `%prefix%'.$table.'` (`table_id`,'.$fields.')'.PHP_EOL.'VALUES';
 							if($diag) {
-								$row1 = str_replace('"table_id":"'.esc_html($id).'"', '"table_id":"%table_id%"', esc_html($values));
-								print esc_html($row1);
+								print str_replace('"table_id":"'.$id.'"', '"table_id":"%table_id%"', $values);
 							} else {
-								print esc_html($values);
+								print $values;
 							}
-							print ';'.esc_html($delimEOL);
+							print ';'.$delimEOL;
 						}
 						$offset += $limit;
 					} while ($offset < $countRows);
 					if($diag) {
-						sprintf("UPDATE `%prefix%%s` `data`=REPLACE(`data`, '%table_id%', @table_id) WHERE `table_id`=@table_id; %s", $table, $delimEOL);
+						print 'UPDATE `%prefix%'.$table.'` SET `data`=REPLACE(`data`, "%table_id%", @table_id) WHERE `table_id`=@table_id;'.$delimEOL;
 					}
 				}
 			}

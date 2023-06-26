@@ -79,16 +79,24 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 			return $items;
 		}
 
+		// if empty destination languages we don't display the switcher.
+		if ( empty( $this->language_services->get_destination_languages( $this->request_url_services->is_allowed_private() ) ) ) {
+			return $items;
+		}
+
 		$new_items = array();
 		$offset    = 0;
 
 		foreach ( $items as $key => $item ) {
 
-			if ( strpos( $item->post_name, 'weglot-switcher' ) === false ) {
-				$item->menu_order += $offset;
-				$new_items[]       = $item;
-				continue;
+			if( isset( $item->post_name ) ){
+				if ( strpos( $item->post_name, 'weglot-switcher' ) === false ) {
+					$item->menu_order += $offset;
+					$new_items[]       = $item;
+					continue;
+				}
 			}
+
 			$id = $item->ID;
 			$i  = 0;
 
@@ -258,7 +266,6 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 		return $items;
 	}
 
-
 	/**
 	 * @since 2.0
 	 * @version 2.4.0
@@ -269,8 +276,10 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 	 */
 	public function add_nav_menu_link_attributes_atts( $attrs, $item, $args ) {
 		$str = 'weglot-switcher';
-		if ( strpos( $item->post_name, $str ) !== false ) {
-			$attrs['data-wg-notranslate'] = 'true';
+		if( isset( $item->post_name ) ){
+			if ( strpos( $item->post_name, $str ) !== false ) {
+				$attrs['data-wg-notranslate'] = 'true';
+			}
 		}
 		return $attrs;
 	}

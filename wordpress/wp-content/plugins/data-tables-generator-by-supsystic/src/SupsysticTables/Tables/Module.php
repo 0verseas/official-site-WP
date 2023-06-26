@@ -1,5 +1,5 @@
 <?php
-
+#[AllowDynamicProperties]
 class SupsysticTables_Tables_Module extends SupsysticTables_Core_BaseModule
 {
 	/**

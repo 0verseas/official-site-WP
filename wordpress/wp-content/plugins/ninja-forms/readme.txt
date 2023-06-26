@@ -1,9 +1,11 @@
 === Ninja Forms Contact Form - The Drag and Drop Form Builder for WordPress ===
 Contributors: wpninjasllc, kstover, jameslaws, kbjohnson90, klhall1987, krmoorhouse, jmcelhaney, wpnzach, ericwindhamsd
 Tags: forms, contact form, email form, form builder, custom form, pdf form, registration form, payment form, login form, contact me, signature form, upload form, file upload form, conditional form, feedback form, appointment form, quote form, survey form, contact button, signup form, form plugin, contact form plugin, subscription form, email subscription form, newsletter form, donation form, booking form, quote request form, multi page form, conditional logic form, subscription form, application form, employment verification form, star rating form, rating form, event form, mailchimp form, campaign monitor form, constant contact form, mailpoet form, aweber form, cleverreach form, emma form, convertkit form, active campaign form, salesforce form, zoho form, capsule form, insightly form, pipelinedeals form, onepagecrm form
-Requires at least: 5.6
-Tested up to: 6.1.1
-Stable tag: 3.6.17
+
+Requires at least: 6.0
+Tested up to: 6.2.2
+Stable tag: 3.6.25
+
 License: GPLv2 or later
 
 The 100% beginner friendly WordPress form builder. Drag & drop form fields to build beautiful, professional contact forms in minutes.
@@ -302,16 +304,97 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.6.17 (8 February 2023)
+= 3.6.25 (14 June 2023)
 *Bug Fixes:*
-- Ensure HTML injected in label is sanitized
-- Correct typo in date format for option DD/MM/YYYY
-- Ensure GMT offset setting does not prevent submissions page display
-- Prevent deprecated notice on empty merge tag "other"
-- Prevent deprecated notice for jsonSerialize
-- Prevent deprecated notice for passing null value
+- Remove duplicate radio bubble on opionated styles mobile
+- Restrict delete file route to uploads directory
+
+*Other:*
+ - Bump @wordpress/jest-preset-default from 10.9.0 to 11.4.0 #6579
+ -  Bump core-js from 3.30.1 to 3.30.2 #6578
+ - Bump axe-core from 4.7.0 to 4.7.1 #6577
+ - Bump @wordpress/components from 23.9.0 to 24.0.0 #6576
+ - Bump @babel/core from 7.21.5 to 7.21.8 #6575
+ - Prototype Pollution in lodash
+ - Regular Expression Denial of Service in trim
+ - glob-parent before 5.1.2 vulnerable to Regular Expression Denial of Service in enclosure regex
+ - Uncontrolled Resource Consumption in trim-newlines
+ - Inefficient Regular Expression Complexity in nth-check
 
 == Changelog ==
+= 3.6.25 (14 June 2023)
+*Bug Fixes:*
+- Remove duplicate radio bubble on opionated styles mobile
+- Restrict delete file route to uploads directory
+
+*Other:*
+ - Bump @wordpress/jest-preset-default from 10.9.0 to 11.4.0 #6579
+ -  Bump core-js from 3.30.1 to 3.30.2 #6578
+ - Bump axe-core from 4.7.0 to 4.7.1 #6577
+ - Bump @wordpress/components from 23.9.0 to 24.0.0 #6576
+ - Bump @babel/core from 7.21.5 to 7.21.8 #6575
+ - Prototype Pollution in lodash
+ - Regular Expression Denial of Service in trim
+ - glob-parent before 5.1.2 vulnerable to Regular Expression Denial of Service in enclosure regex
+ - Uncontrolled Resource Consumption in trim-newlines
+ - Inefficient Regular Expression Complexity in nth-check
+
+= 3.6.24 (12 May 2023)
+*Bug Fixes:*
+- Prevent bypass of required field with modified data
+- Prevent datepicker to break the view when set with 0 minutes increment
+- Prevent Submit button to double submit a form
+
+= 3.6.23 (26 April 2023)
+*Bug Fixes:*
+- Ensure HTML fields load merge data
+- Add fieldset repeater uploads to CSV and emails
+
+= 3.6.22 (20 April 2023)
+*Bug Fixes:*
+- Prevent possible XSS vulnerability
+
+= 3.6.21 (12 April 2023)
+*Bug Fixes:*
+- Ensure cron_interval value is integer
+- Ensure option definition value has fallback value
+- Ensure cache update process doesn't break on errant stored data
+- Replace deprecated use of self in callable
+- Use form Id to filter field searches for faster response
+
+= 3.6.20 (14 March 2023)
+*Bug Fixes:*
+- Error management in Repeater fieldsets (fields inside repeater fieldsets now respond to frontend validation)
+- Display repeater field data in HTML field via merge tags
+- Include Repeater data in CSVs when the repeater wasn't repeated
+- Display repeater data in retrigger email actions (and its CSV)
+- Display Correct repeater child fields labels in emails
+- Display repeater description on form
+- Ensure correct rendering of date field in repeaters
+- CSVs now display repeaters data as one row for each fieldset
+
+*Fixes for extensions:*
+- Save progress display repeater field without errors
+- Multi-part compatibility display repeater field, with merge tags and data saved correctly
+
+= 3.6.19 (22 February 2023)
+*Bug Fixes:*
+- Migrate/update jBox library
+- Ensure language filter results are passed to downstream filters
+- Prevent non-string math error
+
+*Other:*
+- Add version checks for extensions
+
+= 3.6.18 (16 February 2023)
+*Bug Fixes:*
+- Prevent deprecated warning null preg_match_all
+- Ensure empty form does not throw error on preview
+- Ensure array for currency doesn't throw fatal error
+- Declare previously undeclared properties (PHP 8)
+- Prevent undefined array key error
+- Ensure missing key in recaptcha field doesn't fail
+
 = 3.6.17 (8 February 2023)
 *Bug Fixes:*
 - Ensure HTML injected in label is sanitized

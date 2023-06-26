@@ -1,6 +1,6 @@
 <?php
 
-
+#[AllowDynamicProperties]
 class RscDtgs_Common_Collection implements Countable, IteratorAggregate, Serializable, ArrayAccess
 {
 

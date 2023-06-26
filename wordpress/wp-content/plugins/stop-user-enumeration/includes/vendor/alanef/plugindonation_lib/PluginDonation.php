@@ -1,6 +1,6 @@
 <?php
 /*
- *  @version 1.4
+ *  @version 1.5
  *  @licence GPL2 or Later
  *  @copyright Alan Fuller
  */
@@ -11,6 +11,7 @@ namespace AlanEFPluginDonation;
  * @since 1.0
  */
 class PluginDonation {
+	public $strings;
 	/**
 	 * @var string $plugin_slug plugin base name or slug
 	 */
@@ -31,6 +32,8 @@ class PluginDonation {
 	 * @var string $title the plugin name in human form
 	 */
 	protected $title;
+	protected $freemius;
+	protected $repo;
 
 	/**
 	 * @param string $plugin_slug plugin base name or slug
@@ -41,13 +44,14 @@ class PluginDonation {
 	 *
 	 * @since 1.0
 	 */
-	public function __construct( $plugin_slug, $settings_hook, $plugin_file, $settings_url, $title, $freemius = null ) {
+	public function __construct( $plugin_slug, $settings_hook, $plugin_file, $settings_url, $title, $freemius = null, $repo = 'wp.org' ) {
 		$this->plugin_slug   = $plugin_slug;
 		$this->settings_hook = $settings_hook;
 		$this->plugin_file   = $plugin_file;
 		$this->settings_url  = $settings_url;
 		$this->title         = $title;
 		$this->freemius      = $freemius;
+		$this->repo          = $repo;
 		$this->hooks();
 	}
 
@@ -97,6 +101,7 @@ class PluginDonation {
 		}
 		if ( get_option( $this->plugin_slug . '-activate', false ) ) {
 			delete_option( $this->plugin_slug . '-activate' );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action, nonce is not required WordPress provided and no impact if not present
 			if ( ! isset( $_GET['activate-multi'] ) ) {
 				wp_safe_redirect( $this->settings_url );
 				exit;
@@ -133,7 +138,7 @@ class PluginDonation {
 
 		if ( $this->plugin_file === $file ) {
 			$new_links = array(
-				'<a href="https://www.buymeacoffee.com/wpdevalan" target="_blank">' . esc_html( $this->get_string( 34 ) ) . '</a>'
+				'<a href="https://ko-fi.com/wpalan" target="_blank">' . esc_html( $this->get_string( 34 ) ) . '</a>'
 			);
 
 			$links = array_merge( $links, $new_links );
@@ -245,6 +250,33 @@ class PluginDonation {
 div.tabcontentwrap div:first-child{
   display: flex;
 }
+/* other styles */
+.pdl_w-full {
+  width: 100%;
+}
+.pdl_max-w-full {
+  max-width: 100%;
+}
+.pdl_md__hide {
+  display: none;
+}
+@media only screen and (max-width: 768px) {
+  .pdl_md__hide {
+    display: block;
+  }
+  .pdl_lg__hide {
+    display: none;
+  }
+}
+@media only screen and (min-width: 769px) {
+  .pdl_md__hide {
+    display: none;
+  }
+  .pdl_lg__hide {
+    display: block;
+  }
+}
+
 EOT;
 
 		wp_add_inline_style( 'admin-bar', $style );
@@ -258,6 +290,14 @@ EOT;
 	public function enqueue_scripts( $hook ) {
 		if ( $this->admin_page_we_use() ) {
 			wp_enqueue_script( 'plugindonation_lib', plugin_dir_url( __FILE__ ) . 'js/admin.js', array( 'jquery' ), '1.0', false );
+			wp_localize_script(
+				'plugindonation_lib',
+				'pdl_notice',
+				array(
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'plugindonation_lib' ),
+				)
+			);
 		}
 	}
 
@@ -362,6 +402,8 @@ EOT;
 			 */
 			esc_html__( 'Buy Me a Coffee makes supporting fun and easy. In just a couple of taps, you can donate (buy me a coffee) and leave a message. You don’t even have to create an account!', 'plugin-donation-lib' ),
 			// 37
+			esc_html__( 'Github ISSUES', 'plugin-donation-lib' ),
+			// 38
 		);
 
 		$this->strings = apply_filters( 'plugindonation_lib_strings_' . $this->plugin_slug, $this->strings );
@@ -372,10 +414,19 @@ EOT;
 	 * @since 1.0
 	 */
 	public function display() {
-		if ( $this->freemius !== null &&  ! $this->freemius->is_free_plan() ) {
-            return;
+		if ( ( $this->freemius !== null && ! $this->freemius->is_free_plan() ) || $this->is_anti_spam_pro_active() ) {
+			return;
 		}
 		?>
+        <div class="pdl_md__hide">
+                <a href="https://fullworksplugins.com/products/anti-spam/" target="_blank"><img class=" pdl_w-full pdl_max-w-full" src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/banners/anti-spam-02.png'; ?>"
+                                                                                               alt="anti spam banner" /></a>
+            </div>
+        <div class="pdl_lg__hide">
+            <a href="https://fullworksplugins.com/products/anti-spam/" target="_blank"><img class=" pdl_w-full pdl_max-w-full" src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/banners/anti-spam-01.png'; ?>"
+                                                                                            alt="anti spam banner" /></a>
+        </div>
+
         <tr valign="top">
             <th scope="row"><?php echo esc_html( $this->get_string( 0 ) ); ?></th>
             <td>
@@ -391,23 +442,10 @@ EOT;
                 <!-- Tab links -->
                 <div class="tab">
                     <button class="tablinks" onclick="openPDLTab(event, 'BMAC')"><img height="32"
-                                                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/BMAC.svg'; ?>">
-                    </button>
-                    <button class="tablinks" onclick="openPDLTab(event, 'BTC')"><img height="32"
-                                                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/BTC.png'; ?>">
+                                                                                      src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/BMAC.svg'; ?>">
                     </button>
                     <button class="tablinks" onclick="openPDLTab(event, 'PP')"><img height="32"
-                                                                                    src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/PP.png'; ?>">
-                    </button>
-                    <button class="tablinks" onclick="openPDLTab(event, 'BCH')"><img height="32"
-                                                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/BCH.png'; ?>"><br>Bitcoin
-                        Cash
-                    </button>
-                    <button class="tablinks" onclick="openPDLTab(event, 'ETH')"><img height="32"
-                                                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/ETH.png'; ?>"><br>Ethereum
-                    </button>
-                    <button class="tablinks" onclick="openPDLTab(event, 'DOGE')"><img height="32"
-                                                                                      src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/DOGE.png'; ?>"><br>Dogecoin
+                                                                                    src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/PP.png'; ?>">
                     </button>
 
                 </div>
@@ -416,77 +454,34 @@ EOT;
                 <div class="tabcontentwrap">
                     <div id="BMAC" class="tabcontent">
                         <div>
-                            <img height="48" src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/BMAC.svg'; ?>">
+                            <a href="https://ko-fi.com/wpalan" target="_blank"><img alt="kofi logo" height="48"
+                                                                                    src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/BMAC.svg'; ?>"></a>
                         </div>
                         <div>
-			                <?php echo esc_html( $this->get_string( 37 ) ); ?><br><br> <strong><a
-                                        href="https://www.buymeacoffee.com/wpdevalan">https://www.buymeacoffee.com/wpdevalan</a></strong>
+							<?php echo esc_html( $this->get_string( 37 ) ); ?><br><br> <strong><a
+                                        href="https://ko-fi.com/wpalan"
+                                        target="_blank">https://ko-fi.com/wpalan</a></strong>
                         </div>
                         <div>
-                            <img height="140"
-                                 src="<?php echo plugin_dir_url( __FILE__ ) . 'images/QRcodes/BMAC.png'; ?>">
-                        </div>
-                    </div>
-                    <div id="BTC" class="tabcontent">
-                        <div>
-                            <img height="48" src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/BTC.png'; ?>">
-                        </div>
-                        <div>
-							<?php echo esc_html( $this->get_string( 4 ) ); ?><br><br> <strong><a
-                                        href="https://www.blockchain.com/btc/address/bc1q04zt3yxxu282ayg3aev633twpqtw0dzzetp78x">bc1q04zt3yxxu282ayg3aev633twpqtw0dzzetp78x</a></strong>
-                        </div>
-                        <div>
-                            <img height="140"
-                                 src="<?php echo plugin_dir_url( __FILE__ ) . 'images/QRcodes/BTC.png'; ?>">
+                            <a href="https://ko-fi.com/wpalan" target="_blank"><img height="140" alt="kofi QR code"
+                                                                                    src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/QRcodes/BMAC.png'; ?>
+                                "></a>
                         </div>
                     </div>
                     <div id="PP" class="tabcontent">
                         <div><a href="https://www.paypal.com/donate/?hosted_button_id=UGRBY5CHSD53Q"
-                                target="_blank"><img height="48"
-                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/PP.png'; ?>">
+                                target="_blank"><img alt="PayPal Logo" height="48"
+                                                     src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/PP.png'; ?>">
                             </a></div>
                         <div><a href="https://www.paypal.com/donate/?hosted_button_id=UGRBY5CHSD53Q"
                                 target="_blank"><?php echo esc_html( $this->get_string( 5 ) ); ?>
                             </a></div>
                         <div><a href="https://www.paypal.com/donate/?hosted_button_id=UGRBY5CHSD53Q"
-                                target="_blank"><img height="48"
-                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/PPcards.png'; ?>">
+                                target="_blank"><img height="48" alt="PayPal Cards Logo"
+                                                     src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/PPcards.png'; ?>">
                             </a></div>
                     </div>
-                    <div id="BCH" class="tabcontent">
-                        <div><img height="48" src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/BCH.png'; ?>">
-                        </div>
-                        <div>
-							<?php echo esc_html( $this->get_string( 6 ) ); ?><br><br><strong>bitcoincash:qpmn76wad2mwfhk3c9vhx77ex5nqhq2r0ursp8z6mp</strong>
-                        </div>
-                        <div>
-                            <img height="140"
-                                 src="<?php echo plugin_dir_url( __FILE__ ) . 'images/QRcodes/BCH.png'; ?>">
-                        </div>
-                    </div>
 
-                    <div id="ETH" class="tabcontent">
-                        <div><img height="48" src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/ETH.png'; ?>">
-                        </div>
-                        <div>
-							<?php echo esc_html( $this->get_string( 7 ) ); ?><br><br><strong>0x492Bdf65bcB65bC067Ab3886e9B79a7CDe9021BB</strong>
-                        </div>
-                        <div>
-                            <img height="140"
-                                 src="<?php echo plugin_dir_url( __FILE__ ) . 'images/QRcodes/ETH.png'; ?>">
-                        </div>
-                    </div>
-                    <div id="DOGE" class="tabcontent">
-                        <h3><img height="48" src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/DOGE.png'; ?>">Dogecoin
-                        </h3>
-                        <div>
-							<?php echo esc_html( $this->get_string( 8 ) ); ?><br><br><strong>D7nB2HsBxNPACis9fSgjqTShe4JfSztAjr</strong>
-                        </div>
-                        <div>
-                            <img height="140"
-                                 src="<?php echo plugin_dir_url( __FILE__ ) . 'images/QRcodes/DOGE.png'; ?>">
-                        </div>
-                    </div>
                 </div>
             </td>
         </tr>
@@ -498,51 +493,72 @@ EOT;
                 </h3>
                 <!-- Tab links -->
                 <div class="tab">
-                    <button class="tablinks" onclick="openPDLTab(event, 'review-tab')"><img height="32"
-                                                                                            src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/reviews.png'; ?>"><br><?php echo esc_html( $this->get_string( 11 ) ); ?>
+					<?php
+					//  here check repo
+					if ( 'wp.org' === $this->repo ) {
+					?>
+                    <button class="tablinks" onclick="openPDLTab(event, 'review-tab')"><img alt="" height="32"
+                                                                                            src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/reviews.png'; ?>"><br><?php echo esc_html( $this->get_string( 11 ) ); ?>
                     </button>
-                    <button class="tablinks" onclick="openPDLTab(event, 'translate-tab')"><img height="32"
-                                                                                               src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/translate.png'; ?>"><br><?php echo esc_html( $this->get_string( 12 ) ); ?>
+                    <button class="tablinks" onclick="openPDLTab(event, 'translate-tab')"><img alt="" height="32"
+                                                                                               src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/translate.png'; ?>"><br><?php echo esc_html( $this->get_string( 12 ) ); ?>
                     </button>
-                    <button class="tablinks" onclick="openPDLTab(event, 'github-tab')"><img height="32"
-                                                                                            src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/github.png'; ?>"><br><?php echo esc_html( $this->get_string( 36 ) ); ?>
-                    </button>
+					<?php
+					//  end check repo
+					//  here check repo
+					if ( 'wp.org' === $this->repo || 'github.org' === $this->repo ) {
+						?>
+                        <button class="tablinks" onclick="openPDLTab(event, 'github-tab')"><img alt="" height="32"
+                                                                                                src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/github.png'; ?>"><br><?php echo esc_html( $this->get_string( 36 ) ); ?>
+                        </button>
+						<?php
+						//  end check repo
+					}
+					?>
                 </div>
                 <!-- Tab content -->
                 <div class="tabcontentwrap">
-                    <div id="review-tab" class="tabcontent">
-                        <div>
-                            <a class="button-secondary"
-                               href="https://wordpress.org/support/plugin/<?php echo esc_attr( $this->plugin_slug ); ?>/reviews/?view=all#new-post"
-                               target="_blank"><?php echo esc_html( $this->get_string( 13 ) ); ?></a>
+					<?php
+					//  here check repo
+					if ( 'wp.org' === $this->repo ) {
+						?>
+                        <div id="review-tab" class="tabcontent">
+                            <div>
+                                <a class="button-secondary"
+                                   href="https://wordpress.org/support/plugin/<?php echo esc_attr( $this->plugin_slug ); ?>/reviews/?view=all#new-post"
+                                   target="_blank"><?php echo esc_html( $this->get_string( 13 ) ); ?></a>
+                            </div>
+                            <div>
+                                <p><?php echo esc_html( $this->get_string( 14 ) ); ?></p>
+                            </div>
+                            <div>
+                                <a class="button-secondary"
+                                   href="https://wordpress.org/support/plugin/<?php echo esc_attr( $this->plugin_slug ); ?>/"
+                                   target="_blank"><?php echo esc_html( $this->get_string( 15 ) ); ?></a>
+                            </div>
                         </div>
-                        <div>
-                            <p><?php echo esc_html( $this->get_string( 14 ) ); ?></p>
+                        <div id="translate-tab" class="tabcontent">
+                            <div>
+                                <a href="https://translate.wordpress.org/projects/wp-plugins/<?php echo esc_attr( $this->plugin_slug ); ?>/"
+                                   target="_blank"><img height="48"
+                                                        src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/translate.png'; ?>">
+                                </a></div>
+                            <div>
+                                <p><?php echo esc_html( $this->get_string( 16 ) ); ?> </p>
+                            </div>
+                            <div><a class="button-secondary"
+                                    href="https://translate.wordpress.org/projects/wp-plugins/<?php echo esc_attr( $this->plugin_slug ); ?>/"
+                                    target="_blank"><?php echo esc_html( $this->get_string( 17 ) ); ?></a>
+                            </div>
                         </div>
-                        <div>
-                            <a class="button-secondary"
-                               href="https://wordpress.org/support/plugin/<?php echo esc_attr( $this->plugin_slug ); ?>/"
-                               target="_blank"><?php echo esc_html( $this->get_string( 15 ) ); ?></a>
-                        </div>
-                    </div>
-                    <div id="translate-tab" class="tabcontent">
-                        <div>
-                            <a href="https://translate.wordpress.org/projects/wp-plugins/<?php echo esc_attr( $this->plugin_slug ); ?>/"
-                               target="_blank"><img height="48"
-                                                    src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/translate.png'; ?>">
-                            </a></div>
-                        <div>
-                            <p><?php echo esc_html( $this->get_string( 16 ) ); ?> </p>
-                        </div>
-                        <div><a class="button-secondary"
-                                href="https://translate.wordpress.org/projects/wp-plugins/<?php echo esc_attr( $this->plugin_slug ); ?>/"
-                                target="_blank"><?php echo esc_html( $this->get_string( 17 ) ); ?></a>
-                        </div>
-                    </div>
+					<?php }
+					if ( 'wp.org' === $this->repo || 'github.org' === $this->repo ) {
+
+					} ?>
                     <div id="github-tab" class="tabcontent">
                         <div><a href="https://github.com/alanef/<?php echo esc_attr( $this->plugin_slug ); ?>/"
                                 target="_blank"><img height="48"
-                                                     src="<?php echo plugin_dir_url( __FILE__ ) . 'images/logos/github.png'; ?>"></a>
+                                                     src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/logos/github.png'; ?>"></a>
                         </div>
                         <div>
                             <p><?php echo esc_html( $this->get_string( 18 ) ); ?></p>
@@ -553,6 +569,7 @@ EOT;
                                target="_blank"><?php echo esc_html( $this->get_string( 19 ) ); ?></a>
                         </div>
                     </div>
+					<?php } ?>
 
                 </div>
             </td>
@@ -560,9 +577,26 @@ EOT;
         <tr valign="top">
             <th scope="row"><?php echo esc_html( $this->get_string( 20 ) ); ?></th>
             <td>
-                <a class="button-secondary"
-                   href="https://wordpress.org/support/plugin/<?php echo esc_attr( $this->plugin_slug ); ?>/"
-                   target="_blank"><?php echo esc_html( $this->get_string( 21 ) ); ?></a>
+				<?php
+				//  here check repo
+				if ( 'wp.org' === $this->repo ) {
+					?>
+                    <a class="button-secondary"
+                       href="https://wordpress.org/support/plugin/<?php echo esc_attr( $this->plugin_slug ); ?>/"
+                       target="_blank"><?php echo esc_html( $this->get_string( 21 ) ); ?></a>
+					<?php
+					//  end check repo
+				}
+				//  here check repo
+				if ( 'github.com' === $this->repo ) {
+					?>
+                    <a class="button-secondary"
+                       href="https://github.com/alanef/<?php echo esc_attr( $this->plugin_slug ); ?>/issues"
+                       target="_blank"><?php echo esc_html( $this->get_string( 38 ) ); ?></a>
+					<?php
+					//  end check repo
+				}
+				?>
             </td>
         </tr>
 		<?php
@@ -572,9 +606,12 @@ EOT;
 	 * @since 1.0
 	 */
 	public function display_admin_notice() {
-        if ( $this->freemius !== null && ! $this->freemius->is_free_plan() ) {
-            return;
-        }
+		if ( ( $this->freemius !== null && ! $this->freemius->is_free_plan() ) || $this->is_anti_spam_pro_active() ) {
+			return;
+		}
+
+
+
 		$this->set_timers();
 		// Don't display notices to users that can't do anything about it.
 		if ( ! current_user_can( 'install_plugins' ) ) {
@@ -643,6 +680,20 @@ EOT;
 		}
 	}
 
+    private function is_anti_spam_pro_active() {
+	    // check if global $fwantispam_fs
+        if ( isset( $GLOBALS['fwantispam_fs'] ) ) {
+	        /** @var \Freemius $fwantispam_fs Freemius global object. */
+            global $fwantispam_fs;
+            if ( !empty( $fwantispam_fs ) ) {
+                if ( $fwantispam_fs->can_use_premium_code() ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 	/**
 	 * @since 1.0
 	 */
@@ -652,26 +703,27 @@ EOT;
 		}
 		$user_id = get_current_user_id();
 		/* handle issue of old version */
-        $slugs =array(
-	        'stop-user-enumeration',
-            'clean-and-simple-contact-form-by-meg-nicholas',
-            'redirect-404-error-page-to-homepage-or-custom-page',
-            'simple-google-maps-short-code',
-	        'stop-wp-emails-going-to-spam',
-        );
-        foreach( $slugs as $slug) {
-	        $legacy = get_user_meta( $user_id, $slug .'_pdlib_dismissed_notices', true );
-	        if ( ! empty( $legacy ) ) {
-		        update_user_meta( $user_id, 'pdlib_dismissed_notices', $legacy );
-		        delete_user_meta( $user_id, $slug .'_pdlib_dismissed_notices' );
-                break;
-	        }
-        }
-        /* end of tidy up */
+		$slugs = array(
+			'stop-user-enumeration',
+			'clean-and-simple-contact-form-by-meg-nicholas',
+			'redirect-404-error-page-to-homepage-or-custom-page',
+			'simple-google-maps-short-code',
+			'stop-wp-emails-going-to-spam',
+		);
+		foreach ( $slugs as $slug ) {
+			$legacy = get_user_meta( $user_id, $slug . '_pdlib_dismissed_notices', true );
+			if ( ! empty( $legacy ) ) {
+				update_user_meta( $user_id, 'pdlib_dismissed_notices', $legacy );
+				delete_user_meta( $user_id, $slug . '_pdlib_dismissed_notices' );
+				break;
+			}
+		}
+		/* end of tidy up */
 		$um = get_user_meta( $user_id, 'pdlib_dismissed_notices', true );
 		if ( ! is_array( $um ) ) {
 			$um = array();
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification -- nonce is verified in valid_ajax_call
 		$um[ sanitize_text_field( $_POST['id'] ) ] = true;
 		update_user_meta( $user_id, 'pdlib_dismissed_notices', $um );
 		wp_die();
@@ -691,6 +743,9 @@ EOT;
 		if ( ! current_user_can( 'install_plugins' ) ) {
 			return false;
 		}
+		if ( isset( $POST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'plugindonation_lib' ) ) {
+			return false;
+		}
 
 		return true;
 	}
@@ -702,6 +757,7 @@ EOT;
 		if ( ! $this->valid_ajax_call() ) {
 			return;
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification -- nonce is verified in valid_ajax_call
 		if ( sanitize_text_field( $_POST['id'] ) === $this->plugin_slug . '_pdlib_notice_donate' ) {
 			// donate later
 			$donate = get_option( $this->plugin_slug . '_donate' );
@@ -709,6 +765,7 @@ EOT;
 				update_option( $this->plugin_slug . '_donate', (int) $donate + ( 6 * WEEK_IN_SECONDS ) );
 			}
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification -- nonce is verified in valid_ajax_call
 		if ( sanitize_text_field( $_POST['id'] ) === $this->plugin_slug . '_pdlib_notice_review' ) {
 			// review later
 			$review = get_option( $this->plugin_slug . '_review' );

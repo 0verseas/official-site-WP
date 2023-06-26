@@ -56,6 +56,53 @@ class WpHooksManager {
 		}
 	}
 
+    public function disable_callbacks($args = []) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'token' => '',
+				'source' => []
+			]
+		);
+
+		blocksy_assert_args($args, ['token', 'source']);
+
+		global $wp_filter;
+
+		foreach ($args['source'] as $source_id) {
+			if (! isset($wp_filter[$source_id])) {
+				continue;
+			}
+
+			$this->tokens[$args['token']][$source_id] = $wp_filter[$source_id];
+			unset($wp_filter[$source_id]);
+		}
+    }
+
+    public function enable_callbacks($args = []) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'token' => '',
+				'source' => []
+			]
+		);
+
+		blocksy_assert_args($args, ['token', 'source']);
+
+		global $wp_filter;
+
+		foreach ($args['source'] as $source_id) {
+			if (! isset($this->tokens[$args['token']][$source_id])) {
+				continue;
+			}
+
+			$wp_filter[$source_id] = $this->tokens[$args['token']][$source_id];
+
+			unset($this->tokens[$args['token']][$source_id]);
+		}
+    }
+
 	// For now callback rolling is not needed, but it may be needed eventually
 	/*
 	public function rollback_callbacks($args = []) {
