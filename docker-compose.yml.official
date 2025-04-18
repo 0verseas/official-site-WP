@@ -1,8 +1,8 @@
 version: "3.7"
 services:
     wp-php:
-        image: wordpress:php8.0-fpm-alpine
-        container_name: wp-php
+        image: wordpress:php8.0-fpm
+        container_name: ${CONTAINER_PHP}
         restart: always
         environment:
             WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
@@ -11,34 +11,35 @@ services:
             WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
         volumes:
             - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+            - ./www.conf:/usr/local/etc/php-fpm.d/www.conf
             - ./wordpress:/var/www/html
         networks:
             - bridge
 
     wp-web:
-#        build:
-#            context: .
-#            dockerfile: ./Dockerfile
         image: nginx:latest
-        container_name: wp-web
+        container_name: ${CONTAINER_WEB}
         restart: always
         environment:
             - TZ=Asia/Taipei
         volumes:
             - ./nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./realip.conf:/etc/nginx/nginx.conf
             - ./wordpress:/var/www/html
+            - ./admission-ebook/2024:/var/www/html/admission-ebook/2024
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.wp-dev.entrypoints=websecure"
-            - "traefik.http.routers.wp-dev.rule=HOST(`${DOMAIN_NAME}`)"
-            - "traefik.http.routers.wp-dev.tls=true"
-            - "traefik.http.routers.wp-dev.tls.certresolver=lets-encr"
-            - "traefik.http.routers.wp-dev.tls.options=default"
-            - "traefik.http.routers.wp-dev.middlewares=wp-secure-headers@file,traefik-compress@file"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=${ENTRYPOINTS}"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=HOST(`${DOMAIN_NAME_1}`,`${DOMAIN_NAME_2}`,`${DOMAIN_NAME_3}`)"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls=true"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=lets-encr"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.options=default"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=wp-secure-headers@file,traefik-compress@file"
+#            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ncnuipwhitelist@file" # 禁止對外連接
         networks:
             - bridge
 
 networks:
     bridge:
-        external:
-            name: ${NETWORKS}
+        external: true
+        name: ${NETWORKS}
