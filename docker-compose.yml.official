@@ -26,16 +26,20 @@ services:
             - ./nginx.conf:/etc/nginx/conf.d/default.conf
             - ./realip.conf:/etc/nginx/nginx.conf
             - ./wordpress:/var/www/html
-            - ./admission-ebook/2024:/var/www/html/admission-ebook/2024
+            - ./admission-ebook/:/var/www/html/admission-ebook/
         labels:
             - "traefik.enable=true"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.entrypoints=web"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.rule=HOST(`${DOMAIN_NAME_1}`,`${DOMAIN_NAME_2}`,`${DOMAIN_NAME_3}`)"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.service=http-service@file"
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.middlewares=check-host@file,redirect-to-https@file"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=${ENTRYPOINTS}"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=HOST(`${DOMAIN_NAME_1}`,`${DOMAIN_NAME_2}`,`${DOMAIN_NAME_3}`)"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls=true"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=lets-encr"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.options=default"
-            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=wp-secure-headers@file,traefik-compress@file"
-#            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ncnuipwhitelist@file" # 禁止對外連接
+            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=check-host@file,wp-secure-headers@file,traefik-compress@file"
+#            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ncnuipwhitelist@fil,check-host@file,wp-secure-headers@file,traefik-compress@file" # 禁止對外連接
         networks:
             - bridge
 
