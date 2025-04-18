@@ -42,7 +42,7 @@ const renderTabsType = () => {
 		wp.customize('woo_tabs_alignment')()
 }
 
-wp.customize('woo_tabs_type', (val) => val.bind((to) => renderTabsType()))
+// wp.customize('woo_tabs_type', (val) => val.bind((to) => renderTabsType()))
 wp.customize('woo_tabs_alignment', (val) => val.bind((to) => renderTabsType()))
 
 wp.customize('has_product_sticky_gallery', (val) =>
@@ -83,15 +83,15 @@ wp.customize('product_gallery_ratio', (val) =>
 			return
 		}
 
-		const article = document.querySelector('.product.type-product')
+		const article = document.querySelector('.ct-product-gallery-container')
 
-		;[
-			...article.querySelectorAll(
-				'.flexy-items .ct-image-container, .woocommerce-product-gallery > .ct-image-container'
-			),
-		].map((el) => {
-			ctEvents.trigger('ct:flexy:update-height')
-			setRatioFor(to, el)
+		;[...article.querySelectorAll('.ct-media-container')].map((el) => {
+			setRatioFor({
+				ratio: to,
+				el,
+
+				setFullSize: true,
+			})
 
 			const flexyItems = article.querySelector('.flexy-items')
 

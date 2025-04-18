@@ -6,7 +6,7 @@ import {
 
 import { isIosDevice } from '../../helpers/is-ios-device'
 
-export var enable = function (el) {
+export var enable = function () {
 	if (!isIosDevice()) {
 		document.body.style.overflow = ''
 		document.body.style.removeProperty('--scrollbar-width')
@@ -35,6 +35,10 @@ export var disable = function (el) {
 
 				allowTouchMove: (el) => {
 					if (el.closest('.select2-container')) {
+						return true
+					}
+
+					if (el.closest('.flexy')) {
 						return true
 					}
 

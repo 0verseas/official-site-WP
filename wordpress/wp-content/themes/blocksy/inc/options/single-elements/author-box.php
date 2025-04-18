@@ -102,23 +102,41 @@ $options = [
 						],
 					],
 
+					$prefix . 'single_author_box_archive_link' => [
+						'label' => __( 'Author Archive Link', 'blocksy' ),
+						'type' => 'ct-switch',
+						'value' => 'yes',
+						'divider' => 'top',
+						'sync' => [
+							'prefix' => $prefix,
+							'selector' => '.author-box',
+							'render' => function () {
+								if (have_posts()) {
+									the_post();
+								}
+
+								blocksy_author_box();
+							}
+						],
+					],
+
 					$prefix . 'single_author_box_social' => [
 						'label' => __( 'Social Icons', 'blocksy' ),
 						'type' => 'ct-switch',
 						'value' => 'yes',
-						'desc' => sprintf(
+						'desc' => blocksy_safe_sprintf(
 							// translators: placeholder here is the link URL.
 							__(
 								'You can set the author social channels %shere%s.',
 								'blocksy'
 							),
-							sprintf(
+							blocksy_safe_sprintf(
 								'<a href="%s" target="_blank">',
 								admin_url('/profile.php')
 							),
 							'</a>'
 						),
-						'divider' => 'top',
+						'divider' => 'top:full',
 						'sync' => [
 							'prefix' => $prefix,
 							'selector' => '.author-box',
@@ -154,6 +172,23 @@ $options = [
 								],
 							],
 
+							$prefix . 'single_author_box_social_link_nofollow' => [
+								'type'  => 'ct-switch',
+								'label' => __( 'Set links to nofollow', 'blocksy' ),
+								'value' => 'no',
+								'sync' => [
+									'prefix' => $prefix,
+									'selector' => '.author-box',
+									'render' => function () {
+										if (have_posts()) {
+											the_post();
+										}
+
+										blocksy_author_box();
+									}
+								],
+							],
+
 						],
 					],
 
@@ -162,14 +197,11 @@ $options = [
 						'type' => 'ct-slider',
 						'value' => '40px',
 						'units' => blocksy_units_config([
-							[
-								'unit' => 'px',
-								'min' => 0,
-								'max' => 100,
-							],
+							[ 'unit' => 'px', 'min' => 0, 'max' => 100],
+							['unit' => '', 'type' => 'custom'],
 						]),
 						'responsive' => true,
-						'divider' => 'top',
+						'divider' => 'top:full',
 						'sync' => 'live'
 					],
 
@@ -182,13 +214,11 @@ $options = [
 						'type' => 'ct-visibility',
 						'design' => 'block',
 						'sync' => 'live',
-
-						'value' => [
+						'value' => blocksy_default_responsive_value([
 							'desktop' => true,
 							'tablet' => true,
 							'mobile' => false,
-						],
-
+						]),
 						'choices' => blocksy_ordered_keys([
 							'desktop' => __( 'Desktop', 'blocksy' ),
 							'tablet' => __( 'Tablet', 'blocksy' ),
@@ -229,27 +259,27 @@ $options = [
 								'title' => __( 'Initial', 'blocksy' ),
 								'id' => 'default',
 								'inherit' => [
-									'var(--heading-1-color, var(--headings-color))' => [
+									'var(--theme-heading-1-color, var(--theme-headings-color))' => [
 										$prefix . 'single_author_box_name_heading' => 'h1'
 									],
 
-									'var(--heading-2-color, var(--headings-color))' => [
+									'var(--theme-heading-2-color, var(--theme-headings-color))' => [
 										$prefix . 'single_author_box_name_heading' => 'h2'
 									],
 
-									'var(--heading-3-color, var(--headings-color))' => [
+									'var(--theme-heading-3-color, var(--theme-headings-color))' => [
 										$prefix . 'single_author_box_name_heading' => 'h3'
 									],
 
-									'var(--heading-4-color, var(--headings-color))' => [
+									'var(--theme-heading-4-color, var(--theme-headings-color))' => [
 										$prefix . 'single_author_box_name_heading' => 'h4'
 									],
 
-									'var(--heading-5-color, var(--headings-color))' => [
+									'var(--theme-heading-5-color, var(--theme-headings-color))' => [
 										$prefix . 'single_author_box_name_heading' => 'h5'
 									],
 
-									'var(--heading-6-color, var(--headings-color))' => [
+									'var(--theme-heading-6-color, var(--theme-headings-color))' => [
 										$prefix . 'single_author_box_name_heading' => 'h6'
 									]
 								]
@@ -289,19 +319,19 @@ $options = [
 							[
 								'title' => __( 'Text', 'blocksy' ),
 								'id' => 'default',
-								'inherit' => 'var(--color)'
+								'inherit' => 'var(--theme-text-color)'
 							],
 
 							[
 								'title' => __( 'Link Initial', 'blocksy' ),
 								'id' => 'initial',
-								'inherit' => 'var(--linkInitialColor)'
+								'inherit' => 'var(--theme-link-initial-color)'
 							],
 
 							[
 								'title' => __( 'Link Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--linkHoverColor)'
+								'inherit' => 'var(--theme-link-hover-color)'
 							],
 						],
 					],
@@ -316,7 +346,7 @@ $options = [
 								'type'  => 'ct-color-picker',
 								'design' => 'block:right',
 								'responsive' => true,
-								'divider' => 'bottom',
+								// 'divider' => 'bottom',
 								'setting' => [ 'transport' => 'postMessage' ],
 
 								'value' => [
@@ -366,13 +396,13 @@ $options = [
 									[
 										'title' => __( 'Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--paletteColor1)'
+										'inherit' => 'var(--theme-palette-color-1)'
 									],
 
 									[
 										'title' => __( 'Hover', 'blocksy' ),
 										'id' => 'hover',
-										'inherit' => 'var(--paletteColor2)'
+										'inherit' => 'var(--theme-palette-color-2)'
 									],
 								],
 							],
@@ -431,7 +461,7 @@ $options = [
 								'value' => blocksy_background_default_value([
 									'backgroundColor' => [
 										'default' => [
-											'color' => '#ffffff',
+											'color' => 'var(--theme-palette-color-8)',
 										],
 									],
 								]),
@@ -477,9 +507,8 @@ $options = [
 								'sync' => 'live',
 								'type' => 'ct-spacing',
 								'divider' => 'top',
-								'value' => blocksy_spacing_value([
-									'linked' => true,
-								]),
+								'value' => blocksy_spacing_value(),
+								'min' => 0,
 								'responsive' => true
 							],
 						],

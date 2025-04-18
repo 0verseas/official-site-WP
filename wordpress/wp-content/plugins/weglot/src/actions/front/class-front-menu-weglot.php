@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use AllowDynamicProperties;
 use WeglotWP\Models\Hooks_Interface_Weglot;
 use WeglotWP\Services\Button_Service_Weglot;
 
@@ -18,6 +19,7 @@ use WeglotWP\Services\Request_Url_Service_Weglot;
  * @since 2.0
  *
  */
+#[AllowDynamicProperties]
 class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 	/**
 	 * @var Option_Service_Weglot
@@ -61,16 +63,15 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 			return;
 		}
 
-
 		add_filter( 'wp_get_nav_menu_items', array( $this, 'weglot_wp_get_nav_menu_items' ), 20 );
-		add_filter( 'nav_menu_link_attributes', array( $this, 'add_nav_menu_link_attributes_atts' ), 10, 3 );
+		add_filter( 'nav_menu_link_attributes', array( $this, 'add_nav_menu_link_attributes_atts' ), 10, 2 );
 		add_filter( 'wp_nav_menu_objects', array( $this, 'wp_nav_menu_objects' ) );
 	}
 
 	/**
 	 * @since 2.4.0
-	 * @param array $items
-	 * @return array
+	 * @param array<int|string,mixed> $items
+	 * @return array<int|string,mixed>
 	 */
 	public function weglot_wp_get_nav_menu_items( $items ) {
 
@@ -86,11 +87,13 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 
 		$new_items = array();
 		$offset    = 0;
+		$wg_original_no_follow     = apply_filters( 'weglot_autoredirect_no_follow', false );
 
 		foreach ( $items as $key => $item ) {
 
 			if( isset( $item->post_name ) ){
 				if ( strpos( $item->post_name, 'weglot-switcher' ) === false ) {
+					/** @phpstan-ignore-next-line */
 					$item->menu_order += $offset;
 					$new_items[]       = $item;
 					continue;
@@ -194,6 +197,9 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 				$language_item->lang        = $language->getInternalCode();
 				$language_item->classes     = array_merge( $classes, $add_classes );
 				$language_item->menu_order += $offset + $i++;
+				if($wg_original_no_follow && strpos( $link_button, 'wg-choose-original' ) !== false){
+					$language_item->xfn .= 'nofollow';
+				}
 				if ( $dropdown ) {
 					$language_item->menu_item_parent = $item->db_id;
 					$language_item->db_id            = 0;
@@ -210,7 +216,7 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 	/**
 	 * @since 2.7.0
 	 * @param object $item
-	 * @return array
+	 * @return array<int|string,mixed>
 	 */
 	public function get_ancestors( $item ) {
 		$ids     = array();
@@ -225,8 +231,8 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 
 	/**
 	 * @since 2.7.0
-	 * @param array $items
-	 * @return array
+	 * @param array<int|string,mixed> $items
+	 * @return array<int|string,mixed>
 	 */
 	public function wp_nav_menu_objects( $items ) {
 		$r_ids = array();
@@ -235,6 +241,7 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 		foreach ( $items as $item ) {
 			if ( ! empty( $item->classes ) && is_array( $item->classes ) ) {
 				if ( in_array( 'menu-item-weglot', $item->classes, true ) ) {
+					/** @phpstan-ignore-next-line */
 					$item->current = false;
 					$item->classes = array_diff( $item->classes, array( 'current-menu-item' ) );
 					$r_ids         = array_merge( $r_ids, $this->get_ancestors( $item ) ); // Remove the classes for these ancestors.
@@ -248,6 +255,7 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 
 		foreach ( $items as $item ) {
 			if ( ! empty( $item->db_id ) && in_array( $item->db_id, $r_ids, true ) ) {
+				/** @phpstan-ignore-next-line */
 				$item->classes = array_diff( $item->classes, array( 'current-menu-ancestor', 'current-menu-parent', 'current_page_parent', 'current_page_ancestor' ) );
 			}
 		}
@@ -270,11 +278,11 @@ class Front_Menu_Weglot implements Hooks_Interface_Weglot {
 	 * @since 2.0
 	 * @version 2.4.0
 	 * @see nav_menu_link_attributes_atts
-	 * @param array $attrs
+	 * @param array<int|string,mixed> $attrs
 	 * @param object $item
-	 * @return array
+	 * @return array<int|string,mixed>
 	 */
-	public function add_nav_menu_link_attributes_atts( $attrs, $item, $args ) {
+	public function add_nav_menu_link_attributes_atts( $attrs, $item ) {
 		$str = 'weglot-switcher';
 		if( isset( $item->post_name ) ){
 			if ( strpos( $item->post_name, $str ) !== false ) {

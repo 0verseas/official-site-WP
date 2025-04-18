@@ -406,7 +406,7 @@ class WPCode_Generator_Query extends WPCode_Generator_Type {
 							'repeater'    => 'tax_query',
 							'default'     => 'term_id',
 							'options'     => array(
-								'term_id'          => __( 'Term ID (default', 'insert-headers-and-footers' ),
+								'term_id'          => __( 'Term ID (default)', 'insert-headers-and-footers' ),
 								'name'             => __( 'Term Name', 'insert-headers-and-footers' ),
 								'slug'             => __( 'Term Slug', 'insert-headers-and-footers' ),
 								'term_taxonomy_id' => __( 'Term Taxonomy ID', 'insert-headers-and-footers' ),
@@ -613,7 +613,7 @@ wp_reset_postdata();
 
 		$optional_values = array(
 			'post__in'            => false,
-			'post__not_in'        => false,
+			'post__not_in'        => false,  // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in
 			'post_parent__in'     => false,
 			'post_parent__not_in' => false,
 			'post_name__in'       => true,
@@ -728,18 +728,16 @@ wp_reset_postdata();
 
 		$args = "\n" . $args;
 
-		return <<<EOD
-// Query Posts.
+		return '// Query Posts.
 
 // Query arguments.
-\$query_args = array($args$tax_query$meta_query
+$query_args = array(' . $args . $tax_query . $meta_query . '
 );
 
 // Run the query.
-$query_variable = new WP_Query( \$query_args );
-$loop_code
-
-EOD;
+' . $query_variable . ' = new WP_Query( $query_args );
+' . $loop_code . '
+';
 	}
 
 }

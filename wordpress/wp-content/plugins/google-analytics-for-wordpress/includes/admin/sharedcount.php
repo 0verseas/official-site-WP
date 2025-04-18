@@ -74,8 +74,11 @@ class MonsterInsights_SharedCount {
 	 * a daily cron to keep the counts fresh.
 	 */
 	public function ajax_start_indexing() {
-
 		check_ajax_referer( 'mi-admin-nonce', 'nonce' );
+
+		if ( ! current_user_can( 'monsterinsights_save_settings' ) ) {
+			return;
+		}
 
 		if ( $this->get_api_key() ) {
 			if ( $this->start_posts_count() ) {
@@ -196,7 +199,7 @@ class MonsterInsights_SharedCount {
 			'posts_per_page'   => 100, // Don't try to load more than 500 posts at once.
 			'fields'           => 'ids', // Load just the ids.
 			'paged'            => $page,
-			'suppress_filters' => true, // Avoid loading additional functionality from other plugins/theme.
+			'suppress_filters' => true, // phpcs:ignore -- Avoid loading additional functionality from other plugins/theme.
 		);
 		$posts_query = new WP_Query( $posts_args );
 		$urls        = array();
@@ -592,6 +595,12 @@ class MonsterInsights_SharedCount {
 	 * Get the index progress with ajax.
 	 */
 	public function ajax_get_index_progress() {
+		check_ajax_referer( 'mi-admin-nonce', 'nonce' );
+
+		if ( ! current_user_can( 'monsterinsights_save_settings' ) ) {
+			return;
+		}
+
 		wp_send_json( array(
 			'progress' => self::get_index_progress_percent(),
 		) );

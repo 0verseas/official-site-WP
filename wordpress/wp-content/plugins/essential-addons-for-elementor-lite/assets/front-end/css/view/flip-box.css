@@ -13,7 +13,6 @@
 .eael-elements-flip-box-container .flipbox-button {
   display: inline-block;
   -webkit-transition: all 400ms;
-  -o-transition: all 400ms;
   transition: all 400ms;
   padding: 14px 18px;
   border-radius: 3px;
@@ -72,7 +71,8 @@
   z-index: 2;
   width: 100%;
   height: 100%;
-  background: #8a35ff;
+  background-color: #8a35ff;
+  background-blend-mode: multiply;
   color: #ffffff;
   border-color: #000000;
   -webkit-display: flex;
@@ -103,7 +103,8 @@
   left: 0px;
   width: 100%;
   height: 100%;
-  background: #502fc6;
+  background-color: #502fc6;
+  background-blend-mode: multiply;
   color: #ffffff;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -146,13 +147,10 @@
 .eael-elements-flip-box-front-container,
 .eael-elements-flip-box-rear-container {
   -webkit-transition-duration: 500ms;
-       -o-transition-duration: 500ms;
           transition-duration: 500ms;
   -webkit-transition-property: all;
-  -o-transition-property: all;
   transition-property: all;
   -webkit-transition-timing-function: ease;
-       -o-transition-timing-function: ease;
           transition-timing-function: ease;
 }
 .eael-elements-flip-box-flip-card {
@@ -161,7 +159,6 @@
   -webkit-transform-style: preserve-3d;
           transform-style: preserve-3d;
   -webkit-transition: all 500ms ease;
-  -o-transition: all 500ms ease;
   transition: all 500ms ease;
 }
 .eael-elements-flip-box-rear-container,
@@ -205,22 +202,26 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
-.eael-animate-flip.eael-animate-up.eael-elements-flip-box-container:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-flip-card,
 .eael-animate-flip.eael-animate-up .eael-elements-flip-box-rear-container {
   -webkit-transform: rotateX(180deg);
           transform: rotateX(180deg);
 }
-.eael-animate-flip.eael-animate-down.eael-elements-flip-box-container:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-flip-card,
 .eael-animate-flip.eael-animate-down .eael-elements-flip-box-rear-container {
   -webkit-transform: rotateX(-180deg);
           transform: rotateX(-180deg);
 }
-.eael-animate-flip.eael-animate-left.eael-elements-flip-box-container:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-flip-card,
 .eael-animate-flip.eael-animate-left .eael-elements-flip-box-rear-container {
   -webkit-transform: rotateY(-180deg);
           transform: rotateY(-180deg);
 }
-.eael-animate-flip.eael-animate-right.eael-elements-flip-box-container:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-flip-card,
+.eael-animate-flip.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-flip-card,
 .eael-animate-flip.eael-animate-right .eael-elements-flip-box-rear-container {
   -webkit-transform: rotateY(180deg);
           transform: rotateY(180deg);
@@ -238,8 +239,10 @@
 .eael-animate-slide.eael-animate-up .eael-elements-flip-box-rear-container {
   top: 100%;
 }
-.eael-animate-push.eael-animate-up.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container,
-.eael-animate-slide.eael-animate-up.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container {
+.eael-animate-push.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container,
+.eael-animate-push.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container {
   top: 0;
 }
 .eael-animate-push.eael-animate-down .eael-elements-flip-box-rear-container,
@@ -247,8 +250,10 @@
   top: auto;
   bottom: 100%;
 }
-.eael-animate-push.eael-animate-down.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container,
-.eael-animate-slide.eael-animate-down.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container {
+.eael-animate-push.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container,
+.eael-animate-push.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container {
   top: auto;
   bottom: 0;
 }
@@ -256,8 +261,10 @@
 .eael-animate-slide.eael-animate-left .eael-elements-flip-box-rear-container {
   left: 100%;
 }
-.eael-animate-push.eael-animate-left.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container,
-.eael-animate-slide.eael-animate-left.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container {
+.eael-animate-push.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container,
+.eael-animate-push.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container {
   left: 0;
 }
 .eael-animate-push.eael-animate-right .eael-elements-flip-box-rear-container,
@@ -265,22 +272,28 @@
   left: auto;
   right: 100%;
 }
-.eael-animate-push.eael-animate-right.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container,
-.eael-animate-slide.eael-animate-right.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container {
+.eael-animate-push.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container,
+.eael-animate-push.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container,
+.eael-animate-slide.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container {
   left: auto;
   right: 0;
 }
 /*--- Push + Slide Above ---*/
-.eael-animate-push.eael-animate-up.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
+.eael-animate-push.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-front-container,
+.eael-animate-push.eael-animate-up.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-front-container {
   top: -100%;
 }
-.eael-animate-push.eael-animate-down.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
+.eael-animate-push.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-front-container,
+.eael-animate-push.eael-animate-down.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-front-container {
   top: 100%;
 }
-.eael-animate-push.eael-animate-left.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
+.eael-animate-push.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-front-container,
+.eael-animate-push.eael-animate-left.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-front-container {
   left: -100%;
 }
-.eael-animate-push.eael-animate-right.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
+.eael-animate-push.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-front-container,
+.eael-animate-push.eael-animate-right.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-front-container {
   left: 100%;
 }
 /*--- Zoom In ---*/
@@ -291,21 +304,24 @@
           transform: scale(0.75);
   z-index: 3;
 }
-.eael-animate-zoom-in.eael-elements-flip-box-container:hover .eael-elements-flip-box-rear-container {
+.eael-animate-zoom-in.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-rear-container,
+.eael-animate-zoom-in.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-rear-container {
   opacity: 1;
   -webkit-transform: scale(1);
       -ms-transform: scale(1);
           transform: scale(1);
 }
 /*--- Zoom Out ---*/
-.eael-animate-zoom-out.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
+.eael-animate-zoom-out.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-front-container,
+.eael-animate-zoom-out.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-front-container {
   opacity: 0;
   visibility: hidden;
   -webkit-transform: scale(0.75);
       -ms-transform: scale(0.75);
           transform: scale(0.75);
 }
-.eael-animate-fade.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
+.eael-animate-fade.eael-elements-flip-box-container.eael-flip-box-hover:hover .eael-elements-flip-box-front-container,
+.eael-animate-fade.eael-elements-flip-box-container.eael-flip-box-click.--active .eael-elements-flip-box-front-container {
   opacity: 0;
 }
 /*--- Builder Related Style ---*/
@@ -330,7 +346,6 @@
   -webkit-perspective: 1000px;
           perspective: 1000px;
   -webkit-transition: all 0.6s ease-in-out;
-  -o-transition: all 0.6s ease-in-out;
   transition: all 0.6s ease-in-out;
 }
 .eael-animate-fade-in.eael-elements-flip-box-container:hover .eael-elements-flip-box-front-container {
@@ -342,7 +357,6 @@
 }
 .eael-animate-fade-in.eael-elements-flip-box-container .eael-elements-flip-box-front-container, .eael-animate-fade-in.eael-elements-flip-box-container .eael-elements-flip-box-rear-container {
   -webkit-transition: all 0.6s ease-in-out !important;
-  -o-transition: all 0.6s ease-in-out !important;
   transition: all 0.6s ease-in-out !important;
 }
 .eael-animate-fade-in.eael-elements-flip-box-container .eael-elements-flip-box-rear-container {

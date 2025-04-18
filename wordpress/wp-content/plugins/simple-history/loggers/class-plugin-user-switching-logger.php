@@ -11,6 +11,7 @@ use Simple_History\Log_Initiators;
  * @since 2.2
  */
 class Plugin_User_Switching_Logger extends Logger {
+	/** @var string Logger slug */
 	public $slug = 'PluginUserSwitchingLogger';
 
 	/**
@@ -35,15 +36,22 @@ class Plugin_User_Switching_Logger extends Logger {
 		return $arr_info;
 	}
 
+	/**
+	 * Called when logger is loaded.
+	 */
 	public function loaded() {
-
 		add_action( 'switch_to_user', array( $this, 'on_switch_to_user' ), 10, 2 );
 		add_action( 'switch_back_user', array( $this, 'on_switch_back_user' ), 10, 2 );
 		add_action( 'switch_off_user', array( $this, 'on_switch_off_user' ), 10, 1 );
 	}
 
+	/**
+	 * Function is called when a user switches to another user.
+	 *
+	 * @param int $user_id     The ID of the user being switched to.
+	 * @param int $old_user_id The ID of the user being switched from.
+	 */
 	public function on_switch_to_user( $user_id, $old_user_id ) {
-
 		$user_to = get_user_by( 'id', $user_id );
 		$user_from = get_user_by( 'id', $old_user_id );
 
@@ -54,9 +62,11 @@ class Plugin_User_Switching_Logger extends Logger {
 		$this->info_message(
 			'switched_to_user',
 			array(
-				// It is the old user who initiates the switching
+				// It is the old user who initiates the switching.
 				'_initiator' => Log_Initiators::WP_USER,
-				'_user_id' => $old_user_id,
+				'_user_id' => $user_from->ID,
+				'_user_login' => $user_from->user_login,
+				'_user_email' => $user_from->user_email,
 				'user_id' => $user_id,
 				'old_user_id' => $old_user_id,
 				'user_login_to' => $user_to->user_login,
@@ -76,7 +86,6 @@ class Plugin_User_Switching_Logger extends Logger {
 	 *                               after having been switched off.
 	 */
 	public function on_switch_back_user( $user_id, $old_user_id ) {
-
 		$user_to = get_user_by( 'id', $user_id );
 
 		$user_from = $old_user_id == false ? null : get_user_by( 'id', $old_user_id );
@@ -86,12 +95,14 @@ class Plugin_User_Switching_Logger extends Logger {
 		}
 
 		if ( $user_from ) {
-			// User switched back from another user
+			// User switched back from another user.
 			$this->info_message(
 				'switched_back_user',
 				array(
 					'_initiator' => Log_Initiators::WP_USER,
-					'_user_id' => $old_user_id,
+					'_user_id' => $user_to->ID,
+					'_user_login' => $user_to->user_login,
+					'_user_email' => $user_to->user_email,
 					'user_id' => $user_id,
 					'old_user_id' => $old_user_id,
 					'user_login_to' => $user_to->user_login,
@@ -99,20 +110,26 @@ class Plugin_User_Switching_Logger extends Logger {
 				)
 			);
 		} else {
-			// User switched back to themself (no prev user)
+			// User switched back to themself (no prev user).
 			$this->info_message(
 				'switched_back_themself',
 				array(
 					'_initiator' => Log_Initiators::WP_USER,
-					'_user_id' => $user_id,
+					'_user_id' => $user_to->ID,
+					'_user_login' => $user_to->user_login,
+					'_user_email' => $user_to->user_email,
 					'user_login_to' => $user_to->user_login,
 				)
 			);
 		}
 	}
 
+	/**
+	 * Function is called when a user is switched off.
+	 *
+	 * @param int $user_id The ID of the user being switched off.
+	 */
 	public function on_switch_off_user( $user_id ) {
-
 		$user = get_user_by( 'id', $user_id );
 
 		if ( ! is_a( $user, 'WP_User' ) ) {
@@ -124,6 +141,8 @@ class Plugin_User_Switching_Logger extends Logger {
 			array(
 				'_initiator' => Log_Initiators::WP_USER,
 				'_user_id' => $user_id,
+				'_user_login' => $user->user_login,
+				'_user_email' => $user->user_email,
 				'user_id' => $user_id,
 				'user_login' => $user->user_login,
 			)

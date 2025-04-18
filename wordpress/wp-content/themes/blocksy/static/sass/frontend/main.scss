@@ -1,5 +1,4 @@
 // 1 - HELPERS
-@import '1-helpers/mixins';
 @import '1-helpers/functions';
 @import '1-helpers/variables';
 @import '1-helpers/fallbacks';
@@ -9,7 +8,6 @@
 @import '2-basics/colors';
 @import '2-basics/utilities';
 @import '2-basics/typography';
-@import '2-basics/background';
 @import '2-basics/accessibility';
 @import '2-basics/content-spacing';
 @import '2-basics/admin-bar-reset';
@@ -18,7 +16,6 @@
 
 // 3 - ACTIONS
 @import '3-actions/parallax';
-@import '3-actions/page-helpers';
 @import '3-actions/reveal-animation';
 
 // 4 - COMPONENTS
@@ -39,23 +36,24 @@
 @import '4-components/buttons/main';
 @import '4-components/passepartout';
 @import '4-components/entry-button';
+@import '4-components/module-title';
+@import '4-components/slider-arrows';
 @import '4-components/image-overlay';
-@import '4-components/gdpr-checkbox';
 @import '4-components/related-posts';
 @import '4-components/show-password';
 @import '4-components/featured-image';
 @import '4-components/post-edit-link';
 @import '4-components/video-indicator';
+@import '4-components/expandable-container';
 
 // 5 - MODULES
-@import '5-modules/content-blocks';
 @import '5-modules/menu/main';
 @import '5-modules/header/main';
 @import '5-modules/footer/main';
-@import '5-modules/widgets/main';
+@import '5-modules/blocks/main';
 @import '5-modules/off-canvas/main';
 @import '5-modules/social-box/main';
-@import '5-modules/shortcodes/main';
+@import '5-modules/drawer-canvas';
 
 // 6 - LAYOUT
 @import '6-layout/main';
@@ -69,3 +67,4 @@
 // 8 - INTEGRATIONS
 @import '8-integrations/editors-common';
 @import '8-integrations/gutenberg/main';
+

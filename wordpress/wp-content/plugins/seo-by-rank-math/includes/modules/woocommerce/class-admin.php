@@ -14,7 +14,7 @@ use RankMath\KB;
 use RankMath\Admin\Admin_Helper;
 use RankMath\Module\Base;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Arr;
+use RankMath\Helpers\Arr;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,7 +30,7 @@ class Admin extends Base {
 	 */
 	public function __construct() {
 
-		$directory = dirname( __FILE__ );
+		$directory = __DIR__;
 		$this->config(
 			[
 				'id'        => 'woocommerce',

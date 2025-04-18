@@ -9,7 +9,8 @@ $options = [
 				'custom_logo' => [
 					'label' => __( 'Logo', 'blocksy' ),
 					'type' => 'ct-image-uploader',
-					'value' => get_theme_mod('custom_logo', ''),
+					'value' => blocksy_get_theme_mod('custom_logo', ''),
+					'revertDefaultValue' => '',
 					'inline_value' => true,
 					'responsive' => [
 						'tablet' => 'skip'
@@ -40,21 +41,43 @@ $options = [
 				blocksy_rand_md5() => [
 					'type' => 'ct-condition',
 					'condition' => [
-						'builderSettings/has_sticky_header' => 'yes',
+						'any' => [
+							'custom_logo:truthy' => 'yes',
+							'all' => [
+								'builderSettings/has_transparent_header' => 'yes',
+								'transparent_logo:truthy' => 'yes',
+							]
+						]
 					],
 					'options' => [
-						'sticky_logo' => [
-							'label' => __( 'Sticky State Logo', 'blocksy' ),
-							'type' => 'ct-image-uploader',
-							'value' => '',
-							'inline_value' => true,
-							'responsive' => [
-								'tablet' => 'skip'
+						[
+							blocksy_rand_md5() => [
+								'type' => 'ct-condition',
+								'condition' => [
+									'builderSettings/has_sticky_header' => 'yes',
+								],
+								'options' => [
+									'sticky_logo' => [
+										'label' => __( 'Sticky State Logo', 'blocksy' ),
+										'type' => 'ct-image-uploader',
+										'value' => '',
+										'inline_value' => true,
+										'responsive' => [
+											'tablet' => 'skip'
+										],
+										'divider' => 'top',
+										'attr' => [ 'data-type' => 'small' ],
+									],
+								],
 							],
-							'divider' => 'top',
-							'attr' => [ 'data-type' => 'small' ],
 						],
-					],
+
+						apply_filters(
+							'blocksy:panel-builder:logo:options:general',
+							[],
+							$panel_type
+						),
+					]
 				],
 
 				blocksy_rand_md5() => [
@@ -148,14 +171,11 @@ $options = [
 							'design' => 'block',
 							'allow_empty' => true,
 							'sync' => 'live',
-							// 'view' => 'modal',
-
-							'value' => [
+							'value' => blocksy_default_responsive_value([
 								'desktop' => true,
 								'tablet' => true,
 								'mobile' => true,
-							],
-
+							]),
 							'choices' => blocksy_ordered_keys([
 								'desktop' => __( 'Desktop', 'blocksy' ),
 								'tablet' => __( 'Tablet', 'blocksy' ),
@@ -196,13 +216,11 @@ $options = [
 							'design' => 'block',
 							'allow_empty' => true,
 							'sync' => 'live',
-
-							'value' => [
+							'value' => blocksy_default_responsive_value([
 								'desktop' => true,
 								'tablet' => true,
 								'mobile' => true,
-							],
-
+							]),
 							'choices' => blocksy_ordered_keys([
 								'desktop' => __( 'Desktop', 'blocksy' ),
 								'tablet' => __( 'Tablet', 'blocksy' ),
@@ -211,6 +229,22 @@ $options = [
 						],
 
 					],
+				],
+
+				blocksy_rand_md5() => [
+					'type' => 'ct-condition',
+					'condition' => [
+						'has_svg_logo' => 'yes'
+					],
+					'computed_fields' => ['has_svg_logo'],
+					'options' => [
+						'inline_svg_logos' => [
+							'label' => __('Inline SVG File', 'blocksy'),
+							'type' => 'ct-switch',
+							'value' => 'no',
+							'divider' => 'top:full',
+						]
+					]
 				],
 
 				blocksy_rand_md5() => [
@@ -254,7 +288,7 @@ $options = [
 
 					],
 				],
-			], 
+			],
 
 			$panel_type === 'header' ? [
 				blocksy_rand_md5() => [
@@ -322,11 +356,11 @@ $options = [
 					'design' => 'block',
 					'divider' => 'top',
 					'sync' => 'live',
-					'value' => [
+					'value' => blocksy_default_responsive_value([
 						'desktop' => true,
 						'tablet' => true,
 						'mobile' => true,
-					],
+					]),
 					'choices' => blocksy_ordered_keys([
 						'desktop' => __( 'Desktop', 'blocksy' ),
 						'tablet' => __( 'Tablet', 'blocksy' ),
@@ -343,6 +377,22 @@ $options = [
 					'divider' => 'top:full',
 					'value' => '',
 					'desc' => __( 'Separate multiple classes with spaces.', 'blocksy' ),
+				],
+
+				'header_logo_aria_label' => [
+					'label' => __( 'Custom Aria Label', 'blocksy' ),
+					'type' => 'text',
+					'design' => 'block',
+					'divider' => 'top',
+					'value' => '',
+					'desc' => blocksy_safe_sprintf(
+						// translators: placeholder here means the actual URL.
+						__( 'Add a custom %saria label%s attribute.', 'blocksy' ),
+						blocksy_safe_sprintf(
+							'<a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label" target="_blank">'
+						),
+						'</a>'
+					),
 				],
 			]
 		),
@@ -408,7 +458,7 @@ $options = [
 
 								'value' => [
 									'default' => [
-										'color' => 'var(--paletteColor4)',
+										'color' => 'var(--theme-palette-color-4)',
 									],
 
 									'hover' => [
@@ -425,7 +475,7 @@ $options = [
 									[
 										'title' => __( 'Hover', 'blocksy' ),
 										'id' => 'hover',
-										'inherit' => 'var(--linkHoverColor)'
+										'inherit' => 'var(--theme-link-hover-color)'
 									],
 								],
 							],
@@ -562,7 +612,7 @@ $options = [
 									[
 										'title' => __( 'Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--color)'
+										'inherit' => 'var(--theme-text-color)'
 									],
 								],
 							],
@@ -623,9 +673,7 @@ $options = [
 				'label' => __( 'Margin', 'blocksy' ),
 				'type' => 'ct-spacing',
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => blocksy_spacing_value([
-					'linked' => true,
-				]),
+				'value' => blocksy_spacing_value(),
 				'responsive' => true
 			],
 

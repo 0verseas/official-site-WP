@@ -102,7 +102,7 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
         if ( $is_maintenance ) {
             $message = sprintf(
                 esc_html__( 'This form is currently undergoing maintenance. Please %sclick here%s to reload the form and try again.', 'ninja-forms' )
-                ,'<a href="' . $_SERVER[ 'HTTP_REFERER' ] . '">', '</a>'
+                ,'<a href="' . esc_html($_SERVER[ 'HTTP_REFERER' ]) . '">', '</a>'
             );
             $this->_errors[ 'form' ][] = apply_filters( 'nf_maintenance_message', $message  ) ;
             $this->_respond();
@@ -189,6 +189,8 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
         $this->_data[ 'form_id' ] = $this->_form_data[ 'form_id' ] = $this->_form_id;
         $this->_data[ 'settings' ] = $form_settings;
         $this->_data[ 'settings' ][ 'is_preview' ] = $this->is_preview();
+
+        $this->maybePreserveExtraData();
         $this->_data[ 'extra' ] = $this->_form_data[ 'extra' ];
 
         /*
@@ -369,6 +371,15 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
         |--------------------------------------------------------------------------
         */
 
+        /**
+         * We shouldn't have anything in here before processing.
+         * So, clear out the trash.
+         */
+        if( isset( $this->_data['extra']['calculations'] ) ) {
+            unset( $this->_data['extra']['calculations']);
+            unset( $this->_form_data['extra']['calculations']);
+        }
+
         if( isset( $this->_form_cache[ 'settings' ][ 'calculations' ] ) ) {
 
             /**
@@ -512,6 +523,25 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
         $this->_respond();
     }
 
+    /**
+     * Upon request, preserve a resumed action's  extra data from before halt
+     *
+     * @return void
+     */
+    private function maybePreserveExtraData(): void
+    {
+        if (
+            isset($this->_data['resume']) &&
+            isset($this->_data['resume']['preserve_extra_data'])
+        ) {
+            $preservedKey = $this->_data['resume']['preserve_extra_data'];
+
+            if (isset($this->_data['extra'][$preservedKey])) {
+                $this->_form_data['extra'][$preservedKey] = $this->_data['extra'][$preservedKey];
+            }
+        }
+    }
+
     protected function validate_field( $field_settings )
     {
         $field_settings = apply_filters( 'ninja_forms_pre_validate_field_settings', $field_settings );
@@ -519,6 +549,11 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
         if( ! is_string( $field_settings['type'] ) ) return;
 
         $field_class = Ninja_Forms()->fields[ $field_settings['type'] ];
+
+        // if field_class is neither object nor string return before method_exists call
+        if(!is_object($field_class) && !is_string($field_class)){
+            return;
+        }
 
         if( ! method_exists( $field_class, 'validate' ) ) return;
 
@@ -534,6 +569,11 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
         if( ! is_string( $field_settings['type'] ) ) return;
 
         $field_class = Ninja_Forms()->fields[ $field_settings['type'] ];
+
+        // If $field_class is not object or string, return w/o checking for method_exists
+        if(!is_object($field_class) && !is_string($field_class)){
+            return;
+        }
 
         if( ! method_exists( $field_class, 'process' ) ) return;
 

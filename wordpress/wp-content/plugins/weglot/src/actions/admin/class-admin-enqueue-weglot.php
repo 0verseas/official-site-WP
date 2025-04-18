@@ -68,11 +68,11 @@ class Admin_Enqueue_Weglot implements Hooks_Interface_Weglot {
 	 * @see admin_enqueue_scripts
 	 */
 	public function weglot_admin_enqueue_scripts( $page ) {
-		if ( ! in_array( $page, array( 'toplevel_page_' . Helper_Pages_Weglot::SETTINGS ), true ) ) {
+		if ( ! in_array( $page, array( 'toplevel_page_' . Helper_Pages_Weglot::SETTINGS, 'edit.php' ), true ) ) {
 			return;
 		}
 
-		wp_enqueue_script( 'weglot-admin-selectize-js', WEGLOT_URL_DIST . '/selectize.js', array(
+		wp_enqueue_script( 'weglot-admin-selectize-js', 'https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js', array(
 			'jquery',
 			'jquery-ui-sortable'
 		) );
@@ -129,7 +129,7 @@ class Admin_Enqueue_Weglot implements Hooks_Interface_Weglot {
 
 	/**
 	 * Print in admin head
-	 *
+	 * @return void
 	 * @since 3.1.6
 	 */
 	public function weglot_admin_print_head() {

@@ -15,14 +15,14 @@ ctEvents.on(
 		variableDescriptors['socials'] = ({ itemId }) => ({
 			socialsIconSize: {
 				selector: assembleSelector(getRootSelectorFor({ itemId })),
-				variable: 'icon-size',
+				variable: 'theme-icon-size',
 				responsive: true,
 				unit: 'px',
 			},
 
 			socialsIconSpacing: {
 				selector: assembleSelector(getRootSelectorFor({ itemId })),
-				variable: 'spacing',
+				variable: 'items-spacing',
 				responsive: true,
 				unit: 'px',
 			},
@@ -57,7 +57,7 @@ ctEvents.on(
 							to_add: 'a',
 						})
 					),
-					variable: 'linkInitialColor',
+					variable: 'theme-link-initial-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -70,7 +70,7 @@ ctEvents.on(
 							to_add: 'a',
 						})
 					),
-					variable: 'linkHoverColor',
+					variable: 'theme-link-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -85,7 +85,7 @@ ctEvents.on(
 							to_add: '[data-color="custom"]',
 						})
 					),
-					variable: 'icon-color',
+					variable: 'theme-icon-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -98,7 +98,7 @@ ctEvents.on(
 							to_add: '[data-color="custom"]',
 						})
 					),
-					variable: 'icon-hover-color',
+					variable: 'theme-icon-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -147,7 +147,7 @@ ctEvents.on(
 							to_add: '[data-transparent-row="yes"]',
 						})
 					),
-					variable: 'linkInitialColor',
+					variable: 'theme-link-initial-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -165,7 +165,7 @@ ctEvents.on(
 							to_add: '[data-transparent-row="yes"]',
 						})
 					),
-					variable: 'linkHoverColor',
+					variable: 'theme-link-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -186,7 +186,7 @@ ctEvents.on(
 						})
 					),
 
-					variable: 'icon-color',
+					variable: 'theme-icon-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -205,7 +205,7 @@ ctEvents.on(
 						})
 					),
 
-					variable: 'icon-hover-color',
+					variable: 'theme-icon-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -266,7 +266,7 @@ ctEvents.on(
 							to_add: '[data-sticky*="yes"]',
 						})
 					),
-					variable: 'linkInitialColor',
+					variable: 'theme-link-initial-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -284,7 +284,7 @@ ctEvents.on(
 							to_add: '[data-sticky*="yes"]',
 						})
 					),
-					variable: 'linkHoverColor',
+					variable: 'theme-link-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -304,7 +304,7 @@ ctEvents.on(
 							to_add: '[data-sticky*="yes"]',
 						})
 					),
-					variable: 'icon-color',
+					variable: 'theme-icon-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -322,7 +322,7 @@ ctEvents.on(
 							to_add: '[data-sticky*="yes"]',
 						})
 					),
-					variable: 'icon-hover-color',
+					variable: 'theme-icon-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},

@@ -22,7 +22,8 @@ use Embera\Url;
 class SelfHosted extends ProviderAdapter implements ProviderInterface
 {
 
-    public function __construct($url, array $config = []){
+    public function __construct($url, array $config = [])
+    {
         parent::__construct($url, $config);
         $hosts_url = parse_url($url);
         $this->addHost($hosts_url['host']);
@@ -42,7 +43,7 @@ class SelfHosted extends ProviderAdapter implements ProviderInterface
     public function validateUrl(Url $url)
     {
         return  (bool) preg_match(
-            '/\.(mp4|mov|avi|wmv|flv|mkv|webm|mpeg|mpg|mp3|wav|ogg|aac)$/i',
+            '/^(https?:\/\/)?(www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i',
             (string) $url
         );
     }
@@ -62,6 +63,26 @@ class SelfHosted extends ProviderAdapter implements ProviderInterface
         );
     }
 
+    public function validateWrapper($url)
+    {
+        return  (bool) preg_match(
+            '/^(https?:\/\/)?(www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i',
+            (string) $url
+        );
+    }
+
+    public function fileExtention($fileUrl)
+    {
+        $pathInfo = pathinfo($fileUrl);
+
+        if (isset($pathInfo['extension'])) {
+            $fileExtension = $pathInfo['extension'];
+            return $fileExtension;
+        }
+    }
+
+
+
     /**
      * This method fakes an Oembed response.
      *
@@ -72,26 +93,34 @@ class SelfHosted extends ProviderAdapter implements ProviderInterface
     public function fakeResponse()
     {
         $src_url = urldecode($this->url);
-        
+        $provider_name = 'Self Hosterd';
 
         $width = isset($this->config['maxwidth']) ? $this->config['maxwidth'] : 600;
         $height = isset($this->config['maxheight']) ? $this->config['maxheight'] : 450;
-        
+
+        // Check if the url is already converted to the embed format  
+        if ($this->fileExtention($src_url) === 'ppsx' || $this->fileExtention($src_url) === 'pptx' || $this->fileExtention($src_url) === 'ppt' || $this->fileExtention($src_url) === 'xlsx' || $this->fileExtention($src_url) === 'xls' || $this->fileExtention($src_url) === 'doc' || $this->fileExtention($src_url) === 'docx') {
+            $src_url = '//view.officeapps.live.com/op/embed.aspx?src=' . $this->url;
+        }
+
         // Check if the url is already converted to the embed format  
         $html = '';
         if ($this->validateSelfHostedVideo($this->url)) {
-            $html ='<video controls width="'.esc_attr($width).'" height="'.esc_attr($height).'"> <source src="'.esc_url($this->url).'" > </video>';
-        } 
-        else if ($this->validateSelfHostedAudio($this->url)) {
-            $html = '<audio controls> <source src="'.esc_url($this->url).'" ></audio>';
-        }
-        else {
+
+            $html = '<video controls width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"> <source src="' . esc_url($this->url) . '" > </video>';
+        } else if ($this->validateSelfHostedAudio($this->url)) {
+            $html = '<audio controls> <source src="' . esc_url($this->url) . '" ></audio>';
+        } else if ($this->validateWrapper($this->url)) {
+            $provider_name = 'Wrapper';
+
+            $html = '<iframe width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" src="' . esc_url($src_url) . '" > </iframe>';
+        } else {
             return [];
         }
-        
+
         return [
             'type'          => 'rich',
-            'provider_name' => 'Self Hosted',
+            'provider_name' => $provider_name,
             'provider_url'  => site_url(),
             'title'         => 'Unknown title',
             'html'          => $html,

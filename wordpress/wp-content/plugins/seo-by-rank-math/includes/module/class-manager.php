@@ -13,7 +13,6 @@ namespace RankMath\Module;
 use RankMath\KB;
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -42,17 +41,17 @@ class Manager {
 	 * The Constructor.
 	 */
 	public function __construct() {
-		if ( Conditional::is_heartbeat() ) {
+		if ( Helper::is_heartbeat() ) {
 			return;
 		}
 
-		$this->action( 'plugins_loaded', 'setup_modules' );
+		$this->action( 'after_setup_theme', 'setup_modules', 2 );
 		$this->filter( 'rank_math/modules', 'setup_core', 1 );
 		$this->filter( 'rank_math/modules', 'setup_admin_only', 1 );
 		$this->filter( 'rank_math/modules', 'setup_internals', 1 );
 		$this->filter( 'rank_math/modules', 'setup_3rd_party', 1 );
 
-		$this->action( 'plugins_loaded', 'load_modules' );
+		$this->action( 'after_setup_theme', 'load_modules', 2 );
 		add_action( 'rank_math/module_changed', [ '\RankMath\Admin\Watcher', 'module_changed' ], 10, 2 );
 		$this->action( 'rank_math/module_changed', 'watch_for_analytics', 10, 2 );
 	}
@@ -90,6 +89,7 @@ class Manager {
 		$modules = $this->do_filter( 'modules', [] );
 
 		ksort( $modules );
+		$modules = array_merge( [ 'content-ai' => $modules['content-ai'] ], $modules ); // Move Content AI to first position.
 		foreach ( $modules as $id => $module ) {
 			$this->add_module( $id, $module );
 		}
@@ -176,7 +176,7 @@ class Manager {
 			'title'       => esc_html__( 'Content AI', 'rank-math' ),
 			'desc'        => esc_html__( 'Get sophisticated AI suggestions for related Keywords, Questions & Links to include in the SEO meta & Content Area. Supports 80+ Countries.', 'rank-math' ),
 			'class'       => 'RankMath\ContentAI\Content_AI',
-			'icon'        => 'target',
+			'icon'        => 'content-ai',
 			'upgradeable' => true,
 			'settings'    => Helper::get_admin_url( 'options-general' ) . '#setting-panel-content-ai',
 			'betabadge'   => true,
@@ -334,8 +334,9 @@ class Manager {
 			'class'         => 'RankMath\WooCommerce\WooCommerce',
 			'icon'          => 'cart',
 			'upgradeable'   => true,
-			'disabled'      => ( ! Conditional::is_woocommerce_active() ),
+			'disabled'      => ( ! Helper::is_woocommerce_active() ),
 			'disabled_text' => esc_html__( 'Please activate WooCommerce plugin to use this module.', 'rank-math' ),
+			'settings'      => Helper::get_admin_url( 'options-general' ) . '#setting-panel-woocommerce',
 		];
 
 		$modules['acf'] = [
@@ -390,7 +391,7 @@ class Manager {
 				<?php $this->cta(); ?>
 
 				<?php
-				foreach ( $this->modules as $module ) :
+				foreach ( $this->modules as $key => $module ) :
 					if ( ! $module->can_display() ) {
 						continue;
 					}
@@ -403,25 +404,29 @@ class Manager {
 					$is_upgradeable = $module->is_upgradeable();
 					$is_pro         = $module->is_pro_module();
 					$dep_modules    = $module->get_dependencies();
+					$is_pro_active  = defined( 'RANK_MATH_PRO_FILE' );
 					?>
 					<div class="rank-math-box <?php echo $is_active ? 'active' : ''; ?> <?php echo $is_hidden ? 'hidden' : ''; ?> <?php echo $is_pro ? 'is-pro' : ''; ?>">
 						<i class="rm-icon rm-icon-<?php echo esc_attr( $module->get_icon() ); ?>"></i>
+						<?php if ( 'content-ai' === $key && 'free' === Helper::get_content_ai_plan() ) { ?>
+							<div class="rank-math-free-badge"><?php echo esc_html__( 'Free', 'rank-math' ); ?></div>
+						<?php } ?>
 						<header>
 							<h3>
 								<?php echo esc_html( $module->get( 'title' ) ); ?>
 								<?php if ( $is_betabadge ) { ?>
 									<span class="rank-math-pro-badge beta"><?php echo esc_html__( 'NEW!', 'rank-math' ); ?></span>
-								<?php } elseif ( $is_probadge ) { ?>
+								<?php } elseif ( $is_probadge && ! $is_pro_active ) { ?>
 									<span class="rank-math-pro-badge"><?php echo esc_html__( 'PRO', 'rank-math' ); ?></span>
 								<?php } ?>
-								<?php if ( $is_upgradeable && ! defined( 'RANK_MATH_PRO_FILE' ) ) { ?>
+								<?php if ( $is_upgradeable && ! $is_pro_active ) { ?>
 									<span class="is-upgradeable rank-math-tooltip">
 										<a href="<?php KB::the( 'pro', esc_html( $module->get( 'title' ) ) . ' Module Upgradable Icon' ); ?>">
 											<div>&#171;</div>
 										</a>
 										<span><?php echo esc_html__( 'More powerful options are available in the PRO version.', 'rank-math' ); ?></span>
 									</span>
-								<?php } elseif ( $is_upgradeable ) { ?>
+								<?php } elseif ( $is_upgradeable || ( $is_probadge && $is_pro_active ) ) { ?>
 									<span class="is-upgradeable rank-math-tooltip">
 										<div class="upgraded">&#171;</div>
 										<span><?php echo esc_html__( 'PRO options are enabled.', 'rank-math' ); ?></span>
@@ -520,7 +525,7 @@ class Manager {
 		?>
 			<div class="rank-math-box rank-math-unlock-pro-box">
 				<i class="rm-icon rm-icon-software"></i>
-				<a href="<?php KB::the( 'pro', 'Unlock PRO Module Box' ); ?>" target="_blank" class="pro-link">
+				<a href="<?php KB::the( 'pro', 'Unlock PRO Module Box' ); ?>" target="_blank" class="pro-link" data-url="https://rankmath.com/site-checkout/">
 					<header>
 						<h3><?php esc_html_e( 'Take SEO to the Next Level!', 'rank-math' ); ?></h3>
 						<ul>

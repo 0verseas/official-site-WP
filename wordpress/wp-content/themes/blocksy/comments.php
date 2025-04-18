@@ -21,14 +21,27 @@ $commenter = wp_get_current_commenter();
 
 $prefix = blocksy_manager()->screen->get_prefix();
 
-$comments_position = get_theme_mod($prefix . '_comments_position', 'below');
+$comments_position = blocksy_get_theme_mod($prefix . '_comments_position', 'below');
 
 do_action('blocksy:comments:before');
+
+$html_atts = [
+	'class' => 'ct-comments',
+	'id' => 'comments'
+];
+
+if (blocksy_get_theme_mod(
+	$prefix . '_comments_containment',
+	'separated'
+) === 'contained'
+) {
+	$html_atts['class'] .= ' is-width-constrained';
+}
 
 ?>
 
 
-<div class="ct-comments" id="comments">
+<div <?php echo blocksy_attr_to_html($html_atts); ?>>
 	<?php do_action('blocksy:comments:top'); ?>
 
 	<?php if ( have_comments() ) : ?>

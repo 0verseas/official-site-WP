@@ -97,16 +97,28 @@ class OutputBuffer {
             });
         }
 
-        if (defined('PERFMATTERS_VERSION')) {
+        if (class_exists('WP_Grid_Builder\Autoload')) {
             /**
-             * @see SSDEV-3398
+             * @see SSDEV-3888
              */
             add_action('template_redirect', function () {
                 ob_start(array(
                     $this,
                     "outputCallback"
                 ));
-            }, 11);
+            });
+        }
+
+        if (class_exists('wps_ic')) {
+            /**
+             * @see SSDEV-3916
+             */
+            add_action('template_redirect', function () {
+                ob_start(array(
+                    $this,
+                    "outputCallback"
+                ));
+            });
         }
     }
 

@@ -9,8 +9,10 @@ defined( 'ABSPATH' ) || exit;
  * Description: The most advanced addons for Elementor with tons of widgets, Header builder, Footer builder, Mega menu builder, layout pack and powerful custom controls.
  * Plugin URI: https://products.wpmet.com/elementskit
  * Author: Wpmet
- * Version: 2.8.8
+ * Version: 3.4.8
  * Author URI: https://wpmet.com/
+ * License: GPLv3 or later
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *
  * Text Domain: elementskit-lite
  * Domain Path: /languages
@@ -32,7 +34,7 @@ final class ElementsKit_Lite {
 	 * @var string The plugin version.
 	 */
 	static function version() {
-		return '2.8.8';
+		return '3.4.8';
 	}
 
 	/**
@@ -272,6 +274,8 @@ final class ElementsKit_Lite {
 		require_once self::plugin_dir() . 'libs/rating/rating.php';
 		require_once self::plugin_dir() . 'libs/pro-awareness/pro-awareness.php'; // pro menu class file
 		require_once self::plugin_dir() . 'libs/forms/forms.php'; // form menu class file
+		require_once self::plugin_dir() . 'libs/our-plugins/our-plugins.php'; // used to display the wpmet other plugins
+		require_once self::plugin_dir() . 'libs/emailkit/emailkit.php';
 		require_once self::plugin_dir() . 'helpers/utils.php';
 
 		// Load translation
@@ -355,8 +359,6 @@ final class ElementsKit_Lite {
 		);
 	}
 
-
-
 	/**
 	 * Admin notice
 	 *
@@ -381,11 +383,14 @@ final class ElementsKit_Lite {
 
 		\Oxaim\Libs\Notice::instance( 'elementskit-lite', 'unsupported-elementor-version' )
 		->set_type( 'error' )
-		->set_message( sprintf( esc_html__( 'ElementsKit requires Elementor version %1$s+, which is currently NOT RUNNING.', 'elementskit-lite' ), self::min_el_version() ) )
+		->set_message( sprintf( '%1$s %2$s+, %3$s', 
+				esc_html__( 'ElementsKit requires Elementor version', 'elementskit-lite' ),
+				self::min_el_version() ,
+				esc_html__( 'which is currently NOT RUNNING.', 'elementskit-lite' ),
+			) )
 		->set_button( $btn )
 		->call();
 	}
-
 
 	/**
 	 * Admin notice
@@ -398,7 +403,11 @@ final class ElementsKit_Lite {
 	public function failed_php_version() {
 		\Oxaim\Libs\Notice::instance( 'elementskit-lite', 'unsupported-php-version' )
 		->set_type( 'error' )
-		->set_message( sprintf( esc_html__( 'ElementsKit requires PHP version %1$s+, which is currently NOT RUNNING on this server.', 'elementskit-lite' ), self::min_php_version() ) )
+		->set_message( sprintf( '%1$s %2$s+, %3$s',
+				esc_html__( 'ElementsKit requires PHP version', 'elementskit-lite' ),
+				self::min_php_version(),
+				esc_html__( 'which is currently NOT RUNNING on this server.', 'elementskit-lite' )
+			))
 		->call();
 	}
 
@@ -411,6 +420,7 @@ final class ElementsKit_Lite {
 	public static function install_activation_key() {
 		add_option( 'elementskit-lite__plugin_activated', self::plugin_file() );
 	}
+
 	/**
 	 * Add category.
 	 *

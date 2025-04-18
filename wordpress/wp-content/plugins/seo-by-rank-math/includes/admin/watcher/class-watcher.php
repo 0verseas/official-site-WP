@@ -13,7 +13,7 @@ namespace RankMath\Admin;
 use RankMath\Runner;
 use RankMath\Traits\Hooker;
 use RankMath\Helpers\Security;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
 use RankMath\Helper as GlobalHelper;
 
 defined( 'ABSPATH' ) || exit;
@@ -282,6 +282,5 @@ class Watcher implements Runner {
 				'classes' => 'is-dismissible',
 			]
 		);
-
 	}
 }

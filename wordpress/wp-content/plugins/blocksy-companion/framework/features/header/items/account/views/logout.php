@@ -7,7 +7,7 @@ $login_label = do_shortcode(
 			$atts,
 			__('Login', 'blocksy-companion')
 		),
-		'header:' . $section_id . ':' . $item_id . ':login_label'
+		$panel_type . ':' . $section_id . ':' . $item_id . ':login_label'
 	)
 );
 
@@ -38,15 +38,15 @@ $loggedout_label_position = blocksy_expand_responsive_value(
 );
 
 $attr['data-state'] = 'out';
+$data_label_attr = '';
 
 if (blocksy_akg('logged_out_style', $atts, 'icon') !== 'none') {
-	$attr['data-label'] = $loggedout_label_position[$device];
+	$data_label_attr = 'data-label="' . $loggedout_label_position[$device] . '"';
 }
 
-$attr['href'] = $link;
-$attr['aria-label'] = $login_label;
+echo '<div ' . blocksy_attr_to_html($attr) . '>';
 
-echo '<a ' . blocksy_attr_to_html($attr) . '>';
+echo '<a href="' . $link . '" class="ct-account-item" ' . $data_label_attr . ' aria-label="' .  $login_label . '">';
 
 if (! empty($login_label)) {
 	echo '<span class="' . trim('ct-label ' . blocksy_visibility_classes(
@@ -65,7 +65,7 @@ if (blocksy_akg('logged_out_style', $atts, 'icon') === 'icon') {
 
 	if (function_exists('blc_get_icon')) {
 		$icon_source = blocksy_default_akg('logged_out_icon_source', $atts, 'default');
-		
+
 		if ( $icon_source === 'custom' ) {
 			$media_html = blc_get_icon([
 				'icon_descriptor' => blocksy_akg(
@@ -82,3 +82,5 @@ if (blocksy_akg('logged_out_style', $atts, 'icon') === 'icon') {
 }
 
 echo '</a>';
+
+echo '</div>';

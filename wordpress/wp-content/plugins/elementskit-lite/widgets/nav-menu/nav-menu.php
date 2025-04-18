@@ -1,10 +1,8 @@
 <?php
 
 namespace Elementor;
-
 use \Elementor\ElementsKit_Widget_Nav_Menu_Handler as Handler;
 use \ElementsKit_Lite\Modules\Controls\Controls_Manager as ElementsKit_Controls_Manager;
-
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class ElementsKit_Widget_Nav_Menu extends Widget_Base {
@@ -39,6 +37,10 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
 
     public function get_help_url() {
         return 'https://wpmet.com/doc/nav-menu/';
+    }
+
+    protected function is_dynamic_content(): bool {
+        return true;
     }
 
     public function get_menus(){
@@ -98,15 +100,81 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
             ]
         );
 
+		if(\ElementsKit_Lite::license_status() === 'valid') {
+			$this->add_control(
+				'elementskit_submenu_indicator_icon',
+				[
+					'label' => esc_html__( 'Dropdown Indicator Icon', 'elementskit-lite' ),
+					'type' => Controls_Manager::ICONS,
+					'skin' => 'inline',
+					'exclude_inline_options' => ['svg'],
+					'skin_settings' => [
+						'inline' => [
+							'none' => [
+								'label' => esc_html__( 'Default', 'elementskit-lite' ),
+								'icon' => 'icon icon-down-arrow1',
+							],
+							'icon' => [
+								'label' => esc_html__( 'Icon Library', 'elementskit-lite' ),
+								'icon' => 'fas fa-external-link-alt',
+							],
+						],
+					],
+					'recommended' => [
+						'ekiticons' => [
+							'down-arrow1',
+							'arrow-point-to-down',
+							'plus',
+							'link',
+						],
+						'fa-solid' => [
+							'plus',
+							'external-link-alt',
+							'link',
+							'angle-down',
+						],
+					],
+					'label_block' => false,
+				]
+			);
+		} else {
+			$this->add_control(
+				'elementskit_style_tab_submenu_item_arrow',
+				[
+					'label' => esc_html__( 'Submenu Indicator', 'elementskit-lite' ),
+					'type'  => Controls_Manager::SELECT,
+					'default' => 'elementskit_line_arrow',
+					'options' => [
+						'elementskit_line_arrow'    => esc_html__( 'Line Arrow', 'elementskit-lite' ),
+						'elementskit_plus_icon'     => esc_html__( 'Plus', 'elementskit-lite' ),
+						'elementskit_fill_arrow'    => esc_html__( 'Fill Arrow', 'elementskit-lite' ),
+						'elementskit_none'          => esc_html__( 'None', 'elementskit-lite' ),
+					],
+				]
+			);
+		}
+
         $this->add_control(
             'elementskit_one_page_enable',
             [
                 'label' => esc_html__('Enable one page? ', 'elementskit-lite'),
-                'description'	=> esc_html__('This works in the current page.', 'elementskit-lite'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'no',
                 'label_on' =>esc_html__( 'Yes', 'elementskit-lite' ),
                 'label_off' =>esc_html__( 'No', 'elementskit-lite' ),
+            ]
+        );
+
+        $this->add_control(
+            'elementskit_one_page_notice',
+            [
+                'type' => Controls_Manager::NOTICE,
+                'notice_type' => 'warning',
+                'heading' => esc_html__('Enable OnePage Notice', 'elementskit-lite'),
+                'content' => esc_html__('This feature only works on the current page. Ensure that the links in your menu are pointing to sections within the same page for the one-page navigation correctly.', 'elementskit-lite'),
+                'condition' => [
+                    'elementskit_one_page_enable' => 'yes',
+                ],
             ]
         );
 
@@ -365,7 +433,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->start_controls_section(
             'elementskit_style_tab_menuitem',
             [
-                'label' => esc_html__('Menu item style', 'elementskit-lite'),
+                'label' => esc_html__('Menu Item', 'elementskit-lite'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -608,56 +676,117 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
 
         $this->end_controls_section();
 
-        $this->start_controls_section(
-            'elementskit_style_tab_submenu_item',
+		$this->start_controls_section(
+			'elementskit_style_tab_submenu_indicator',
+			[
+				'label' => esc_html__('Submenu Indicator', 'elementskit-lite'),
+				'tab' => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_responsive_control(
+			'ekit_submenu_indicator_font_size',
+			[
+				'label' => esc_html__( 'Font Size', 'elementskit-lite' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px' ],
+				'range' => [
+					'px' => [
+						'min' => 5,
+						'max' => 100,
+						'step' => 1,
+					]
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator' => 'font-size: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-navbar-nav > li > a .ekit-submenu-indicator-icon' => 'font-size: {{SIZE}}{{UNIT}};',
+				]
+			]
+		);
+
+		$this->add_control(
+			'elementskit_style_tab_submenu_indicator_color',
+			[
+				'label' => esc_html__( 'color', 'elementskit-lite' ),
+				'type'  => Controls_Manager::COLOR,
+				'default'   =>  '#101010',
+				'alpha'     => false,
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator' => 'color: {{VALUE}}; fill: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-navbar-nav > li > a .ekit-submenu-indicator-icon' => 'color: {{VALUE}}; fill: {{VALUE}}',
+				],
+			]
+		);
+
+        $this->add_group_control(
+            Group_Control_Background::get_type(),
             [
-                'label' => esc_html__('Submenu item style', 'elementskit-lite'),
-                'tab' => Controls_Manager::TAB_STYLE,
+                'name' => 'elementskit_submenu_indicator_background',
+                'label' => esc_html__('Background', 'elementskit-lite'),
+                'types' => ['classic', 'gradient'],
+                'exclude' => ['image'],
+                'selector' => '{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator',
             ]
         );
 
-        $this->add_control(
-            'elementskit_style_tab_submenu_item_arrow',
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
             [
-                'label' => esc_html__( 'Submenu Indicator', 'elementskit-lite' ),
-                'type'  => Controls_Manager::SELECT,
-                'default' => 'elementskit_line_arrow',
-                'options' => [
-                    'elementskit_line_arrow'    => esc_html__( 'Line Arrow', 'elementskit-lite' ),
-                    'elementskit_plus_icon'     => esc_html__( 'Plus', 'elementskit-lite' ),
-                    'elementskit_fill_arrow'    => esc_html__( 'Fill Arrow', 'elementskit-lite' ),
-                    'elementskit_none'          => esc_html__( 'None', 'elementskit-lite' ),
-                ],
+                'name' => 'elementskit_submenu_indicator_border',
+                'label' => esc_html__( 'Border', 'elementskit-lite' ),
+                'selector' => '{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator',
+                'separator' => 'before',
             ]
         );
 
         $this->add_responsive_control(
-            'elementskit_style_tab_submenu_indicator_color',
+            'elementskit_submenu_indicator_border_radius',
             [
-                'label' => esc_html__( 'Indicator color', 'elementskit-lite' ),
-                'type'  => Controls_Manager::COLOR,
-                'default'   =>  '#101010',
-                'alpha'     => false,
+                'label' => esc_html__( 'Border Radius', 'elementskit-lite' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px' ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .elementskit-navbar-nav > li > a .ekit-submenu-indicator-icon' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
-                'condition' => [
-                    'elementskit_style_tab_submenu_item_arrow!' => 'elementskit_none'
-                ]
             ]
         );
+
         $this->add_responsive_control(
             'ekit_submenu_indicator_spacing',
             [
-                'label' => esc_html__( 'Indicator Margin (px)', 'elementskit-lite' ),
+                'label' => esc_html__('Margin', 'elementskit-lite'),
                 'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => ['px'],
+                'size_units' => ['px', '%', 'em'],
+                'separator' => 'before',
                 'selectors' => [
                     '{{WRAPPER}} .elementskit-navbar-nav-default .elementskit-dropdown-has>a .elementskit-submenu-indicator' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .elementskit-navbar-nav-default .elementskit-dropdown-has>a .ekit-submenu-indicator-icon' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
-                'condition' => [
-                    'elementskit_style_tab_submenu_item_arrow!' => 'elementskit_none'
-                ]
+            ]
+        );
+
+        //create Padding, Border, Radius
+        $this->add_responsive_control(
+            'elementskit_submenu_indicator_padding',
+            [
+                'label' => esc_html__('Padding', 'elementskit-lite'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .elementskit-navbar-nav > li > a .elementskit-submenu-indicator' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .elementskit-navbar-nav > li > a .ekit-submenu-indicator-icon' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+        
+		$this->end_controls_section();
+
+        $this->start_controls_section(
+            'elementskit_style_tab_submenu_item',
+            [
+                'label' => esc_html__('Submenu Item', 'elementskit-lite'),
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
 
@@ -862,7 +991,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->start_controls_section(
             'elementskit_style_tab_submenu_panel',
             [
-                'label' => esc_html__('Submenu panel style', 'elementskit-lite'),
+                'label' => esc_html__('Submenu Panel', 'elementskit-lite'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -959,7 +1088,7 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
         $this->start_controls_section(
             'elementskit_menu_toggle_style_tab',
             [
-                'label' => esc_html__( 'Hamburger Style', 'elementskit-lite' ),
+                'label' => esc_html__( 'Hamburger Menu', 'elementskit-lite' ),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -1516,9 +1645,14 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
             $responsive_menu_breakpoint = "767";
         }
 
-        echo '<div class="ekit-wid-con '.esc_attr($settings['elementskit_responsive_breakpoint']).'" data-hamburger-icon="'.esc_attr($hamburger_icon_value).'" data-hamburger-icon-type="'.esc_attr($hamburger_icon_type).'" data-responsive-breakpoint="'.esc_attr($responsive_menu_breakpoint).'">';
-        $this->render_raw();
-        echo '</div>';
+		?>
+		<nav class="ekit-wid-con <?php echo esc_attr($settings['elementskit_responsive_breakpoint']); ?>" 
+			data-hamburger-icon="<?php echo esc_attr($hamburger_icon_value); ?>" 
+			data-hamburger-icon-type="<?php echo esc_attr($hamburger_icon_type); ?>" 
+			data-responsive-breakpoint="<?php echo esc_attr($responsive_menu_breakpoint); ?>">
+			<?php $this->render_raw(); ?>
+        </nav>
+		<?php
     }
 
     protected function render_raw( ) {
@@ -1561,23 +1695,33 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
                 $nofollow = ($settings['elementskit_nav_menu_logo_link']['nofollow'] != "on" ? "" : "nofollow");
             }
 
-            $metadata = \ElementsKit_Lite\Utils::img_meta(esc_attr($settings['elementskit_nav_menu_logo']['id']));
 			$markup = '<div class="elementskit-nav-identity-panel">';
+			
 			// Use an if statement to conditionally display the site logo
-			if (!empty($settings['elementskit_nav_menu_logo']['id'])) : 
-				$markup .= '
-				<div class="elementskit-site-title">
-					<a class="elementskit-nav-logo" href="'.esc_url($link).'" target="'.(!empty($target) ? esc_attr($target) : '_self').'" rel="'.esc_attr($nofollow).'">
-						'. \Elementskit_Lite\Utils::get_attachment_image_html($settings, 'elementskit_nav_menu_logo', 'full') .'
-					</a> 
-				</div>';
+			$ekit_nav_menu_logo = !empty($settings['elementskit_nav_menu_logo']) ? $settings['elementskit_nav_menu_logo'] : [];
+			if (!empty($ekit_nav_menu_logo['id']) && !empty($ekit_nav_menu_logo['url'])) :
+				// $nav_logo_html = \Elementskit_Lite\Utils::get_attachment_image_html($settings, 'elementskit_nav_menu_logo', 'full');
+
+				$nav_logo_html = sprintf(
+					'<img src="%s" title="%s" alt="%s" decoding="async" />',
+					esc_url($ekit_nav_menu_logo['url']),
+					Control_Media::get_image_title($ekit_nav_menu_logo),
+					Control_Media::get_image_alt($ekit_nav_menu_logo)
+				);
+
+				$markup .= sprintf(
+					'<a class="elementskit-nav-logo" href="%1$s" target="%2$s" rel="%3$s">%4$s</a>',
+					esc_url($link),
+					esc_attr($target),
+					esc_attr($nofollow),
+					$nav_logo_html
+				);
 			endif;
+
 			$markup .= '<button class="elementskit-menu-close elementskit-menu-toggler" type="button">X</button></div>';
-		
 
 			$container_classes = [
 				'elementskit-menu-container elementskit-menu-offcanvas-elements elementskit-navbar-nav-default',
-				$settings['elementskit_style_tab_submenu_item_arrow'],
 				'ekit-nav-menu-one-page-' . $settings['elementskit_one_page_enable'],
 				!empty($settings['elementskit_nav_dropdown_as']) ? $settings['elementskit_nav_dropdown_as'] : 'ekit-nav-dropdown-hover',
 			];
@@ -1592,9 +1736,21 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
 				'depth'           => 4,
 				'echo'            => true,
 				'fallback_cb'     => 'wp_page_menu',
-				'walker'          => (class_exists('\ElementsKit_Lite\ElementsKit_Menu_Walker') ? new \ElementsKit_Lite\ElementsKit_Menu_Walker() : '' )
 			];
 
+			// set walker conditionally if mega menu module is active or not
+			if(class_exists('\ElementsKit_Lite\ElementsKit_Menu_Walker')) {
+				$args['walker'] = new \ElementsKit_Lite\ElementsKit_Menu_Walker();
+			} else {
+				if (!class_exists('\ElementsKit_Lite\ElementsKit_Seconday_Menu_Walker')) {
+					include dirname(__FILE__) . '/nav-menu-walker.php';
+				}
+				$args['walker'] = new \ElementsKit_Lite\ElementsKit_Seconday_Menu_Walker();
+			}
+
+			// set submenu indicator icon
+			$args['submenu_indicator_icon'] = $this->get_indicator_icon($settings);
+			
 			// WP 6.1 submenu issue
 			if(version_compare(get_bloginfo('version'), '6.1', '>=')){
 				unset($args['depth']);
@@ -1602,18 +1758,49 @@ class ElementsKit_Widget_Nav_Menu extends Widget_Base {
 
 			wp_nav_menu($args);
 
-            /**
-             * Mobile Menu Overlay
-             */
-            ?><div class="elementskit-menu-overlay elementskit-menu-offcanvas-elements elementskit-menu-toggler ekit-nav-menu--overlay"></div><?php
+			/**
+			 * Mobile Menu Overlay
+			 */
+			?>
+			
+			<div class="elementskit-menu-overlay elementskit-menu-offcanvas-elements elementskit-menu-toggler ekit-nav-menu--overlay"></div><?php
 
 
-            /**
-             * Editor: Widget Empty Fallback on Responsive View
-             */
-            if ( Plugin::$instance->editor->is_edit_mode() ):
-                ?><span class="ekit-nav-menu--empty-fallback">&nbsp;</span><?php
-            endif;
-        }
-    }
+			/**
+			 * Editor: Widget Empty Fallback on Responsive View
+			 */
+			if ( Plugin::$instance->editor->is_edit_mode() ) : ?>
+				<span class="ekit-nav-menu--empty-fallback">&nbsp;</span>
+			<?php endif;
+		}
+	}
+
+	protected function get_indicator_icon($settings) {
+		extract($settings);
+
+		$icon_html = '';
+		$indicator_class = 'elementskit-submenu-indicator';
+
+		// if ElementsKit Pro activate and licenced is activated
+		if (\ElementsKit_Lite::license_status() === 'valid') {
+			if(!empty($elementskit_submenu_indicator_icon['value'])) {
+				return Icons_Manager::try_get_icon_html($settings['elementskit_submenu_indicator_icon'], ['class' => $indicator_class, 'aria-hidden' => 'true']);
+			}
+		} elseif(!empty($elementskit_style_tab_submenu_item_arrow)) {
+			$icon_class_map = [
+				'elementskit_line_arrow' => 'icon-down-arrow1',
+				'elementskit_plus_icon' => 'icon-plus',
+				'elementskit_fill_arrow' => 'icon-arrow-point-to-down',
+				'elementskit_none' => 'icon-none'
+			];
+
+			$selected_arrow = $elementskit_style_tab_submenu_item_arrow;
+
+			if (isset($icon_class_map[$selected_arrow])) {
+				return sprintf('<i aria-hidden="true" class="icon %1$s %2$s"></i>', $icon_class_map[$selected_arrow], $indicator_class);
+			}
+		}
+
+		return $icon_html;
+	}
 }

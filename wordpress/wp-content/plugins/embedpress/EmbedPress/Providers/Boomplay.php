@@ -61,7 +61,8 @@ class Boomplay extends ProviderAdapter implements ProviderInterface
 			$width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: '100%';
 			$height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 450;
 
-			$html = "<iframe src='https://www.boomplay.com/embed/$content_id/$endpoint_type' frameborder='0' height='$height' width='$width'></iframe>";
+			$html = "<iframe src='" . esc_url("https://www.boomplay.com/embed/$content_id/$endpoint_type") . "' frameborder='0' height='" . esc_attr($height) . "' width='" . esc_attr($width) . "'></iframe>";
+
 
 
 
@@ -78,15 +79,15 @@ class Boomplay extends ProviderAdapter implements ProviderInterface
 				$alert_message = sprintf( '<p><strong>%s</strong>. <span style="font-size: 13px;">%s</span></p>', __( 'Embedding Boomplay playlists and albums are supported in EmbedPress Pro', 'embedpress'), __( 'This message is only visible to you.', 'embedpress'));
 				// for gutenberg
 
-				if ( !is_embedpress_pro_active() ) {
+				if ( !apply_filters('embedpress/is_allow_rander', false) ) {
 					$response['alert'] = $alert_message;
 				}
 
-				if (  is_admin() && !is_embedpress_pro_active()  ) {
+				if (  is_admin() && !apply_filters('embedpress/is_allow_rander', false)  ) {
 					$response['html'] = $alert_message;
 				}
 
-				if ( !is_admin() && !is_embedpress_pro_active() ) {
+				if ( !is_admin() && !apply_filters('embedpress/is_allow_rander', false) ) {
 					$response['html'] = $url;
 				}
 

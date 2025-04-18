@@ -5,11 +5,20 @@
  * @package wpcode
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Class WPCode_Auto_Insert_Archive.
  */
 class WPCode_Auto_Insert_Archive extends WPCode_Auto_Insert_Type {
-
+	/**
+	 * The type unique name (slug).
+	 *
+	 * @var string
+	 */
+	public $name = 'archive';
 	/**
 	 * The category of this type.
 	 *
@@ -23,7 +32,30 @@ class WPCode_Auto_Insert_Archive extends WPCode_Auto_Insert_Type {
 	 * @return void
 	 */
 	public function init() {
-		$this->label     = __( 'Categories, Archives, Tags, Taxonomies', 'insert-headers-and-footers' );
+		$this->locations = array(
+			'before_excerpt'      => array(),
+			'after_excerpt'       => array(),
+			'between_posts'       => array(),
+			'archive_before_post' => array(),
+			'archive_after_post'  => array(),
+		);
+	}
+
+	/**
+	 * Load the label.
+	 *
+	 * @return void
+	 */
+	public function load_label() {
+		$this->label = __( 'Categories, Archives, Tags, Taxonomies', 'insert-headers-and-footers' );
+	}
+
+	/**
+	 * Load the available locations.
+	 *
+	 * @return void
+	 */
+	public function load_locations() {
 		$this->locations = array(
 			'before_excerpt'      => array(
 				'label'       => __( 'Insert Before Excerpt', 'insert-headers-and-footers' ),
@@ -141,7 +173,7 @@ class WPCode_Auto_Insert_Archive extends WPCode_Auto_Insert_Type {
 		foreach ( $snippets as $snippet ) {
 			$insert_number = $snippet->get_auto_insert_number();
 			if ( $query->current_post === $insert_number - 1 ) {
-				echo wpcode()->execute->get_snippet_output( $snippet );
+				echo wpcode()->execute->get_snippet_output( $snippet ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 
@@ -150,7 +182,7 @@ class WPCode_Auto_Insert_Archive extends WPCode_Auto_Insert_Type {
 		foreach ( $snippets as $snippet ) {
 			$insert_number = $snippet->get_auto_insert_number();
 			if ( $query->current_post === $insert_number ) {
-				echo wpcode()->execute->get_snippet_output( $snippet );
+				echo wpcode()->execute->get_snippet_output( $snippet ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 	}

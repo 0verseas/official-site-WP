@@ -12,8 +12,7 @@ use RankMath\KB;
 use RankMath\Helper;
 use RankMath\Google\Console;
 use RankMath\Google\Authentication;
-
-use MyThemeShop\Helpers\DB;
+use RankMath\Helpers\DB;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -174,6 +173,13 @@ function rank_math_register_seo_analysis_auto_update_test( $tests ) {
  * @return array
  */
 function rank_math_analyze_auto_update() {
+	if ( Helper::is_plugin_update_disabled() ) {
+		return [
+			'status'  => 'warning',
+			'message' => __( 'Site wide plugins auto-update option is disabled on your site.', 'rank-math' ),
+		];
+	}
+
 	if ( Helper::get_auto_update_setting() ) {
 		return [
 			'status'  => 'ok',
@@ -241,7 +247,7 @@ function rank_math_is_default_tagline() {
 	}
 
 	// Also check untranslated version.
-	return $description === 'Just another WordPress site';
+	return 'Just another WordPress site' === $description;
 }
 
 /**
@@ -401,7 +407,8 @@ function rank_math_analyze_post_titles() {
 /**
  * Get `post_type` links.
  *
- * @param array $rows Rows.
+ * @param array  $rows         Rows.
+ * @param string $extra_params Extra parameters.
  *
  * @return array
  */
@@ -478,10 +485,9 @@ function rank_math_analyze_group_result( $data ) {
 /**
  * Check if sitemap module is active.
  *
- * @param SEO_Analyzer $analyzer Analyzer instance.
  * @return array
  */
-function rank_math_analyze_sitemap( $analyzer ) {
+function rank_math_analyze_sitemap() {
 
 	$found = Helper::is_module_active( 'sitemap' );
 	if ( ! $found ) {

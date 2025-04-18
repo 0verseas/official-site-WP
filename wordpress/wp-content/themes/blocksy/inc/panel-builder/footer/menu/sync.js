@@ -69,7 +69,7 @@ export const handleMenuVariables = ({ itemId }) => ({
 					to_add: '> ul > li > a',
 				})
 			),
-			variable: 'linkInitialColor',
+			variable: 'theme-link-initial-color',
 			type: 'color:default',
 		},
 
@@ -84,7 +84,7 @@ export const handleMenuVariables = ({ itemId }) => ({
 					to_add: '> ul > li > a',
 				})
 			),
-			variable: 'linkHoverColor',
+			variable: 'theme-link-hover-color',
 			type: 'color:hover',
 		},
 
@@ -99,7 +99,7 @@ export const handleMenuVariables = ({ itemId }) => ({
 					to_add: '> ul > li > a',
 				})
 			),
-			variable: 'linkActiveColor',
+			variable: 'theme-link-active-color',
 			type: 'color:active',
 		},
 	],
@@ -122,10 +122,13 @@ export const handleMenuVariables = ({ itemId }) => ({
 		responsive: true,
 		unit: '',
 		extractValue: (val) => {
+			const { desktop, tablet, mobile } =
+				maybePromoteScalarValueIntoResponsive(val || 'horizontal')
+
 			return {
-				desktop: val.desktop === 'vertical' ? '100%' : 'initial',
-				tablet: val.tablet === 'vertical' ? '100%' : 'initial',
-				mobile: val.mobile === 'vertical' ? '100%' : 'initial',
+				desktop: desktop === 'vertical' ? '100%' : 'initial',
+				tablet: tablet === 'vertical' ? '100%' : 'initial',
+				mobile: mobile === 'vertical' ? '100%' : 'initial',
 			}
 		},
 	},

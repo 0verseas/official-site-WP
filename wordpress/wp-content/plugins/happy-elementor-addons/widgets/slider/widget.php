@@ -12,7 +12,7 @@ use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Image_Size;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Utils;
 use Elementor\Icons_Manager;
 
@@ -50,6 +50,10 @@ class Slider extends Base {
 
 	public function get_keywords() {
 		return [ 'slider', 'image', 'gallery', 'carousel' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	/**
@@ -264,6 +268,22 @@ class Slider extends Base {
 		);
 
 		$this->add_control(
+			'slides_transition',
+			[
+				'label' => __( 'Transition', 'happy-elementor-addons' ),
+				'type' => Controls_Manager::SELECT,
+				'default' => 'slide',
+				'options' => [
+					'slide' => __( 'Slide', 'happy-elementor-addons' ),
+					'fade' => __( 'Fade', 'happy-elementor-addons' ),
+				],
+				'frontend_available' => true,
+				'style_transfer' => true,
+				'render_type' => 'template',
+			]
+		);
+
+		$this->add_control(
 			'navigation',
 			[
 				'label' => __( 'Navigation', 'happy-elementor-addons' ),
@@ -431,7 +451,9 @@ class Slider extends Base {
 			[
 				'name' => 'title',
 				'selector' => '{{WRAPPER}} .ha-slick-title',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -472,7 +494,9 @@ class Slider extends Base {
 			[
 				'name' => 'subtitle',
 				'selector' => '{{WRAPPER}} .ha-slick-subtitle',
-				'scheme' => Typography::TYPOGRAPHY_3,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 

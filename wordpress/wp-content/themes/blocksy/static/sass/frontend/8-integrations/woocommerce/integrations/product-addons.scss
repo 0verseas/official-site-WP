@@ -1,5 +1,5 @@
 label.wc-pao-addon-name {
-	--fontWeight: 500;
+	font-weight: 500;
 	margin-bottom: 10px;
 }
 
@@ -19,7 +19,7 @@ div.product-addon-totals {
 }
 
 .wc-pao-addon-image-swatch.selected {
-	outline-color: var(--paletteColor1);
+	outline-color: var(--theme-palette-color-1);
 }
 
 .wc-points-rewards-product-message {

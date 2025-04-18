@@ -1090,6 +1090,12 @@ var g_stbServerSideProcessingIsActive = false;
             }
             jQuery.each(override, function(key, value) {
                 if (value.length) {
+                    if (key == 'previous' || key == 'next') {
+                        if (typeof translation['paginate'] === "undefined") {
+                            translation['paginate'] = {};
+                        }
+                        translation['paginate'][key] = value;
+                    }
                     translation[key] = value;
                     // We need to support old DT format, cuz some languages use it
                     translation['s' + key.charAt(0).toUpperCase() + key.substr(1)] = value;

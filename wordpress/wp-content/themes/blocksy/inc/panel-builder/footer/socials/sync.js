@@ -15,18 +15,26 @@ ctEvents.on(
 		variableDescriptors['socials'] = ({ fullItemId, itemId }) => ({
 			socialsIconSize: {
 				selector: assembleSelector(
-					getRootSelectorFor({ itemId, panelType: 'footer' })
+					getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType: 'footer',
+					})
 				),
-				variable: 'icon-size',
+				variable: 'theme-icon-size',
 				responsive: true,
 				unit: 'px',
 			},
 
 			socialsIconSpacing: {
 				selector: assembleSelector(
-					getRootSelectorFor({ itemId, panelType: 'footer' })
+					getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType: 'footer',
+					})
 				),
-				variable: 'spacing',
+				variable: 'items-spacing',
 				responsive: true,
 				unit: 'px',
 			},
@@ -36,6 +44,7 @@ ctEvents.on(
 					mutateSelector({
 						selector: getRootSelectorFor({
 							itemId,
+							fullItemId,
 							panelType: 'footer',
 						}),
 						operation: 'replace-last',
@@ -53,6 +62,7 @@ ctEvents.on(
 				selector: assembleSelector(
 					mutateSelector({
 						selector: getRootSelectorFor({
+							fullItemId,
 							itemId,
 							panelType: 'footer',
 						}),
@@ -74,6 +84,7 @@ ctEvents.on(
 					mutateSelector({
 						selector: getRootSelectorFor({
 							itemId,
+							fullItemId,
 							panelType: 'footer',
 						}),
 						operation: 'suffix',
@@ -88,13 +99,14 @@ ctEvents.on(
 						mutateSelector({
 							selector: getRootSelectorFor({
 								itemId,
+								fullItemId,
 								panelType: 'footer',
 							}),
 							operation: 'suffix',
 							to_add: 'a',
 						})
 					),
-					variable: 'linkInitialColor',
+					variable: 'theme-link-initial-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -104,13 +116,14 @@ ctEvents.on(
 						mutateSelector({
 							selector: getRootSelectorFor({
 								itemId,
+								fullItemId,
 								panelType: 'footer',
 							}),
 							operation: 'suffix',
 							to_add: 'a',
 						})
 					),
-					variable: 'linkHoverColor',
+					variable: 'theme-link-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -122,13 +135,14 @@ ctEvents.on(
 						mutateSelector({
 							selector: getRootSelectorFor({
 								itemId,
+								fullItemId,
 								panelType: 'footer',
 							}),
 							operation: 'suffix',
 							to_add: '[data-color="custom"]',
 						})
 					),
-					variable: 'icon-color',
+					variable: 'theme-icon-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -138,13 +152,14 @@ ctEvents.on(
 						mutateSelector({
 							selector: getRootSelectorFor({
 								itemId,
+								fullItemId,
 								panelType: 'footer',
 							}),
 							operation: 'suffix',
 							to_add: '[data-color="custom"]',
 						})
 					),
-					variable: 'icon-hover-color',
+					variable: 'theme-icon-hover-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -156,6 +171,7 @@ ctEvents.on(
 						mutateSelector({
 							selector: getRootSelectorFor({
 								itemId,
+								fullItemId,
 								panelType: 'footer',
 							}),
 							operation: 'suffix',
@@ -172,6 +188,7 @@ ctEvents.on(
 						mutateSelector({
 							selector: getRootSelectorFor({
 								itemId,
+								fullItemId,
 								panelType: 'footer',
 							}),
 							operation: 'suffix',
@@ -186,7 +203,11 @@ ctEvents.on(
 
 			footerSocialsMargin: {
 				selector: assembleSelector(
-					getRootSelectorFor({ itemId, panelType: 'footer' })
+					getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType: 'footer',
+					})
 				),
 				type: 'spacing',
 				variable: 'margin',
@@ -196,7 +217,11 @@ ctEvents.on(
 
 			footer_socials_direction: {
 				selector: assembleSelector(
-					getRootSelectorFor({ itemId, panelType: 'footer' })
+					getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType: 'footer',
+					})
 				),
 				variable: 'items-direction',
 				responsive: true,

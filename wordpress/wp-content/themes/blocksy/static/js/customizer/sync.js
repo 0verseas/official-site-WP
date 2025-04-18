@@ -58,6 +58,21 @@ wp.customize('blogdescription', (value) =>
 	value.bind((to) => $('.site-description').text(to))
 )
 
+document.addEventListener('DOMContentLoaded', () => {
+	const oldisLinkPreviewable = wp.customize.isLinkPreviewable
+
+	// WooCommerce archive add to cart links should not trigger full page
+	// refresh.
+	wp.customize.isLinkPreviewable = function (element, opts) {
+		if (element.matches('.ajax_add_to_cart')) {
+			element.classList.remove('customize-unpreviewable')
+			return false
+		}
+
+		return oldisLinkPreviewable(element, opts)
+	}
+})
+
 export const updateAndSaveEl = (
 	selector,
 	cb,
@@ -96,5 +111,26 @@ export {
 	applyPrefixFor,
 	watchOptionsWithPrefix,
 } from './sync/helpers'
-export { responsiveClassesFor } from './sync/helpers'
+export { responsiveClassesFor, setRatioFor } from './sync/helpers'
 export { typographyOption } from './sync/variables/typography'
+export { maybePromoteScalarValueIntoResponsive } from 'customizer-sync-helpers/dist/promote-into-responsive'
+
+export const triggerCustomizerAutosave = (callback = () => {}) => {
+	wp.customize.preview.send('ct-trigger-autosave')
+
+	let executed = false
+
+	const cb = () => {
+		if (executed) {
+			return
+		}
+
+		executed = true
+
+		callback()
+
+		wp.customize.preview.unbind('ct-trigger-autosave-done', cb)
+	}
+
+	wp.customize.preview.bind('ct-trigger-autosave-done', cb)
+}

@@ -45,6 +45,9 @@ add_action('customize_register', function ($wp_customize) {
 		$wp_customize->get_control('woocommerce_thumbnail_cropping')->section = 'woocommerce_misc';
 */
 
+		$woocommerce_thumbnail_cropping = $wp_customize->get_setting('woocommerce_thumbnail_cropping');
+		// $woocommerce_thumbnail_cropping->transport = 'postMessage';
+
 		$wp_customize->remove_control('woocommerce_single_image_width');
 		$wp_customize->remove_control('woocommerce_thumbnail_image_width');
 		$wp_customize->remove_control('woocommerce_thumbnail_cropping');
@@ -63,25 +66,10 @@ add_action('customize_register', function ($wp_customize) {
 		)
 	);
 
-	blocksy_customizer_register_options($wp_customize, blocksy_get_options('customizer'));
-});
-
-add_action('customize_save', function ($obj) {
-	$header_placements = $obj->get_setting('header_placements');
-
-	if ($header_placements) {
-		$current_value = $header_placements->post_value();
-		unset($current_value['__forced_static_header__']);
-		$header_placements->manager->set_post_value('header_placements', $current_value);
-	}
-
-	$footer_placements = $obj->get_setting('footer_placements');
-
-	if ($footer_placements) {
-		$current_value = $footer_placements->post_value();
-		unset($current_value['__forced_static_footer__']);
-		$footer_placements->manager->set_post_value('footer_placements', $current_value);
-	}
+	blocksy_customizer_register_options(
+		$wp_customize,
+		blocksy_get_options('customizer')
+	);
 });
 
 /**
@@ -90,37 +78,43 @@ add_action('customize_save', function ($obj) {
 add_action(
 	'customize_preview_init',
 	function () {
+		add_action(
+			'wp_enqueue_scripts',
+			function () {
+				$theme = blocksy_get_wp_parent_theme();
 
-		wp_enqueue_script(
-			'ct-customizer',
-			get_template_directory_uri() . '/static/bundle/sync.min.js',
-			['customize-preview', 'wp-date', 'ct-scripts'],
-			'20151215',
-			true
+				wp_enqueue_script(
+					'ct-customizer',
+					get_template_directory_uri() . '/static/bundle/sync.min.js',
+					['customize-preview', 'wp-date', 'ct-scripts'],
+					$theme->get('Version'),
+					true
+				);
+
+				$locale_data_ct = blocksy_get_jed_locale_data('blocksy');
+
+				wp_add_inline_script(
+					'wp-i18n',
+					'wp.i18n.setLocaleData( ' . wp_json_encode($locale_data_ct) . ', "blocksy" );'
+				);
+
+				wp_localize_script(
+					'ct-customizer',
+					'ct_customizer_localizations',
+					[
+						'static_public_url' => get_template_directory_uri() . '/static/',
+						'product_name' => blocksy_get_wp_theme()->get('Name'),
+						'header_builder_data' => Blocksy_Manager::instance()->builder->get_data_for_customizer(),
+						'dismissed_google_fonts_notice' => get_option(
+							'dismissed-blocksy_google_fonts_notice',
+							'no'
+						) === 'yes',
+
+					]
+				);
+			}
 		);
 
-		$locale_data_ct = blocksy_get_jed_locale_data('blocksy');
-
-		wp_add_inline_script(
-			'wp-i18n',
-			'wp.i18n.setLocaleData( ' . wp_json_encode($locale_data_ct) . ', "blocksy" );'
-		);
-
-		wp_localize_script(
-			'ct-customizer',
-			'ct_customizer_localizations',
-			[
-				'static_public_url' => get_template_directory_uri() . '/static/',
-				'product_name' => blocksy_get_wp_theme()->get('Name'),
-				'header_builder_data' => Blocksy_Manager::instance()->builder->get_data_for_customizer(),
-				'dismissed_google_fonts_notice' => get_option(
-					'dismissed-blocksy_google_fonts_notice',
-					'no'
-				) === 'yes'
-			]
-		);
-
-		wp_enqueue_media();
 	}
 );
 
@@ -169,7 +163,6 @@ function blocksy_customizer_sync_data() {
 add_action(
 	'customize_controls_enqueue_scripts',
 	function () {
-
 		if (class_exists('Kadence_Woomail_Designer')) {
 			if (
 				Kadence_Woomail_Designer::is_own_customizer_request()
@@ -202,7 +195,6 @@ add_action(
 		);
 
 		$theme = blocksy_get_wp_parent_theme();
-
 
 		wp_enqueue_editor();
 
@@ -285,21 +277,46 @@ add_action(
 			$has_new_widgets = wp_use_widgets_block_editor();
 		}
 
+		$gradients = get_theme_support('editor-gradient-presets')[0];
+
+		if (function_exists('wp_get_global_settings')) {
+			$gradients = wp_get_global_settings()['color']['gradients']['theme'];
+		}
+
 		wp_localize_script(
 			'ct-customizer-controls',
 			'ct_customizer_localizations',
 			[
-				'customizer_reset_none' => wp_create_nonce( 'ct-customizer-reset' ),
+				'customizer_reset_none' => wp_create_nonce('ct-customizer-reset'),
 				'static_public_url' => get_template_directory_uri() . '/static/',
-				'header_builder_data' => Blocksy_Manager::instance()->builder->get_data_for_customizer(),
+				'header_builder_data' => Blocksy_Manager::instance()
+					->builder
+					->get_data_for_customizer(),
 				'has_new_widgets' => $has_new_widgets,
-				'gradients' => get_theme_support('editor-gradient-presets')[0],
+				'gradients' => $gradients,
 				'has_child_theme' => $has_child_theme,
 				'is_parent_theme' => ! wp_get_theme()->parent(),
+				'rest_url' => get_rest_url(),
+				'wp_admin_url' => admin_url(),
 				'dismissed_google_fonts_notice' => get_option(
 					'dismissed-blocksy_google_fonts_notice',
 					'no'
-				) === 'yes'
+				) === 'yes',
+				'current_palette' => array_keys(
+					blocksy_manager()->colors->get_color_palette()
+				),
+				'gutenberg_blocks_data' => apply_filters(
+					'blocksy:gutenberg-blocks-data',
+					[]
+				),
+				'gutenberg_metaboxes_data' => apply_filters(
+					'blocksy:gutenberg-metaboxes-data',
+					[]
+				),
+				'dashboard_actions_nonce' => wp_create_nonce('ct-dashboard'),
+				'conditions_override' => blocksy_manager()->get_conditions_overrides(),
+				'modal_links' => blocksy_get_pricing_links(),
+				'backend_dynamic_styles_urls' => blocksy_backend_dynamic_styles_urls()
 			]
 		);
 	}
@@ -319,38 +336,59 @@ add_action(
 	function () {
 		global $wp_customize;
 
-		if ( ! $wp_customize ) {
+		if (! $wp_customize) {
 			return;
 		}
 
-		if ( ! $wp_customize->is_preview() ) {
+		if (! $wp_customize->is_preview()) {
 			wp_send_json_error();
 		}
 
-		if ( ! check_ajax_referer( 'ct-customizer-reset', 'nonce', false ) ) {
-			wp_send_json_error( 'nonce' );
+		if (! check_ajax_referer('ct-customizer-reset', 'nonce', false)) {
+			wp_send_json_error('nonce');
 		}
 
 		$settings = $wp_customize->settings();
 
 		foreach ($settings as $single_setting) {
-			if ('theme_mod' !== $single_setting->type) {
-				if (
-					$single_setting->id === 'woocommerce_thumbnail_cropping_custom_height'
-					||
-					$single_setting->id === 'woocommerce_thumbnail_cropping_custom_width'
-					||
-					$single_setting->id === 'woocommerce_thumbnail_cropping'
-				) {
-					delete_option($single_setting->id);
-				}
-
+			if ('theme_mod' === $single_setting->type) {
 				continue;
 			}
 
-			remove_theme_mod( $single_setting->id );
+			if (
+				$single_setting->id === 'woocommerce_thumbnail_cropping_custom_height'
+				||
+				$single_setting->id === 'woocommerce_thumbnail_cropping_custom_width'
+				||
+				$single_setting->id === 'woocommerce_thumbnail_cropping'
+				||
+				$single_setting->id === 'woocommerce_thumbnail_image_width'
+				||
+				$single_setting->id === 'woocommerce_archive_thumbnail_cropping_custom_height'
+				||
+				$single_setting->id === 'woocommerce_archive_thumbnail_cropping_custom_width'
+				||
+				$single_setting->id === 'woocommerce_archive_thumbnail_cropping'
+				||
+				$single_setting->id === 'woocommerce_archive_thumbnail_image_width'
+				||
+				$single_setting->id === 'woocommerce_catalog_columns'
+				||
+				$single_setting->id === 'woocommerce_catalog_rows'
+				||
+				$single_setting->id === 'woocommerce_shop_page_display'
+				||
+				$single_setting->id === 'woocommerce_category_archive_display'
+				||
+				$single_setting->id === 'woocommerce_default_catalog_orderby'
+			) {
+				delete_option($single_setting->id);
+			}
 		}
 
+		remove_theme_mods();
+
+		update_option('blocksy_custom_palettes', []);
 		do_action('blocksy:dynamic-css:refresh-caches');
 
 		wp_send_json_success();
@@ -493,7 +531,7 @@ function blocksy_customizer_register_options(
 				)
 				&&
 				 */
-				isset( $opt['option']['inner-options'] )
+				isset($opt['option']['inner-options'])
 			) {
 				$options_to_send = null;
 
@@ -684,6 +722,7 @@ function blocksy_customizer_register_options(
 					'ct-spacer',
 					'ct-title',
 					'ct-notification',
+					'ct-customize-section-title-actions',
 					'blocksy-customizer-options-manager'
 				]
 			);

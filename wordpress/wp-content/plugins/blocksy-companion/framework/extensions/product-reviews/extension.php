@@ -316,18 +316,19 @@ class BlocksyExtensionProductReviews {
 
 			$option['settings']['overall_score'] = [
 				'label' => __('Overall Score', 'blocksy-companion'),
-					/*
 				'options' => [
-					'excerpt_length' => [
-						'label' => __('Length', 'blocksy-companion'),
-						'type' => 'ct-number',
-						'design' => 'inline',
-						'value' => 40,
-						'min' => 10,
+					'spacing' => [
+						'label' => __('Bottom Spacing', 'blocksy-companion'),
+						'type' => 'ct-slider',
+						'min' => 0,
 						'max' => 100,
+						'value' => 20,
+						'responsive' => true,
+						'sync' => [
+							'id' => $prefix . '_archive_order_skip'
+						],
 					],
-				],
-				*/
+				]
 			];
 
 			return $option;
@@ -340,8 +341,7 @@ class BlocksyExtensionProductReviews {
 					return;
 				}
 
-				echo blc_call_fn(
-					['fn' => 'blocksy_render_view'],
+				echo blocksy_render_view(
 					dirname(__FILE__) . '/views/single-top.php',
 					[]
 				);
@@ -471,7 +471,7 @@ class BlocksyExtensionProductReviews {
 									[
 										'title' => __( 'Active', 'blocksy-companion' ),
 										'id' => 'default',
-										'inherit' => '#ffffff'
+										'inherit' => 'var(--theme-palette-color-8)'
 									],
 								],
 							],
@@ -492,7 +492,7 @@ class BlocksyExtensionProductReviews {
 									[
 										'title' => __( 'Active', 'blocksy-companion' ),
 										'id' => 'default',
-										'inherit' => '#1A202C'
+										'inherit' => 'var(--theme-palette-color-4)'
 									],
 								],
 							],
@@ -613,7 +613,7 @@ class BlocksyExtensionProductReviews {
 	public function setup_meta_box() {
 		add_meta_box(
 			'blocksy_settings_meta_box',
-			sprintf(
+			blc_safe_sprintf(
 				// Translators: %s is the theme name.
 				__( '%s Settings', 'blocksy-companion' ),
 				__( 'Blocksy', 'blocksy-companion' )
@@ -625,8 +625,7 @@ class BlocksyExtensionProductReviews {
 					$values = [[]];
 				}
 
-				$options = blc_call_fn(
-					['fn' => 'blocksy_get_options'],
+				$options = blocksy_get_options(
 					dirname(__FILE__) . '/metabox.php',
 					[],
 					false

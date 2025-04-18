@@ -1,13 +1,20 @@
 import $ from 'jquery'
 
-var currentTask
-
-function singleProductAddToCart(wrapper) {
+function singleProductAddToCart(wrapper, event) {
 	if (!$) return
 
 	var form = wrapper.closest('form')
-	var button = form.find('button.button')
+
+	var button = form.find(event.submitter)
+
 	var formUrl = $(form)[0].action
+
+	if (typeof formUrl !== 'string') {
+		form.submit()
+
+		return
+	}
+
 	var formMethod = form.attr('method')
 
 	if (typeof formMethod === 'undefined' || formMethod == '') {
@@ -44,31 +51,61 @@ function singleProductAddToCart(wrapper) {
 	button.addClass('loading')
 
 	// Trigger event.
-	$(document.body).trigger('adding_to_cart', [button, {}])
 
-	currentTask = fetch(formUrl, {
+	$(document.body).trigger('adding_to_cart', [
+		button,
+		[...formData.entries()].reduce((acc, [key, value]) => {
+			acc[key] = value
+			return acc
+		}, {}),
+	])
+
+	const url = new URL(formUrl)
+	const searchParams = new URLSearchParams(url.search)
+	searchParams.append('blocksy_add_to_cart', 'yes')
+
+	if (window.ct_customizer_localizations) {
+		searchParams.set('wp_customize', 'on')
+	}
+
+	url.search = searchParams.toString()
+
+	formUrl = url.toString()
+
+	fetch(formUrl, {
 		method: formMethod,
 		body: formData,
+
 		/*
 		cache: false,
 		contentType: false,
 		processData: false,
         */
 	})
-		.then((r) => r.text())
-		.then((data, textStatus, jqXHR) => {
-			const div = document.createElement('div')
-			div.innerHTML = data
+		.then((r) => r.json())
+		.then(({ success, data }) => {
+			if (!success) {
+				return
+			}
 
-			let error = div.querySelector('.woocommerce-error')
+			const { notices, fragments, cart_hash } = data
+
+			const errorSelector =
+				'.woocommerce-error, .wc-block-components-notice-banner.is-error'
+
+			const div = document.createElement('div')
+
+			div.innerHTML = notices
+
+			let error = div.querySelector(errorSelector)
 
 			if (error && error.innerHTML.length > 0) {
 				let notices = document.querySelector(
 					'.woocommerce-notices-wrapper'
 				)
 
-				if (notices.querySelector('.woocommerce-error')) {
-					notices.querySelector('.woocommerce-error').remove()
+				if (notices.querySelector(errorSelector)) {
+					notices.querySelector(errorSelector).remove()
 				}
 
 				if (notices) {
@@ -78,40 +115,21 @@ function singleProductAddToCart(wrapper) {
 				return
 			}
 
-			$(document.body).trigger('wc_fragment_refresh')
+			$(document.body).trigger('added_to_cart', [
+				fragments,
+				cart_hash,
+				button,
+			])
 
-			$.ajax({
-				url: wc_cart_fragments_params.wc_ajax_url
-					.toString()
-					.replace('%%endpoint%%', 'get_refreshed_fragments'),
-				type: 'POST',
-				success: (data) => {
-					if (data && data.fragments) {
-						$.each(data.fragments, function (key, value) {
-							$(key).replaceWith(value)
-						})
+			if (form.closest('.quick-view-modal').length) {
+				form.closest('.quick-view-modal')
+					.find('.ct-quick-add')
+					.addClass('added')
 
-						$(document.body).trigger('wc_fragments_refreshed')
-					}
-
-					if (form.closest('.quick-view-modal').length) {
-						form.closest('.quick-view-modal')
-							.find('.ct-quick-add')
-							.addClass('added')
-
-						form.closest('.quick-view-modal')
-							.find('.ct-quick-add')
-							.removeClass('loading')
-					}
-
-					$(document.body).trigger('added_to_cart', [
-						data.fragments,
-						data.cart_hash,
-						button,
-						quantity,
-					])
-				},
-			})
+				form.closest('.quick-view-modal')
+					.find('.ct-quick-add')
+					.removeClass('loading')
+			}
 		})
 		.catch(() => button.removeClass('loading'))
 		.finally(() => button.removeClass('loading'))
@@ -123,5 +141,6 @@ export const mount = (el, { event }) => {
 	}
 
 	ctEvents.trigger('ct:header:update')
-	singleProductAddToCart($(el))
+
+	singleProductAddToCart($(el), event)
 }

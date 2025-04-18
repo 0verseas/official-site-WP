@@ -179,14 +179,14 @@ class Blocksy_WP_Import extends WP_Importer {
 	 * @param string $file Path to the WXR file for importing
 	 */
 	function import_start( $file ) {
-		if ( ! is_file($file) ) {
 			/*
+		if ( ! is_file($file) ) {
 			echo '<p><strong>' . __( 'Sorry, there has been an error.', 'wordpress-importer' ) . '</strong><br />';
 			echo __( 'The file does not exist, please try again.', 'wordpress-importer' ) . '</p>';
 			$this->footer();
 			die();
-			 */
 		}
+			 */
 
 		$import_data = $this->parse( $file );
 
@@ -576,6 +576,10 @@ class Blocksy_WP_Import extends WP_Importer {
 			$description = isset( $term['term_description'] ) ? $term['term_description'] : '';
 			$termarr = array( 'slug' => $term['slug'], 'description' => $description, 'parent' => intval($parent) );
 
+			if (! taxonomy_exists($term['term_taxonomy'])) {
+				register_taxonomy($term['term_taxonomy'], 'post');
+			}
+
 			$id = wp_insert_term( $term['term_name'], $term['term_taxonomy'], $termarr );
 			if ( ! is_wp_error( $id ) ) {
 				if ( isset($term['term_id']) )
@@ -641,7 +645,7 @@ class Blocksy_WP_Import extends WP_Importer {
 			}
 
 			// Export gets meta straight from the DB so could have a serialized string
-			$value = maybe_unserialize( $meta['value'] );
+			$value = maybe_unserialize( wp_unslash($meta['value']) );
 
 			add_term_meta($term_id, wp_slash($key), $value);
 
@@ -912,6 +916,7 @@ class Blocksy_WP_Import extends WP_Importer {
 
 			$post['postmeta'] = apply_filters( 'wp_import_post_meta', $post['postmeta'], $post_id, $post );
 
+
 			// add/update post meta
 			if ( ! empty( $post['postmeta'] ) ) {
 				foreach ( $post['postmeta'] as $meta ) {
@@ -928,7 +933,7 @@ class Blocksy_WP_Import extends WP_Importer {
 					if ( $key ) {
 						// export gets meta straight from the DB so could have a serialized string
 						if (! $value) {
-							$value = maybe_unserialize( $meta['value'] );
+							$value = maybe_unserialize($meta['value']);
 						}
 
 						// add_post_meta($post_id, wp_slash($key), wp_slash_strings_only($value));
@@ -1033,6 +1038,26 @@ class Blocksy_WP_Import extends WP_Importer {
 
 
 		$id = wp_update_nav_menu_item( $menu_id, 0, $args );
+
+		if (! empty($item['postmeta'])) {
+			foreach ($item['postmeta'] as $meta) {
+				$key = apply_filters('import_post_meta_key', $meta['key'], $id, $item);
+				$value = false;
+
+				if ($key) {
+					// export gets meta straight from the DB so could have a serialized string
+					if (! $value) {
+						$value = maybe_unserialize(wp_unslash($meta['value']));
+					}
+
+					// add_post_meta($post_id, wp_slash($key), wp_slash_strings_only($value));
+					add_post_meta($id, wp_slash($key), $value);
+
+					do_action('import_post_meta', $id, $key, $value);
+				}
+			}
+		}
+
 		if ( $id && ! is_wp_error( $id ) )
 			$this->processed_menu_items[intval($item['post_id'])] = (int) $id;
 	}
@@ -1120,7 +1145,7 @@ class Blocksy_WP_Import extends WP_Importer {
 		// make sure the fetch was successful
 		if ( $remote_response_code != '200' ) {
 			@unlink( $upload['file'] );
-			return new WP_Error( 'import_file_error', sprintf( __('Remote server returned error response %1$d %2$s', 'wordpress-importer'), esc_html($remote_response_code), get_status_header_desc($remote_response_code) ) );
+			return new WP_Error( 'import_file_error', blc_safe_sprintf( __('Remote server returned error response %1$d %2$s', 'wordpress-importer'), esc_html($remote_response_code), get_status_header_desc($remote_response_code) ) );
 		}
 
 		$filesize = filesize( $upload['file'] );
@@ -1138,7 +1163,7 @@ class Blocksy_WP_Import extends WP_Importer {
 		$max_size = (int) $this->max_attachment_size();
 		if ( ! empty( $max_size ) && $filesize > $max_size ) {
 			@unlink( $upload['file'] );
-			return new WP_Error( 'import_file_error', sprintf(__('Remote file is too large, limit is %s', 'wordpress-importer'), size_format($max_size) ) );
+			return new WP_Error( 'import_file_error', blc_safe_sprintf(__('Remote file is too large, limit is %s', 'wordpress-importer'), size_format($max_size) ) );
 		}
 
 		// keep track of the old and new urls so we can substitute them later

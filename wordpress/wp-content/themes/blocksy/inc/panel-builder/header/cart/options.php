@@ -26,32 +26,32 @@ $options = [
 						'divider' => 'bottom',
 						'setting' => [ 'transport' => 'postMessage' ],
 						'choices' => [
-		
+
 							'type-1' => [
 								'src'   => blocksy_image_picker_file( 'cart-1' ),
 								'title' => __( 'Type 1', 'blocksy' ),
 							],
-		
+
 							'type-2' => [
 								'src'   => blocksy_image_picker_file( 'cart-2' ),
 								'title' => __( 'Type 2', 'blocksy' ),
 							],
-		
+
 							'type-3' => [
 								'src'   => blocksy_image_picker_file( 'cart-3' ),
 								'title' => __( 'Type 3', 'blocksy' ),
 							],
-		
+
 							'type-4' => [
 								'src'   => blocksy_image_picker_file( 'cart-4' ),
 								'title' => __( 'Type 4', 'blocksy' ),
 							],
-		
+
 							'type-5' => [
 								'src'   => blocksy_image_picker_file( 'cart-5' ),
 								'title' => __( 'Type 5', 'blocksy' ),
 							],
-		
+
 							'type-6' => [
 								'src'   => blocksy_image_picker_file( 'cart-6' ),
 								'title' => __( 'Type 6', 'blocksy' ),
@@ -80,18 +80,17 @@ $options = [
 			],
 
 			'cart_subtotal_visibility' => [
-				'label' => __( 'Cart Total Visibility', 'blocksy' ),
+				'label' => __( 'Label Visibility', 'blocksy' ),
 				'type' => 'ct-visibility',
 				'design' => 'block',
 				'divider' => 'top',
 				'allow_empty' => true,
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'desktop' => true,
 					'tablet' => true,
 					'mobile' => true,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'desktop' => __( 'Desktop', 'blocksy' ),
 					'tablet' => __( 'Tablet', 'blocksy' ),
@@ -111,7 +110,7 @@ $options = [
 				'options' => [
 					'cart_total_position' => [
 						'type' => 'ct-radio',
-						'label' => __( 'Cart Total Position', 'blocksy' ),
+						'label' => __( 'Label Position', 'blocksy' ),
 						'value' => 'left',
 						'view' => 'text',
 						'divider' => 'top',
@@ -125,7 +124,26 @@ $options = [
 							'bottom' => __( 'Bottom', 'blocksy' ),
 						],
 					],
+
+					'cart_total_label' => [
+						'label' => __( 'Label Text', 'blocksy' ),
+						'type' => 'text',
+						'divider' => 'top',
+						'design' => 'block',
+						'value' => '{price}',
+						'responsive' => [
+							'tablet' => 'skip'
+						],
+					],
 				],
+			],
+
+			'has_empty_cart' => [
+				'label' => __( 'Hide Empty Cart', 'blocksy' ),
+				'type' => 'ct-switch',
+				'value' => 'no',
+				'divider' => 'top',
+				'setting' => [ 'transport' => 'postMessage' ],
 			],
 
 		],
@@ -205,13 +223,13 @@ $options = [
 									[
 										'title' => __( 'Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--color)'
+										'inherit' => 'var(--theme-text-color)'
 									],
 
 									[
 										'title' => __( 'Hover', 'blocksy' ),
 										'id' => 'hover',
-										'inherit' => 'var(--linkHoverColor)'
+										'inherit' => 'var(--theme-link-hover-color)'
 									],
 								],
 							],
@@ -319,7 +337,7 @@ $options = [
 						'setting' => [ 'transport' => 'postMessage' ],
 						'value' => [
 							'default' => [
-								'color' => 'var(--color)',
+								'color' => 'var(--theme-text-color)',
 							],
 
 							'hover' => [
@@ -336,7 +354,7 @@ $options = [
 							[
 								'title' => __( 'Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--paletteColor2)',
+								'inherit' => 'var(--theme-palette-color-2)',
 							],
 						],
 					],
@@ -458,7 +476,7 @@ $options = [
 							[
 								'title' => __( 'Background', 'blocksy' ),
 								'id' => 'background',
-								'inherit' => 'var(--paletteColor1)',
+								'inherit' => 'var(--theme-palette-color-1)',
 							],
 
 							[
@@ -537,9 +555,7 @@ $options = [
 				'type' => 'ct-spacing',
 				'divider' => 'top',
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => blocksy_spacing_value([
-					'linked' => true,
-				]),
+				'value' => blocksy_spacing_value(),
 				'responsive' => true
 			],
 
@@ -668,6 +684,26 @@ $options = [
 
 						],
 					],
+
+					'thumb_ratio' => [
+						'label' => __('Image Ratio', 'blocksy'),
+						'type' => 'ct-ratio',
+						'view' => 'inline',
+						'value' => '1/1',
+						'divider' => 'top'
+					],
+
+					'image_size' => [
+						'label' => __('Image Size', 'blocksy'),
+						'type' => 'ct-select',
+						'value' => 'woocommerce_thumbnail',
+						'view' => 'text',
+						'design' => 'inline',
+						'divider' => 'top',
+						'choices' => blocksy_ordered_keys(
+							blocksy_get_all_image_sizes()
+						),
+					],
 				],
 			],
 
@@ -709,13 +745,13 @@ $options = [
 									[
 										'title' => __( 'Link Initial', 'blocksy' ),
 										'id' => 'link_initial',
-										'inherit' => 'var(--linkInitialColor)'
+										'inherit' => 'var(--theme-link-initial-color)'
 									],
 
 									[
 										'title' => __( 'Link Hover', 'blocksy' ),
 										'id' => 'link_hover',
-										'inherit' => 'var(--linkHoverColor)'
+										'inherit' => 'var(--theme-link-hover-color)'
 									],
 								],
 							],
@@ -785,7 +821,7 @@ $options = [
 									[
 										'title' => __( 'Text Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--headings-color)'
+										'inherit' => 'var(--theme-headings-color)'
 									],
 								],
 							],
@@ -803,7 +839,7 @@ $options = [
 									],
 
 									'link_initial' => [
-										'color' => 'var(--headings-color)',
+										'color' => 'var(--theme-headings-color)',
 									],
 
 									'link_hover' => [
@@ -815,7 +851,7 @@ $options = [
 									[
 										'title' => __( 'Text Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--color)'
+										'inherit' => 'var(--theme-text-color)'
 									],
 
 									[
@@ -826,7 +862,7 @@ $options = [
 									[
 										'title' => __( 'Link Hover', 'blocksy' ),
 										'id' => 'link_hover',
-										'inherit' => 'var(--linkHoverColor)'
+										'inherit' => 'var(--theme-link-hover-color)'
 									],
 								],
 							],
@@ -848,7 +884,7 @@ $options = [
 									[
 										'title' => __( 'Text Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--color)'
+										'inherit' => 'var(--theme-text-color)'
 									],
 								],
 							],
@@ -1090,11 +1126,10 @@ $options = [
 				'design' => 'block',
 				'setting' => [ 'transport' => 'postMessage' ],
 				'allow_empty' => true,
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'tablet' => true,
 					'mobile' => true,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'tablet' => __( 'Tablet', 'blocksy' ),
 					'mobile' => __( 'Mobile', 'blocksy' ),

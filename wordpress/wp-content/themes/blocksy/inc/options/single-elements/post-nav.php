@@ -77,11 +77,8 @@ $options = [
 						'type' => 'ct-slider',
 						'value' => '50px',
 						'units' => blocksy_units_config([
-							[
-								'unit' => 'px',
-								'min' => 0,
-								'max' => 200,
-							],
+							[ 'unit' => 'px', 'min' => 0, 'max' => 200],
+							['unit' => '', 'type' => 'custom'],
 						]),
 						'responsive' => true,
 						'sync' => 'live',
@@ -114,12 +111,11 @@ $options = [
 						'sync' => 'live',
 						'divider' => 'bottom',
 						'allow_empty' => true,
-						'value' => [
+						'value' => blocksy_default_responsive_value([
 							'desktop' => true,
 							'tablet' => true,
 							'mobile' => true,
-						],
-
+						]),
 						'choices' => blocksy_ordered_keys([
 							'desktop' => __( 'Desktop', 'blocksy' ),
 							'tablet' => __( 'Tablet', 'blocksy' ),
@@ -134,12 +130,11 @@ $options = [
 						'sync' => 'live',
 						'divider' => 'bottom',
 						'allow_empty' => true,
-						'value' => [
+						'value' => blocksy_default_responsive_value([
 							'desktop' => true,
 							'tablet' => true,
 							'mobile' => false,
-						],
-
+						]),
 						'choices' => blocksy_ordered_keys([
 							'desktop' => __( 'Desktop', 'blocksy' ),
 							'tablet' => __( 'Tablet', 'blocksy' ),
@@ -152,12 +147,11 @@ $options = [
 						'type' => 'ct-visibility',
 						'design' => 'block',
 						'sync' => 'live',
-						'value' => [
+						'value' => blocksy_default_responsive_value([
 							'desktop' => true,
 							'tablet' => true,
 							'mobile' => true,
-						],
-
+						]),
 						'choices' => blocksy_ordered_keys([
 							'desktop' => __( 'Desktop', 'blocksy' ),
 							'tablet' => __( 'Tablet', 'blocksy' ),
@@ -180,7 +174,7 @@ $options = [
 						'sync' => 'live',
 						'value' => [
 							'default' => [
-								'color' => 'var(--color)',
+								'color' => 'var(--theme-text-color)',
 							],
 
 							'hover' => [
@@ -196,7 +190,7 @@ $options = [
 							[
 								'title' => __( 'Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--linkHoverColor)'
+								'inherit' => 'var(--theme-link-hover-color)'
 							],
 						],
 					],
@@ -216,7 +210,7 @@ $options = [
 							[
 								'title' => __( 'Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--paletteColor1)'
+								'inherit' => 'var(--theme-palette-color-1)'
 							],
 						],
 					],
@@ -225,12 +219,11 @@ $options = [
 						'label' => __( 'Thumbnail Border Radius', 'blocksy' ),
 						'type' => 'ct-spacing',
 						'divider' => 'top',
-						'value' => blocksy_spacing_value([
-							'linked' => true,
-						]),
+						'value' => blocksy_spacing_value(),
 						'inputAttr' => [
 							'placeholder' => '100'
 						],
+						'min' => 0,
 						'sync' => 'live',
 					],
 

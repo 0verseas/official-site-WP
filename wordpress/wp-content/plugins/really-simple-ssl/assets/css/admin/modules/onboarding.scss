@@ -1,11 +1,14 @@
 .rsssl-modal.rsssl-onboarding {
   width: clamp(300px, 100ch, 100vw );
+  padding-top: var(--rsp-spacing-m);
+  line-height: 2.2;
+  min-height:295px;
   .rsssl-logo {
     height: 26px;
   }
   .rsssl-modal-content{
     display:flex;
-
+    min-height:295px;
     .rsssl-onboarding-placeholder {
       flex-grow:1
     }
@@ -14,21 +17,6 @@
       flex-direction: column;
       width:100%;
     }
-    &-step-footer{
-      display:flex;
-      align-items: center;
-      gap: var(--rsp-spacing-m);
-      .components-toggle-control {
-        margin-top:8px;
-        .components-form-toggle{
-          margin-top:12px;
-        }
-      }
-      margin-top:auto;
-    }
-    padding-top: var(--rsp-spacing-m);
-    line-height: 2.2;
-    min-height:295px;
     .rsssl-processing {
       opacity:0.5;
     }
@@ -45,10 +33,4 @@
     }
   }
 
-}
-
-.rsssl-modal-content-step-footer {
-  .components-toggle-control {
-    margin-top:8px;
-  }
 }

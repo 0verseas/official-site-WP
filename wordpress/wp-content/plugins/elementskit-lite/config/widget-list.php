@@ -532,6 +532,30 @@ class Widget_List extends \ElementsKit_Lite\Core\Config_List {
 					'package'         => 'pro-disabled',
 					'widget-category' => 'general', // General
 				),
+				'comparison-table' => array(
+					'slug'            => 'comparison-table',
+					'title'           => 'Comparison Table',
+					'package'         => 'pro-disabled',
+					'widget-category' => 'general', // General
+				),
+				'protected-content' => array(
+					'slug'            => 'protected-content',
+					'title'           => 'Protected Content',
+					'package'         => 'pro-disabled',
+					'widget-category' => 'general', // General
+				),
+				'interactive-links' => array(
+					'slug'            => 'interactive-links',
+					'title'           => 'Interactive Links',
+					'package'         => 'pro-disabled',
+					'widget-category' => 'general', // General
+				),
+				'circle-menu' => array(
+					'slug'            => 'circle-menu',
+					'title'           => 'Circle Menu',
+					'package'         => 'pro-disabled',
+					'widget-category' => 'general', // General
+				),
 			)
 		);
 	}

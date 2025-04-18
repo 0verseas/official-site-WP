@@ -63,12 +63,12 @@ trait Api {
 	/**
 	 * Get Setting.
 	 *
-	 * @param  string $field_id The field id to get value for.
-	 * @param  mixed  $default  The default value if no field found.
+	 * @param  string $field_id      The field id to get value for.
+	 * @param  mixed  $default_value The default value if no field found.
 	 * @return mixed
 	 */
-	public static function get_settings( $field_id = '', $default = false ) {
-		return rank_math()->settings->get( $field_id, $default );
+	public static function get_settings( $field_id = '', $default_value = false ) {
+		return rank_math()->settings->get( $field_id, $default_value );
 	}
 
 	/**
@@ -118,52 +118,5 @@ trait Api {
 	 */
 	public static function remove_json( $key, $object_name = 'rankMath' ) {
 		rank_math()->json->remove( $key, $object_name );
-	}
-
-	/**
-	 * Get the Content AI Credits.
-	 *
-	 * @param bool $force_update Whether to send a request to API to get the new Credits value.
-	 */
-	public static function get_content_ai_credits( $force_update = false ) {
-		$registered = Admin_Helper::get_registration_data();
-		if ( empty( $registered ) ) {
-			return 0;
-		}
-
-		$credits = get_option( 'rank_math_ca_credits' );
-		if ( $credits && ! $force_update ) {
-			return $credits;
-		}
-
-		$args = [
-			'username' => rawurlencode( $registered['username'] ),
-			'api_key'  => rawurlencode( $registered['api_key'] ),
-			'site_url' => rawurlencode( self::get_home_url() ),
-		];
-
-		$url = add_query_arg(
-			$args,
-			'https://rankmath.com/wp-json/rankmath/v1/contentAiCredits'
-		);
-
-		$data = wp_remote_get(
-			$url,
-			[
-				'timeout' => 60,
-			]
-		);
-
-		$response_code = wp_remote_retrieve_response_code( $data );
-		if ( 200 !== $response_code ) {
-			return 0;
-		}
-
-		$data = wp_remote_retrieve_body( $data );
-		$data = json_decode( $data, true );
-
-		$credits = ! empty( $data['remaining_credits'] ) ? $data['remaining_credits'] : 0;
-		update_option( 'rank_math_ca_credits', $credits, false );
-		return $credits;
 	}
 }

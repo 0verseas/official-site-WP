@@ -10,8 +10,8 @@
 
 namespace RankMath\Redirections;
 
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Database\Database;
+use RankMath\Helpers\Str;
+use RankMath\Admin\Database\Database;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -41,10 +41,17 @@ class DB {
 		}
 
 		$redirction_counts = self::table()
-			->selectSum( 'status = "active"', 'active' )
-			->selectSum( 'status = "inactive"', 'inactive' )
-			->selectSum( 'status = "trashed"', 'trashed' )
+			->selectSum( "status = 'active'", 'active' )
+			->selectSum( "status = 'inactive'", 'inactive' )
+			->selectSum( "status = 'trashed'", 'trashed' )
 			->one( ARRAY_A );
+
+		$redirction_counts = array_map(
+			function ( $value ) {
+				return $value ? $value : 0;
+			},
+			$redirction_counts
+		);
 
 		$redirction_counts['all'] = $redirction_counts['active'] + $redirction_counts['inactive'];
 
@@ -183,15 +190,20 @@ class DB {
 
 		foreach ( $sources as $source ) {
 			$compare_uri = $uri;
-			if ( 'exact' === $source['comparison'] ) {
+			$comparison  = $source['comparison'];
+			if ( 'exact' === $comparison ) {
 				$compare_uri = untrailingslashit( $compare_uri );
 			}
 
-			if ( 'exact' === $source['comparison'] && isset( $source['ignore'] ) && 'case' === $source['ignore'] && strtolower( $source['pattern'] ) === strtolower( $compare_uri ) ) {
+			if ( in_array( $comparison, [ 'contains', 'start', 'end' ], true ) ) {
+				$source['pattern'] = untrailingslashit( $source['pattern'] );
+			}
+
+			if ( 'exact' === $comparison && isset( $source['ignore'] ) && 'case' === $source['ignore'] && strtolower( $source['pattern'] ) === strtolower( $compare_uri ) ) {
 				return true;
 			}
 
-			if ( Str::comparison( self::get_clean_pattern( $source['pattern'], $source['comparison'] ), $compare_uri, $source['comparison'] ) ) {
+			if ( Str::comparison( self::get_clean_pattern( $source['pattern'], $comparison ), $compare_uri, $comparison ) ) {
 				return true;
 			}
 		}
@@ -267,14 +279,25 @@ class DB {
 	 * @return bool|array
 	 */
 	public static function get_redirection( $data ) {
+		$args = [];
+		if ( isset( $data['destination'] ) ) {
+			$args[] = [ 'url_to', '=', $data['destination'] ];
+		}
+
+		if ( isset( $data['type'] ) ) {
+			$args[] = [ 'header_code', '=', $data['type'] ];
+		}
+
+		if ( isset( $data['status'] ) ) {
+			$args[] = [ 'status', '=', $data['status'] ];
+		}
+
+		if ( empty( $args ) ) {
+			return false;
+		}
+
 		// Exist by destination.
-		$exist = self::get_redirection_by(
-			[
-				[ 'url_to', '=', $data['destination'] ],
-				[ 'header_code', '=', $data['type'] ],
-				[ 'status', '=', $data['status'] ],
-			]
-		);
+		$exist = self::get_redirection_by( $args );
 
 		if ( $exist ) {
 			return $exist;
@@ -291,12 +314,11 @@ class DB {
 	/**
 	 *  Get source by.
 	 *
-	 * @param array  $data     Redirection fields.
-	 * @param string $status Status to filter with.
+	 * @param array $data Redirection fields.
 	 *
 	 * @return bool|array
 	 */
-	public static function get_redirection_by( $data = [], $status = 'all' ) {
+	public static function get_redirection_by( $data = [] ) {
 		$table = self::table()->where( $data );
 
 		$item = $table->one( ARRAY_A );
@@ -304,7 +326,7 @@ class DB {
 			return false;
 		}
 
-		$item['sources'] = maybe_unserialize( $item['sources'] );
+		$item['sources'] = self::get_sources( maybe_unserialize( $item['sources'] ) );
 		return $item;
 	}
 
@@ -327,6 +349,10 @@ class DB {
 	public static function add( $args = [] ) {
 		if ( empty( $args ) ) {
 			return false;
+		}
+
+		if ( array_key_exists( 'id', $args ) ) {
+			unset( $args['id'] );
 		}
 
 		$args = wp_parse_args(
@@ -431,7 +457,7 @@ class DB {
 		$args['hits']          = absint( $redirection['hits'] ) + 1;
 		$args['last_accessed'] = current_time( 'mysql' );
 
-		self::table()->set( $args )->where( 'id', $redirection['id'] )->update();
+		return self::table()->set( $args )->where( 'id', $redirection['id'] )->update();
 	}
 
 	/**
@@ -474,15 +500,15 @@ class DB {
 	/**
 	 * Clean trashed redirects after 30 days.
 	 *
-	 * @return int Number of records deleted.
+	 * @return void
 	 */
 	public static function periodic_clean_trash() {
 		$ids = self::table()->select( 'id' )->where( 'status', 'trashed' )->where( 'updated', '<=', date_i18n( 'Y-m-d', strtotime( '30 days ago' ) ) )->get( ARRAY_A );
 		if ( empty( $ids ) ) {
-			return 0;
+			return;
 		}
 
-		return self::delete( wp_list_pluck( $ids, 'id' ) );
+		self::delete( wp_list_pluck( $ids, 'id' ) );
 	}
 
 	/**
@@ -509,5 +535,24 @@ class DB {
 	private static function is_valid_status( $status ) {
 		$allowed = [ 'active', 'inactive', 'trashed' ];
 		return in_array( $status, $allowed, true );
+	}
+
+	/**
+	 * Get redirection source.
+	 *
+	 * @param array $sources Unserialized sources.
+	 *
+	 * @return array
+	 */
+	private static function get_sources( $sources ) {
+		if ( ! is_array( $sources ) || empty( $sources ) ) {
+			return $sources;
+		}
+
+		foreach ( $sources as $key => $source ) {
+			$sources[ $key ]['pattern'] = wp_specialchars_decode( $source['pattern'] );
+		}
+
+		return $sources;
 	}
 }

@@ -6,17 +6,17 @@
  * Description: EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC, PPT & all other types of content into your WordPress site with one-click and showcase it beautifully for the visitors. 150+ sources supported.
  * Author: WPDeveloper
  * Author URI: https://wpdeveloper.com
- * Version: 3.8.0
+ * Version: 4.2.2
  * Text Domain: embedpress
  * Domain Path: /languages
  *
- * Copyright (c) 2021 WPDeveloper
+ * Copyright (c) 2023 WPDeveloper
  *
  * EmbedPress plugin bootstrap file.
  *
  * @package     EmbedPress
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2021 WPDeveloper. All rights reserved.
+ * @copyright   Copyright (C) 2023 WPDeveloper. All rights reserved.
  * @license     GPLv3 or later
  * @since       1.0.0
  */
@@ -38,7 +38,7 @@ define('EMBEDPRESS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define('EMBEDPRESS_FILE', __FILE__);
 
 if (!defined('EMBEDPRESS_PLUGIN_VERSION')) {
-    define('EMBEDPRESS_PLUGIN_VERSION', '3.8.0');
+    define('EMBEDPRESS_PLUGIN_VERSION', '4.2.2');
 }
 
 define('EMBEDPRESS_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
@@ -48,6 +48,7 @@ define('EMBEDPRESS_GUTENBERG_DIR_PATH', EMBEDPRESS_PLUGIN_DIR_PATH . 'Gutenberg/
 define('EMBEDPRESS_SETTINGS_ASSETS_URL', EMBEDPRESS_PLUGIN_DIR_URL . 'EmbedPress/Ends/Back/Settings/assets/');
 define('EMBEDPRESS_SETTINGS_PATH', EMBEDPRESS_PLUGIN_DIR_PATH . 'EmbedPress/Ends/Back/Settings/');
 define('EMBEDPRESS_PLUGIN_URL', plugins_url('/', __FILE__));
+
 
 require_once EMBEDPRESS_PLUGIN_DIR_PATH . 'includes.php';
 
@@ -82,7 +83,10 @@ add_action('plugins_loaded', function () {
     do_action('embedpress_before_init');
 });
 $editor_check = get_option('classic-editor-replace');
-if ((Compatibility::isWordPress5() && !Compatibility::isClassicalEditorActive()) || (Compatibility::isClassicalEditorActive() && 'block' === $editor_check)) {
+
+if (isset($_GET['classic-editor']) || isset($_POST['action']) && $_POST['action'] == 'embedpress_do_ajax_request') {
+    $embedPressPlugin = new CoreLegacy();
+} elseif ((Compatibility::isWordPress5() && !Compatibility::isClassicalEditorActive()) || (Compatibility::isClassicalEditorActive() && 'block' === $editor_check)) {
     $embedPressPlugin = new Core();
 } else {
     $embedPressPlugin = new CoreLegacy();
@@ -92,6 +96,8 @@ $embedPressPlugin->initialize();
 new Feature_Enhancer();
 new Extend_Elementor_Controls();
 new Extend_CustomPlayer_Controls();
+
+new Helper();
 
 
 if (is_plugin_active('elementor/elementor.php')) {
@@ -114,35 +120,8 @@ if (class_exists('EmbedPress_Licensing')) {
     $is_pro_active = true;
 }
 
-function get_embed_type()
+add_action('wp_enqueue_scripts', 'load_scripts');
+function load_scripts()
 {
-    // Get the post content
-    $content = get_the_content();
-    // Use regular expressions to find the embed type used in the post
-    preg_match('/\[embedpress.*?type="(.*?)"/', $content, $matches);
-    // Return the embed type
-    if (!empty($matches[1])) {
-        return $matches[1];
-    } else {
-        return false;
-    }
+    Shortcode::shortcode_scripts();
 }
-
-
-function ep_track_embed_usage()
-{
-    // Get the type of embed used (e.g. "youtube", "vimeo", "google_doc", etc.)
-    $embed_type = 'youtube';
-
-    // Log the embed type and user ID in a database
-    global $wpdb;
-    $wpdb->insert('embed_usage_log', array('embed_type' => $embed_type, 'user_id' => get_current_user_id()));
-}
-add_action('embed_content', 'ep_track_embed_usage');
-
-
-function ep_enqueue_jquery_in_header()
-{
-    wp_enqueue_script('jquery', false, array(), false, true);
-}
-add_action('wp_enqueue_scripts', 'ep_enqueue_jquery_in_header', 1);

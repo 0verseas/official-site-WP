@@ -9,13 +9,17 @@ class rsssl_hardening {
 			wp_die(sprintf(__('%s is a singleton class and you cannot create a second instance.', 'really-simple-ssl'), get_class($this)));
 		add_filter( 'rsssl_do_action', array($this, 'hardening_data'), 10, 3 );
 
+		add_action("admin_init", array($this, "load_translations"));
+		self::$_this = $this;
+	}
+
+	public function load_translations(){
 		$this->risk_naming = [
 			'l' => __('low-risk', 'really-simple-ssl'),
 			'm' => __('medium-risk', 'really-simple-ssl'),
 			'h' => __('high-risk', 'really-simple-ssl'),
 			'c' => __('critical', 'really-simple-ssl'),
 		];
-		self::$_this = $this;
 	}
 
 	function hardening_data( array $response, string $action, $data ): array {
@@ -65,14 +69,20 @@ class rsssl_hardening {
 	}
 
 	/**
-	 * @return int
+	 * Gets the count of all available updates for core, plugins, and themes.
+	 *
+	 * @return int The count of all available updates.
 	 */
 	public function getAllUpdatesCount(): int
 	{
-		$updates = wp_get_update_data();
-		//we only want core, plugins and themes
-		$updates = array_slice($updates, 0, 3);
-
-		return array_sum($updates);
+		$updatesData = wp_get_update_data();
+		// Checks if the 'counts' key exists in the array and it's an array itself.
+		if (isset($updatesData['counts']) && is_array($updatesData['counts'])) {
+			//we only want core, plugins and themes.
+			$updatesCounts = array_slice($updatesData['counts'], 0, 3);
+			return array_sum($updatesCounts);
+		}
+		// Fallback return in case there's no 'counts' key or it's not an array.
+		return 0;
 	}
 }

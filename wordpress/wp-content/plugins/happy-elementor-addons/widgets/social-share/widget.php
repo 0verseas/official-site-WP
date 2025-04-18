@@ -9,7 +9,7 @@
 namespace Happy_Addons\Elementor\Widget;
 
 use Elementor\Controls_Manager;
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
@@ -46,6 +46,10 @@ class Social_Share extends Base {
 
 	public function get_keywords () {
 		return [ 'social', 'share', 'facebook', 'twitter', 'instagram', 'linkedin' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	/**
@@ -615,7 +619,9 @@ class Social_Share extends Base {
 			[
 				'name'     => 'text_typography',
 				'label'    => __( 'Typography', 'happy-elementor-addons' ),
-				'scheme'   => Typography::TYPOGRAPHY_3,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 				'selector' => '{{WRAPPER}} .ha-share-network .ha-share-label'
 			]
 		);
@@ -772,7 +778,7 @@ class Social_Share extends Base {
 						<?php
 						$social_media_name = $social_media_name == 'email' ? 'envelope' : $social_media_name;
 						$ico_library = $social_media_name == 'envelope' ? 'fa' : 'fab';
-						
+
 						if ( 'icon_and_text' == $network_view ) {
 							?>
 							<i class="<?=$ico_library?> fa-<?php echo esc_attr( $social_media_name ); ?>" aria-hidden="true"></i>

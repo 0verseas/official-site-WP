@@ -1,13 +1,16 @@
 <?php
 /*
-Plugin Name: Weglot Translate
-Plugin URI: http://wordpress.org/plugins/weglot/
-Description: Translate your website into multiple languages in minutes without doing any coding. Fully SEO compatible.
-Author: Weglot Translate team
-Author URI: https://weglot.com/
-Text Domain: weglot
-Domain Path: /languages/
-Version: 4.0.2
+* Plugin Name: Weglot Translate
+* Plugin URI: http://wordpress.org/plugins/weglot/
+* Description: Translate your website into multiple languages in minutes without doing any coding. Fully SEO compatible.
+* Author: Weglot Translate team
+* Author URI: https://weglot.com/
+* Text Domain: weglot
+* Domain Path: /languages/
+* Woo: 18734003994087:a9b22cd146b2b968b88bba3360c23eed
+* WC requires at least: 4.0
+* WC tested up to: 9.5
+* Version: 4.3.2
 */
 
 /**
@@ -22,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WEGLOT_NAME', 'Weglot' );
 define( 'WEGLOT_SLUG', 'weglot-translate' );
 define( 'WEGLOT_OPTION_GROUP', 'group-weglot-translate' );
-define( 'WEGLOT_VERSION', '4.0.2' );
+define( 'WEGLOT_VERSION', '4.3.2' );
 define( 'WEGLOT_PHP_MIN', '5.6' );
 define( 'WEGLOT_BNAME', plugin_basename( __FILE__ ) );
 define( 'WEGLOT_DIR', __DIR__ );
@@ -39,12 +42,16 @@ define( 'WEGLOT_TEMPLATES', WEGLOT_DIR . '/templates' );
 define( 'WEGLOT_TEMPLATES_ADMIN', WEGLOT_TEMPLATES . '/admin' );
 define( 'WEGLOT_TEMPLATES_ADMIN_NOTICES', WEGLOT_TEMPLATES_ADMIN . '/notices' );
 define( 'WEGLOT_TEMPLATES_ADMIN_PAGES', WEGLOT_TEMPLATES_ADMIN . '/pages' );
+/* Start editing Weglot X WooCommerce */
+define('WEGLOT_WOOCOMMERCE', false);
+/* Stop editing Weglot X WooCommerce */
 
 if ( ! function_exists( 'is_plugin_active' ) ) {
 	include_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
 
 // Compatibility Yoast premium Redirection
+$dir_yoast = plugin_dir_path( __DIR__ ) . 'wordpress-seo';
 $dir_yoast_premium = plugin_dir_path( __DIR__ ) . 'wordpress-seo-premium';
 if ( file_exists( $dir_yoast_premium . '/wp-seo-premium.php' ) ) {
 
@@ -52,16 +59,16 @@ if ( file_exists( $dir_yoast_premium . '/wp-seo-premium.php' ) ) {
 		return;
 	}
 
-	$yoast_plugin_data        = get_plugin_data( $dir_yoast_premium . '/wp-seo-premium.php' );
-	$dir_yoast_premium_inside = $dir_yoast_premium . '/premium/';
-
+	$yoast_plugin_data        = get_plugin_data( $dir_yoast_premium . '/wp-seo-premium.php', true, false );
+	$dir_yoast_premium_inside = $dir_yoast_premium . '/';
+	$dir_yoast_inside = $dir_yoast . '/';
 	// Override yoast redirect
 	if (
 		! is_admin() &&
 		version_compare( $yoast_plugin_data['Version'], '7.1.0', '>=' ) &&
 		is_plugin_active( 'wordpress-seo-premium/wp-seo-premium.php' ) &&
 		file_exists( $dir_yoast_premium_inside ) &&
-		file_exists( $dir_yoast_premium_inside . 'classes/redirect/redirect-handler.php' ) &&
+		file_exists( $dir_yoast_premium_inside . 'src/initializers/redirect-handler.php' ) &&
 		file_exists( $dir_yoast_premium_inside . 'classes/redirect/redirect-util.php' )
 	) {
 		require_once __DIR__ . '/weglot-autoload.php';
@@ -79,6 +86,7 @@ wpml_is_active();
 
 /**
  * Check compatibility this Weglot with WordPress config.
+ * @return bool
  */
 function weglot_is_compatible() {
 	// Check php version.
@@ -92,6 +100,7 @@ function weglot_is_compatible() {
 
 /**
  * Check if GTranslate is active.
+ * @return void
  */
 function gtranslate_is_active() {
 	// Check gtranslate is active.
@@ -103,6 +112,7 @@ function gtranslate_is_active() {
 
 /**
  * Check if Polylang is active.
+ * @return void
  */
 function polylang_is_active() {
 	// Check polylang is active.
@@ -113,6 +123,7 @@ function polylang_is_active() {
 
 /**
  * Check if TranslatePress is active.
+ * @return void
  */
 function translatepress_is_active() {
 	// Check TranslatePress is active.
@@ -123,6 +134,7 @@ function translatepress_is_active() {
 
 /**
  * Check if TranslatePress is active.
+ * @return void
  */
 function wpml_is_active() {
 	// Check WPML is active.
@@ -197,7 +209,8 @@ function weglot_php_min_compatibility() {
 
 /**
  * Activate Weglot.
- *
+ * @return void
+ * @throws Exception
  * @since 2.0
  */
 function weglot_plugin_activate() {
@@ -226,7 +239,8 @@ function weglot_plugin_activate() {
 
 /**
  * Deactivate Weglot.
- *
+ * @return void
+ * @throws Exception
  * @since 2.0
  */
 function weglot_plugin_deactivate() {
@@ -250,7 +264,7 @@ function weglot_plugin_deactivate() {
 
 /**
  * Uninstall Weglot.
- *
+ * @return void
  * @since 2.0
  */
 function weglot_plugin_uninstall() {
@@ -283,7 +297,7 @@ function weglot_rollback() {
 
 /**
  * Load Weglot.
- *
+ * @return void
  * @since 2.0
  */
 function weglot_plugin_loaded() {
@@ -320,4 +334,11 @@ if ( file_exists( $dir_wp_rocket . '/wp-rocket.php' ) ) {
 	include_once __DIR__ . '/src/third/wprocket/wp-rocket-weglot.php';
 }
 
-
+// Ensure WooCommerce is active before adding compatibility and add compatibility with HPOS WooCommerce
+if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+	add_action( 'before_woocommerce_init', function() {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	} );
+}

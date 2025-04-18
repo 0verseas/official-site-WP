@@ -1,12 +1,11 @@
 <?php
-
-namespace Simple_History;
-
 /**
  * Style example.
  *
  * @package SimpleHistory
  */
+
+namespace Simple_History;
 
 defined( 'ABSPATH' ) || die();
 ?>
@@ -33,11 +32,11 @@ defined( 'ABSPATH' ) || die();
 					<strong class="SimpleHistoryLogitem__inlineDivided">Jessie</strong>
 					<span class="SimpleHistoryLogitem__inlineDivided SimpleHistoryLogitem__headerEmail">admin@example.com</span>
                     <?php // phpcs:ignore Generic.Files.LineLength ?>
-					<span class="SimpleHistoryLogitem__permalink SimpleHistoryLogitem__when SimpleHistoryLogitem__inlineDivided"><a class="" href="http://playground-root.ep/wp-admin/index.php?page=simple_history_page#item/665"><time datetime="2014-08-11T21:08:44+00:00" title="2014-08-11T21:08:44+00:00" class="">1 min ago</time></a></span>
+					<span class="SimpleHistoryLogitem__permalink SimpleHistoryLogitem__when SimpleHistoryLogitem__inlineDivided"><a class="" href="http://playground-root.ep/wp-admin/index.php?page=simple_history_page#simple-history/event/665"><time datetime="2014-08-11T21:08:44+00:00" title="2014-08-11T21:08:44+00:00" class="">1 min ago</time></a></span>
 				</div>
 
 				<div class="SimpleHistoryLogitem__text">
-					Short message descriping the thing that happened.
+					Short message describing the thing that happened.
 				</div>
 
 				<div class="SimpleHistoryLogitem__details">
@@ -105,9 +104,39 @@ defined( 'ABSPATH' ) || die();
 						</tbody>
 					</table>
 
+					<p>Tables can be used to show before and after values:</p>
+
+					<table class="SimpleHistoryLogitem__keyValueTable">
+						<tbody>
+							<tr>
+								<td>Nickname</td>
+								<td>
+									<ins class="SimpleHistoryLogitem__keyValueTable__addedThing">john</ins>
+									<del class="SimpleHistoryLogitem__keyValueTable__removedThing">johndoe</del>
+								</td>
+							</tr>
+							<tr>
+								<td>Website</td>
+								<td>
+									<ins class="SimpleHistoryLogitem__keyValueTable__addedThing">https://texttv.nu</ins>
+									<del class="SimpleHistoryLogitem__keyValueTable__removedThing">http://texttv.nu/</del>
+								</td>
+							</tr>
+							<tr>
+								<td>Description</td>
+								<td>
+									<ins class="SimpleHistoryLogitem__keyValueTable__addedThing">Description of something. New and good.</ins>
+									<del class="SimpleHistoryLogitem__keyValueTable__removedThing">Old and bad description that was not so good.</del>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<p>Inline divided with much info in a row next to each other:</p>
+
 					<p>
 						<span class="SimpleHistoryLogitem__inlineDivided">
-							<em>Author:</em>
+							<em>Author</em>
 							<a href="http://bbpress.org">The bbPress Community</a>
 						</span>
 
@@ -117,7 +146,7 @@ defined( 'ABSPATH' ) || die();
 						</span>
 
 						<span class="SimpleHistoryLogitem__inlineDivided">
-							<em>Version:</em>
+							<em>Version</em>
 							2.5.4
 						</span>
 
@@ -141,8 +170,130 @@ defined( 'ABSPATH' ) || die();
 
 				</div>
 
-			</div>
-		</li>
+
+				<p>Table with diff content:</p>
+
+				<table class="SimpleHistoryLogitem__keyValueTable">
+					<tbody>
+						<tr>
+							<td>Title</td>
+							<td>
+								<div class="SimpleHistory__diff__contents" tabindex="0">
+									<div class="SimpleHistory__diff__contentsInner">
+										<table class="diff SimpleHistory__diff">
+											<colgroup>
+												<col class="content" />
+											</colgroup>
+											<tbody>
+												<tr>
+													<td class="diff-deletedline">
+														<span aria-hidden="true" class="dashicons dashicons-minus"></span><span
+															class="screen-reader-text">Deleted: </span>About
+														<del>us</del>
+													</td>
+													<td class="diff-addedline">
+														<span aria-hidden="true" class="dashicons dashicons-plus"></span><span
+															class="screen-reader-text">Added: </span>About
+														<ins>Us</ins>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>Content</td>
+							<td>
+								<div class="SimpleHistory__diff__contents" tabindex="0">
+									<div class="SimpleHistory__diff__contentsInner">
+										<table class="diff SimpleHistory__diff">
+											<colgroup>
+												<col class="content" />
+											</colgroup>
+											<tbody>
+												<tr>
+													<td class="diff-context">
+														<span class="screen-reader-text">Unchanged: </span>&lt;p&gt;Mer.&lt;/p&gt;
+													</td>
+													<td class="diff-context">
+														<span class="screen-reader-text">Unchanged: </span>&lt;p&gt;Mer.&lt;/p&gt;
+													</td>
+												</tr>
+												<tr>
+													<td>&nbsp;</td>
+													<td class="diff-addedline">
+														<span aria-hidden="true" class="dashicons dashicons-plus"></span><span
+															class="screen-reader-text">Added: </span>&lt;!--
+														/wp:paragraph --&gt;
+													</td>
+												</tr>
+												<tr>
+													<td>&nbsp;</td>
+													<td class="diff-addedline">
+														<span aria-hidden="true" class="dashicons dashicons-plus"></span><span
+															class="screen-reader-text">Added: </span>&lt;!--
+														wp:paragraph --&gt;
+													</td>
+												</tr>
+												<tr>
+													<td>&nbsp;</td>
+													<td class="diff-addedline">
+														<span aria-hidden="true" class="dashicons dashicons-plus"></span><span
+															class="screen-reader-text">Added: </span>&lt;p&gt;Hepp.&lt;/p&gt;
+													</td>
+												</tr>
+												<tr>
+													<td class="diff-context">
+														<span class="screen-reader-text">Unchanged: </span>&lt;!--
+														/wp:paragraph --&gt;
+													</td>
+													<td class="diff-context">
+														<span class="screen-reader-text">Unchanged: </span>&lt;!--
+														/wp:paragraph --&gt;
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>Menu order</td>
+							<td>
+								<div class="SimpleHistory__diff__contents" tabindex="0">
+									<div class="SimpleHistory__diff__contentsInner">
+										<table class="diff SimpleHistory__diff">
+											<colgroup>
+												<col class="content" />
+											</colgroup>
+											<tbody>
+												<tr>
+													<td class="diff-deletedline">
+														<span aria-hidden="true" class="dashicons dashicons-minus"></span><span
+															class="screen-reader-text">Deleted: </span>0
+													</td>
+													<td class="diff-addedline">
+														<span aria-hidden="true" class="dashicons dashicons-plus"></span><span
+															class="screen-reader-text">Added: </span>2
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+			</div><!-- // second col -->
+
+		</li><!-- // one row -->
+
+		
 
 		<?php
 		// All debug levels.
@@ -202,6 +353,7 @@ defined( 'ABSPATH' ) || die();
 		$refl = new \ReflectionClass( 'Simple_History\Log_Levels' );
 		foreach ( $refl->getConstants() as $val ) {
 			$msg = $arr_messages[ $val ] ?? 'This is a message with loglevel';
+			// phpcs:ignore Universal.CodeAnalysis.NoEchoSprintf.Found
 			echo sprintf(
 				$template, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$val, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

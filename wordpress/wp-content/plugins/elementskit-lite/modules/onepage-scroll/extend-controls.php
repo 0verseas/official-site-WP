@@ -5,6 +5,7 @@ namespace Elementor;
 use \ElementsKit_Lite\Modules\Onepage_Scroll\Init;
 
 class ElementsKit_Extend_Onepage_Scroll {
+
 	public function __construct() {
 		/**
 		 * Page Controls
@@ -48,13 +49,17 @@ class ElementsKit_Extend_Onepage_Scroll {
 				'type'        => \Elementor\Controls_Manager::CHOOSE,
 				'options'     => array(
 					'1' => array(
-						'icon' => 'fa fa-unlock-alt',
+						'icon' => 'eicon-lock',
 					),
 				),
 				'default'     => '1',
 				'toggle'      => false,
 				'separator'   => 'before',
-				'description' => sprintf( __( '%1$s Get the %2$s Pro version %3$s for more awesome elements and powerful modules. %4$s', 'elementskit-lite' ), '<span class="ekit-widget-pro-feature">', '<a href="https://wpmet.com/elementskit-pricing" target="_blank">', '</a>', '</span>' ),
+				'description' => sprintf('<span class="ekit-widget-pro-feature"> %1$s <a href="https://wpmet.com/elementskit-pricing" target="_blank"> %2$s </a> %3$s </span>',
+					esc_html__('Get the', 'elementskit-lite'),
+					esc_html__('Pro version', 'elementskit-lite'),
+					esc_html__('for more awesome elements and powerful modules.', 'elementskit-lite'),
+				),
 			)
 		);
 	}
@@ -178,7 +183,26 @@ class ElementsKit_Extend_Onepage_Scroll {
 				break;
 		}
 
-		include_once 'nav-styles/' . $nav_style . '.php';
+		$nav_styles = array(
+			'circle-scale-up',
+			'circle-fill-in',
+			'circle-fill-out',
+			'circle-stroke',
+			'circle-stroke-dot',
+			'circle-stroke-simple',
+			'circle-dot-move',
+			'circle-timeline',
+			'square-scale-up',
+			'line-grow',
+			'line-shrink',
+			'line-fill',
+			'line-move',
+			'icon',
+		);
+
+		if( in_array($nav_style, $nav_styles) ) {
+			include_once 'nav-styles/' . $nav_style . '.php';
+		}
 
 		if ( $is_editor ) :
 			echo '</div>';

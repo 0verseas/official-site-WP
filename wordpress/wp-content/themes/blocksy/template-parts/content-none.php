@@ -7,13 +7,13 @@
  * @package Blocksy
  */
 
-echo '<div class="entry-content">';
+echo '<div class="entry-content is-layout-flow">';
 
 if (is_home() && current_user_can('publish_posts')) {
 	printf(
 		'<p>' . wp_kses(
 			/* translators: 1: link to WP admin new post page open 2: link closing. */
-			__( 'Ready to publish your first post? %1$sGet started here%2$s.', 'blocksy' ),
+			__('Ready to publish your first post? %1$sGet started here%2$s.', 'blocksy'),
 			[
 				'a' => [
 					'href' => []

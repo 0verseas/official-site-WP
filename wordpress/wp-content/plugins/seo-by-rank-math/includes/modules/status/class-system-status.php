@@ -71,7 +71,7 @@ class System_Status {
 	 * @return void
 	 */
 	private function display_system_info_list() {
-		$directory = dirname( __FILE__ );
+		$directory = __DIR__;
 		foreach ( $this->wp_info as $section => $details ) {
 			if ( ! isset( $details['fields'] ) || empty( $details['fields'] ) ) {
 				continue;
@@ -205,7 +205,7 @@ class System_Status {
 
 		// Core debug data.
 		if ( ! class_exists( 'WP_Debug_Data' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php'; // @phpstan-ignore-line
 		}
 
 		wp_enqueue_style( 'site-health' );
@@ -245,8 +245,7 @@ class System_Status {
 	 */
 	public function get_table_size( $table ) {
 		global $wpdb;
-		$size = (int) $wpdb->get_var( 'SELECT SUM((data_length + index_length)) AS size FROM information_schema.TABLES WHERE table_schema="' . $wpdb->dbname . '" AND (table_name="' . $wpdb->prefix . $table . '")' ); // phpcs:ignore
-
+		$size = (int) $wpdb->get_var( "SELECT SUM((data_length + index_length)) AS size FROM information_schema.TABLES WHERE table_schema='" . $wpdb->dbname . "' AND (table_name='" . $wpdb->prefix . $table . "')" ); // phpcs:ignore
 		return size_format( $size );
 	}
 }

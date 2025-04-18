@@ -1,72 +1,67 @@
 <?php
 
-function blocksy_isolated_get_search_form($args) {
-	if (class_exists('IS_Admin_Public')) {
-		remove_filter(
-			'get_search_form',
-			[\IS_Admin_Public::getInstance(), 'get_search_form'],
-			9999999
-		);
+namespace Blocksy;
+
+class SearchModifications {
+	use WordPressActionsManager;
+
+	private $filters = [
+		[
+			'action' => 'rest_post_search_query',
+			'priority' => 999,
+			'args' => 2
+		],
+
+		[
+			'action' => 'pre_get_posts'
+		],
+
+		[
+			'action' => 'rest_api_init'
+		]
+	];
+
+	public function __construct() {
+		$this->attach_hooks();
 	}
 
-	get_search_form($args);
-
-	if (class_exists('IS_Admin_Public')) {
-		add_filter(
-			'get_search_form',
-			[\IS_Admin_Public::getInstance(), 'get_search_form'],
-			9999999
-		);
-	}
-}
-
-add_filter(
-	'rest_post_query',
-	function ($args, $request) {
-		if (
-			isset($request['post_type'])
-			&&
-			(strpos($request['post_type'], 'ct_forced') !== false)
-		) {
-			$post_type = explode(
-				':',
-				str_replace('ct_forced_', '', $request['post_type'])
-			);
-
-			if ($post_type[0] === 'any') {
-				$post_type = array_diff(
-					get_post_types(['public' => true]),
-					['ct_content_block']
-				);
-			}
-
-			$args = [
-				'posts_per_page' => $args['posts_per_page'],
-				'post_type' => $post_type,
-				'paged' => 1,
-				's' => $args['s'],
-			];
+	public function rest_api_init() {
+		if (! isset($_GET['ct_live_search']) || $_GET['ct_live_search'] !== 'true') {
+			return;
 		}
 
-		if (
-			isset($request['post_type'])
-			&&
-			(strpos($request['post_type'], 'ct_cpt') !== false)
-		) {
-			$next_args = [
-				'posts_per_page' => $args['posts_per_page'],
-				'post_type' => array_diff(
-					get_post_types(['public' => true]),
-					['post', 'page', 'attachment', 'ct_content_block']
-				),
-				'paged' => 1
-			];
+		register_rest_field('search-result', 'ct_featured_media', [
+			'get_callback' => function ($post, $field_name, $request) {
+				$image_id = get_post_thumbnail_id($post['id']);
 
-			if (isset($args['s'])) {
-				$next_args['s'] = $args['s'];
+				$image = get_post($image_id);
+
+				if (! $image) {
+					return null;
+				}
+
+				$controller = new \WP_REST_Attachments_Controller('attachment');
+
+				$attachment = $controller->prepare_item_for_response(
+					$image,
+					$request
+				);
+
+				return $attachment->data;
 			}
+		]);
 
-			$args = $next_args;
+		do_action('blocksy:rest_api:live_search:fields');
+	}
+
+	public function rest_post_search_query($args, $request) {
+		// Patch WP_Query args for search only when it's a live search
+		if (
+			! isset($_GET['ct_live_search'])
+			||
+			$_GET['ct_live_search'] !== 'true'
+		) {
+			return $args;
 		}
 
 		if (
@@ -81,11 +76,19 @@ add_filter(
 					$meta_query = $args['meta_query'];
 				}
 
-				$meta_query[] = array(
-					'key'     => '_stock_status',
-					'value'   => 'outofstock',
-					'compare' => '!=',
-				);
+				$meta_query[] = [
+					'relation' => 'OR',
+					[
+						'key'     => '_stock_status',
+						'value'   => 'outofstock',
+						'compare' => '!=',
+					],
+
+					[
+						'key'     => '_stock_status',
+						'compare' => 'NOT EXISTS',
+					]
+				];
 
 				$args['meta_query'] = $meta_query;
 			}
@@ -112,99 +115,173 @@ add_filter(
 
 				$args['tax_query'] = $tax_query;
 			}
-		}
 
-		return $args;
-	},
-	10,
-	2
-);
+			if (class_exists('Addify_Products_Visibility_Front')) {
+				$visibility = new \Addify_Products_Visibility_Front();
 
-if (!is_admin()) {
-	add_filter('pre_get_posts', function ($query) {
-		if ($query->is_search && (
-			is_search()
-			||
-			wp_doing_ajax()
-		)) {
-			if (!empty($_GET['ct_post_type'])) {
-				$custom_post_types = blocksy_manager()->post_types->get_supported_post_types();
+				$q = new \WP_Query();
 
-				if (function_exists('is_bbpress')) {
-					$custom_post_types[] = 'forum';
-					$custom_post_types[] = 'topic';
-					$custom_post_types[] = 'reply';
-				}
+				$visibility->afpvu_custom_pre_get_posts_query($q);
 
-				$allowed_post_types = [];
-
-				$post_types = explode(
-					':',
-					sanitize_text_field($_GET['ct_post_type'])
-				);
-
-				$known_cpts = ['post', 'page'];
-
-				if (get_post_type_object('product')) {
-					$known_cpts[] = 'product';
-				}
-
-				foreach ($post_types as $single_post_type) {
-					if (
-						in_array($single_post_type, $custom_post_types)
-						||
-						in_array($single_post_type, $known_cpts)
-					) {
-						$allowed_post_types[] = $single_post_type;
-					}
-				}
-
-				$query->set('post_type', $allowed_post_types);
-
-				if (in_array('product', $allowed_post_types)) {
-					if ('yes' === get_option('woocommerce_hide_out_of_stock_items')) {
-						$meta_query = [];
-
-						if (! empty($query->get('meta_query'))) {
-							$meta_query = $query->get('meta_query');
-						}
-
-						$meta_query[] = array(
-							'key'     => '_stock_status',
-							'value'   => 'outofstock',
-							'compare' => '!=',
-						);
-
-						$query->set('meta_query', $meta_query);
-					}
-
-					if (function_exists('wc_get_product_visibility_term_ids')) {
-						$product_visibility_term_ids = wc_get_product_visibility_term_ids();
-
-						$tax_query = [];
-
-						if (! empty($query->get('tax_query'))) {
-							$tax_query = $query->get('tax_query');
-						}
-
-						$tax_query['relation'] = 'AND';
-
-						$tax_query[] = [
-							[
-								'taxonomy' => 'product_visibility',
-								'field' => 'term_taxonomy_id',
-								'terms' => $product_visibility_term_ids['exclude-from-search'],
-								'operator' => 'NOT IN',
-							]
-						];
-
-						$query->set('tax_query', $tax_query);
-					}
+				foreach ($q->query_vars as $key => $value) {
+					$args[$key] = $value;
 				}
 			}
 		}
 
+		$tax_query = [];
+
+		if (isset($args['tax_query']) && is_array($args['tax_query'])) {
+			$tax_query = $args['tax_query'];
+		}
+
+		if (
+			isset($request['ct_tax_query'])
+			&&
+			! empty($request['ct_tax_query'])
+		) {
+			$tax_params = explode(':', $request['ct_tax_query']);
+
+			$tax_query[] = [
+				'relation' => 'AND',
+				[
+					'taxonomy' => $tax_params[0],
+					'field' => 'id',
+					'terms' => $tax_params[1],
+					'operator' => 'IN',
+				]
+			];
+		}
+
+		$args['tax_query'] = $tax_query;
+
+		return $args;
+	}
+
+	public function pre_get_posts($query) {
+		if (is_admin() || ! $query->is_search) {
+			return $query;
+		}
+
+		if (
+			! is_search()
+			&&
+			! wp_doing_ajax()
+		) {
+			return $query;
+		}
+
+		$this->maybe_apply_post_type($query);
+		$this->maybe_apply_tax_query($query);
+
 		return $query;
-	});
+	}
+
+	private function maybe_apply_post_type($query) {
+		if (empty($_GET['ct_post_type'])) {
+			return;
+		}
+
+		$custom_post_types = blocksy_manager()->post_types->get_supported_post_types();
+
+		if (function_exists('is_bbpress')) {
+			$custom_post_types[] = 'forum';
+			$custom_post_types[] = 'topic';
+			$custom_post_types[] = 'reply';
+		}
+
+		$allowed_post_types = [];
+
+		$post_types = explode(
+			':',
+			sanitize_text_field($_GET['ct_post_type'])
+		);
+
+		$known_cpts = ['post', 'page'];
+
+		if (get_post_type_object('product')) {
+			$known_cpts[] = 'product';
+		}
+
+		foreach ($post_types as $single_post_type) {
+			if (
+				in_array($single_post_type, $custom_post_types)
+				||
+				in_array($single_post_type, $known_cpts)
+			) {
+				$allowed_post_types[] = $single_post_type;
+			}
+		}
+
+		$query->set('post_type', $allowed_post_types);
+
+		if (in_array('product', $allowed_post_types)) {
+			if ('yes' === get_option('woocommerce_hide_out_of_stock_items')) {
+				$meta_query = [];
+
+				if (! empty($query->get('meta_query'))) {
+					$meta_query = $query->get('meta_query');
+				}
+
+				$meta_query[] = array(
+					'key'     => '_stock_status',
+					'value'   => 'outofstock',
+					'compare' => '!=',
+				);
+
+				$query->set('meta_query', $meta_query);
+			}
+
+			if (function_exists('wc_get_product_visibility_term_ids')) {
+				$product_visibility_term_ids = wc_get_product_visibility_term_ids();
+
+				$tax_query = [];
+
+				if (! empty($query->get('tax_query'))) {
+					$tax_query = $query->get('tax_query');
+				}
+
+				$tax_query['relation'] = 'AND';
+
+				$tax_query[] = [
+					[
+						'taxonomy' => 'product_visibility',
+						'field' => 'term_taxonomy_id',
+						'terms' => $product_visibility_term_ids['exclude-from-search'],
+						'operator' => 'NOT IN',
+					]
+				];
+
+				$query->set('tax_query', $tax_query);
+			}
+		}
+	}
+
+	// TODO: check if existing tax query exists before overriding new one
+	private function maybe_apply_tax_query($query) {
+		if (empty($_GET['ct_tax_query'])) {
+			return;
+		}
+
+		$tax_query = [
+			'relation' => 'AND',
+		];
+
+		$tax_params = explode(':', $_GET['ct_tax_query']);
+
+		$tax_query[] = [
+			[
+				'taxonomy' => $tax_params[0],
+				'field' => 'id',
+				'terms' => $tax_params[1],
+				'operator' => 'IN',
+			]
+		];
+
+		$query->set('tax_query', [
+			'relation' => 'AND',
+			$tax_query
+		]);
+	}
 }
 

@@ -21,7 +21,7 @@ class Assets_Manager {
 		// Edit and preview enqueue
 		add_action('elementor/preview/enqueue_styles', [__CLASS__, 'enqueue_preview_styles']);
 
-		// Enqueue editor scripts
+		// Enqueue editor & editorv2 scripts
 		add_action('elementor/editor/after_enqueue_scripts', [__CLASS__, 'editor_enqueue']);
 
 		// Paragraph toolbar registration
@@ -78,6 +78,13 @@ class Assets_Manager {
 		wp_register_style(
 			'happy-icons',
 			HAPPY_ADDONS_ASSETS . 'fonts/style.min.css',
+			null,
+			HAPPY_ADDONS_VERSION
+		);
+
+		wp_register_style(
+			'huge-icons',
+			HAPPY_ADDONS_ASSETS . 'fonts/huge-icons/huge-icons.min.css',
 			null,
 			HAPPY_ADDONS_VERSION
 		);
@@ -267,6 +274,7 @@ class Assets_Manager {
 			HAPPY_ADDONS_VERSION,
 			false
 		);
+
 		// Happy addons LordIcon JS
 		wp_register_script(
 			'lord-icon',
@@ -275,11 +283,118 @@ class Assets_Manager {
 			HAPPY_ADDONS_VERSION,
 			false
 		);
+
+		// dom-purify js to sanitize text
+		wp_register_script(
+			'dom-purify',
+			HAPPY_ADDONS_ASSETS . 'vendor/dom-purify/purify.min.js',
+			[],
+			'3.1.6',
+			false
+		);
+
+		// gsap js
+		wp_register_script(
+			'gsap',
+			HAPPY_ADDONS_ASSETS . 'vendor/gsap/gsap.min.js',
+			[],
+			'3.12.5',
+			false
+		);
+
+		// three js
+		wp_register_script(
+			'three',
+			HAPPY_ADDONS_ASSETS . 'vendor/three.min.js',
+			[],
+			HAPPY_ADDONS_VERSION,
+			false
+		);
+
+		// hover-effect js
+		wp_register_script(
+			'hover-effect',
+			HAPPY_ADDONS_ASSETS . 'vendor/hover-effect.umd.js',
+			[],
+			HAPPY_ADDONS_VERSION,
+			false
+		);
+
+		// Anime js
+		wp_register_script(
+			'anime',
+			HAPPY_ADDONS_ASSETS . 'vendor/anime/lib/anime.min.js',
+			[],
+			HAPPY_ADDONS_VERSION,
+			true
+		);
+
+		// Match Height
+		wp_register_script(
+			'jquery-match-height',
+			HAPPY_ADDONS_ASSETS . 'vendor/jquery-match-height/jquery.matchHeight-min.js',
+			[],
+			HAPPY_ADDONS_VERSION,
+			true
+		);
+
+		// mouse follower css
+		wp_register_style(
+			'mouse-follower',
+			HAPPY_ADDONS_ASSETS . 'vendor/mouse-follower/mouse-follower.min.css',
+			[],
+			HAPPY_ADDONS_VERSION
+		);
+
+		// mouse follower js
+		wp_register_script(
+			'mouse-follower',
+			HAPPY_ADDONS_ASSETS . 'vendor/mouse-follower/mouse-follower.min.js',
+			['gsap'],
+			HAPPY_ADDONS_VERSION,
+			true
+		);
+		
+		// Scroll Trigger
+		wp_register_script(
+			'scroll-trigger',
+			HAPPY_ADDONS_ASSETS . 'vendor/scroll-trigger/scroll-trigger.min.js',
+			['gsap'],
+			HAPPY_ADDONS_VERSION,
+			true
+		);
+		
+		// Split Type
+		wp_register_script(
+			'split-type',
+			HAPPY_ADDONS_ASSETS . 'vendor/split-type/split-type.min.js',
+			['gsap', 'scroll-trigger'],
+			HAPPY_ADDONS_VERSION,
+			true
+		);
+
 		// Main assets
 		wp_register_style(
 			'happy-elementor-addons',
 			HAPPY_ADDONS_ASSETS . 'css/main' . $suffix . 'css',
 			['elementor-frontend'],
+			HAPPY_ADDONS_VERSION
+		);
+
+		// mouse follower js
+		wp_register_script(
+			'mouse-follower',
+			HAPPY_ADDONS_ASSETS . 'vendor/mouse-follower/mouse-follower.min.js',
+			['gsap'],
+			HAPPY_ADDONS_VERSION,
+			true
+		);
+
+		// mouse follower css
+		wp_register_style(
+			'mouse-follower',
+			HAPPY_ADDONS_ASSETS . 'vendor/mouse-follower/mouse-follower.min.css',
+			[],
 			HAPPY_ADDONS_VERSION
 		);
 
@@ -337,6 +452,8 @@ class Assets_Manager {
 			return;
 		}
 
+		wp_enqueue_script( 'dom-purify' );
+
 		self::enqueue(get_the_ID());
 	}
 
@@ -393,6 +510,8 @@ class Assets_Manager {
 	 */
 	public static function editor_enqueue() {
 
+		$suffix = ha_is_script_debug_enabled() ? '.' : '.min.';
+
 		wp_enqueue_style(
 			'happy-icons',
 			HAPPY_ADDONS_ASSETS . 'fonts/style.min.css',
@@ -401,15 +520,22 @@ class Assets_Manager {
 		);
 
 		wp_enqueue_style(
+			'huge-icons',
+			HAPPY_ADDONS_ASSETS . 'fonts/huge-icons/huge-icons.min.css',
+			null,
+			HAPPY_ADDONS_VERSION
+		);
+
+		wp_enqueue_style(
 			'happy-elementor-addons-editor',
-			HAPPY_ADDONS_ASSETS . 'admin/css/editor.min.css',
+			HAPPY_ADDONS_ASSETS . 'admin/css/editor'.$suffix.'css',
 			null,
 			HAPPY_ADDONS_VERSION
 		);
 
 		wp_enqueue_script(
 			'happy-elementor-addons-editor',
-			HAPPY_ADDONS_ASSETS . 'admin/js/editor.min.js',
+			HAPPY_ADDONS_ASSETS . 'admin/js/editor'.$suffix.'js',
 			['elementor-editor', 'jquery'],
 			HAPPY_ADDONS_VERSION,
 			true
@@ -431,6 +557,7 @@ class Assets_Manager {
 			'i18n' => [
 				'promotionDialogHeader'     => esc_html__('%s Widget', 'happy-elementor-addons'),
 				'promotionDialogMessage'    => esc_html__('Use %s widget with other exclusive pro widgets and 100% unique features to extend your toolbox and build sites faster and better.', 'happy-elementor-addons'),
+				'promotionDialogBtnTxt'    => esc_html__('Upgrade Now', 'happy-elementor-addons'),
 				'templatesEmptyTitle'       => esc_html__('No Templates Found', 'happy-elementor-addons'),
 				'templatesEmptyMessage'     => esc_html__('Try different category or sync for new templates.', 'happy-elementor-addons'),
 				'templatesNoResultsTitle'   => esc_html__('No Results Found', 'happy-elementor-addons'),
@@ -493,7 +620,7 @@ class Assets_Manager {
 		}
 
 		$data = '
-		.elementor-add-new-section{
+		.elementor-add-section[data-view=choose-action] .elementor-add-new-section {
 			display: inline-flex !important;
 			flex-wrap: wrap;
 			align-items: center;
@@ -506,6 +633,10 @@ class Assets_Manager {
 			background-color: #5636d1;
 			margin-left: 5px;
 			font-size: 20px;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 		';
 		wp_add_inline_style('happy-elementor-addons', $data);

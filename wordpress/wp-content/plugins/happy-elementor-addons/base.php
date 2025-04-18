@@ -20,21 +20,8 @@ class Base {
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
-			self::$instance->init();
 		}
 		return self::$instance;
-	}
-
-	private function __construct() {
-		add_action( 'init', [ $this, 'i18n' ] );
-	}
-
-	public function i18n() {
-		load_plugin_textdomain(
-			'happy-elementor-addons',
-			false,
-			dirname( plugin_basename( HAPPY_ADDONS__FILE__ ) ) . '/i18n/'
-		);
 	}
 
 	public function init() {
@@ -48,9 +35,15 @@ class Base {
 
 		add_action( 'init', [ $this, 'include_on_init' ] );
 
+		add_action( 'init', [ $this, 'i18n' ] );
+
 		$this->init_appsero_tracking();
 
 		do_action( 'happyaddons_loaded' );
+	}
+
+	public function i18n() {
+		load_plugin_textdomain( 'happy-elementor-addons', false, dirname( plugin_basename( __FILE__ ) ) . '/i18n' );
 	}
 
 	/**
@@ -68,6 +61,8 @@ class Base {
 			'Happy Elementor Addons',
 			HAPPY_ADDONS__FILE__
 		);
+
+		$this->appsero->set_textdomain( 'happy-elementor-addons' );
 
 		// Active insights
 		$this->appsero->insights()
@@ -92,7 +87,7 @@ class Base {
 		include_once( HAPPY_ADDONS_DIR_PATH . 'classes/widgets-cache.php' );
 		include_once( HAPPY_ADDONS_DIR_PATH . 'classes/assets-cache.php' );
 		include_once( HAPPY_ADDONS_DIR_PATH . 'classes/wpml-manager.php' );
-		
+
 		if ( is_admin() ) {
 			include_once( HAPPY_ADDONS_DIR_PATH . 'classes/updater.php' );
 			include_once( HAPPY_ADDONS_DIR_PATH . 'classes/dashboard.php' );
@@ -100,7 +95,7 @@ class Base {
 			include_once( HAPPY_ADDONS_DIR_PATH . 'classes/select2-handler.php' );
 			include_once( HAPPY_ADDONS_DIR_PATH . 'classes/dashboard-widgets.php' );
 		}
-		
+
 		if ( is_user_logged_in() ) {
 			include_once( HAPPY_ADDONS_DIR_PATH . 'classes/library-manager.php' );
 			include_once( HAPPY_ADDONS_DIR_PATH . 'classes/library-source.php' );
@@ -121,7 +116,6 @@ class Base {
 	}
 
 	public function include_on_init() {
-		include_once( HAPPY_ADDONS_DIR_PATH . 'inc/functions-extensions.php' );
 		include_once( HAPPY_ADDONS_DIR_PATH . 'classes/extensions-manager.php' );
 		include_once( HAPPY_ADDONS_DIR_PATH . 'classes/credentials-manager.php' );
 	}
@@ -157,7 +151,7 @@ class Base {
 
 		$Select2 = __NAMESPACE__ . '\Controls\Select2';
 		$Widget_List = __NAMESPACE__ . '\Controls\Widget_List';
-		
+
 		ha_elementor()->controls_manager->register( new $Select2() );
 		ha_elementor()->controls_manager->register( new $Widget_List() );
 

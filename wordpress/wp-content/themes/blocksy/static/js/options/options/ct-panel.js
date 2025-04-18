@@ -11,15 +11,11 @@ import OptionsPanel from '../../options/OptionsPanel'
 import Switch from './ct-switch'
 import { PanelContext } from '../components/PanelLevel'
 
-import { Transition, animated } from '@react-spring/web'
+import { Transition, animated } from 'react-spring'
 
 export const PanelMetaWrapper = ({ id, option, getActualOption, value }) => {
-	const {
-		panelsState,
-		panelsHelpers,
-		panelsDispatch,
-		containerRef,
-	} = useContext(PanelContext)
+	const { panelsState, panelsHelpers, panelsDispatch, containerRef } =
+		useContext(PanelContext)
 
 	const selfPanelId = id
 
@@ -98,9 +94,9 @@ export const PanelMetaWrapper = ({ id, option, getActualOption, value }) => {
 
 	useEffect(() => {
 		return () => {
-			;[
-				...document.querySelectorAll('.ct-panel-open:not(.open)'),
-			].map((el) => el.classList.remove('ct-panel-open'))
+			;[...document.querySelectorAll('.ct-panel-open:not(.open)')].map(
+				(el) => el.classList.remove('ct-panel-open')
+			)
 		}
 	}, [])
 
@@ -119,6 +115,15 @@ export const PanelMetaWrapper = ({ id, option, getActualOption, value }) => {
 			} ct-panel`,
 			onClick: ({ target }) => {
 				if (option.switch && !isEnabled) {
+					return
+				}
+
+				if (option.panelSecondLevel) {
+					panelsHelpers.openSecondLevel({
+						secondLevelTitleLabel: option.label,
+						secondLevelOptions: option['inner-options'],
+					})
+
 					return
 				}
 
@@ -265,7 +270,20 @@ const PanelContainer = ({ option, id, onChange, getValues, onChangeFor }) => {
 											</h3>
 										</div>
 
-										<div className="customizer-panel-content"></div>
+										<div className="customizer-panel-content">
+											{panelsState.secondLevelOptions && (
+												<OptionsPanel
+													purpose="customizer"
+													onChange={(key, val) =>
+														onChangeFor(key, val)
+													}
+													options={
+														panelsState.secondLevelOptions
+													}
+													value={getValues()}
+												/>
+											)}
+										</div>
 									</div>
 								)}
 							</animated.div>

@@ -6,6 +6,11 @@ use \EmbedPress\Providers\Youtube;
 use EmbedPress\Shortcode;
 use EmbedPress\Includes\Classes\Helper;
 use \Elementor\Controls_Manager;
+use EmbedPress\Providers\TemplateLayouts\YoutubeLayout;
+use EmbedPress\Providers\TikTok;
+use EmbedPress\Providers\Spreaker;
+use EmbedPress\Providers\Wrapper;
+use EmbedPress\Providers\GooglePhotos;
 
 class Feature_Enhancer
 {
@@ -32,62 +37,160 @@ class Feature_Enhancer
 		add_action('wp_ajax_youtube_rest_api', [$this, 'youtube_rest_api']);
 		add_action('wp_ajax_nopriv_youtube_rest_api', [$this, 'youtube_rest_api']);
 		add_action('embedpress_gutenberg_embed', [$this, 'gutenberg_embed'], 10, 2);
-		add_action( 'wp_ajax_save_source_data', [$this, 'save_source_data'] );
-		add_action( 'wp_ajax_nopriv_save_source_data', [$this, 'save_source_data'] );
-		add_action( 'save_post', [$this, 'save_source_data_on_post_update'], 10, 3 );
-		add_action( 'wp_ajax_delete_source_data', [$this, 'delete_source_data'] );
-		add_action( 'wp_ajax_nopriv_delete_source_data', [$this, 'delete_source_data'] );
-		add_action( 'load-post.php', [$this, 'delete_source_temp_data_on_reload'] );
+		add_action('wp_ajax_save_source_data', [$this, 'save_source_data']);
+		add_action('save_post', [$this, 'save_source_data_on_post_update'], 10, 3);
+		add_action('wp_ajax_delete_source_data', [$this, 'delete_source_data']);
+		add_action('load-post.php', [$this, 'delete_source_temp_data_on_reload']);
 		add_action('embedpress:isEmbra', [$this, 'isEmbra'], 10, 3);
-		add_action( 'elementor/editor/after_save', [$this, 'save_el_source_data_on_post_update'] );
-		
+		add_action('elementor/editor/after_save', [$this, 'save_el_source_data_on_post_update']);
+
 		add_action('wp_head', [$this, 'embedpress_generate_social_share_meta']);
+
+		add_action('wp_ajax_get_viewer', function () {
+			$pdf = EMBEDPRESS_PATH_BASE . 'assets/pdf/web/viewer.html';
+			// header type html
+			header('Content-Type: text/html');
+			$contents = file_get_contents($pdf);
+			echo str_replace('<head>', '<head><base href="' . EMBEDPRESS_URL_ASSETS . 'pdf/web/' . '">', $contents);
+			die;
+		});
+		add_action('wp_ajax_nopriv_get_viewer', function () {
+			$pdf = EMBEDPRESS_PATH_BASE . 'assets/pdf/web/viewer.html';
+			// header type html
+			header('Content-Type: text/html');
+			$contents = file_get_contents($pdf);
+			echo str_replace('<head>', '<head><base href="' . EMBEDPRESS_URL_ASSETS . 'pdf/web/' . '">', $contents);
+			die;
+		});
 	}
 
-	public function save_source_data(){
+	public function save_source_data()
+	{
+		if (!isset($_POST['_source_nonce']) || !wp_verify_nonce($_POST['_source_nonce'], 'source_nonce_embedpress')) {
+			return;
+		}
 
-		$source_url = $_POST['source_url'];
-		$blockid = $_POST['block_id'];
+		if (!current_user_can('manage_options')) {
+			return;
+		}
+
+		$source_url = isset($_POST['source_url']) ? $_POST['source_url'] : null;
+		$blockid = isset($_POST['block_id']) ? $_POST['block_id'] : null;
+
 
 		Helper::get_source_data($blockid, $source_url, 'gutenberg_source_data', 'gutenberg_temp_source_data');
 	}
 
-	function save_el_source_data_on_post_update( $post_id ) {
-		Helper::get_save_source_data_on_post_update('elementor_source_data', 'elementor_temp_source_data');	
+	function save_el_source_data_on_post_update($post_id)
+	{
+		Helper::get_save_source_data_on_post_update('elementor_source_data', 'elementor_temp_source_data');
 	}
 
-	function save_source_data_on_post_update( $post_id, $post, $update ) {
+	function save_source_data_on_post_update($post_id, $post, $update)
+	{
 		if (!empty(strpos($post->post_content, 'wp:embedpress'))) {
-			Helper::get_save_source_data_on_post_update('gutenberg_source_data', 'gutenberg_temp_source_data');	
+			Helper::get_save_source_data_on_post_update('gutenberg_source_data', 'gutenberg_temp_source_data');
 		}
 	}
-	
-	public function delete_source_data() {
-		$blockid = $_POST['block_id'];
+
+	public function delete_source_data()
+	{
+		if (!isset($_POST['_source_nonce']) || !wp_verify_nonce($_POST['_source_nonce'], 'source_nonce_embedpress')) {
+			return;
+		}
+		if (!current_user_can('manage_options')) {
+			return;
+		}
+
+		$blockid = isset($_POST['block_id']) ? $_POST['block_id'] : '';
+
 		Helper::get_delete_source_data($blockid, 'gutenberg_source_data', 'gutenberg_temp_source_data');
 	}
 
-	public function delete_source_temp_data_on_reload() {
+	public function delete_source_temp_data_on_reload()
+	{
 		Helper::get_delete_source_temp_data_on_reload('gutenberg_temp_source_data');
-
 	}
-		 
-	
 
 	public function isEmbra($isEmbra, $url, $atts)
 	{
+
 		if (strpos($url, 'youtube.com') !== false) {
 			$youtube = new Youtube($url, $atts);
 			if ($youtube->validateUrl($youtube->getUrl(false))) {
 				return true;
 			}
 		}
+		if (strpos($url, 'tiktok.com') !== false) {
+			$tiktok = new TikTok($url, $atts);
+			if ($tiktok->validateUrl($tiktok->getUrl(false))) {
+				return true;
+			}
+		}
+		if (strpos($url, 'spreaker.com') !== false) {
+			$spreaker = new Spreaker($url, $atts);
+			if ($spreaker->validateUrl($spreaker->getUrl(false))) {
+				return true;
+			}
+		}
+
+
+		if (strpos($url, 'photos.app.goo.gl') !== false) {
+			$google_photos = new GooglePhotos($url, $atts);
+
+			if ($google_photos->validateUrl($google_photos->getUrl(false))) {
+				return true;
+			}
+		}
+
+		if (strpos($url, site_url()) !== false) {
+			$wrapper = new Wrapper($url, $atts);
+			if ($wrapper->validateUrl($wrapper->getUrl(false))) {
+				return true;
+			}
+		}
+
 		return $isEmbra;
 	}
 
+	// public function youtube_rest_api()
+	// {
+	// 	// Instantiate the class
+	// 	$youtube = new Youtube($config = '');
+
+
+	// 	// Call the non-static method
+	// 	// $result = $youtube->someMethod();
+
+	// 	$result = YoutubeLayout::create_youtube_layout([
+	// 		'playlistId'        => isset($_POST['playlistid']) ? sanitize_text_field($_POST['playlistid']) : null,
+	// 		'pageToken'         => isset($_POST['pagetoken']) ? sanitize_text_field($_POST['pagetoken']) : null,
+	// 		'ytChannelLayout'   => isset($_POST['ytChannelLayout']) ? sanitize_text_field($_POST['ytChannelLayout']) : 'gallery',
+	// 		'pagesize'          => isset($_POST['pagesize']) ? sanitize_text_field($_POST['pagesize']) : null,
+	// 		'currentpage'       => isset($_POST['currentpage']) ? sanitize_text_field($_POST['currentpage']) : null,
+	// 		'columns'           => isset($_POST['epcolumns']) ? sanitize_text_field($_POST['epcolumns']) : null,
+	// 		'showTitle'         => isset($_POST['showtitle']) ? sanitize_text_field($_POST['showtitle']) : null,
+	// 		'showPaging'        => isset($_POST['showpaging']) ? sanitize_text_field($_POST['showpaging']) : null,
+	// 		'autonext'          => isset($_POST['autonext']) ? sanitize_text_field($_POST['autonext']) : null,
+	// 		'thumbplay'         => isset($_POST['thumbplay']) ? sanitize_text_field($_POST['thumbplay']) : null,
+	// 		'thumbnail_quality' => isset($_POST['thumbnail_quality']) ? sanitize_text_field($_POST['thumbnail_quality']) : null,
+	// 	], $youtube->layout_data(), $youtube->get_layout());
+
+	// 	// print_r($youtube->layout_data()); die;
+
+	// 	wp_send_json($result);
+	// }
+
 	public function youtube_rest_api()
 	{
-		$result = Youtube::get_gallery_page([
+		// Instantiate the class
+		$youtube = new Youtube($config = '');
+
+		// echo '<pre>';
+
+		// print_r($_POST);
+
+		$result = $youtube->get_gallery_page([
 			'playlistId'        => isset($_POST['playlistid']) ? sanitize_text_field($_POST['playlistid']) : null,
 			'pageToken'         => isset($_POST['pagetoken']) ? sanitize_text_field($_POST['pagetoken']) : null,
 			'pagesize'          => isset($_POST['pagesize']) ? sanitize_text_field($_POST['pagesize']) : null,
@@ -98,6 +201,7 @@ class Feature_Enhancer
 			'autonext'          => isset($_POST['autonext']) ? sanitize_text_field($_POST['autonext']) : null,
 			'thumbplay'         => isset($_POST['thumbplay']) ? sanitize_text_field($_POST['thumbplay']) : null,
 			'thumbnail_quality' => isset($_POST['thumbnail_quality']) ? sanitize_text_field($_POST['thumbnail_quality']) : null,
+			'channel_url'		=> isset($_POST['channelUrl']) ? sanitize_text_field($_POST['channelUrl']) : ''
 		]);
 
 		wp_send_json($result);
@@ -106,33 +210,34 @@ class Feature_Enhancer
 
 	//Check is YouTube single video
 	public function ytValidateUrl($url)
-    {
-        return (bool) (preg_match('~v=(?:[a-z0-9_\-]+)~i', (string) $url));
-    }
+	{
+		return (bool) (preg_match('~v=(?:[a-z0-9_\-]+)~i', (string) $url));
+	}
 
 	//Check is YouTube live video
 	public function ytValidateLiveUrl($url)
-    {
-        return (bool) (preg_match('/^https?:\/\/(?:www\.)?youtube\.com\/(?:channel\/[\w-]+|@[\w-]+)\/live$/', (string) $url));
-    }
-	
-	
+	{
+		return (bool) (preg_match('/^https?:\/\/(?:www\.)?youtube\.com\/(?:channel\/[\w-]+|@[\w-]+)\/live$/', (string) $url));
+	}
+
+
 	//Check is Wistia validate url
 	public function wistiaValidateUrl($url)
-    {
-        return (bool) (preg_match('#\/medias\\\?\/([a-z0-9]+)\.?#i', (string) $url ));
-    }
+	{
+		return (bool) (preg_match('#\/medias\\\?\/([a-z0-9]+)\.?#i', (string) $url));
+	}
 
 	//Check is Wistia validate url
 	public function vimeoValidateUrl($url)
-    {
-		return (bool)preg_match('/https?:\/\/(www\.)?vimeo\.com\/\d+/', (string) $url);
-    }
+	{
+		return (bool) preg_match('/https?:\/\/(www\.)?vimeo\.com\/\d+/', (string) $url);
+	}
 
 
 
-	// Get wistia block attributes 
-	public function get_wistia_block_attributes($attributes) {
+	// Get wistia block attributes
+	public function get_wistia_block_attributes($attributes)
+	{
 
 		// Embed Options
 		$embedOptions = new \stdClass;
@@ -146,20 +251,11 @@ class Feature_Enhancer
 		$embedOptions->autoPlay = (isset($attributes['wautoplay']) && (bool) $attributes['wautoplay'] === true);
 		$embedOptions->resumable = (isset($attributes['resumable']) && (bool) $attributes['resumable'] === true);
 
-		if(!empty($attributes['wstarttime'])){
+		if (!empty($attributes['wstarttime'])) {
 			$embedOptions->time = isset($attributes['wstarttime']) ? $attributes['wstarttime'] : '';
 		}
 
-		if ( is_embedpress_pro_active() ) {
-			$embedOptions->volumeControl = (isset($attributes['volumecontrol']) && (bool) $attributes['volumecontrol'] === true);
-
-			$volume = isset($attributes['volume']) ? (float) $attributes['volume'] : 0;
-
-			if ( $volume > 1 ) {
-				$volume = $volume / 100;
-			}
-			$embedOptions->volume = $volume;
-		}
+		$embedOptions = apply_filters('embedpress_wistia_block_attributes', $embedOptions, $attributes);
 
 		$pluginList = [];
 
@@ -168,13 +264,13 @@ class Feature_Enhancer
 			if (null !== $color) {
 				$embedOptions->playerColor = $color;
 			}
-		}	
+		}
 
 		// Closed Captions plugin
-		if ( $attributes['captions'] === true ) {
-			$isCaptionsEnabled          = ( $attributes['captions'] === true );
-			$isCaptionsEnabledByDefault = ( $attributes['captions'] === true );
-			if ( $isCaptionsEnabled ) {
+		if ($attributes['captions'] === true) {
+			$isCaptionsEnabled          = ($attributes['captions'] === true);
+			$isCaptionsEnabledByDefault = ($attributes['captions'] === true);
+			if ($isCaptionsEnabled) {
 				$pluginList['captions-v1'] = [
 					'onByDefault' => $isCaptionsEnabledByDefault,
 				];
@@ -184,7 +280,7 @@ class Feature_Enhancer
 		}
 
 		$embedOptions->plugin = $pluginList;
-		
+
 
 
 		return json_encode($embedOptions);
@@ -192,19 +288,24 @@ class Feature_Enhancer
 
 	public function gutenberg_embed($embedHTML, $attributes)
 	{
+		$attributes = Helper::removeQuote($attributes);
+
 		if (!empty($attributes['url'])) {
 			$youtube = new Youtube($attributes['url']);
-			
+
 			$is_youtube = $youtube->validateUrl($youtube->getUrl(false));
 			if ($is_youtube && empty($this->ytValidateLiveUrl($attributes['url']))) {
 				$atts = [
 					'width'    => intval($attributes['width']),
 					'height'   => intval($attributes['height']),
 					'pagesize' => isset($attributes['pagesize']) ? intval($attributes['pagesize']) : 6,
+					'ytChannelLayout' => isset($attributes['ytChannelLayout']) ? $attributes['ytChannelLayout'] : 'gallery',
 					'columns' => isset($attributes['columns']) ? intval($attributes['columns']) : 3,
 					'ispagination' => isset($attributes['ispagination']) ? $attributes['ispagination'] : 0,
 					'gapbetweenvideos' => isset($attributes['gapbetweenvideos']) ? $attributes['gapbetweenvideos'] : 30,
 				];
+
+				$atts = Helper::removeQuote($atts);
 
 				$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
 
@@ -212,9 +313,9 @@ class Feature_Enhancer
 					$embedHTML = $urlInfo->embed;
 				}
 			}
-			
-			if(!empty($attributes['url']) && ($this->ytValidateUrl($attributes['url']) || $this->ytValidateLiveUrl($attributes['url']))){
-				
+
+			if (!empty($attributes['url']) && ($this->ytValidateUrl($attributes['url']) || $this->ytValidateLiveUrl($attributes['url']))) {
+
 				$atts = [
 					'url'	=> $attributes['url'],
 					'starttime'    => !empty($attributes['starttime']) ? $attributes['starttime'] : '',
@@ -227,6 +328,7 @@ class Feature_Enhancer
 					'closedcaptions'   => !empty($attributes['closedcaptions']) ? 1 : 0,
 					'modestbranding'   => !empty($attributes['modestbranding']) ? $attributes['modestbranding'] : '',
 					'relatedvideos'   => !empty($attributes['relatedvideos']) ? 1 : 0,
+
 					'customlogo'   => !empty($attributes['customlogo']) ? $attributes['customlogo'] : '',
 					'logoX' => !empty($attributes['logoX']) ? $attributes['logoX'] : 5,
 					'logoY' => !empty($attributes['logoY']) ? $attributes['logoY'] : 10,
@@ -234,18 +336,21 @@ class Feature_Enhancer
 					'logoOpacity' => !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : 0.6,
 				];
 
+				$atts = Helper::removeQuote($atts);
+
 				$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
 
 				if (!empty($urlInfo->embed)) {
 					$embedHTML = $urlInfo->embed;
 				}
 
-				if(isset( $urlInfo->embed ) && preg_match( '/src=\"(.+?)\"/', $urlInfo->embed, $match )){
+				if (isset($urlInfo->embed) && preg_match('/src=\"(.+?)\"/', $urlInfo->embed, $match)) {
 					$url_full = $match[1];
-					$query = parse_url( $url_full, PHP_URL_QUERY );
-					parse_str( $query, $params );
+					$query = parse_url($url_full, PHP_URL_QUERY);
 
-					$params['controls']       = isset($attributes['controls']) ? $attributes['controls']: '1';
+					parse_str($query ?? '', $params);
+
+					$params['controls']       = isset($attributes['controls']) ? $attributes['controls'] : '1';
 					$params['iv_load_policy'] = !empty($attributes['videoannotations']) ? 1 : 0;
 					$params['fs']             = !empty($attributes['fullscreen']) ? 1 : 0;
 					$params['rel']             = !empty($attributes['relatedvideos']) ? 1 : 0;
@@ -256,36 +361,33 @@ class Feature_Enhancer
 					$params['modestbranding'] = empty($attributes['modestbranding']) ? 0 : 1; // Reverse the condition value for modestbranding. 0 = display, 1 = do not display
 					$params['cc_load_policy'] = !empty($attributes['closedcaptions']) ? 0 : 1;
 
-					preg_match( '/(.+)?\?/', $url_full, $url );
+					preg_match('/(.+)?\?/', $url_full, $url);
 
-					if ( empty( $url) ) {
+					if (empty($url)) {
 						return $embedHTML;
 					}
-					
+
 					$url = $url[1];
 
 					// Reassemble the url with the new variables.
 					$url_modified = $url . '?';
 
-					foreach ( $params as $paramName => $paramValue ) {
-						
+					foreach ($params as $paramName => $paramValue) {
+
 						$and = '&';
-						if(array_key_last($params) === $paramName){
+						if (array_key_last($params) === $paramName) {
 							$and = '';
 						}
-						
-						if(isset($paramValue) && $paramValue !== ''){
+
+						if (isset($paramValue) && $paramValue !== '') {
 							$url_modified .= $paramName . '=' . $paramValue . $and;
 						}
 					}
 
 					// Replaces the old url with the new one.
-					$embedHTML = str_replace( $url_full, rtrim( $url_modified, '&' ), $urlInfo->embed );
-					
+					$embedHTML = str_replace($url_full, rtrim($url_modified, '&'), $urlInfo->embed);
 				}
-
 			}
-
 		}
 
 		if (!empty($attributes['url']) && $this->wistiaValidateUrl($attributes['url'])) {
@@ -332,7 +434,8 @@ class Feature_Enhancer
 			$embedHTML = $html;
 		}
 
-		if(!empty($attributes['url']) && $this->vimeoValidateUrl($attributes['url'])){
+		if (!empty($attributes['url']) && $this->vimeoValidateUrl($attributes['url'])) {
+
 			$atts = [
 				'url'	=> $attributes['url'],
 				'vstarttime'    => !empty($attributes['vstarttime']) ? $attributes['vstarttime'] : '',
@@ -350,18 +453,20 @@ class Feature_Enhancer
 				'logoOpacity' => !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : 0.6,
 			];
 
+			$atts = Helper::removeQuote($atts);
+
 			$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
 
 			if (!empty($urlInfo->embed)) {
 				$embedHTML = $urlInfo->embed;
 			}
 
-			if(isset( $urlInfo->embed ) && preg_match( '/src=\"(.+?)\"/', $urlInfo->embed, $match )){
+			if (isset($urlInfo->embed) && preg_match('/src=\"(.+?)\"/', $urlInfo->embed, $match)) {
 				$url_full = $match[1];
-				$query = parse_url( $url_full, PHP_URL_QUERY );
-				parse_str( $query, $params );
+				$query = parse_url($url_full, PHP_URL_QUERY);
+				parse_str($query, $params);
 
-				
+
 				unset($params['amp;dnt']);
 
 				$params['title'] = !empty($attributes['vtitle']) ? 1 : 0;
@@ -370,21 +475,21 @@ class Feature_Enhancer
 				$params['autoplay'] 		= !empty($attributes['vautoplay']) ? 1 : 0;
 				$params['loop'] 		= !empty($attributes['vloop']) ? 1 : 0;
 				$params['autopause'] 		= !empty($attributes['vautopause']) ? 1 : 0;
-				if(empty($attributes['vautopause'])) :
+				if (empty($attributes['vautopause'])) :
 					$params['dnt'] 		= !empty($attributes['vdnt']) ? 1 : 0;
 				endif;
 				$params['color'] = !empty($attributes['vscheme']) ? str_replace("#", "", $attributes['vscheme']) : '00ADEF';
 
-				if(!empty($attributes['vstarttime'])) : 
+				if (!empty($attributes['vstarttime'])) :
 					$params['t'] 			= !empty($attributes['vstarttime']) ? $attributes['vstarttime'] : '';
 				endif;
 
-				preg_match( '/(.+)?\?/', $url_full, $url );
+				preg_match('/(.+)?\?/', $url_full, $url);
 
-				if ( empty( $url) ) {
+				if (empty($url)) {
 					return $embedHTML;
 				}
-				
+
 				$url = $url[1];
 
 				// Reassemble the url with the new variables.
@@ -392,7 +497,7 @@ class Feature_Enhancer
 
 				// print_r($url_modified);
 
-			
+
 				foreach ($params as $param => $value) {
 					$url_modified = add_query_arg($param, $value, $url_modified);
 				}
@@ -400,12 +505,11 @@ class Feature_Enhancer
 				$url_modified = str_replace("&t=", "#t=", $url_modified);
 
 				// Replaces the old url with the new one.
-				$embedHTML = str_replace( $url_full, rtrim( $url_modified, '&' ), $urlInfo->embed );
-				
+				$embedHTML = str_replace($url_full, rtrim($url_modified, '&'), $urlInfo->embed);
 			}
 		}
 
-		return $embedHTML ;
+		return $embedHTML;
 	}
 
 
@@ -495,7 +599,7 @@ class Feature_Enhancer
 
 		return apply_filters('embedpress_youtube_params', $params);
 	}
-	
+
 	public function get_vimeo_params($options)
 	{
 		$params   = [];
@@ -526,21 +630,22 @@ class Feature_Enhancer
 	//--- For CLASSIC AND BLOCK EDITOR
 	public function enhance_youtube($embed)
 	{
-		
+
 
 		$isYoutube = (isset($embed->provider_name) && strtoupper($embed->provider_name) === 'YOUTUBE') || (isset($embed->url) && isset($embed->{$embed->url}) && isset($embed->{$embed->url}['provider_name']) && strtoupper($embed->{$embed->url}['provider_name']) === 'YOUTUBE');
 
 		if (
 			$isYoutube && isset($embed->embed)
-			&& preg_match('/src=\"(.+?)\"/', $embed->embed, $match)
+			&& preg_match('/<iframe[^>]+src=["\']([^"\']+)[^>]*>/', $embed->embed, $match)
 		) {
 
 			// for compatibility only, @TODO; remove later after deep testing.
 			$options = $this->getOptions('youtube', $this->get_youtube_settings_schema());
-			
+
 			// Parse the url to retrieve all its info like variables etc.
 			$url_full = $match[1];
 			$query = parse_url($url_full, PHP_URL_QUERY);
+			$query = $query ?? ''; // Ensure $query is a string
 			parse_str($query, $params);
 			// Handle `color` option.
 			if (!empty($options['color'])) {
@@ -601,12 +706,16 @@ class Feature_Enhancer
 				}
 			}
 
-			preg_match('/(.+)?\?/', $url_full, $url);
-			$url = $url[1];
 
-			if(is_object($embed->attributes) && !empty($embed->attributes)){
+			$url = explode('?', $url_full);
+
+			if (isset($url[0])) {
+				$url = $url[0];
+			}
+
+			if (is_object($embed->attributes) && !empty($embed->attributes)) {
 				$attributes = (array) $embed->attributes;
-				
+
 				$params['controls']       = isset($attributes['data-controls']) ? $attributes['data-controls'] : '1';
 				$params['iv_load_policy'] = !empty($attributes['data-videoannotations']) && ($attributes['data-videoannotations'] == 'true') ? 1 : 0;
 				$params['fs']             = !empty($attributes['data-fullscreen']) && ($attributes['data-fullscreen'] == 'true') ? 1 : 0;
@@ -617,13 +726,22 @@ class Feature_Enhancer
 				$params['color'] = !empty($attributes['data-progressbarcolor']) ? $attributes['data-progressbarcolor'] : 'red';
 				$params['modestbranding'] = empty($attributes['data-modestbranding']) ? 0 : 1; // Reverse the condition value for modestbranding. 0 = display, 1 = do not display
 				$params['cc_load_policy'] = !empty($attributes['data-closedcaptions']) && ($attributes['data-closedcaptions'] == 'true') ? 0 : 1;
+				$params['playsinline']    = '1';
+				
 			}
 
-			// Reassemble the url with the new variables.
-			$url_modified = $url . '?';
+			// Ensure $url is a string. If $url is an array, convert it to a string or use a specific element.
+			$url_string = is_array($url) ? (isset($url[0]) ? $url[0] : '') : $url;
+
+			// Reassemble the URL with the new variables.
+			$url_modified = $url_string . '?';
 			foreach ($params as $paramName => $paramValue) {
-				$url_modified .= $paramName . '=' . $paramValue . '&';
+				$url_modified .= urlencode($paramName) . '=' . urlencode($paramValue) . '&';
 			}
+
+			// Remove the trailing '&' or '?' if no parameters were added.
+			$url_modified = rtrim($url_modified, '&?');
+
 
 			// Replaces the old url with the new one.
 			$embed->embed = str_replace($url_full, rtrim($url_modified, '&'), $embed->embed);
@@ -631,10 +749,10 @@ class Feature_Enhancer
 
 		return $embed;
 	}
-	
+
 	public function enhance_vimeo($embed)
-	{ 
-		
+	{
+
 
 		if (
 			isset($embed->provider_name)
@@ -691,7 +809,7 @@ class Feature_Enhancer
 				}
 			}
 
-			if(!empty($params['autopause'])){
+			if (!empty($params['autopause'])) {
 				unset($params['dnt']);
 				unset($params['amp;dnt']);
 			}
@@ -699,9 +817,11 @@ class Feature_Enhancer
 			// Reassemble the url with the new variables.
 			$url_modified = str_replace("&amp;dnt=1", "", $url_full);
 
-			if(is_object($embed->attributes) && !empty($embed->attributes)){
+			if (is_object($embed->attributes) && !empty($embed->attributes)) {
 				$attributes = (array) $embed->attributes;
+
 				$attributes = stringToBoolean($attributes);
+				
 
 				$params['title'] = !empty($attributes['data-vtitle']) ? 1 : 0;
 				$params['byline']             = !empty($attributes['data-vauthor'])  ? 1 : 0;
@@ -709,37 +829,35 @@ class Feature_Enhancer
 				$params['autoplay'] 		= !empty($attributes['data-vautoplay']) ? 1 : 0;
 				$params['loop'] 		= !empty($attributes['data-vloop']) ? 1 : 0;
 				$params['autopause'] 		= !empty($attributes['data-vautopause']) ? 1 : 0;
-				if(empty($attributes['data-vautopause'])) :
+				if (empty($attributes['data-vautopause'])) :
 					$params['dnt'] 		= !empty($attributes['data-vdnt']) ? 1 : 0;
 				endif;
 				$params['color'] = !empty($attributes['data-vscheme']) ? str_replace("#", "", $attributes['data-vscheme']) : '00ADEF';
 
-				if(!empty($attributes['data-vstarttime'])) :
+				if (!empty($attributes['data-vstarttime'])) :
 					$params['t'] 			= !empty($attributes['data-vstarttime']) ? $attributes['data-vstarttime'] : '';
 				endif;
-			
-				foreach ($params as $param => $value) {
-					$url_modified = add_query_arg($param, $value, $url_modified);
-				}
-				
-				$url_modified = str_replace("&t=", "#t=", $url_modified);
 
-			}
-			else{
 				foreach ($params as $param => $value) {
 					$url_modified = add_query_arg($param, $value, $url_modified);
 				}
-	
+
+				$url_modified = str_replace("&t=", "#t=", $url_modified);
+			} else {
+				foreach ($params as $param => $value) {
+					$url_modified = add_query_arg($param, $value, $url_modified);
+				}
+
 				if (empty($attributes['data-vstarttime']) && isset($options['start_time'])) {
-					$url_modified .= '#t=' . $options['start_time'];
+					$start_time = sanitize_text_field($options['start_time']);
+					$url_modified .= '#t=' . $start_time;
 				}
 			}
 
 			do_action('embedpress_after_modified_url', $url_modified, $url_full, $params);
-			
+
 			// Replaces the old url with the new one.
 			$embed->embed = str_replace($url_full, $url_modified, $embed->embed);
-
 		}
 
 		return $embed;
@@ -747,7 +865,7 @@ class Feature_Enhancer
 
 	public function enhance_wistia($embed)
 	{
-		
+
 		if (
 			isset($embed->provider_name)
 			&& strtoupper($embed->provider_name) === 'WISTIA, INC.'
@@ -762,7 +880,9 @@ class Feature_Enhancer
 			$query = parse_url($embed->url, PHP_URL_QUERY);
 			$url = str_replace('?' . $query, '', $url_full);
 
-			parse_str($query, $params);
+			if ($query !== null) {
+				parse_str($query, $params);
+			}
 
 			// Set the class in the attributes
 			$embed->attributes->class = str_replace('{provider_alias}', 'wistia', $embed->attributes->class);
@@ -779,8 +899,8 @@ class Feature_Enhancer
 
 			$embedOptions->autoPlay = (isset($options['autoplay']) && (bool) $options['autoplay'] === true);
 
-			if(!empty($options['start_time'])){
-				$embedOptions->time = isset($options['start_time']) ? $options['start_time'] : 0;
+			if (!empty($options['start_time'])) {
+				// $embedOptions->time = isset($options['start_time']) ? $options['start_time'] : 0;
 			}
 
 			if (isset($options['player_color'])) {
@@ -837,7 +957,7 @@ class Feature_Enhancer
 				}
 			}
 			$embedOptions->plugin = $pluginList;
-			
+
 			$embedOptions = json_encode($embedOptions);
 
 			// Get the video ID
@@ -897,7 +1017,7 @@ class Feature_Enhancer
 			$muted = isset($settings['embedpress_pro_twitch_mute']) && ('yes' === $settings['embedpress_pro_twitch_mute']) ? 'true' : 'false';
 			$full_screen = isset($settings['embedpress_pro_fs']) && ('yes' === $settings['embedpress_pro_fs']) ? 'true' : 'false';
 			$autoplay = isset($settings['embedpress_pro_twitch_autoplay']) && ('yes' === $settings['embedpress_pro_twitch_autoplay']) ? 'true' : 'false';
-			$theme      = !empty($settings['embedpress_pro_twitch_theme']) ? $settings['embedpress_pro_twitch_theme'] : 'dark';
+			$theme      = !empty($settings['embedpress_pro_twitch_theme']) ? esc_attr($settings['embedpress_pro_twitch_theme']) : 'dark';
 
 			$layout     = 'video';
 			$width      = !empty($atts->{'data-width'}) ? (int) $atts->{'data-width'} : 800;
@@ -914,7 +1034,7 @@ class Feature_Enhancer
 			$url = !empty($pars_url['host']) ? $url . '&parent=' . $pars_url['host'] : $url;
 			ob_start();
 			?>
-			<div class="embedpress_wrapper" data-url="<?php echo esc_attr(esc_url($embed_content->url)); ?>">
+			<div class="embedpress_wrapper" data-url="<?php echo esc_url($embed_content->url); ?>">
 				<iframe src="<?php echo esc_url($url); ?>" allowfullscreen="" scrolling="no" frameborder="0" allow="autoplay; fullscreen" title="Twitch" sandbox="allow-modals allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>" style="max-width: <?php echo esc_attr($width); ?>px; max-height:<?php echo esc_attr($height); ?>px;"></iframe>
 			</div>
 		<?php
@@ -948,9 +1068,9 @@ class Feature_Enhancer
 						$params['playsinline'] = 1;
 					}
 					$params['start'] = (int) isset($options['start_time']) ? $options['start_time'] : null;
-					if (is_embedpress_pro_active()) {
-						$params['ui-logo'] = (int) isset($options['show_logo']) ? $options['show_logo'] : null;
-					}
+
+					$params = apply_filters('embedpress_enhance_dailymotion', $params, $options);
+
 
 					$url_modified = $url_full;
 					foreach ($params as $param => $value) {
@@ -986,10 +1106,7 @@ class Feature_Enhancer
 						'show_user'      => isset($options['username']) && $options['username'] == '1' ? 'true' : 'false',
 					];
 
-					if (is_embedpress_pro_active()) {
-						$params['buying'] = isset($options['buy_button']) && $options['buy_button'] == '1' ? 'true' : 'false';
-						$params['download'] = isset($options['download_button']) && $options['download_button'] == '1' ? 'true' : 'false';
-					}
+					$params = apply_filters('embedpress_enhance_soundcloud', $params, $options);
 
 					$url_modified = $url_full;
 					foreach ($params as $param => $value) {
@@ -1041,8 +1158,8 @@ class Feature_Enhancer
 					}
 					//@TODO; test responsive without static height width, keeping for now backward compatibility
 					?>
-			<div class="ose-vimeo wp-block-embed-vimeo <?php echo $align; ?>">
-				<iframe src="<?php echo $iframeUrl; ?>" allowtransparency="true" frameborder="0" width="640" height="360">
+			<div class="ose-vimeo wp-block-embed-vimeo <?php echo esc_attr($align); ?>">
+				<iframe src="<?php echo esc_url($iframeUrl); ?>" allowtransparency="true" frameborder="0" width="640" height="360">
 				</iframe>
 			</div>
 <?php
@@ -1212,7 +1329,7 @@ class Feature_Enhancer
 			),
 		);
 	}
-	
+
 
 	public function getVideoIDFromURL($url)
 	{
@@ -1310,7 +1427,7 @@ class Feature_Enhancer
 		return apply_filters('embedpress_wistia_params_after_encode', $embedOptions);
 	}
 
-	
+
 	public function get_twitch_settings_schema()
 	{
 		return [
@@ -1430,8 +1547,8 @@ class Feature_Enhancer
 		];
 	}
 
-	public function enhance_missing_title($embed){
-
+	public function enhance_missing_title($embed)
+	{
 
 		$embed_arr = get_object_vars($embed);
 
@@ -1439,12 +1556,7 @@ class Feature_Enhancer
 
 		if (strpos($url, 'gettyimages') !== false) {
 			$title = $embed_arr[$url]['title'];
-		} else {
-			$title = '';
-		}
-
-
-		$embed->embed = $embed->embed . "
+			$embed->embed = $embed->embed . "
 			<script>
 				if (typeof gie === 'function') {
 					gie(function(){
@@ -1456,13 +1568,16 @@ class Feature_Enhancer
 				}
 			</script>
 		";
+		}
+
+
 		return $embed;
 	}
 
-	
+
 	public function embedpress_generate_social_share_meta()
 	{
-		$post_id = get_the_ID(); 
+		$post_id = get_the_ID();
 		$post = get_post($post_id);
 		$tags = '';
 
@@ -1470,33 +1585,32 @@ class Feature_Enhancer
 
 		if (!empty($_GET['hash'])) {
 
-			$id_value = $_GET['hash'];
-			$url = get_the_permalink( $post_id );
+			$id_value = sanitize_text_field($_GET['hash']);
+
+			$url = get_the_permalink($post_id);
 
 			if (class_exists('Elementor\Plugin') && \Elementor\Plugin::$instance->db->is_built_with_elementor(get_the_ID())) {
-				$page_settings = get_post_meta( $post_id, '_elementor_data', true );
-				
+				$page_settings = get_post_meta($post_id, '_elementor_data', true);
+
 				$ep_settings = Helper::ep_get_elementor_widget_settings($page_settings, $id_value, 'embedpres_elementor');
 				$pdf_settings = Helper::ep_get_elementor_widget_settings($page_settings, $id_value, 'embedpress_pdf');
 				$doc_settings = Helper::ep_get_elementor_widget_settings($page_settings, $id_value, 'embedpres_document');
 
 
-			
+
 				if (is_array($ep_settings) && !empty($ep_settings)) {
 					$title = !empty($ep_settings['settings']['embedpress_content_title']) ? $ep_settings['settings']['embedpress_content_title'] : '';
 
 					$description = !empty($ep_settings['settings']['embedpress_content_descripiton']) ? $ep_settings['settings']['embedpress_content_descripiton'] : '';
 
 					$image_url = !empty($ep_settings['settings']['embedpress_content_share_custom_thumbnail']['url']) ? $ep_settings['settings']['embedpress_content_share_custom_thumbnail']['url'] : '';
-				}
-				else if (is_array($pdf_settings) && !empty($pdf_settings)) {
+				} else if (is_array($pdf_settings) && !empty($pdf_settings)) {
 					$title = !empty($pdf_settings['settings']['embedpress_pdf_content_title']) ? $pdf_settings['settings']['embedpress_pdf_content_title'] : '';
 
 					$description = !empty($pdf_settings['settings']['embedpress_pdf_content_descripiton']) ? $pdf_settings['settings']['embedpress_pdf_content_descripiton'] : '';
 
 					$image_url = !empty($pdf_settings['settings']['embedpress_pdf_content_share_custom_thumbnail']['url']) ? $pdf_settings['settings']['embedpress_pdf_content_share_custom_thumbnail']['url'] : '';
-				}
-				else if (is_array($doc_settings) && !empty($doc_settings)) {
+				} else if (is_array($doc_settings) && !empty($doc_settings)) {
 					$title = !empty($doc_settings['settings']['embedpress_doc_content_title']) ? $doc_settings['settings']['embedpress_doc_content_title'] : '';
 
 					$description = !empty($doc_settings['settings']['embedpress_doc_content_descripiton']) ? $doc_settings['settings']['embedpress_doc_content_descripiton'] : '';
@@ -1504,73 +1618,67 @@ class Feature_Enhancer
 					$image_url = !empty($doc_settings['settings']['embedpress_doc_content_share_custom_thumbnail']['url']) ? $doc_settings['settings']['embedpress_doc_content_share_custom_thumbnail']['url'] : '';
 				}
 
-				// Search for the regex pattern in the string and extract the href value
 				if (!empty($image_url)) {
-					$tags .= "<meta name='twitter:image' content='$image_url'/>\n";
-					$tags .= "<meta property='og:image' content='$image_url'/>\n";
-					$tags .= "<meta property='og:url' content='$url?hash=$id_value'/>\n";
-				}
-				else if(!empty($thumbnail_ur)){
-					$tags .= "<meta name='twitter:image' content='$image_url'/>\n";
-					$tags .= "<meta property='og:image' content='$image_url'/>\n";
+					$tags .= "<meta name='twitter:image' content='" . esc_url($image_url) . "'/>\n";
+					$tags .= "<meta property='og:image' content='" . esc_url($image_url) . "'/>\n";
+					$tags .= "<meta property='og:url' content='" . esc_url("$url?hash=$id_value") . "'/>\n";
+				} else if (!empty($thumbnail_url)) {
+					$tags .= "<meta name='twitter:image' content='" . esc_url($thumbnail_url) . "'/>\n";
+					$tags .= "<meta property='og:image' content='" . esc_url($thumbnail_url) . "'/>\n";
 				}
 
 				if (!empty($title)) {
 					$title = json_decode('"' . $title . '"', JSON_UNESCAPED_UNICODE);
-					$tags .= "<meta property='og:title' content='$title'/>\n";
-					$tags .= "<meta name='title' property='og:title' content='$title'>\n";
-					$tags .= "<meta name='twitter:title' content='$title'/>\n";
+					$tags .= "<meta property='og:title' content='" . esc_attr($title) . "'/>\n";
+					$tags .= "<meta name='title' property='og:title' content='" . esc_attr($title) . "'>\n";
+					$tags .= "<meta name='twitter:title' content='" . esc_attr($title) . "'/>\n";
 				}
+
 				if (!empty($description)) {
 					$description = json_decode('"' . $description . '"', JSON_UNESCAPED_UNICODE);
-					$tags .= "<meta property='og:description' content='$description'/>\n";
-					$tags .= "<meta name='twitter:description' content='$description'/>\n";
+					$tags .= "<meta property='og:description' content='" . esc_attr($description) . "'/>\n";
+					$tags .= "<meta name='twitter:description' content='" . esc_attr($description) . "'/>\n";
 				}
-				
 			} else {
 
 				$block_content = $post->post_content;
-				
+
 				// Regular expression to match the id and href keys and their values
 				$thumb = '/(?:"id":"' . $id_value . '"|"clientId":"' . $id_value . '").*?"customThumbnail":"(.*?)"/';
 				$title = '/(?:"id":"' . $id_value . '"|"clientId":"' . $id_value . '").*?"customTitle":"(.*?)"/';
 				$description = '/(?:"id":"' . $id_value . '"|"clientId":"' . $id_value . '").*?"customDescription":"(.*?)"/';
 
 				// Search for the regex pattern in the string and extract the href value
+				// Search for the regex pattern in the string and extract the href value
 				if (preg_match($thumb, $block_content, $matches1)) {
-					$image_url = $matches1[1];
-					$tags .= "\n<meta name='twitter:image' content='$image_url'/>\n";
-					$tags .= "<meta property='og:image' content='$image_url'/>\n";
-					$tags .= "<meta property='og:url' content='$url?hash=$id_value'/>\n";
-				}
-				else if(!empty($thumbnail_url)){
-					$tags .= "\n<meta name='twitter:image' content='$thumbnail_url'/>\n";
-					$tags .= "<meta property='og:image' content='$thumbnail_url'/>\n";
+					$image_url = esc_url($matches1[1]);
+					echo "\n<meta name='twitter:image' content='" . esc_attr($image_url) . "'/>\n";
+					echo "<meta property='og:image' content='" . esc_attr($image_url) . "'/>\n";
+					echo "<meta property='og:url' content='" . esc_url("$url?hash=$id_value") . "'/>\n";
+				} else if (!empty($thumbnail_url)) {
+					echo "\n<meta name='twitter:image' content='" . esc_attr($thumbnail_url) . "'/>\n";
+					echo "<meta property='og:image' content='" . esc_attr($thumbnail_url) . "'/>\n";
 				}
 
 				if (preg_match($title, $block_content, $matches2)) {
 					$title = json_decode('"' . $matches2[1] . '"', JSON_UNESCAPED_UNICODE);
-					$tags .= "<meta property='og:title' content='$title'/>\n";
-					$tags .= "<meta name='title' property='og:title' content='$title'>\n";
-					$tags .= "<meta name='twitter:title' content='$title'/>\n";
+					echo "<meta property='og:title' content='" . esc_attr($title) . "'/>\n";
+					echo "<meta name='title' property='og:title' content='" . esc_attr($title) . "'>\n";
+					echo "<meta name='twitter:title' content='" . esc_attr($title) . "'/>\n";
 				}
-				
-				if (preg_match($description, $block_content, $matches3)) {	
+
+				if (preg_match($description, $block_content, $matches3)) {
 					$description = json_decode('"' . $matches3[1] . '"', JSON_UNESCAPED_UNICODE);
-					$tags .= "<meta property='og:description' content='$description'/>\n";
-					$tags .= "<meta name='twitter:description' content='$description'/>\n";
+					echo "<meta property='og:description' content='" . esc_attr($description) . "'/>\n";
+					echo "<meta name='twitter:description' content='" . esc_attr($description) . "'/>\n";
 				}
 			}
-			
+
 			$tags .= "<meta name='twitter:card' content='summary_large_image'/>\n";
 
 			remove_action('wp_head', 'rel_canonical');
 
 			echo $tags;
-
 		}
 	}
-
-	
-
 }

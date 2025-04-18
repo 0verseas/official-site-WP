@@ -1,6 +1,23 @@
 "use strict";
 
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 ;
+function haObserveTarget(target, callback) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var observer = new IntersectionObserver(function (entries, observer) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        callback(entry);
+      }
+    });
+  }, options);
+  observer.observe(target);
+}
 (function ($) {
   'use strict';
 
@@ -142,14 +159,25 @@
         this.run();
       }, 200),
       getSlickSettings: function getSlickSettings() {
+        var $rtl = $('html[dir="rtl"]').length == 1 || $('body').hasClass('rtl');
+        if ('yes' == this.getElementSettings('vertical')) {
+          $rtl = false; // for vertical direction rtl is off
+        }
+
+        // Determine if the widget has the 'ha-slider' class
+        var isHaSlider = this.$element.hasClass('ha-slider');
+
+        // Generate the settings object
         var settings = {
+          fade: isHaSlider ? this.getElementSettings('slides_transition') === 'fade' : this.getElementSettings('slides_transition') === 'fade' && parseInt(this.getElementSettings('slides_to_show')) === 1,
           infinite: !!this.getElementSettings('loop'),
           autoplay: !!this.getElementSettings('autoplay'),
           autoplaySpeed: this.getElementSettings('autoplay_speed'),
           speed: this.getElementSettings('animation_speed'),
           centerMode: !!this.getElementSettings('center'),
           vertical: !!this.getElementSettings('vertical'),
-          slidesToScroll: 1
+          // slidesToScroll: 1,
+          rtl: $rtl
         };
         switch (this.getElementSettings('navigation')) {
           case 'arrow':
@@ -163,16 +191,20 @@
             settings.dots = true;
             break;
         }
+        var slides_to_scroll = !!this.getElementSettings('slides_to_scroll');
         settings.slidesToShow = parseInt(this.getElementSettings('slides_to_show')) || 1;
+        settings.slidesToScroll = slides_to_scroll ? parseInt(this.getElementSettings('slides_to_show')) || 1 : 1;
         settings.responsive = [{
           breakpoint: elementorFrontend.config.breakpoints.lg,
           settings: {
-            slidesToShow: parseInt(this.getElementSettings('slides_to_show_tablet')) || settings.slidesToShow
+            slidesToShow: parseInt(this.getElementSettings('slides_to_show_tablet')) || settings.slidesToShow,
+            slidesToScroll: slides_to_scroll ? parseInt(this.getElementSettings('slides_to_show_tablet')) || settings.slidesToShow : 1
           }
         }, {
           breakpoint: elementorFrontend.config.breakpoints.md,
           settings: {
-            slidesToShow: parseInt(this.getElementSettings('slides_to_show_mobile')) || parseInt(this.getElementSettings('slides_to_show_tablet')) || settings.slidesToShow
+            slidesToShow: parseInt(this.getElementSettings('slides_to_show_mobile')) || parseInt(this.getElementSettings('slides_to_show_tablet')) || settings.slidesToShow,
+            slidesToScroll: slides_to_scroll ? parseInt(this.getElementSettings('slides_to_show_mobile')) || parseInt(this.getElementSettings('slides_to_show_tablet')) || settings.slidesToShow : 1
           }
         }];
         return $.extend({}, this.getSettings(), settings);
@@ -182,13 +214,13 @@
       }
     });
     var NumberHandler = function NumberHandler($scope) {
-      elementorFrontend.waypoint($scope, function () {
+      haObserveTarget($scope[0], function () {
         var $number = $scope.find('.ha-number-text');
         $number.numerator($number.data('animation'));
       });
     };
     var SkillHandler = function SkillHandler($scope) {
-      elementorFrontend.waypoint($scope, function () {
+      haObserveTarget($scope[0], function () {
         $scope.find('.ha-skill-level').each(function () {
           var $current = $(this),
             $lt = $current.find('.ha-skill-level-text'),
@@ -390,16 +422,15 @@
 
     // Fun factor
     var FunFactor = function FunFactor($scope) {
-      elementorFrontend.waypoint($scope, function () {
+      haObserveTarget($scope[0], function () {
         var $fun_factor = $scope.find('.ha-fun-factor__content-number');
         $fun_factor.numerator($fun_factor.data('animation'));
       });
     };
     var BarChart = function BarChart($scope) {
-      elementorFrontend.waypoint($scope, function () {
-        var $chart = $(this),
-          $container = $chart.find('.ha-bar-chart-container'),
-          $chart_canvas = $chart.find('#ha-bar-chart'),
+      haObserveTarget($scope[0], function () {
+        var $container = $scope.find('.ha-bar-chart-container'),
+          $chart_canvas = $scope.find('#ha-bar-chart'),
           settings = $container.data('settings');
         if ($container.length) {
           new Chart($chart_canvas, settings);
@@ -584,12 +615,15 @@
       var calendarEl = $scope.find('.ha-ec');
       var popup = $scope.find('.ha-ec-popup-wrapper');
       var popupClose = $scope.find(".ha-ec-popup-close");
-      var events = calendarEl.data('events');
+      // var events = calendarEl.data('events');
       var initialview = calendarEl.data('initialview');
       var firstday = calendarEl.data('firstday');
       var locale = calendarEl.data('locale');
       var showPopup = calendarEl.data('show-popup');
       var allday_text = calendarEl.data('allday-text');
+      var time_format = calendarEl.data('time-format');
+      var ECjson = window['HaECjson' + $scope.data('id')];
+      var events = ECjson;
       if ('undefined' == typeof events) {
         return;
       }
@@ -618,14 +652,32 @@
               return new Date(timeString);
             };
             var timeFormat = function timeFormat(date) {
-              var hours = date.getHours();
-              var minutes = date.getMinutes();
-              var ampm = hours >= 12 ? 'pm' : 'am';
-              hours = hours % 12;
-              hours = hours ? hours : 12; // the hour '0' should be '12'
-              minutes = minutes < 10 ? '0' + minutes : minutes;
-              var strTime = hours + ':' + minutes + '' + ampm;
-              return strTime;
+              var time_format = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'g:i a';
+              return function (date) {
+                // Parse the input time
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var date = new Date();
+                date.setHours(hours);
+                date.setMinutes(minutes);
+                var options = {};
+                if (time_format.includes('H')) {
+                  options.hour = '2-digit';
+                  options.hour12 = false;
+                } else {
+                  options.hour = 'numeric';
+                  options.hour12 = true;
+                  if (time_format.includes('a') || time_format.includes('A')) {
+                    options.hour = 'numeric';
+                  }
+                }
+                options.minute = '2-digit';
+                var formattedTime = new Intl.DateTimeFormat('en-US', options).format(date);
+                if (time_format.includes('a')) {
+                  formattedTime = formattedTime.toLowerCase();
+                }
+                return formattedTime;
+              }(date);
             };
             info.jsEvent.preventDefault();
             var todayDateString = info.view.calendar.currentData.currentDate.toString(),
@@ -692,10 +744,10 @@
               timeWrap.removeAttr("style");
               startDate = Date.parse(getTheDate(startDate));
               endDate = Date.parse(getTheDate(endDate));
-              var startTimeText = timeFormat(getTheDate(startDate));
+              var startTimeText = timeFormat(getTheDate(startDate), time_format);
               var endTimeText = 'Invalid Data';
               if (startDate < endDate) {
-                endTimeText = timeFormat(getTheDate(endDate));
+                endTimeText = timeFormat(getTheDate(endDate), time_format);
               }
               timeWrap.find('span.ha-ec-event-time').text(startTimeText + ' - ' + endTimeText);
             } else {
@@ -785,9 +837,7 @@
               clearTimeout(hideMsg);
             }, 5000);
           },
-          error: function error(_error3) {
-            // console.log(error);
-          }
+          error: function error(_error3) {}
         });
       });
     };
@@ -1107,5 +1157,333 @@
       $window.on('resize', debounce(burgerClsAdd, 100));
     };
     elementorFrontend.hooks.addAction("frontend/element_ready/ha-navigation-menu.default", NavigationMenu);
+    var AgeGate = function AgeGate($scope, $) {
+      if (elementorFrontend.isEditMode()) {
+        localStorage.removeItem("ha-age-gate-expire-time");
+        if ($scope.find('.ha-age-gate-wrapper').length) {
+          var editor_mood = $scope.find('.ha-age-gate-wrapper').data('editor_mood');
+          if ('no' == editor_mood) {
+            $scope.find('.ha-age-gate-wrapper').hide();
+          }
+        }
+      } else if (!elementorFrontend.isEditMode()) {
+        var container = $scope.find('.ha-age-gate-wrapper'),
+          cookies_time = container.data('age_gate_cookies_time'),
+          exd = localStorage.getItem("ha-age-gate-expire-time");
+        //container.closest("body").find("header").css("display","none");
+        container.closest("body").css("overflow", "hidden");
+        var cdate = new Date();
+        var endDate = new Date();
+        endDate.setDate(cdate.getDate() + cookies_time);
+        $("body,html,document").scrollTop($scope.offset().top);
+        var t = setTimeout(function () {
+          $("body,html,document").scrollTop($("body").offset().top);
+          clearTimeout(t);
+        }, 1000);
+        if (exd != '' && exd != undefined && new Date(cdate) <= new Date(exd)) {
+          $('.ha-age-gate-wrapper').hide();
+          container.closest("body").css("overflow", "");
+        } else if (exd != '' && exd != undefined && new Date(cdate) > new Date(exd)) {
+          localStorage.removeItem("ha-age-gate-expire-time");
+          $('.ha-age-gate-wrapper').show();
+        } else {
+          $('.ha-age-gate-wrapper').show();
+        }
+
+        /*confirm-age*/
+        if ($scope.find('.ha-age-gate-wrapper.ha-age-gate-confirm-age').length) {
+          $(".ha-age-gate-confirm-age-btn").on("click", function () {
+            localStorage.setItem("ha-age-gate-expire-time", endDate);
+            $(this).closest(".ha-age-gate-wrapper").hide();
+            //$(this).closest("body").find("header").css("display","block");
+            $(this).closest("body").css("overflow", "");
+          });
+        }
+
+        /*confirm-dob*/
+        if ($scope.find('.ha-age-gate-wrapper.ha-age-gate-confirm-dob').length) {
+          $(".ha-age-gate-confirm-dob-btn").on("click", function () {
+            var birthYear = new Date(Date.parse($(this).closest('.ha-age-gate-form-body').find('.ha-age-gate-date-input').val())),
+              agebirth = birthYear.getFullYear(),
+              currentYear = cdate.getFullYear(),
+              userage = currentYear - agebirth,
+              agelimit = $(this).closest('.ha-age-gate-wrapper').data("userbirth");
+            if (userage < agelimit) {
+              $(this).closest('.ha-age-gate-boxes').find('.ha-age-gate-warning-msg').show();
+            } else {
+              localStorage.setItem("ha-age-gate-expire-time", endDate);
+              $(this).closest('.ha-age-gate-wrapper').hide();
+              //$(this).closest("body").find("header").css("display","block");
+              $(this).closest("body").css("overflow", "");
+            }
+          });
+        }
+
+        /*confirm-by-boolean*/
+        if ($scope.find('.ha-age-gate-wrapper.ha-age-gate-confirm-by-boolean').length) {
+          $(".ha-age-gate-wrapper .ha-age-gate-confirm-yes-btn").on("click", function () {
+            localStorage.setItem("ha-age-gate-expire-time", endDate);
+            $(this).closest('.ha-age-gate-wrapper').hide();
+            //$(this).closest("body").find("header").css("display","block");
+            $(this).closest("body").css("overflow", "");
+          });
+          $(".ha-age-gate-wrapper .ha-age-gate-confirm-no-btn").on("click", function () {
+            $(this).closest('.ha-age-gate-boxes').find('.ha-age-gate-warning-msg').show();
+          });
+        }
+      }
+    };
+    elementorFrontend.hooks.addAction("frontend/element_ready/ha-age-gate.default", AgeGate);
+    var LiquidHoverImage = ModuleHandler.extend({
+      onInit: function onInit() {
+        ModuleHandler.prototype.onInit.apply(this, arguments);
+        this.run();
+
+        // $window.on('resize', debounce(this.run.bind(this), 100));
+      },
+      onElementChange: debounce(function (changedProp) {
+        var $keys = ['width', 'title_typography_typography', 'title_typography_font_size', 'title_typography_line_height', 'title_typography_font_weight', 'sub_title_typography_typography', 'sub_title_typography_font_size', 'sub_title_typography_line_height', 'sub_title_typography_font_weight'];
+        if ($keys.indexOf(changedProp) !== -1) {
+          this.run();
+        }
+      }, 300),
+      run: function run() {
+        var self = this,
+          settings = JSON.parse(self.$element.find('.ha-lhi-image-area').attr("data-settings")),
+          liquidImage = self.$element.find('.ha-lhi-image'),
+          title = self.$element.find('.ha-lhi-title h2'),
+          sub_title = self.$element.find('.ha-lhi-title p'),
+          canvas = self.$element.find('canvas'),
+          style = settings.hover_style,
+          hover_effect = settings.plugin_url + 'liquid-hover-image/' + settings.hover_effect;
+        if ('custom' == settings.hover_effect) {
+          hover_effect = settings.custom_effect ? settings.custom_effect : '';
+        }
+        if (canvas) {
+          canvas.remove();
+        }
+        var myAnimation = new hoverEffect({
+          parent: liquidImage[0],
+          intensity: settings.intensity,
+          image1: settings.first_image,
+          image2: settings.second_image,
+          displacementImage: hover_effect,
+          imagesRatio: liquidImage.height() / liquidImage.width(),
+          angle1: (settings.angle - 45) * (Math.PI / 180) * -1,
+          angle2: (settings.angle - 45) * (Math.PI / 180) * -1,
+          speedIn: settings.speed,
+          speedOut: settings.speed
+        });
+
+        /* if title or subtitle enable */
+        if ('style-1' == style && (title.length || sub_title.length)) {
+          var HoverOutDelay = function HoverOutDelay(el, i, a) {
+            return 'right' == style_direction ? (a - i) * 40 : 40 * i;
+          };
+          var style_direction = settings.style_1_direction;
+          if (title.length) {
+            title[0].innerHTML = title[0].textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+          }
+          if (sub_title.length) {
+            sub_title.addClass("letter");
+          }
+          var HoverTranslateX = [0, 0],
+            HoverOutTranslateX = [0, 0],
+            HoverTranslateY = [0, 0],
+            HoverOutTranslateY = [0, 0];
+          ;
+          if ('left' == style_direction) {
+            HoverTranslateX = [80, 0], HoverOutTranslateX = [0, -80];
+          } else if ('right' == style_direction) {
+            HoverTranslateX = [0, 80], HoverOutTranslateX = [80, 200];
+          } else if ('up' == style_direction) {
+            HoverTranslateY = [80, 0], HoverOutTranslateY = [0, -80];
+          } else if ('down' == style_direction) {
+            HoverTranslateY = [-80, 0], HoverOutTranslateY = [0, 80];
+          }
+          self.$element.hover(function () {
+            anime.timeline({
+              loop: false
+            }).add({
+              targets: '.elementor-element-' + self.getID() + ' .ha-lhi-title .letter',
+              translateX: HoverTranslateX,
+              translateY: HoverTranslateY,
+              translateZ: 0,
+              opacity: [0, 1],
+              easing: "easeOutExpo",
+              duration: 800,
+              delay: function delay(el, i) {
+                return 40 * i;
+              }
+            });
+          }, function () {
+            anime.timeline({
+              loop: false
+            }).add({
+              targets: '.elementor-element-' + self.getID() + ' .ha-lhi-title .letter',
+              translateX: HoverOutTranslateX,
+              translateY: HoverOutTranslateY,
+              opacity: [1, 0],
+              // easing: "easeInExpo",
+              duration: 850,
+              delay: function delay(el, i, a) {
+                return HoverOutDelay(el, i, a);
+              }
+            });
+          });
+        }
+        if ('style-2' == style && (title.length || sub_title.length)) {
+          if (title.length) {
+            var height = title.find('.normal').outerHeight();
+            title.height(height);
+          }
+          if (sub_title.length) {
+            var height = sub_title.find('.normal').outerHeight();
+            sub_title.height(height);
+          }
+          self.$element.hover(function () {
+            title.addClass('play');
+            sub_title.addClass('play');
+          }, function () {
+            title.removeClass('play');
+            sub_title.removeClass('play');
+          });
+        }
+        if ('style-5' == style && (title.length || sub_title.length)) {
+          if (title.length) {
+            var height = title.find('.normal').outerHeight();
+            title.attr('style', '--ha-lhi-style-5-height:' + height + 'px');
+          }
+        }
+      }
+    });
+    elementorFrontend.hooks.addAction('frontend/element_ready/ha-liquid-hover-image.default', function ($scope) {
+      elementorFrontend.elementsHandler.addHandler(LiquidHoverImage, {
+        $element: $scope
+      });
+    });
+    var TextScroll = ModuleHandler.extend({
+      onInit: function onInit() {
+        ModuleHandler.prototype.onInit.apply(this, arguments);
+        this.run();
+      },
+      onElementChange: debounce(function (changedProp) {
+        var $keys = ['text_scroll_type'];
+        if ($keys.indexOf(changedProp) !== -1) {
+          this.run();
+        }
+      }, 300),
+      getReadySettings: function getReadySettings() {
+        var settings = {};
+        var scroll_type = this.getElementSettings('text_scroll_type');
+        if (scroll_type) settings.scroll_type = scroll_type;
+        return $.extend({}, this.getSettings(), settings);
+      },
+      run: function run() {
+        var settings = this.getReadySettings();
+        var $element = this.$element;
+        var elementsToSplit = $element.find('.ha-split-lines')[0];
+        var instancesOfSplit = [];
+        var textScrollType = settings.scroll_type;
+        var lastScrollTop = 0;
+        var typeSplit;
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+        gsap.registerPlugin(ScrollTrigger);
+        function runSplit() {
+          if (elementsToSplit.length <= 0) return;
+          if (textScrollType === 'horizontal_line_mask' || textScrollType === 'vertical_line_mask') {
+            $(elementsToSplit).each(function (index) {
+              var currentElement = $(this);
+              instancesOfSplit[index] = new SplitType(currentElement, {
+                types: "lines, words"
+              });
+            });
+            $(elementsToSplit).find(".line").each(function (index) {
+              $(this).append("<div class='ha-line-mask'></div>");
+            });
+          } else if (textScrollType === 'horizontal_line_highlight') {
+            $(elementsToSplit).each(function (index) {
+              var currentElement = $(this);
+              instancesOfSplit[index] = new SplitType(currentElement, {
+                types: "words, chars"
+              });
+            });
+          } else {
+            typeSplit = new SplitType(elementsToSplit, {
+              types: 'lines, words'
+            });
+          }
+          createAnimation();
+        }
+        runSplit();
+        function createAnimation() {
+          if (textScrollType === 'horizontal_line_mask' || textScrollType === 'vertical_line_mask') {
+            $element.find('.line').each(function (index, targetElement) {
+              var mask = $(targetElement).find('.ha-line-mask');
+              if (mask.length <= 0) return;
+              $(targetElement).addClass('mask-active');
+              var scrollTriggerProps = {
+                start: textScrollType === 'horizontal_line_mask' ? 'bottom 50%' : 'bottom center',
+                end: 'bottom center',
+                scrub: 3
+              };
+              var animationProps = textScrollType === 'horizontal_line_mask' ? {
+                width: '0%'
+              } : {
+                height: '0%'
+              };
+              var tl = gsap.timeline({
+                scrollTrigger: _objectSpread({
+                  trigger: targetElement
+                }, scrollTriggerProps)
+              });
+              tl.to(mask, _objectSpread(_objectSpread({}, animationProps), {}, {
+                duration: 1
+              }));
+            });
+          } else if (textScrollType === 'horizontal_line_highlight') {
+            var charsTargetElement = $element.find('.word .char');
+            var triggerElement = $element.find('.ha-split-lines');
+            if (charsTargetElement.length >= 0 && triggerElement.length >= 0) {
+              gsap.to(charsTargetElement, {
+                scrollTrigger: {
+                  trigger: triggerElement,
+                  start: 'top 40%',
+                  end: 'bottom center',
+                  scrub: 1
+                },
+                opacity: 1,
+                duration: 2,
+                stagger: 1
+              });
+            }
+          } else {
+            $element.find('.line').each(function () {
+              var _this2 = this;
+              gsap.to(this, {
+                scrollTrigger: {
+                  trigger: this,
+                  start: 'top 50%',
+                  end: 'bottom 50%',
+                  onEnter: function onEnter() {
+                    $(_this2).addClass('highlight');
+                  },
+                  onLeaveBack: function onLeaveBack() {
+                    $(_this2).removeClass('highlight');
+                  }
+                }
+              });
+            });
+          }
+        }
+      }
+    });
+
+    // Hook into Elementor's frontend ready event
+    elementorFrontend.hooks.addAction('frontend/element_ready/ha-text-scroll.default', function ($scope) {
+      elementorFrontend.elementsHandler.addHandler(TextScroll, {
+        $element: $scope
+      });
+    });
   });
 })(jQuery);

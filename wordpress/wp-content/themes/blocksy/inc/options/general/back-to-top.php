@@ -198,13 +198,11 @@ $options = [
 						'type' => 'ct-visibility',
 						'design' => 'block',
 						'setting' => [ 'transport' => 'postMessage' ],
-
-						'value' => [
+						'value' => blocksy_default_responsive_value([
 							'desktop' => true,
 							'tablet' => true,
 							'mobile' => false,
-						],
-
+						]),
 						'choices' => blocksy_ordered_keys([
 							'desktop' => __( 'Desktop', 'blocksy' ),
 							'tablet' => __( 'Tablet', 'blocksy' ),
@@ -269,13 +267,13 @@ $options = [
 							[
 								'title' => __( 'Initial', 'blocksy' ),
 								'id' => 'default',
-								'inherit' => 'var(--paletteColor3)'
+								'inherit' => 'var(--theme-palette-color-3)'
 							],
 
 							[
 								'title' => __( 'Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--paletteColor4)'
+								'inherit' => 'var(--theme-palette-color-4)'
 							],
 						],
 					],
@@ -290,14 +288,11 @@ $options = [
 								'type' => 'ct-spacing',
 								'divider' => 'top',
 								'setting' => [ 'transport' => 'postMessage' ],
-								'value' => blocksy_spacing_value([
-									'linked' => true,
-									'top' => '2px',
-									'left' => '2px',
-									'right' => '2px',
-									'bottom' => '2px',
-								]),
-								// 'responsive' => true
+								'value' => blocksy_spacing_value(),
+								'inputAttr' => [
+									'placeholder' => '2'
+								],
+								'min' => 0,
 							],
 
 						],

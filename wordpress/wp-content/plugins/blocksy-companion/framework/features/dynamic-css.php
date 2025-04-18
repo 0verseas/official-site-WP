@@ -64,21 +64,42 @@ class DynamicCss {
 			}
 		);
 
-		add_action('updated_option', function($option_name, $old_value, $value) {
-			if ('active_plugins' === $option_name) {
-				$this->generate_css_files();
+		add_action('current_screen', function () {
+			$screen = get_current_screen();
+
+			if ($screen->base === 'plugins') {
+				if (
+					isset($_GET['activate-multi'])
+					||
+					isset($_GET['activate'])
+					||
+					isset($_GET['deactivate'])
+					||
+					isset($_GET['deactivate-multi'])
+				) {
+					$this->generate_css_files();
+				}
 			}
-		}, 10, 3);
+		});
 
 		add_action('blocksy:dynamic-css:refresh-caches', function () {
 			$this->generate_css_files();
 		});
 
-		$this->enqueue_dynamic_css();
+		add_action('init', function () {
+			$this->enqueue_dynamic_css();
+		});
+
+		// Needs to run very early.
+		// Will catch when the import is done and will refresh the dynamic CSS.
+		// All in One WP Migration compatibility.
+		add_action('ai1wm_status_import_done', function () {
+			do_action('blocksy:dynamic-css:refresh-caches');
+		});
 	}
 
 	public function should_use_files() {
-		return get_theme_mod('dynamic_css_file', 'file') === 'file';
+		return blocksy_get_theme_mod('dynamic_css_file', 'file') === 'file';
 	}
 
 	public function get_chunks() {
@@ -152,7 +173,6 @@ class DynamicCss {
 			}
 
 			$file = $theme_paths['css_path'] . '/' . $chunk['filename'];
-			$url = $theme_paths['css_url'] . '/' . $chunk['filename'];
 
 			if (
 				function_exists('blocksy_get_dynamic_css_file_content')
@@ -167,7 +187,7 @@ class DynamicCss {
 		}
 	}
 
-	private function maybe_prepare_theme_uploads_path($args = []) {
+	public function maybe_prepare_theme_uploads_path($args = []) {
 		$args = wp_parse_args($args, [
 			'should_generate' => false,
 		]);
@@ -235,15 +255,7 @@ class DynamicCss {
 
 		if ($wp_filesystem) {
 			if ($wp_filesystem->method !== 'direct') {
-				if (
-					is_wp_error($wp_filesystem->errors)
-					&&
-					$wp_filesystem->errors->get_error_code()
-				) {
-					return true;
-				} else {
-					return $wp_filesystem->method === 'direct';
-				}
+				return false;
 			} else {
 				return true;
 			}
@@ -268,6 +280,10 @@ class DynamicCss {
 		}
 
 		return false;
+	}
+
+	public function get_wp_filesystem() {
+		return $this->wp_filesystem;
 	}
 }
 

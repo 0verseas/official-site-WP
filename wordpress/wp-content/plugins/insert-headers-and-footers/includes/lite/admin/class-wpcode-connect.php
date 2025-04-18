@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * WPCode Connect.
  *
@@ -43,7 +47,7 @@ class WPCode_Connect {
 			return;
 		}
 
-		$asset = include_once $admin_asset_file;
+		$asset = require $admin_asset_file;
 
 		wp_enqueue_script( 'wpcode-connect-js', WPCODE_PLUGIN_URL . 'build/connect.js', $asset['dependencies'], $asset['version'], true );
 	}
@@ -78,6 +82,7 @@ class WPCode_Connect {
 
 		if ( ! is_wp_error( $active ) ) {
 
+			update_option( 'wpcode_install', 1 ); // Run install routines.
 			// Deactivate Lite.
 			$plugin = plugin_basename( WPCODE_FILE );
 
@@ -94,7 +99,8 @@ class WPCode_Connect {
 		}
 
 		// Generate URL.
-		$oth = hash( 'sha512', wp_rand() );
+		$oth        = hash( 'sha512', wp_rand() );
+		$hashed_oth = hash_hmac( 'sha512', $oth, wp_salt() );
 
 		update_option( 'wpcode_connect_token', $oth );
 		update_option( 'wpcode_connect', $key );
@@ -105,7 +111,7 @@ class WPCode_Connect {
 		$url      = add_query_arg(
 			array(
 				'key'      => $key,
-				'oth'      => $oth,
+				'oth'      => $hashed_oth,
 				'endpoint' => $endpoint,
 				'version'  => $version,
 				'siteurl'  => admin_url(),
@@ -152,7 +158,7 @@ class WPCode_Connect {
 		// Verify oth.
 		$oth = get_option( 'wpcode_connect_token' );
 
-		if ( empty( $oth ) || ! hash_equals( $oth, $post_oth ) ) {
+		if ( hash_hmac( 'sha512', $oth, wp_salt() ) !== $post_oth ) {
 			wp_send_json_error( $error );
 		}
 

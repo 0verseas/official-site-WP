@@ -1,4 +1,5 @@
 <?php
+//phpcs:disable Squiz.Commenting.InlineComment.InvalidEndChar
 
 namespace Simple_History\Loggers;
 
@@ -9,7 +10,6 @@ namespace Simple_History\Loggers;
  * @package SimpleHistory
  * @since 2.21
  */
-
 class Plugin_ACF_Logger extends Logger {
 	/**
 	 * The slug for this logger.
@@ -21,9 +21,9 @@ class Plugin_ACF_Logger extends Logger {
 	/**
 	 * Will contain field groups and fields, before and after post save.
 	 *
-	 * @var string $old_and_new_field_groups_and_fields
+	 * @var array $old_and_new_field_groups_and_fields
 	 */
-	private $old_and_new_field_groups_and_fields = array(
+	private array $old_and_new_field_groups_and_fields = array(
 		'fieldGroup'     => array(
 			'old' => null,
 			'new' => null,
@@ -39,9 +39,9 @@ class Plugin_ACF_Logger extends Logger {
 	/**
 	 * Will contain the post data before save, i.e. the previous version of the post.
 	 *
-	 * @var string $old_post_data
+	 * @var array $old_post_data
 	 */
-	private $old_post_data = array();
+	private array $old_post_data = array();
 
 	/**
 	 * Get info for this logger.
@@ -59,6 +59,11 @@ class Plugin_ACF_Logger extends Logger {
 		return $arr_info;
 	}
 
+	/**
+	 * Check if ACF is installed.
+	 *
+	 * @return bool
+	 */
 	private function isACFInstalled() {
 		return defined( 'ACF' ) && ACF;
 	}
@@ -83,14 +88,14 @@ class Plugin_ACF_Logger extends Logger {
 		// Store old and new field data when a post is saved.
 		add_action( 'transition_post_status', array( $this, 'on_transition_post_status' ), 5, 3 );
 
-		// Append ACF data to post context
+		// Append ACF data to post context.
 		add_filter( 'simple_history/post_logger/post_updated/context', array( $this, 'on_post_updated_context' ), 10, 2 );
 
 		// Add ACF diff data to activity feed detailed output.
 		add_filter( 'simple_history/post_logger/post_updated/diff_table_output', array( $this, 'on_diff_table_output_field_group' ), 10, 2 );
 
 		// Store prev ACF field values before new values are added.
-		// Called from filter admin_action_editpost that is fired at top of admin.php
+		// Called from filter admin_action_editpost that is fired at top of admin.php.
 		add_action( 'admin_action_editpost', array( $this, 'on_admin_action_editpost' ) );
 
 		// Fired when ACF saves a post. Adds ACF context to logged row.
@@ -102,12 +107,16 @@ class Plugin_ACF_Logger extends Logger {
 
 	/**
 	 * Fired after a log row is inserted.
+	 *
+	 * @param array                          $context Context.
+	 * @param array                          $data_parent_row Data parent row.
+	 * @param \Simple_History\Loggers\Logger $simple_history_instance Simple History logger instance.
 	 */
 	public function on_log_inserted( $context, $data_parent_row, $simple_history_instance ) {
-		$message_key = ! empty( $context['_message_key'] ) ? $context['_message_key'] : false;
-		$logger = ! empty( $data_parent_row['logger'] ) ? $data_parent_row['logger'] : false;
-		$post_id = ! empty( $context['post_id'] ) ? $context['post_id'] : false;
-		$post_type = ! empty( $context['post_type'] ) ? $context['post_type'] : false;
+		$message_key = empty( $context['_message_key'] ) ? false : $context['_message_key'];
+		$logger = empty( $data_parent_row['logger'] ) ? false : $data_parent_row['logger'];
+		$post_id = empty( $context['post_id'] ) ? false : $context['post_id'];
+		$post_type = empty( $context['post_type'] ) ? false : $context['post_type'];
 
 		// Bail if not all required vars are set.
 		if ( ! $message_key || ! $logger || ! $post_id || ! $post_type ) {
@@ -137,6 +146,11 @@ class Plugin_ACF_Logger extends Logger {
 	 *
 	 * This function checks if post type logged by SimplePostLogger is a ACF Field Group, and if it is
 	 * then don't log that log. This way we prevent the post logger from logging the field group changes twice.
+	 *
+	 * @param bool     $ok_to_log Ok to log.
+	 * @param string   $new_status New status.
+	 * @param string   $old_status Old status.
+	 * @param \WP_Post $post Post.
 	 */
 	public function prevent_second_acf_field_group_post_save_log( $ok_to_log, $new_status, $old_status, $post ) {
 		if ( isset( $post->post_type ) && $post->post_type === 'acf-field-group' ) {
@@ -152,7 +166,7 @@ class Plugin_ACF_Logger extends Logger {
 	 *
 	 * Called when ACF saves a post.
 	 *
-	 * @param mixed int $post_id ID of post that is being saved. string "option" or "options" when saving an options page.
+	 * @param mixed $post_id ID of post that is being saved. String "option" or "options" when saving an options page.
 	 */
 	public function on_acf_save_post( $post_id ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
@@ -193,7 +207,7 @@ class Plugin_ACF_Logger extends Logger {
 		$new_post_meta = get_post_custom( $post_id );
 		array_walk(
 			$new_post_meta,
-			function( &$value, $key ) {
+			function ( &$value, $key ) {
 				$value = reset( $value );
 			}
 		);
@@ -274,6 +288,7 @@ class Plugin_ACF_Logger extends Logger {
 			$post_logger->append_context( $last_insert_id, $acf_context );
 
 			// Prev and new post meta for testing.
+
 			/*
 			$post_logger->append_context(
 				$last_insert_id,
@@ -317,7 +332,7 @@ class Plugin_ACF_Logger extends Logger {
 
 			If field slug contains a number, like in "product_images_2_image"
 			that probably means that that field is a repeater with name "product_images"
-			with a sub field called "image" and that the image is the 2:nd among it's selected sub fields.
+			with a sub field called "image" and that the image is the 2:and among it's selected sub fields.
 
 			Example of how fields can look:
 			acf_field_added_0   product_images_2_image
@@ -332,7 +347,7 @@ class Plugin_ACF_Logger extends Logger {
 			$context[ "{$context_key}/slug" ] = $field_slug;
 
 			/*
-				* Try to get som extra info, like display name and type for this field.
+				* Try to get some extra info, like display name and type for this field.
 				* For a nice context in the feed we want: parent field group name and type?
 				*/
 			if ( isset( $fieldnames_to_field_keys[ $field_slug ] ) ) {
@@ -357,7 +372,7 @@ class Plugin_ACF_Logger extends Logger {
 					}
 
 					// We have at least one parent, get them all, including the field group
-					// $context[ "{$context_key}/field_parent_object" ] = $parent_field;
+					// $context[ "{$context_key}/field_parent_object" ] = $parent_field;.
 					$field_parents     = array();
 					$field_field_group = null;
 
@@ -437,7 +452,7 @@ class Plugin_ACF_Logger extends Logger {
 					// repeatable or flexible fields or similar.
 					// error_log( "Final parents" . print_r( $field_parents, 1 ) );
 					// error_log( "Final field group" . print_r( $field_field_group['title'], 1 ) );
-					// error_log( "context" . print_r( $context, 1 ) );
+					// error_log( "context" . print_r( $context, 1 ) );.
 				} // End if().
 			} // End if().
 
@@ -446,7 +461,7 @@ class Plugin_ACF_Logger extends Logger {
 
 		// error_log( "---------------------------" );
 		// error_log( "field_path_string: $field_path_string");
-		// error_log( "context" . print_r( $context, 1 ) );
+		// error_log( "context" . print_r( $context, 1 ) );.
 		return $context;
 	}
 
@@ -466,7 +481,16 @@ class Plugin_ACF_Logger extends Logger {
 	public function keep_only_acf_stuff_in_array( $arr, $all_fields ) {
 		$new_arr = array();
 
+		if ( ! is_array( $arr ) ) {
+			return $new_arr;
+		}
+
 		foreach ( $arr as $key => $val ) {
+			// Bail if not a string.
+			if ( ! is_string( $key ) || ! is_string( $val ) ) {
+				continue;
+			}
+
 			// Don't keep keys that begin with underscore "_".
 			if ( strpos( $key, '_' ) === 0 ) {
 				continue;
@@ -504,13 +528,13 @@ class Plugin_ACF_Logger extends Logger {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$post_ID = isset( $_POST['post_ID'] ) ? (int) $_POST['post_ID'] : 0;
 
-		if ( ! $post_ID ) {
+		if ( $post_ID === 0 ) {
 			return;
 		}
 
 		$prev_post = get_post( $post_ID );
 
-		if ( is_wp_error( $prev_post ) ) {
+		if ( ! $prev_post instanceof \WP_Post ) {
 			return;
 		}
 
@@ -519,7 +543,7 @@ class Plugin_ACF_Logger extends Logger {
 		// Meta is array of arrays, get first value of each array value.
 		array_walk(
 			$post_meta,
-			function( &$value, $key ) {
+			function ( &$value, $key ) {
 				$value = reset( $value );
 			}
 		);
@@ -531,19 +555,19 @@ class Plugin_ACF_Logger extends Logger {
 	 * Called from PostLogger and its diff table output using filter 'simple_history/post_logger/post_updated/diff_table_output'.
 	 * Diff table is generated only for post type 'acf-field-group'.
 	 *
-	 * @param string $diff_table_output
-	 * @param array  $context
+	 * @param string $diff_table_output Diff table output.
+	 * @param array  $context Context.
 	 * @return string
 	 */
 	public function on_diff_table_output_field_group( $diff_table_output, $context ) {
-		$post_type = ! empty( $context['post_type'] ) ? $context['post_type'] : false;
+		$post_type = empty( $context['post_type'] ) ? false : $context['post_type'];
 
 		// Bail if not ACF Field Group.
 		if ( $post_type !== 'acf-field-group' ) {
 			return $diff_table_output;
 		}
 
-		// Field group fields to check for and output if found
+		// Field group fields to check for and output if found.
 		$arrKeys = array(
 			'instruction_placement' => array(
 				'name' => _x( 'Instruction placement', 'Logger: Plugin ACF', 'simple-history' ),
@@ -568,8 +592,8 @@ class Plugin_ACF_Logger extends Logger {
 			),
 		);
 
-		foreach ( $arrKeys as $acfKey => $acfVals ) {
-			if ( isset( $context[ "acf_new_$acfKey" ] ) && isset( $context[ "acf_prev_$acfKey" ] ) ) {
+		foreach ( $arrKeys as $acf_key => $acfVals ) {
+			if ( isset( $context[ "acf_new_$acf_key" ] ) && isset( $context[ "acf_prev_$acf_key" ] ) ) {
 				$diff_table_output .= sprintf(
 					'<tr>
 						<td>%1$s</td>
@@ -579,13 +603,13 @@ class Plugin_ACF_Logger extends Logger {
 						</td>
 					</tr>',
 					$acfVals['name'],
-					esc_html( $context[ "acf_new_$acfKey" ] ),
-					esc_html( $context[ "acf_prev_$acfKey" ] )
+					esc_html( $context[ "acf_new_$acf_key" ] ),
+					esc_html( $context[ "acf_prev_$acf_key" ] )
 				);
 			}
 		}
 
-		// If only acf_hide_on_screen_removed exists nothing is outputed.
+		// If only acf_hide_on_screen_removed exists nothing is outputted.
 		$acf_hide_on_screen_added   = empty( $context['acf_hide_on_screen_added'] ) ? null : $context['acf_hide_on_screen_added'];
 		$acf_hide_on_screen_removed = empty( $context['acf_hide_on_screen_removed'] ) ? null : $context['acf_hide_on_screen_removed'];
 
@@ -652,7 +676,7 @@ class Plugin_ACF_Logger extends Logger {
 			);
 		} // if deleted fields
 
-		// Check for added fields
+		// Check for added fields.
 		if ( isset( $context['acf_added_fields_0_key'] ) ) {
 			// 1 or more deleted fields exist in context
 			$loopnum        = 0;
@@ -681,7 +705,7 @@ class Plugin_ACF_Logger extends Logger {
 			);
 		} // if deleted fields
 
-		// Check for modified fields
+		// Check for modified fields.
 		if ( isset( $context['acf_modified_fields_0_ID_prev'] ) ) {
 			// 1 or more modifiedfields exist in context
 			$loopnum                   = 0;
@@ -705,32 +729,22 @@ class Plugin_ACF_Logger extends Logger {
 			);
 
 			while ( isset( $context[ "acf_modified_fields_{$loopnum}_name_prev" ] ) ) {
-				// One modified field, with one or more changed things
+				// One modified field, with one or more changed things.
 				$strOneModifiedField = '';
-
-				// Add the field name manually, if it is not among the changed field,
-				// or we don't know what field the other changed values belongs to.
-				/*
-				if (empty($context["acf_modified_fields_{$loopnum}_name_new"])) {
-					$strOneModifiedField .= sprintf(
-						_x('Name: %1$s', 'Logger: Plugin ACF', 'simple-history'), // 1
-						esc_html($context["acf_modified_fields_{$loopnum}_name_prev"]) // 2
-					);
-				}
-				*/
 
 				// Add the label name manually, if it is not among the changed field,
 				// or we don't know what field the other changed values belongs to.
 				if ( empty( $context[ "acf_modified_fields_{$loopnum}_label_new" ] ) ) {
 					$strOneModifiedField .= sprintf(
+						// translators: %1$s is the label name.
 						_x( 'Label: %1$s', 'Logger: Plugin ACF', 'simple-history' ), // 1
 						esc_html( $context[ "acf_modified_fields_{$loopnum}_label_prev" ] ) // 2
 					);
 				}
 
-				// Check for other keys changed for this field
-				foreach ( $arrAddedFieldsKeysToCheck as $oneAddedFieldKeyToCheck => $oneAddedFieldKeyToCheckVals ) {
-					$newAndOldValsExists = isset( $context[ "acf_modified_fields_{$loopnum}_{$oneAddedFieldKeyToCheck}_new" ] ) && isset( $context[ "acf_modified_fields_{$loopnum}_{$oneAddedFieldKeyToCheck}_new" ] );
+				// Check for other keys changed for this field.
+				foreach ( $arrAddedFieldsKeysToCheck as $one_added_field_key_to_check => $one_added_field_key_to_check_vals ) {
+					$newAndOldValsExists = isset( $context[ "acf_modified_fields_{$loopnum}_{$one_added_field_key_to_check}_new" ] ) && isset( $context[ "acf_modified_fields_{$loopnum}_{$one_added_field_key_to_check}_new" ] );
 					if ( $newAndOldValsExists ) {
 						$strOneModifiedField .= sprintf(
 							'
@@ -739,9 +753,9 @@ class Plugin_ACF_Logger extends Logger {
 								<ins class="SimpleHistoryLogitem__keyValueTable__addedThing">%1$s</ins>
 								<del class="SimpleHistoryLogitem__keyValueTable__removedThing">%2$s</del>
 							',
-							esc_html( $context[ "acf_modified_fields_{$loopnum}_{$oneAddedFieldKeyToCheck}_new" ] ), // 1
-							esc_html( $context[ "acf_modified_fields_{$loopnum}_{$oneAddedFieldKeyToCheck}_prev" ] ), // 2
-							esc_html( $oneAddedFieldKeyToCheckVals['name'] ), // 3
+							esc_html( $context[ "acf_modified_fields_{$loopnum}_{$one_added_field_key_to_check}_new" ] ), // 1
+							esc_html( $context[ "acf_modified_fields_{$loopnum}_{$one_added_field_key_to_check}_prev" ] ), // 2
+							esc_html( $one_added_field_key_to_check_vals['name'] ), // 3
 							empty( $strOneModifiedField ) ? '' : '<br>' // 4 new line
 						);
 					}
@@ -749,7 +763,7 @@ class Plugin_ACF_Logger extends Logger {
 
 				$strOneModifiedField = trim( $strOneModifiedField, ", \n\r\t" );
 
-				if ( $strOneModifiedField ) {
+				if ( $strOneModifiedField !== '' && $strOneModifiedField !== '0' ) {
 					$strModifiedFields .= sprintf(
 						'<tr>
 							<td>%1$s</td>
@@ -763,18 +777,6 @@ class Plugin_ACF_Logger extends Logger {
 				$loopnum++;
 			}
 
-			/*
-			if ($strModifiedFields) {
-				$strModifiedFields = sprintf(
-					'<tr>
-						<td>%1$s</td>
-						<td>%2$s</td>
-					</tr>',
-					_nx('Modified field', 'Modified fields', $loopnum, 'Logger: Plugin ACF', 'simple-history'), // 1
-					$strModifiedFields
-				) . $strModifiedFields;
-			}*/
-
 			$diff_table_output .= $strModifiedFields;
 		} // if deleted fields
 
@@ -786,12 +788,11 @@ class Plugin_ACF_Logger extends Logger {
 	 *
 	 * Called via filter `simple_history/post_logger/post_updated/context`.
 	 *
-	 * @param array   $context
-	 * @param WP_Post $post
+	 * @param array    $context Context.
+	 * @param \WP_Post $post Post.
 	 */
 	public function on_post_updated_context( $context, $post ) {
-
-		// Only act if this is a ACF field group that is saved
+		// Only act if this is a ACF field group that is saved.
 		if ( $post->post_type !== 'acf-field-group' ) {
 			return $context;
 		}
@@ -836,27 +837,22 @@ class Plugin_ACF_Logger extends Logger {
 			$context[ "acf_new_{$diff_key}" ]  = $diff_values['new'];
 		}
 
-		// Add checked or uncheckd hide on screen-items to context
+		// Add checked or uncheckd hide on screen-items to context.
 		$arrhHideOnScreenAdded  = array();
 		$arrHideOnScreenRemoved = array();
 
 		$fieldGroup['new']['hide_on_screen'] = isset( $fieldGroup['new']['hide_on_screen'] ) && is_array( $fieldGroup['new']['hide_on_screen'] ) ? $fieldGroup['new']['hide_on_screen'] : array();
 		$fieldGroup['old']['hide_on_screen'] = isset( $fieldGroup['old']['hide_on_screen'] ) && is_array( $fieldGroup['old']['hide_on_screen'] ) ? $fieldGroup['old']['hide_on_screen'] : array();
+		$arrhHideOnScreenAdded  = array_diff( $fieldGroup['new']['hide_on_screen'], $fieldGroup['old']['hide_on_screen'] );
+		$arrHideOnScreenRemoved = array_diff( $fieldGroup['old']['hide_on_screen'], $fieldGroup['new']['hide_on_screen'] );
 
-		// dd($fieldGroup['old']['hide_on_screen'], $fieldGroup['new']['hide_on_screen']);
-		// Act when new or old hide_on_screen is set
-		if ( ! empty( $fieldGroup['new']['hide_on_screen'] ) || ! empty( $fieldGroup['old']['hide_on_screen'] ) ) {
-			$arrhHideOnScreenAdded  = array_diff( $fieldGroup['new']['hide_on_screen'], $fieldGroup['old']['hide_on_screen'] );
-			$arrHideOnScreenRemoved = array_diff( $fieldGroup['old']['hide_on_screen'], $fieldGroup['new']['hide_on_screen'] );
-
-			// ddd($arrhHideOnScreenAdded, $arrHideOnScreenRemoved);
-			if ( $arrhHideOnScreenAdded ) {
+		if ( $arrhHideOnScreenAdded !== [] ) {
 				$context['acf_hide_on_screen_added'] = implode( ',', $arrhHideOnScreenAdded );
-			}
+		}
 
-			if ( $arrHideOnScreenRemoved ) {
+		// Act when new or old hide_on_screen is set
+		if ( $arrHideOnScreenRemoved !== [] ) {
 				$context['acf_hide_on_screen_removed'] = implode( ',', $arrHideOnScreenRemoved );
-			}
 		}
 
 		// ddd($context, $arrhHideOnScreenAdded, $arrHideOnScreenRemoved);
@@ -887,8 +883,7 @@ class Plugin_ACF_Logger extends Logger {
 			}
 		}
 
-		// Add modified fields to context
-		// dd('on_post_updated_context', $context, $this->old_and_new_field_groups_and_fields);
+		// Add modified fields to context.
 		if ( ! empty( $this->old_and_new_field_groups_and_fields['modifiedFields']['old'] ) && ! empty( $this->old_and_new_field_groups_and_fields['modifiedFields']['new'] ) ) {
 			$modifiedFields = $this->old_and_new_field_groups_and_fields['modifiedFields'];
 
@@ -903,12 +898,12 @@ class Plugin_ACF_Logger extends Logger {
 			$loopnum = 0;
 
 			foreach ( $modifiedFields['old'] as $modifiedFieldId => $modifiedFieldValues ) {
-				// Both old and new values mest exist
+				// Both old and new values mest exist.
 				if ( empty( $modifiedFields['new'][ $modifiedFieldId ] ) ) {
 					continue;
 				}
 
-				// Always add ID, name, and lavel
+				// Always add ID, name, and label.
 				$context[ "acf_modified_fields_{$loopnum}_ID_prev" ]    = $modifiedFields['old'][ $modifiedFieldId ]['ID'];
 				$context[ "acf_modified_fields_{$loopnum}_name_prev" ]  = $modifiedFields['old'][ $modifiedFieldId ]['name'];
 				$context[ "acf_modified_fields_{$loopnum}_label_prev" ] = $modifiedFields['old'][ $modifiedFieldId ]['label'];
@@ -936,6 +931,15 @@ class Plugin_ACF_Logger extends Logger {
 		return $context;
 	}
 
+	/**
+	 * Add diff to array.
+	 *
+	 * @param array  $post_data_diff Diff.
+	 * @param string $key Key.
+	 * @param string $old_value Old value.
+	 * @param string $new_value New value.
+	 * @return array
+	 */
 	public function add_diff( $post_data_diff, $key, $old_value, $new_value ) {
 		if ( $old_value != $new_value ) {
 			$post_data_diff[ $key ] = array(
@@ -973,7 +977,7 @@ class Plugin_ACF_Logger extends Logger {
 		$this->old_and_new_field_groups_and_fields['fieldGroup']['old'] = acf_get_field_group( $postarr['ID'] );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$this->old_and_new_field_groups_and_fields['fieldGroup']['new'] = acf_get_valid_field_group( $_POST['acf_field_group'] );
+		$this->old_and_new_field_groups_and_fields['fieldGroup']['new'] = acf_get_valid_field_group( sanitize_text_field( wp_unslash( $_POST['acf_field_group'] ) ) );
 
 		return $data;
 	}
@@ -982,6 +986,10 @@ class Plugin_ACF_Logger extends Logger {
 	 * ACF field group is saved
 	 * Called before ACF calls its save_post filter
 	 * Here we save the new fields values and also get the old values so we can compare
+	 *
+	 * @param string   $new_status New status.
+	 * @param string   $old_status Old status.
+	 * @param \WP_Post $post Post.
 	 */
 	public function on_transition_post_status( $new_status, $old_status, $post ) {
 		static $isCalled = false;
@@ -994,12 +1002,12 @@ class Plugin_ACF_Logger extends Logger {
 
 		$post_id = $post->ID;
 
-		// do not act if this is an auto save routine
+		// do not act if this is an auto save routine.
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
 		}
 
-		// bail early if not acf-field-group
+		// bail early if not acf-field-group.
 		if ( $post->post_type !== 'acf-field-group' ) {
 			return;
 		}
@@ -1009,15 +1017,15 @@ class Plugin_ACF_Logger extends Logger {
 			return;
 		}
 
-		// Store info about fields that are going to be deleted
+		// Store info about fields that are going to be deleted.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( ! empty( $_POST['_acf_delete_fields'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$deletedFieldsIDs = explode( '|', (string) $_POST['_acf_delete_fields'] );
+			$deletedFieldsIDs = explode( '|', (string) sanitize_text_field( wp_unslash( $_POST['_acf_delete_fields'] ) ) );
 			$deletedFieldsIDs = array_map( 'intval', $deletedFieldsIDs );
 
 			foreach ( $deletedFieldsIDs as $id ) {
-				if ( ! $id ) {
+				if ( $id === 0 ) {
 					continue;
 				}
 
@@ -1031,18 +1039,18 @@ class Plugin_ACF_Logger extends Logger {
 			}
 		}
 
-		// Store info about added or modified fields
+		// Store info about added or modified fields.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( ! empty( $_POST['acf_fields'] ) && is_array( $_POST['acf_fields'] ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			foreach ( $_POST['acf_fields'] as $oneFieldAddedOrUpdated ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			foreach ( wp_unslash( $_POST['acf_fields'] ) as $oneFieldAddedOrUpdated ) {
 				if ( empty( $oneFieldAddedOrUpdated['ID'] ) ) {
 					// New fields have no id
-					// 'ID' => string(0) ""
+					// 'ID' => string(0) "".
 					$this->old_and_new_field_groups_and_fields['addedFields'][] = $oneFieldAddedOrUpdated;
 				} else {
 					// Existing fields have an id
-					// 'ID' => string(3) "383"
+					// 'ID' => string(3) "383".
 					$this->old_and_new_field_groups_and_fields['modifiedFields']['old'][ $oneFieldAddedOrUpdated['ID'] ] = acf_get_field( $oneFieldAddedOrUpdated['ID'] );
 
 					$this->old_and_new_field_groups_and_fields['modifiedFields']['new'][ $oneFieldAddedOrUpdated['ID'] ] = $oneFieldAddedOrUpdated;
@@ -1053,22 +1061,20 @@ class Plugin_ACF_Logger extends Logger {
 		// We don't do anything else here, but we make the actual logging
 		// in filter 'acf/update_field_group' because it's safer because
 		// ACF has done it's validation and it's after ACF has saved the fields,
-		// so less likely that we make some critical error
+		// so less likely that we make some critical error.
 	}
-
 
 	/**
 	 * Add the post types that ACF uses for fields to the array of post types
 	 * that the default post logger should not log. If not each field will cause one
 	 * post update log message.
+	 *
+	 * @param array $skip_posttypes Array with post types to skip.
+	 * @return array Array with post types to skip.
 	 */
 	public function remove_acf_from_postlogger( $skip_posttypes ) {
-		array_push(
-			$skip_posttypes,
-			'acf-field'
-		);
+		$skip_posttypes[] = 'acf-field';
 
 		return $skip_posttypes;
 	}
 }
-

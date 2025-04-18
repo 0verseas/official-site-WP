@@ -36,6 +36,14 @@ class ElementsKit_Widget_Drop_Caps extends Widget_Base {
         return 'https://wpmet.com/doc/dropcaps/';
     }
 
+    protected function is_dynamic_content(): bool {
+        return false;
+    }
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
     protected function register_controls() {
 
 		$this->start_controls_section(

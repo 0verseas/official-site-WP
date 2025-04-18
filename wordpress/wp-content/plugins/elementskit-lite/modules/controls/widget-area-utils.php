@@ -19,6 +19,10 @@ class Widget_Area_Utils {
 		}
 
 		$post_id = isset($_POST['post_id']) ? intval( $_POST['post_id'] ) : 0;
+
+		if ( 'publish' !== get_post_status( $post_id ) ) {
+			wp_die();
+		}
 		
 		if ( isset( $post_id ) ) {
 			$elementor = \Elementor\Plugin::instance();
@@ -75,10 +79,10 @@ class Widget_Area_Utils {
 
 			if ( $isAjax === 'yes' ) {
 				$post_id = isset( $builder_post->ID ) ? $builder_post->ID : '';
-				echo '<div class="elementor-widget-container" data-ajax-post-id="' . esc_attr($post_id). '"></div>';
+				echo '<div class="ekit-widget-area-container" data-ajax-post-id="' . esc_attr($post_id). '"></div>';
 			} else {
 				?>
-					<div class="elementor-widget-container">
+					<div class="ekit-widget-area-container">
 					<?php
 					if ( isset( $builder_post->ID ) ) {
 						$builder_post_id = $builder_post->ID;
@@ -90,9 +94,14 @@ class Widget_Area_Utils {
 								$builder_post_id = apply_filters( 'wpml_object_id', $builder_post_id, 'elementskit_content', true, $language_details['language_code'] );
 							}
 						}
+						
+						$builder_content = $elementor->frontend->get_builder_content_for_display($builder_post_id);
+						$rendered_tab_content = \ElementsKit_Lite\Utils::render_tab_content($builder_content, $builder_post_id);
+						// Remove '#elementor' from the rendered content, except when it's part of 'href="#elementor"'
+						$final_content = preg_replace('/(?<!href=")#elementor/', '', $rendered_tab_content);
 
 						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --  Displaying with Elementor content rendering
-						echo str_replace( '#elementor', '', \ElementsKit_Lite\Utils::render_tab_content( $elementor->frontend->get_builder_content_for_display( $builder_post_id ), $builder_post_id ) );
+						echo $final_content;
 					} else {
                         echo esc_html__( 'Click on the Edit Content button to edit/add the content.', 'elementskit-lite' );
 					}

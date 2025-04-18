@@ -13,9 +13,9 @@ namespace RankMath\Analytics;
 use RankMath\Helper;
 use RankMath\Google\Api;
 use RankMath\Google\Console;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\DB as DB_Helper;
-use MyThemeShop\Database\Database;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\DB as DB_Helper;
+use RankMath\Admin\Database\Database;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,7 +29,7 @@ class DB {
 	 *
 	 * @param string $table_name Table name.
 	 *
-	 * @return \MyThemeShop\Database\Query_Builder
+	 * @return \RankMath\Admin\Database\Query_Builder
 	 */
 	public static function table( $table_name ) {
 		return Database::table( $table_name );
@@ -38,7 +38,7 @@ class DB {
 	/**
 	 * Get console data table.
 	 *
-	 * @return \MyThemeShop\Database\Query_Builder
+	 * @return \RankMath\Admin\Database\Query_Builder
 	 */
 	public static function analytics() {
 		return Database::table( 'rank_math_analytics_gsc' );
@@ -47,7 +47,7 @@ class DB {
 	/**
 	 * Get objects table.
 	 *
-	 * @return \MyThemeShop\Database\Query_Builder
+	 * @return \RankMath\Admin\Database\Query_Builder
 	 */
 	public static function objects() {
 		return Database::table( 'rank_math_analytics_objects' );
@@ -56,7 +56,7 @@ class DB {
 	/**
 	 * Get inspections table.
 	 *
-	 * @return \MyThemeShop\Database\Query_Builder
+	 * @return \RankMath\Admin\Database\Query_Builder
 	 */
 	public static function inspections() {
 		return Database::table( 'rank_math_analytics_inspections' );
@@ -144,7 +144,7 @@ class DB {
 			->selectCount( 'id' )
 			->getVar();
 
-		$size = $wpdb->get_var( 'SELECT SUM((data_length + index_length)) AS size FROM information_schema.TABLES WHERE table_schema="' . $wpdb->dbname . '" AND (table_name="' . $wpdb->prefix . 'rank_math_analytics_gsc")' ); // phpcs:ignore
+		$size = $wpdb->get_var( "SELECT SUM((data_length + index_length)) AS size FROM information_schema.TABLES WHERE table_schema='" . $wpdb->dbname . "' AND (table_name='" . $wpdb->prefix . "rank_math_analytics_gsc')" ); // phpcs:ignore
 		$data = compact( 'days', 'rows', 'size' );
 
 		$data = apply_filters( 'rank_math/analytics/analytics_tables_info', $data );
@@ -284,24 +284,22 @@ class DB {
 	 */
 	public static function get_inspection_defaults() {
 		$defaults = [
-			'created'                  => current_time( 'mysql' ),
-			'page'                     => '',
-			'index_verdict'            => 'VERDICT_UNSPECIFIED',
-			'indexing_state'           => 'INDEXING_STATE_UNSPECIFIED',
-			'coverage_state'           => '',
-			'page_fetch_state'         => 'PAGE_FETCH_STATE_UNSPECIFIED',
-			'robots_txt_state'         => 'ROBOTS_TXT_STATE_UNSPECIFIED',
-			'mobile_usability_verdict' => 'VERDICT_UNSPECIFIED',
-			'mobile_usability_issues'  => '',
-			'rich_results_verdict'     => 'VERDICT_UNSPECIFIED',
-			'rich_results_items'       => '',
-			'last_crawl_time'          => '',
-			'crawled_as'               => 'CRAWLING_USER_AGENT_UNSPECIFIED',
-			'google_canonical'         => '',
-			'user_canonical'           => '',
-			'sitemap'                  => '',
-			'referring_urls'           => '',
-			'raw_api_response'         => '',
+			'created'              => current_time( 'mysql' ),
+			'page'                 => '',
+			'index_verdict'        => 'VERDICT_UNSPECIFIED',
+			'indexing_state'       => 'INDEXING_STATE_UNSPECIFIED',
+			'coverage_state'       => '',
+			'page_fetch_state'     => 'PAGE_FETCH_STATE_UNSPECIFIED',
+			'robots_txt_state'     => 'ROBOTS_TXT_STATE_UNSPECIFIED',
+			'rich_results_verdict' => 'VERDICT_UNSPECIFIED',
+			'rich_results_items'   => '',
+			'last_crawl_time'      => '',
+			'crawled_as'           => 'CRAWLING_USER_AGENT_UNSPECIFIED',
+			'google_canonical'     => '',
+			'user_canonical'       => '',
+			'sitemap'              => '',
+			'referring_urls'       => '',
+			'raw_api_response'     => '',
 		];
 
 		return apply_filters( 'rank_math/analytics/inspection_defaults', $defaults );
@@ -397,7 +395,7 @@ class DB {
 
 			$data[] = $date;
 			$data[] = $row['query'];
-			$data[] = Stats::get_relative_url( self::remove_hash( $row['page'] ) );
+			$data[] = str_replace( Helper::get_home_url(), '', self::remove_hash( urldecode( $row['page'] ) ) );
 			$data[] = $row['clicks'];
 			$data[] = $row['impressions'];
 			$data[] = $row['position'];

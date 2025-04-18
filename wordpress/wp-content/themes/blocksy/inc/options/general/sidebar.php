@@ -66,13 +66,14 @@ $options = [
 						'value' => '4%',
 						'divider' => 'top',
 						'units' => blocksy_units_config([
-							[ 'unit' => '%', 'min' => 0, 'max' => 50 ],
-							[ 'unit' => 'px', 'min' => 0, 'max' => 600 ],
-							[ 'unit' => 'pt', 'min' => 0, 'max' => 500 ],
-							[ 'unit' => 'em', 'min' => 0, 'max' => 100 ],
-							[ 'unit' => 'rem', 'min' => 0, 'max' => 100 ],
-							[ 'unit' => 'vw', 'min' => 0, 'max' => 50 ],
-							[ 'unit' => 'vh', 'min' => 0, 'max' => 50 ],
+							['unit' => '%', 'min' => 0, 'max' => 50],
+							['unit' => 'px', 'min' => 0, 'max' => 600],
+							['unit' => 'pt', 'min' => 0, 'max' => 500],
+							['unit' => 'em', 'min' => 0, 'max' => 100],
+							['unit' => 'rem', 'min' => 0, 'max' => 100],
+							['unit' => 'vw', 'min' => 0, 'max' => 50],
+							['unit' => 'vh', 'min' => 0, 'max' => 50],
+							['unit' => '', 'type' => 'custom'],
 						]),
 						'setting' => [ 'transport' => 'postMessage' ],
 					],
@@ -115,8 +116,12 @@ $options = [
 
 					'widgets_title_wrapper' => [
 						'label' => __( 'Widget Title Tag', 'blocksy' ),
-						'type' => 'ct-select',
-						'value' => 'h2',
+						'type' => (
+							function_exists('wp_use_widgets_block_editor')
+							&&
+							wp_use_widgets_block_editor()
+						) ? 'hidden' : 'ct-select',
+						'value' => 'h3',
 						'view' => 'text',
 						'design' => 'inline',
 						'divider' => 'top',
@@ -231,13 +236,11 @@ $options = [
 						'type' => 'ct-visibility',
 						'design' => 'block',
 						'setting' => [ 'transport' => 'postMessage' ],
-
-						'value' => [
+						'value' => blocksy_default_responsive_value([
 							'desktop' => true,
 							'tablet' => false,
 							'mobile' => false,
-						],
-
+						]),
 						'choices' => blocksy_ordered_keys([
 							'desktop' => __( 'Desktop', 'blocksy' ),
 							'tablet' => __( 'Tablet', 'blocksy' ),
@@ -271,7 +274,7 @@ $options = [
 						'type' => 'ct-typography',
 						'label' => __( 'Widgets Title Font', 'blocksy' ),
 						'value' => blocksy_typography_default_values([
-							'size' => '18px',
+							'size' => '20px',
 						]),
 						'setting' => [ 'transport' => 'postMessage' ],
 					],
@@ -282,7 +285,7 @@ $options = [
 						'design' => 'block:right',
 						'responsive' => true,
 						'setting' => [ 'transport' => 'postMessage' ],
-
+						// 'desc' => __( 'Please note, these options will work only with legacy widgets.', 'blocksy' ),
 						'value' => [
 							'default' => [
 								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
@@ -294,27 +297,27 @@ $options = [
 								'title' => __( 'Initial', 'blocksy' ),
 								'id' => 'default',
 								'inherit' => [
-									'var(--heading-1-color, var(--headings-color))' => [
+									'var(--theme-heading-1-color, var(--theme-headings-color))' => [
 										'widgets_title_wrapper' => 'h1'
 									],
 
-									'var(--heading-2-color, var(--headings-color))' => [
+									'var(--theme-heading-2-color, var(--theme-headings-color))' => [
 										'widgets_title_wrapper' => 'h2'
 									],
 
-									'var(--heading-3-color, var(--headings-color))' => [
+									'var(--theme-heading-3-color, var(--theme-headings-color))' => [
 										'widgets_title_wrapper' => 'h3'
 									],
 
-									'var(--heading-4-color, var(--headings-color))' => [
+									'var(--theme-heading-4-color, var(--theme-headings-color))' => [
 										'widgets_title_wrapper' => 'h4'
 									],
 
-									'var(--heading-5-color, var(--headings-color))' => [
+									'var(--theme-heading-5-color, var(--theme-headings-color))' => [
 										'widgets_title_wrapper' => 'h5'
 									],
 
-									'var(--heading-6-color, var(--headings-color))' => [
+									'var(--theme-heading-6-color, var(--theme-headings-color))' => [
 										'widgets_title_wrapper' => 'h6'
 									]
 								]
@@ -336,6 +339,7 @@ $options = [
 						'label' => __( 'Widgets Font Color', 'blocksy' ),
 						'type'  => 'ct-color-picker',
 						'design' => 'block:right',
+						'divider' => 'bottom:full',
 						'responsive' => true,
 						'setting' => [ 'transport' => 'postMessage' ],
 						'value' => [
@@ -344,7 +348,7 @@ $options = [
 							],
 
 							'link_initial' => [
-								'color' => 'var(--color)',
+								'color' => 'var(--theme-text-color)',
 							],
 
 							'link_hover' => [
@@ -356,7 +360,7 @@ $options = [
 							[
 								'title' => __( 'Text Initial', 'blocksy' ),
 								'id' => 'default',
-								'inherit' => 'var(--color)'
+								'inherit' => 'var(--theme-text-color)'
 							],
 
 							[
@@ -367,13 +371,9 @@ $options = [
 							[
 								'title' => __( 'Link Hover', 'blocksy' ),
 								'id' => 'link_hover',
-								'inherit' => 'var(--linkHoverColor)'
+								'inherit' => 'var(--theme-link-hover-color)'
 							],
 						],
-					],
-
-					blocksy_rand_md5() => [
-						'type' => 'ct-divider',
 					],
 
 					blocksy_rand_md5() => [
@@ -397,7 +397,7 @@ $options = [
 									[
 										'title' => __( 'Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--paletteColor8)'
+										'inherit' => 'var(--theme-palette-color-8)'
 									],
 								],
 							],
@@ -481,9 +481,8 @@ $options = [
 								'type' => 'ct-spacing',
 								'divider' => 'top',
 								'setting' => [ 'transport' => 'postMessage' ],
-								'value' => blocksy_spacing_value([
-									'linked' => true,
-								]),
+								'value' => blocksy_spacing_value(),
+								'min' => 0,
 								'responsive' => true
 							],
 

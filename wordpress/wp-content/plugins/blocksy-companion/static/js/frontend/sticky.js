@@ -64,6 +64,7 @@ if (window.wp && wp.customize && wp.customize.selectiveRefresh) {
 			if (shouldSkipNext) {
 				return
 			}
+
 			shouldSkipNext = true
 			setTimeout(() => {
 				clearCache()
@@ -120,7 +121,7 @@ const getStartPositionFor = (stickyContainer) => {
 
 	maybeDynamicOffset =
 		maybeDynamicOffset +
-		(parseFloat(bodyComp.getPropertyValue('--frame-size')) || 0)
+		(parseFloat(bodyComp.getPropertyValue('--theme-frame-size')) || 0)
 
 	if (
 		row.parentNode.children.length === 1 ||

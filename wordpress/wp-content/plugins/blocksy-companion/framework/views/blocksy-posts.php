@@ -17,7 +17,8 @@ $query_args = [
 	'orderby' => $args['orderby'],
 	'posts_per_page' => $args['limit'],
 	'ignore_sticky_posts' => $args['ignore_sticky_posts'] === 'yes',
-	'post_status' => 'publish'
+	'post_status' => 'publish',
+	'blocksy_posts_shortcode' => true
 ];
 
 if (! empty($args['meta_value'])) {
@@ -158,12 +159,25 @@ if ($args['view'] === 'slider') {
 		$slider_args['autoplay'] = intval($args['slider_autoplay']);
 	}
 
+	$pills_container_attr = [
+		'data-flexy' => 'no'
+	];
+
+	if (count($images) <= 4) {
+		$pills_container_attr['data-flexy'] .= ':paused';
+	}
+
 	echo blocksy_flexy(array_merge([
 		'class' => $shortcode_class,
 		'images' => $images,
+		'pills_container_attr' => $pills_container_attr,
 		'slide_image_args' => function ($index, $args) use ($posts_to_render) {
 			$post = $posts_to_render[$index];
 			$args['html_atts']['href'] = get_permalink($post);
+
+			unset($args['html_atts']['data-src']);
+
+			$args['tag_name'] = 'a';
 
 			return $args;
 		},
@@ -194,18 +208,34 @@ if ($args['view'] === 'slider') {
 		blc_cpt_extra_filtering_output([
 			'prefix' => $prefix,
 			'post_type' => $preferred_post_type,
-			'links_strategy' => 'current_page'
+			'links_strategy' => 'current_page',
+			'term_ids' => $args['term_ids'] ? $args['term_ids'] : [],
+			'exclude_term_ids' => $args['exclude_term_ids'] ? $args['exclude_term_ids'] : [],
+			'use_children_tax_ids' => $args['filtering_use_children_tax_ids'] === 'yes'
 		]);
 	}
+
+	global $wp_query;
+
+	$previous_query = $wp_query;
+
+	$wp_query = $query;
 
 	echo blocksy_render_archive_cards([
 		'prefix' => $prefix,
 		'query' => $query,
+		'has_slideshow' => $args['has_slideshow'] === 'yes',
+		'has_slideshow_arrows' => $args['has_slideshow_arrows'] === 'yes',
+		'has_slideshow_autoplay' => $args['has_slideshow_autoplay'] === 'yes',
+		'has_slideshow_autoplay_speed' => $args['has_slideshow_autoplay_speed'],
 		'has_pagination' => $args['has_pagination'] === 'yes'
 	]);
+
+	$wp_query = $previous_query;
 
 	wp_reset_postdata();
 
 	echo '</div>';
 }
+
 

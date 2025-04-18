@@ -8,7 +8,7 @@ const CustomizerResetOptions = ({ value, option, onChange }) => {
 	return (
 		<Fragment>
 			<button
-				className="button"
+				className="button-primary"
 				style={{ width: '100%' }}
 				onClick={(e) => {
 					e.preventDefault()
@@ -57,8 +57,7 @@ const CustomizerResetOptions = ({ value, option, onChange }) => {
 										{
 											wp_customize: 'on',
 											action: 'ct_customizer_reset',
-											nonce:
-												ct_customizer_localizations.customizer_reset_none,
+											nonce: ct_customizer_localizations.customizer_reset_none,
 										},
 										() => {
 											wp.customize

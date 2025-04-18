@@ -12,8 +12,7 @@ namespace RankMath\SEO_Analysis;
 
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
-use MyThemeShop\Helpers\Conditional;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -35,7 +34,7 @@ class SEO_Analysis {
 	 * The Constructor.
 	 */
 	public function __construct() {
-		if ( Conditional::is_heartbeat() ) {
+		if ( Helper::is_heartbeat() ) {
 			return;
 		}
 
@@ -46,8 +45,6 @@ class SEO_Analysis {
 		if ( Helper::has_cap( 'rank_math_site_analysis' ) ) {
 			$this->action( 'rank_math/admin_bar/items', 'admin_bar_items', 11 );
 		}
-
-		$this->filter( 'rank_math/seo_analysis/admin_tab_view', 'add_tab_previews', 10, 2 );
 	}
 
 	/**
@@ -91,7 +88,7 @@ class SEO_Analysis {
 	 */
 	public function add_tab_previews( $file, $current_tab ) {
 		if ( 'competitor_analyzer' === $current_tab ) {
-			$file = dirname( __FILE__ ) . '/views/competitor-analysis.php';
+			$file = __DIR__ . '/views/competitor-analysis.php';
 		}
 
 		return $file;

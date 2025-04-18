@@ -11,7 +11,7 @@ use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Text_Shadow;
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 
 defined( 'ABSPATH' ) || die();
 
@@ -46,6 +46,10 @@ class Step_Flow extends Base {
 
 	public function get_keywords() {
 		return [ 'step', 'flow' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	/**
@@ -432,7 +436,9 @@ class Step_Flow extends Base {
 			[
 				'name' => 'badge_typography',
 				'selector' => '{{WRAPPER}} .ha-steps-label',
-				'scheme' => Typography::TYPOGRAPHY_4,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_ACCENT,
+				],
 				'condition' => [
 					'badge!' => '',
 				],
@@ -524,7 +530,9 @@ class Step_Flow extends Base {
 			[
 				'name' => 'title_typography',
 				'selector' => '{{WRAPPER}} .ha-steps-title',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 
@@ -561,7 +569,9 @@ class Step_Flow extends Base {
 			[
 				'name' => 'description_typography',
 				'selector' => '{{WRAPPER}} .ha-step-description',
-				'scheme' => Typography::TYPOGRAPHY_3,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 

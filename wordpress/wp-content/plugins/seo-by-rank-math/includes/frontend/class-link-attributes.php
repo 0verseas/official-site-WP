@@ -12,9 +12,9 @@ namespace RankMath\Frontend;
 
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\Url;
-use MyThemeShop\Helpers\HTML;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Url;
+use RankMath\Helpers\HTML;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -111,7 +111,12 @@ class Link_Attributes {
 	 * @return string
 	 */
 	public function add_link_attributes( $content ) {
-		preg_match_all( '/<(a\s[^>]+)>/', $content, $matches );
+		// Early bail if content is empty.
+		if ( empty( $content ) ) {
+			return $content;
+		}
+		$stripped_content = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $content );
+		preg_match_all( '/<(a\s[^>]+)>/', $stripped_content, $matches );
 		if ( empty( $matches ) || empty( $matches[0] ) ) {
 			return $content;
 		}
@@ -218,7 +223,7 @@ class Link_Attributes {
 			return $attrs;
 		}
 
-		if ( $this->should_add_nofollow( $attrs['href'] ) ) {
+		if ( $this->do_filter( 'nofollow/url', $this->should_add_nofollow( $attrs['href'] ), $attrs['href'] ) ) {
 			if ( $this->nofollow_link || ( $this->nofollow_image && $this->is_valid_image( $attrs['href'] ) ) ) {
 				$this->is_dirty = true;
 				$this->set_rel_attribute( $attrs, 'nofollow', ( isset( $attrs['rel'] ) && ! Str::contains( 'dofollow', $attrs['rel'] ) && ! Str::contains( 'nofollow', $attrs['rel'] ) ) );
@@ -291,7 +296,7 @@ class Link_Attributes {
 
 		// Strip off www. prefixes.
 		$domains = array_map(
-			function( $domain ) {
+			function ( $domain ) {
 				$domain = preg_replace( '#^http(s)?://#', '', trim( $domain, '/' ) );
 				return preg_replace( '/^www\./', '', $domain );
 			},

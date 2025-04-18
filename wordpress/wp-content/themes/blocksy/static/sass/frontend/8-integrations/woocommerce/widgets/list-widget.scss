@@ -1,14 +1,11 @@
 .product_list_widget {
+
 	li {
 		display: grid;
-		grid-template-columns: 25% 1fr;
+		grid-template-columns: 20% 1fr;
 		grid-column-gap: 20px;
 		align-items: center;
-		margin-bottom: 20px;
-	}
-
-	.ct-image-container {
-		align-self: flex-start;
+		margin-bottom: var(--mini-cart-items-spacing, 20px);
 	}
 
 	.product-data {
@@ -49,18 +46,21 @@
 
 	// product quantity
 	.ct-product-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
 		margin-top: 0.7em;
 	}
 
 	.quantity {
-		--quantity-height: 40px;
+		--quantity-height: 35px;
 	}
 
 	.quantity[data-type="type-1"] {
-		--quantity-width: 70px;
+		--quantity-width: 60px;
 	}
 
 	.quantity[data-type="type-2"] {
-		--quantity-width: 100px;
+		--quantity-width: 80px;
 	}
 }

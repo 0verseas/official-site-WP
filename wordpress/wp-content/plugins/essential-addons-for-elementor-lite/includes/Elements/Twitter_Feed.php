@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 
 use \Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use \Elementor\Group_Control_Border;
 use \Elementor\Group_Control_Box_Shadow;
 use \Elementor\Group_Control_Typography;
@@ -26,7 +27,7 @@ class Twitter_Feed extends Widget_Base
 
     public function get_title()
     {
-        return esc_html__('Twitter Feed', 'essential-addons-for-elementor-lite');
+        return esc_html__('X (Twitter) Feed', 'essential-addons-for-elementor-lite');
     }
 
     public function get_icon()
@@ -43,17 +44,27 @@ class Twitter_Feed extends Widget_Base
     {
         return [
             'twitter',
+            'x',
             'ea twitter feed',
+            'ea x feed',
             'ea twitter gallery',
+            'ea x gallery',
             'social media',
             'twitter embed',
+            'x embed',
             'twitter feed',
+            'x feed',
             'twitter marketing',
+            'x marketing',
             'tweet feed',
             'tweet embed',
             'ea',
             'essential addons',
         ];
+    }
+
+    public function has_widget_inner_wrapper(): bool {
+        return ! Helper::eael_e_optimized_markup();
     }
 
     public function get_custom_help_url()
@@ -86,6 +97,18 @@ class Twitter_Feed extends Widget_Base
         );
 
         $this->add_control(
+		    'eael_twitter_api_v2',
+		    [
+			    'label'        => esc_html__( 'Twitter API V2', 'essential-addons-for-elementor-lite' ),
+			    'type'         => Controls_Manager::SWITCHER,
+			    'label_on'     => __( 'Yes', 'essential-addons-for-elementor-lite' ),
+			    'label_off'    => __( 'No', 'essential-addons-for-elementor-lite' ),
+			    'default'      => '',
+			    'return_value' => 'yes',
+		    ]
+	    );
+
+        $this->add_control(
             'eael_twitter_feed_ac_name',
             [
                 'label' => esc_html__('Account Name', 'essential-addons-for-elementor-lite'),
@@ -94,6 +117,9 @@ class Twitter_Feed extends Widget_Base
                 'default' => '@wpdevteam',
                 'label_block' => false,
                 'description' => esc_html__('Use @ sign with your account name.', 'essential-addons-for-elementor-lite'),
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -105,6 +131,9 @@ class Twitter_Feed extends Widget_Base
                 'dynamic'     => [ 'active' => true ],
                 'label_block' => false,
                 'description' => esc_html__('Remove # sign from your hashtag name.', 'essential-addons-for-elementor-lite'),
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -116,6 +145,12 @@ class Twitter_Feed extends Widget_Base
                 'label_block' => false,
                 'default' => '',
                 'description' => '<a href="https://developer.twitter.com/en/portal/dashboard" target="_blank">Get Consumer Key.</a> Create a new app or select existing app and grab the <b>consumer key.</b>',
+                'ai' => [
+					'active' => false,
+				],
+                'condition'   => [
+				    'eael_twitter_api_v2' => ''
+			    ]
             ]
         );
 
@@ -127,6 +162,29 @@ class Twitter_Feed extends Widget_Base
                 'label_block' => false,
                 'default' => '',
                 'description' => '<a href="https://developer.twitter.com/en/portal/dashboard" target="_blank">Get Consumer Secret.</a> Create a new app or select existing app and grab the <b>consumer secret.</b>',
+                'ai' => [
+					'active' => false,
+				],
+                'condition'   => [
+				    'eael_twitter_api_v2' => ''
+			    ]
+            ]
+        );
+
+        $this->add_control(
+            'eael_twitter_feed_bearer_token',
+            [
+                'label' => esc_html__('Bearer Token', 'essential-addons-for-elementor-lite'),
+                'type' => Controls_Manager::TEXT,
+                'label_block' => false,
+                'default' => '',
+                'description' => '<a href="https://developer.twitter.com/en/portal/dashboard" target="_blank">Get Bearer Token.</a> Create a new app or select existing app within a project and grab the <b>bearer token.</b>',
+                'ai' => [
+					'active' => false,
+				],
+                'condition'   => [
+				    'eael_twitter_api_v2' => 'yes'
+			    ]
             ]
         );
 
@@ -314,7 +372,10 @@ class Twitter_Feed extends Widget_Base
                 'default' => __('Read More', 'essential-addons-for-elementor-lite'),
 	            'condition' => [
 	            	'eael_twitter_feed_show_read_more' => 'true',
-	            ]
+                ],
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -407,6 +468,9 @@ class Twitter_Feed extends Widget_Base
                 'condition' => [
                     'pagination' => 'yes',
                 ],
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
         
@@ -420,6 +484,9 @@ class Twitter_Feed extends Widget_Base
                 'condition' => [
                     'pagination' => 'yes',
                 ],
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
         
@@ -433,6 +500,9 @@ class Twitter_Feed extends Widget_Base
                 'condition' => [
                     'pagination' => 'yes',
                 ],
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
         
@@ -1137,9 +1207,8 @@ class Twitter_Feed extends Widget_Base
             [
                 'label' => __('Color', 'essential-addons-for-elementor-lite'),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'scheme' => [
-                    'type' => \Elementor\Core\Schemes\Color::get_type(),
-                    'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+                'global' => [
+	                'default' => Global_Colors::COLOR_PRIMARY
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .eael-twitter-feed-item .eael-twitter-feed-item-icon' => 'color: {{VALUE}}',
@@ -1476,7 +1545,7 @@ class Twitter_Feed extends Widget_Base
         
         if ($settings['pagination'] == 'yes' && self::$twitter_feed_fetched_count > $post_per_page ) { ?>
             <div class="eael-twitter-feed-loadmore-wrap">
-                <a href="#" <?php echo $this->get_render_attribute_string('load-more-button'); ?>>
+                <a href="#" <?php $this->print_render_attribute_string('load-more-button'); ?>>
                     <span class="eael-btn-loader"></span>
                     <?php if ($settings['button_icon_position'] == 'before') { ?>
                         <?php if ($icon_is_new || $icon_migrated) { ?>
@@ -1490,7 +1559,7 @@ class Twitter_Feed extends Widget_Base
                         <?php } ?>
                     <?php } ?>
                     <span class="eael-twitter-feed-load-more-text">
-                        <?php echo Helper::eael_wp_kses($settings['load_more_text']); ?>
+                        <?php echo wp_kses( $settings['load_more_text'], Helper::eael_allowed_tags() ); ?>
                     </span>
                     <?php if ($settings['button_icon_position'] == 'after') { ?>
                         <?php if ($icon_is_new || $icon_migrated) { ?>
@@ -1533,35 +1602,39 @@ class Twitter_Feed extends Widget_Base
 
         ?> 
         <div>
-            <div <?php echo $this->get_render_attribute_string('twitter-feed-wrap') ?> >
-                <?php echo $this->twitter_feed_render_items($this->get_id(), $settings) ?>
+            <div <?php $this->print_render_attribute_string('twitter-feed-wrap') ?> >
+                <?php 
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo $this->twitter_feed_render_items($this->get_id(), $settings) ?>
             </div>
             <div class="clearfix">
-                <?php echo $this->render_loadmore_button() ?>
+                <?php 
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo $this->render_loadmore_button() ?>
             </div>
         </div>
 
         <?php 
         echo '<style>
-            .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-masonry.eael-twitter-feed-col-2 .eael-twitter-feed-item {
-                width: calc(50% - ' . ceil($feedcolumnspacing / 2) . 'px);
+            .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-masonry.eael-twitter-feed-col-2 .eael-twitter-feed-item {
+                width: calc(50% - ' . esc_html( ceil($feedcolumnspacing / 2) ) . 'px);
             }
-            .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-masonry.eael-twitter-feed-col-3 .eael-twitter-feed-item {
-                width: calc(33.33% - ' . ceil($settings['eael_twitter_feed_column_spacing']['size'] * 2 / 3) . 'px);
+            .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-masonry.eael-twitter-feed-col-3 .eael-twitter-feed-item {
+                width: calc(33.33% - ' . esc_html( ceil($settings['eael_twitter_feed_column_spacing']['size'] * 2 / 3) ) . 'px);
             }
-            .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-masonry.eael-twitter-feed-col-4 .eael-twitter-feed-item {
-                width: calc(25% - ' . ceil($feedcolumnspacing * 3 / 4) . 'px);
+            .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-masonry.eael-twitter-feed-col-4 .eael-twitter-feed-item {
+                width: calc(25% - ' . esc_html( ceil($feedcolumnspacing * 3 / 4) ) . 'px);
             }
 
-            .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-col-2 .eael-twitter-feed-item,
-            .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-col-3 .eael-twitter-feed-item,
-            .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-col-4 .eael-twitter-feed-item {
-                margin-bottom: ' . $settings['eael_twitter_feed_column_spacing']['size'] . 'px;
+            .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-col-2 .eael-twitter-feed-item,
+            .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-col-3 .eael-twitter-feed-item,
+            .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-col-4 .eael-twitter-feed-item {
+                margin-bottom: ' . esc_html( $settings['eael_twitter_feed_column_spacing']['size'] ) . 'px;
             }
             @media only screen and (min-width: 768px) and (max-width: 992px) {
-                .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-masonry.eael-twitter-feed-col-3 .eael-twitter-feed-item,
-                .eael-twitter-feed-' . $this->get_id() . '.eael-twitter-feed-masonry.eael-twitter-feed-col-4 .eael-twitter-feed-item {
-                    width: calc(50% - ' . ceil($feedcolumnspacing / 2) . 'px);
+                .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-masonry.eael-twitter-feed-col-3 .eael-twitter-feed-item,
+                .eael-twitter-feed-' . esc_html( $this->get_id() ) . '.eael-twitter-feed-masonry.eael-twitter-feed-col-4 .eael-twitter-feed-item {
+                    width: calc(50% - ' . esc_html( ceil($feedcolumnspacing / 2) ) . 'px);
                 }
             }
         </style>';
@@ -1569,7 +1642,7 @@ class Twitter_Feed extends Widget_Base
             echo '<script type="text/javascript">
                 jQuery(document).ready(function($) {
                     $(".eael-twitter-feed").each(function() {
-                        var $node_id = "' . $this->get_id() . '",
+                        var $node_id = "' . esc_js( $this->get_id() ) . '",
                         $scope = $(".elementor-element-"+$node_id+""),
                         $gutter = $(".eael-twitter-feed", $scope).data("gutter"),
                         $settings = {

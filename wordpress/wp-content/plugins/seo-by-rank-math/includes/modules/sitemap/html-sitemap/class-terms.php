@@ -12,7 +12,7 @@ namespace RankMath\Sitemap\Html;
 
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Database\Database;
+use RankMath\Admin\Database\Database;
 use RankMath\Sitemap\Sitemap as SitemapBase;
 
 defined( 'ABSPATH' ) || exit;
@@ -27,12 +27,12 @@ class Terms {
 	/**
 	 * Get all terms from a given taxonomy.
 	 *
-	 * @param string $taxonomy Taxonomy name.
-	 * @param int    $parent   Parent term ID.
+	 * @param string $taxonomy    Taxonomy name.
+	 * @param int    $parent_term Parent term ID.
 	 *
 	 * @return array
 	 */
-	private function get_terms( $taxonomy, $parent = 0 ) {
+	private function get_terms( $taxonomy, $parent_term = 0 ) {
 		$sort_map = [
 			'published'    => [
 				'field' => 'term_id',
@@ -74,7 +74,7 @@ class Terms {
 		$query = $terms_table->where( 'taxonomy', $taxonomy )
 			->select( [ $terms_table->table . '.term_id', 'name', 'slug', 'taxonomy' ] )
 			->leftJoin( $tt_table->table, $terms_table->table . '.term_id', $tt_table->table . '.term_id' )
-			->where( 'parent', $parent );
+			->where( 'parent', $parent_term );
 
 		if ( ! empty( $exclude ) ) {
 			$query->whereNotIn( $terms_table->table . '.term_id', $exclude );
@@ -82,12 +82,7 @@ class Terms {
 
 		$terms = $query->orderBy( $sort['field'], $sort['order'] )->get();
 
-		return array_filter(
-			$terms,
-			function( $term ) use ( $taxonomy ) {
-				return SitemapBase::is_object_indexable( get_term( $term->term_id, $taxonomy ), 'term' );
-			}
-		);
+		return $this->get_indexable_terms( $terms, $taxonomy );
 	}
 
 	/**
@@ -100,7 +95,9 @@ class Terms {
 	 * @return string
 	 */
 	public function generate_sitemap( $taxonomy, $show_dates, $args = [] ) {
-		$terms = get_terms( $taxonomy, $args );
+		$args['taxonomy'] = $taxonomy;
+		$terms            = get_terms( $args );
+		$terms            = $this->get_indexable_terms( $terms, $taxonomy );
 		if ( empty( $terms ) ) {
 			return '';
 		}
@@ -178,8 +175,7 @@ class Terms {
 			$output[] = '<li class="rank-math-html-sitemap__item">'
 							. '<a href="' . esc_url( $this->get_term_link( (int) $term->term_id, $taxonomy ) ) . '" class="rank-math-html-sitemap__link">'
 							. esc_html( $this->get_term_title( $term, $taxonomy ) )
-							. '</a>'
-						. '</li>';
+							. '</a>';
 
 			$children = $this->get_terms( $taxonomy, $term->term_id );
 
@@ -188,6 +184,7 @@ class Terms {
 				$output[] = $this->generate_terms_list_hierarchical( $children, $taxonomy, false );
 				$output[] = '</ul>';
 			}
+			$output[] = '</li>';
 		}
 
 		return implode( '', $output );
@@ -240,19 +237,35 @@ class Terms {
 	}
 
 	/**
-	 * Removes terms that have a parent from the list.
+	 * Removes terms that have a parent (and the parent is available in the list) from the list.
 	 *
 	 * @param array $terms The terms list.
 	 *
 	 * @return array
 	 */
 	private function remove_with_parent( $terms ) {
+		$term_ids = array_column( $terms, 'term_id' );
 		return array_filter(
 			$terms,
-			function ( $term ) {
-				return ! $term->parent;
+			function ( $term ) use ( $term_ids ) {
+				return ! $term->parent || ! in_array( $term->parent, $term_ids, true );
 			}
 		);
 	}
 
+	/**
+	 * Remove terms that are not indexable.
+	 *
+	 * @param array  $terms    Array of terms.
+	 * @param string $taxonomy Taxonomy name that `$terms` are part of.
+	 * @return array
+	 */
+	private function get_indexable_terms( $terms, $taxonomy ) {
+		return array_filter(
+			$terms,
+			function ( $term ) use ( $taxonomy ) {
+				return SitemapBase::is_object_indexable( get_term( $term->term_id, $taxonomy ), 'term' );
+			}
+		);
+	}
 }

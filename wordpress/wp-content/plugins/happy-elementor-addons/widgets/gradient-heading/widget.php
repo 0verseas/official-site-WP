@@ -9,8 +9,8 @@ namespace Happy_Addons\Elementor\Widget;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Text_Shadow;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
 use Happy_Addons\Elementor\Controls\Group_Control_Foreground;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 
 defined( 'ABSPATH' ) || die();
 
@@ -46,6 +46,10 @@ class Gradient_Heading extends Base {
 
 	public function get_keywords() {
 		return [ 'gradient', 'advanced', 'heading', 'title', 'colorful' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	/**
@@ -182,7 +186,9 @@ class Gradient_Heading extends Base {
 			[
 				'name' => 'title',
 				'selector' => '{{WRAPPER}} .ha-gradient-heading',
-				'scheme' => Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 			]
 		);
 
@@ -219,6 +225,8 @@ class Gradient_Heading extends Base {
 					'{{WRAPPER}} .ha-gradient-heading' => 'mix-blend-mode: {{VALUE}};',
 				],
 				'separator' => 'none',
+				'frontend_available' => true,
+				'control_type' => 'content',
 			]
 		);
 
@@ -252,12 +260,28 @@ class Gradient_Heading extends Base {
 	public function content_template() {
 		?>
 		<#
+		function HA_gradient_heading_sanitizeURL(url) {
+			// Define a regex pattern to match valid URLs with http, https, or ftp protocols
+			const urlPattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+
+			// Test if the URL matches the pattern
+			if (urlPattern.test(url)) {
+			// Encode potentially unsafe characters in the URL
+			const sanitizedURL = url.replace(/[^\w-._~:/?#[\]@!$&'()*+,;=%]/g, encodeURIComponent);
+			return sanitizedURL;
+			} else {
+			return '';
+			}
+		}
 		view.addInlineEditingAttributes( 'title', 'basic' );
 		view.addRenderAttribute( 'title', 'class', 'ha-gradient-heading' );
+		console.log( HA_gradient_heading_sanitizeURL( settings.link.url ) );
 
-		var title = _.isEmpty(settings.link.url) ? settings.title : '<a href="'+settings.link.url+'">'+settings.title+'</a>';
+		<!-- var title = _.isEmpty(settings.link.url) ? settings.title : '<a href="' + _.escape( settings.link.url ) + '">'+settings.title+'</a>'; -->
+		var title = _.isEmpty(settings.link.url) ? settings.title : '<a href="' + HA_gradient_heading_sanitizeURL( settings.link.url ) + '">'+settings.title+'</a>';
+		var title_tag = elementor.helpers.validateHTMLTag( settings.title_tag );
 		#>
-		<{{ settings.title_tag }} {{{ view.getRenderAttributeString( 'title' ) }}}>{{{ title }}}</{{ settings.title_tag }}>
+		<{{ title_tag }} {{{ view.getRenderAttributeString( 'title' ) }}}>{{{ title }}}</{{ title_tag }}>
 		<?php
 	}
 }

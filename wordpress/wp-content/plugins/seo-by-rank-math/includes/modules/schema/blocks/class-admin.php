@@ -12,7 +12,7 @@ namespace RankMath\Schema\Blocks;
 
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Arr;
+use RankMath\Helpers\Arr;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,7 +45,7 @@ class Admin {
 					'icon'  => 'rm-icon rm-icon-stories',
 					'title' => esc_html__( 'Blocks', 'rank-math' ),
 					'desc'  => esc_html__( 'Take control over the default settings available for Rank Math Blocks.', 'rank-math' ),
-					'file'  => dirname( __FILE__ ) . '/views/options-general.php',
+					'file'  => __DIR__ . '/views/options-general.php',
 				],
 			],
 			7

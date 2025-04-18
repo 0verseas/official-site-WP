@@ -4,11 +4,13 @@ import Tabs from './containers/Tabs'
 import Group from './containers/Group'
 import LabeledGroup from './containers/LabeledGroup'
 import HasMetaCategoryButton from './containers/ct-has-meta-category-button'
+import Accordion from './containers/Accordion'
 
 const GenericContainerType = ({
 	value,
 	renderingChunk,
 	onChange,
+	onChangeMultiple,
 	parentValue,
 	purpose,
 	hasRevertButton,
@@ -27,6 +29,10 @@ const GenericContainerType = ({
 		Container = Tabs
 	}
 
+	if (renderingChunk[0].type === 'accordion') {
+		Container = Accordion
+	}
+
 	if (renderingChunk[0].type === 'ct-group') {
 		Container = Group
 	}
@@ -40,6 +46,7 @@ const GenericContainerType = ({
 			<Container
 				purpose={purpose}
 				onChange={onChange}
+				onChangeMultiple={onChangeMultiple}
 				value={value}
 				renderingChunk={renderingChunk}
 				hasRevertButton={hasRevertButton}

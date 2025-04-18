@@ -20,7 +20,8 @@ const GradientPicker = ({ value, onChange }) => {
 	return (
 		<Fragment>
 			<StableGradientPicker
-				value={value.gradient || ''}
+				__nextHasNoMargin
+				value={value.gradient || null}
 				gradients={[]}
 				onChange={(val) => {
 					onChange({

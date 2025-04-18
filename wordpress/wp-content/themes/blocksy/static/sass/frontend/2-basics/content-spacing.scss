@@ -1,32 +1,29 @@
 p {
-	margin-bottom: var(--content-spacing);
+	margin-block-end: var(--theme-content-spacing);
 }
 
 ul, ol {
-	padding-inline-start: var(--listIndent);
-	margin-bottom: var(--content-spacing);
+	padding-inline-start: var(--theme-list-indent);
+	margin-block-end: var(--theme-content-spacing);
 }
 
 h1, h2, h3, h4, h5, h6 {
-	margin-bottom: calc(var(--has-content-spacing, 1) * (0.3em + 10px));
+	margin-block-end: calc(var(--has-theme-content-spacing, 1) * (0.3em + 10px));
+
+	&:where(:last-child) {
+		margin-block-end: 0;
+	}
 }
 
-.entry-content {
 
-	> * {
-		margin-bottom: var(--content-spacing);
+:is(.is-layout-flow, .is-layout-constrained) {
 
-		&:last-child {
-			margin-bottom: 0;
-		}
+	> *:where(:not(h1, h2, h3, h4, h5, h6)) {
+		margin-block-start: 0;
+		margin-block-end: var(--theme-content-spacing);
 	}
 
-	h1, h2, h3, h4, h5, h6 {
-		margin-top: var(--content-spacing);
-		margin-bottom: calc(var(--has-content-spacing, 1) * (0.3em + 10px));
-
-		&:first-child {
-			margin-top: 0;
-		}
+	:where(h1, h2, h3, h4, h5, h6) {
+		margin-block-end: calc(var(--has-theme-content-spacing, 1) * (0.3em + 10px));
 	}
 }

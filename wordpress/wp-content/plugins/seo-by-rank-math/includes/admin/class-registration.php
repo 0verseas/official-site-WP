@@ -14,7 +14,7 @@ use RankMath\KB;
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
 use RankMath\Admin\Admin_Helper;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
 use RankMath\Helpers\Security;
 use RankMath\Google\Authentication;
 
@@ -47,12 +47,6 @@ class Registration {
 	 * @var string
 	 */
 	protected $step_slug = '';
-	/**
-	 * The text string array.
-	 *
-	 * @var array
-	 */
-	protected $strings = null;
 
 	/**
 	 * Is registration invalid.
@@ -65,12 +59,6 @@ class Registration {
 	 * The Constructor.
 	 */
 	public function __construct() {
-		// Strings passed in from the config file.
-		$this->strings = [
-			'title'               => esc_html__( 'Rank Math Product Registration', 'rank-math' ),
-			'return-to-dashboard' => esc_html__( 'Return to dashboard', 'rank-math' ),
-		];
-
 		$this->step      = 'register';
 		$this->step_slug = 'register';
 		$this->invalid   = Helper::is_invalid_registration();
@@ -84,6 +72,18 @@ class Registration {
 		}
 
 		$this->action( 'admin_init', 'handle_registration' );
+		$this->filter( 'allowed_redirect_hosts', 'allowed_redirect_hosts' );
+	}
+
+	/**
+	 * Add allowed redirect hosts.
+	 *
+	 * @param  array $hosts Allowed hosts.
+	 * @return array
+	 */
+	public function allowed_redirect_hosts( $hosts ) {
+		$hosts[] = 'rankmath.com';
+		return $hosts;
 	}
 
 	/**
@@ -142,8 +142,8 @@ class Registration {
 				]
 			);
 
-			if ( 1 == Param::get( 'analytics' ) ) {
-				wp_redirect( Authentication::get_auth_url() );
+			if ( 1 === absint( Param::get( 'analytics' ) ) ) {
+				wp_redirect( Authentication::get_auth_url() ); //phpcs:ignore -- This is used to redirect to the external url.
 				exit;
 			}
 
@@ -170,7 +170,7 @@ class Registration {
 			return false;
 		}
 
-		$params = json_decode( base64_decode( $params ), true );
+		$params = json_decode( base64_decode( $params ), true ); // phpcs:ignore -- Verified as safe usage.
 		if (
 			! is_array( $params ) ||
 			! isset( $params['username'] ) ||
@@ -210,7 +210,7 @@ class Registration {
 	public function admin_menu() {
 		add_menu_page(
 			esc_html__( 'Rank Math', 'rank-math' ),
-			esc_html__( 'Rank Math', 'rank-math' ),
+			esc_html__( 'Rank Math SEO', 'rank-math' ),
 			'manage_options',
 			$this->slug,
 			[ $this, 'render_page' ]
@@ -299,8 +299,11 @@ class Registration {
 			<h1><?php esc_html_e( 'Connect FREE Account', 'rank-math' ); ?></h1>
 			<p class="rank-math-gray-box">
 				<?php
-				/* translators: Link to Free Account Benefits KB article */
-				printf( esc_html__( 'By connecting your free account, you get keyword suggestions directly from Google when entering the focus keywords. Not only that, get access to our revolutionary SEO Analyzer inside WordPress that scans your website for SEO errors and suggest improvements. %s', 'rank-math' ), '<a href="' . KB::get( 'free-account-benefits', 'SW Connect Free Account' ) . '" target="_blank">' . esc_html__( 'Read more by following this link.', 'rank-math' ) . '</a>' );
+				printf(
+					/* translators: Link to Free Account Benefits KB article */
+					esc_html__( 'By connecting your free account, you get keyword suggestions directly from Google when entering the focus keywords. Not only that, get access to our revolutionary Content AI, SEO Analyzer inside WordPress that scans your website for SEO errors and suggest improvements. %s', 'rank-math' ),
+					'<a href="' . esc_url( KB::get( 'free-account-benefits', 'SW Connect Free Account' ) ) . '" target="_blank">' . esc_html__( 'Read more by following this link.', 'rank-math' ) . '</a>'
+				);
 				?>
 			</p>
 			<?php
@@ -351,14 +354,13 @@ class Registration {
 	 * @param array $values Array of values for the step to process.
 	 */
 	private function redirect_to_connect( $values ) {
-
 		if ( ! isset( $values['rank_math_activate'] ) ) {
 			Admin_Helper::deregister_user();
 			return;
 		}
 
 		$url = Admin_Helper::get_activate_url( Helper::get_admin_url( 'registration' ) );
-		wp_redirect( $url );
+		wp_safe_redirect( $url );
 		die();
 	}
 

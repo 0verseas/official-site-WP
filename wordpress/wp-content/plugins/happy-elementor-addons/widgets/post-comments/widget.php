@@ -8,7 +8,7 @@
 
 namespace Happy_Addons\Elementor\Widget;
 
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Controls_Manager;
 use Happy_Addons\Elementor\Controls\Select2;
 use Elementor\Group_Control_Border;
@@ -50,6 +50,10 @@ class Post_Comments extends Base {
 	public function get_keywords() {
 		return ['comments', 'post', 'response', 'form'];
 	}
+
+	public function get_categories() {
+        return [ 'happy_addons_category', 'happy_addons_theme_builder' ];
+    }
 
 	/**
 	 * Register widget content controls
@@ -150,7 +154,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_title_typography',
 				'label' => __('Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} h2',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -204,7 +210,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_desc_typography',
 				'label' => __('Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} p.logged-in-as',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -268,7 +276,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_desc_link_typography',
 				'label' => __('Link Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} p.logged-in-as a',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 		$this->end_controls_tab();
@@ -297,7 +307,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_desc_link_hover_typography',
 				'label' => __('Link Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} p.logged-in-as a:hover',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 		$this->end_controls_tab();
@@ -342,7 +354,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_textarea_label_typography',
 				'label' => __('Label Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} label',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -395,7 +409,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_textarea_text_typography',
 				'label' => __('Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} textarea',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -462,7 +478,9 @@ class Post_Comments extends Base {
 				'name' => 'pc_button_typography',
 				'label' => __('Typography', 'happy-elementor-addons'),
 				'selector' => '{{WRAPPER}} p.form-submit .submit',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 

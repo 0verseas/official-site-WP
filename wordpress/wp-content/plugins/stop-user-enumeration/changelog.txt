@@ -1,4 +1,28 @@
 == Changelog ==
+= 1.6.3 =
+* fix warning with die
+
+= 1.6.2 =
+* set wp_die to return 403
+* added defer to script
+
+= 1.6.1 =
+* updated tested to 6.6
+
+= 1.6 =
+* change getenv to $_SERVER for better compatability
+* added extra sanitization to meet current plugin repo standards
+* allow exception for Simple JWT Login rest route and add filters to adjust match and exception of rest rules
+
+= 1.5.0 =
+* remove admin notifications for reviews and donations
+
+= 1.4.9 =
+* update library
+
+= 1.4.8 =
+* update library
+
 = 1.4.7 =
 * update library to remove deprecation notices
 

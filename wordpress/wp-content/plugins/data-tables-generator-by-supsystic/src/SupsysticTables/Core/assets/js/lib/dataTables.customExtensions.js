@@ -93,11 +93,11 @@
 	jQuery.fn.dataTableExt.oApi.fnResetFakeRowspan = function (oSettings) {
 		if(oSettings) {
 			var displayRows = oSettings.aiDisplay,
-				mergedData = $(oSettings.nTable).data('merged');
+				mergedData = jQuery(oSettings.nTable).data('merged');
 			if(!mergedData || mergedData.length == 0 || displayRows.length == 0) return this;
 
 			var rows = oSettings.aoData,
-				table = $(oSettings.nTable),
+				table = jQuery(oSettings.nTable),
 				autoHiding = table.attr('data-auto-hiding'),
 				rowNums = {},
 				first = table.attr('data-auto-index') == 'new' ? 1 : 0;
@@ -108,7 +108,7 @@
 				rowNums[cells[first].getAttribute('data-y')] = rowNum;
 				for(var i = 0; i < cells.length; i++) {
 					if(cells[i].getAttribute('data-hide') == "true" && (autoHiding.length <= i || autoHiding[i] == 1)) {
-						$(cells[i]).css('display', '');
+						jQuery(cells[i]).css('display', '');
 					}
 					cells[i].setAttribute('rowspan', 1);
 					cells[i].setAttribute('colspan', 1);

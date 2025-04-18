@@ -4,6 +4,10 @@ import {
 	getOriginalId,
 } from '../panels-builder/placements/helpers'
 
+export const getSkipRuleKeyword = (suffix = '') => {
+	return `CT_CSS_SKIP_RULE${suffix}`
+}
+
 export const assembleSelector = (selector) =>
 	Array.isArray(selector) ? selector.join(' ') : selector
 
@@ -74,7 +78,13 @@ export const getRootSelectorFor = (args = {}) => {
 		// header | footer
 		panelType: 'header',
 		itemId: null,
+		fullItemId: null,
+
 		...args,
+	}
+
+	if (args.itemId && !args.fullItemId) {
+		args.fullItemId = args.itemId
 	}
 
 	let selector = ''
@@ -104,7 +114,7 @@ export const getRootSelectorFor = (args = {}) => {
 	}"]`
 
 	if (
-		args.itemId &&
+		args.fullItemId &&
 		[
 			'middle-row',
 			'top-row',
@@ -122,7 +132,7 @@ export const getRootSelectorFor = (args = {}) => {
 			'widget-area-2',
 			'widget-area-3',
 			'widget-area-4',
-		].indexOf(args.itemId) > -1
+		].indexOf(getOriginalId(args.fullItemId)) > -1
 	) {
 		if (args.panelType === 'header') {
 			header_prefix = `${header_prefix} .ct-header`
@@ -182,26 +192,68 @@ export const withKeys = (keys, descriptor) =>
 		{}
 	)
 
-export const setRatioFor = (ratio, el) => {
-	let imgEl = el.querySelector('[width]')
+export const setRatioFor = (args = {}) => {
+	args = {
+		ratio: false,
+		el: null,
 
-	let thumb_ratio =
-		ratio === 'original'
-			? imgEl
-				? [
-						imgEl.parentNode.dataset.w
-							? parseInt(imgEl.parentNode.dataset.w)
-							: imgEl.width,
-						imgEl.parentNode.dataset.h
-							? parseInt(imgEl.parentNode.dataset.h)
-							: imgEl.height,
-				  ]
-				: [1, 1]
-			: (ratio || '4/3').split(
-					(ratio || '4/3').indexOf('/') > -1 ? '/' : ':'
-			  )
+		setFullSize: false,
 
-	imgEl.style.aspectRatio = `${thumb_ratio[0]} / ${thumb_ratio[1]}`
+		...args,
+	}
+
+	if (!args.el) {
+		return
+	}
+
+	if (!args.ratio) {
+		args.ratio = '4/3'
+	}
+
+	args.el.querySelectorAll('[width]').forEach((imgEl) => {
+		let thumb_ratio = args.ratio.split(
+			args.ratio.indexOf('/') > -1 ? '/' : ':'
+		)
+
+		if (args.ratio === 'original') {
+			thumb_ratio = [
+				imgEl.parentNode.dataset.w
+					? parseInt(imgEl.parentNode.dataset.w)
+					: imgEl.naturalWidth,
+				imgEl.parentNode.dataset.h
+					? parseInt(imgEl.parentNode.dataset.h)
+					: imgEl.naturalHeight,
+			]
+		}
+
+		imgEl.style.aspectRatio = `${thumb_ratio[0]} / ${thumb_ratio[1]}`
+
+		if (args.setFullSize) {
+			let fullSize = ''
+
+			if (imgEl.dataset.original) {
+				fullSize = imgEl.dataset.original
+			}
+
+			if (imgEl.srcset && !imgEl.dataset.original) {
+				const srcSetFullSize = imgEl.srcset
+					.split(',')
+					.reverse()[0]
+					.trim()
+
+				if (srcSetFullSize) {
+					fullSize = srcSetFullSize.split(' ')[0]
+				}
+			}
+
+			if (fullSize) {
+				imgEl.src = fullSize
+
+				imgEl.removeAttribute('srcset')
+				imgEl.removeAttribute('sizes')
+			}
+		}
+	})
 }
 
 export function changeTagName(node, name) {

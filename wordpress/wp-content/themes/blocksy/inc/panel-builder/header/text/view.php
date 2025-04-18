@@ -38,7 +38,7 @@ if ($panel_type === 'header') {
 
 $class .= ' ' . blocksy_visibility_classes($visibility);
 
-$text = do_shortcode(
+$text = blocksy_output_html_safely(
 	blocksy_translate_dynamic(
 		blocksy_default_akg(
 			'header_text',
@@ -58,7 +58,7 @@ if (blocksy_default_akg('has_header_text_full_width', $atts, 'no') === 'yes') {
 <div
 	class="<?php echo esc_attr($class) ?>"
 	<?php echo blocksy_attr_to_html($attr) ?>>
-	<div class="entry-content">
+	<div class="entry-content is-layout-flow">
 		<?php echo $text ?>
 	</div>
 </div>

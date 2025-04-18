@@ -64,6 +64,32 @@
             }
         });
 
+        /** Media page grid/list view switch */
+        $(document).on("click", ".view-switch > a", function(e){
+            if(location.search != "") {
+                try {
+                    if($(this).hasClass("view-grid") || $(this).hasClass("view-list")) {
+                        var eleLink = $(this).attr("href");
+                    }
+                    e.preventDefault();
+                    var str = location.search.substring(1);
+                    const searchArray = Object.fromEntries(new URLSearchParams(str));
+                    if (Object.keys(searchArray).length) {
+                        $.each(searchArray, function (key, keyVal) {
+                            if (key != "mode" && key != "paged") {
+                                if(keyVal != "") {
+                                    eleLink += "&" + key + "=" + keyVal;
+                                }
+                            }
+                        });
+                    }
+                    window.location = eleLink;
+                } catch (exceptionVar) {
+
+                }
+            }
+        });
+
         /* check for jetpack */
         if($("body").hasClass("jetpack-connected") && !$("body").hasClass("mobile")) {
             if(!$("body").hasClass("folded")) {
@@ -130,6 +156,9 @@
                 if(actionName.length && actionName.indexOf("action=inline-save") != -1) {
                     resetMediaAndPosts();
                     triggerInlineUpdate();
+                }
+                if(actionName.length && actionName.indexOf("action=save-attachment&id=") == 0) {
+                    resetMediaData(0);
                 }
             }
         });
@@ -276,6 +305,7 @@
         $(document).on("click", "#js-tree-menu .folder-actions span.folder-inline-edit", function(e){
             e.stopImmediatePropagation()
             e.stopPropagation();
+            e.preventDefault();
             if(wcp_settings.can_manage_folder == 0) {
                 return;
             }
@@ -291,8 +321,19 @@
             } else {
                 menuHtml += "<li class='new-folder-pro'><a target='_blank' href='javascript:;'><span class=''><i class='pfolder-add-folder'></i></span>"+wcp_settings.lang.PRO.NEW_SUB_FOLDER+"</a></li>";
             }
-            menuHtml += "<li class='rename-folder'><a href='javascript:;'><span class=''><i class='pfolder-edit'></i></span>"+wcp_settings.lang.RENAME+"</a></li>" +
-                        "<li class='default-folder'><a target='_blank' href='"+wcp_settings.upgrade_url+"'><span class=''><i class='pfolder-active-icon'></i></span>"+wcp_settings.lang.PRO.OPEN_THIS_FOLDER+"</a></li>" +
+            menuHtml += "<li class='rename-folder'><a href='javascript:;'><span class=''><i class='pfolder-edit'></i></span>"+wcp_settings.lang.RENAME+"</a></li>";
+            menuHtml += "<li class='color-folder'><a href='javascript:;'><span class=''><span class='dashicons dashicons-art'></span></span>" + wcp_settings.lang.CHANGE_COLOR + "<span class='dashicons dashicons-arrow-right-alt2'></span></a>";
+            menuHtml += "<ul class='color-selector'>";
+            menuHtml += "<li class='color-selector-ul'>";
+            $(wcp_settings.selected_colors).each(function(key,value) {
+                menuHtml += "<span class='folder-color-option' data-color='"+value+"' style='background-color:"+value+"'></span>";
+            });
+            menuHtml += "</li>";
+            menuHtml += "<li><a href='"+wcp_settings.upgrade_url+"' target='_blank' class='change-custom-color'>"+wcp_settings.lang.ADD_CUSTOM_COLORS+"</a></li>";
+            menuHtml += "<li><a href='javascript:;' class='folder-color-default'>"+wcp_settings.lang.REMOVE_COLOR+"</a></li>";
+            menuHtml += "</ul>";
+            menuHtml += "</li>";
+            menuHtml += "<li class='default-folder'><a target='_blank' href='"+wcp_settings.upgrade_url+"'><span class=''><i class='pfolder-active-icon'></i></span>"+wcp_settings.lang.PRO.OPEN_THIS_FOLDER+"</a></li>" +
                         "<li class='sticky-folder'><a target='_blank' href='"+wcp_settings.upgrade_url+"'><span class='sticky-pin'><i class='pfolder-pin'></i></span>"+wcp_settings.lang.PRO.STICKY_FOLDER+"</a></li>";
             if(hasStars) {
                 menuHtml += "<li class='mark-folder'><a href='javascript:;'><span class=''><i class='pfolder-star'></i></span>" + ((isHigh) ? wcp_settings.lang.REMOVE_STAR : wcp_settings.lang.ADD_STAR) + "</a></li>";
@@ -332,6 +373,38 @@
             if((yPosition + $(".dynamic-menu").height()) > $(window).height()) {
                 $(".dynamic-menu").css("margin-top", $(window).height() - (yPosition + $(".dynamic-menu").height()));
             }
+            return false;
+        });
+
+        $(document).on("click",".folder-color-option , .folder-color-default",function (e) {
+            e.stopPropagation();
+            folderID = $(this).closest(".dynamic-menu").data("id");
+            var current_color = $(this).attr("data-color");
+            if(typeof(current_color) == "undefined") {
+                current_color = "";
+            }
+
+            var folderPostId = getIndexForPostSetting(folderID);
+            folderPropertyArray[folderPostId]['has_color'] = current_color;
+            nonce = getSettingForPost(folderID, 'nonce');
+            update_custom_folder_color_css();
+            $.ajax({
+                url: wcp_settings.ajax_url,
+                data: {
+                    term_id: folderID,
+                    type: wcp_settings.post_type,
+                    action: "wcp_change_color_folder",
+                    nonce: nonce,
+                    color: current_color
+                },
+                method: 'post',
+                cache: false,
+                success: function (res) {
+                    res = $.parseJSON(res);
+                    update_custom_folder_color_css();
+                }
+            });
+
         });
 
         $(document).on("click", ".sticky-folders .sticky-fldr > a", function(e) {
@@ -429,10 +502,25 @@
             $("#sub-folder-popup").show();
         });
 
-        $(document).on("click", ".close-popup-button a", function(){
+        $(document).on("click", ".close-popup-button a:not(.hide-upgrade-modal):not(.is-modal)", function(){
             $(".folder-popup-form").hide();
             if($(".jstree-node[id='"+fileFolderID+"']").length) {
                 $(".jstree-node[id='"+fileFolderID+"'] > a.jstree-anchor").trigger("focus");
+            }
+            if($(this).hasClass("upgrade-model-button")) {
+                $("#upgrade-modal-popup").remove();
+            }
+        });
+
+        $(document).on("click", ".close-popup-button a.hide-upgrade-modal", function(){
+            if($(".rating-modal-steps#step-4").hasClass("active")) {
+                set_review_reminder(-1);
+                $(".rating-modal-popup").remove();
+            } else if($(".rating-modal-steps#step-3").hasClass("active")) {
+                set_review_reminder(14);
+            } else {
+                $(".rating-modal-steps").removeClass("active");
+                $(".rating-modal-steps#step-3").addClass("active");
             }
         });
 
@@ -554,7 +642,23 @@
         }
     }
 
+
+
+    function update_custom_folder_color_css() {
+        $("#custome_folder_color_css").remove();
+        var custom_color = "<style id='custome_folder_color_css'>"
+        $(folderPropertyArray).each(function (key,val) {
+            if(val.has_color != "") {
+                custom_color += "li.jstree-node[id='" + val.folder_id + "'] .pfolder-folder-close {color: "+val.has_color+ "!important;}";
+            }
+        });
+        custom_color += "</style>";
+        $("head").append(custom_color);
+    }
+
     function setDragAndDropElements() {
+
+        update_custom_folder_color_css();
 
         checkForCopyPaste();
 
@@ -603,6 +707,7 @@
         $(".jstree-anchor:not(.ui-droppable)").droppable({
             accept: ".wcp-move-file, .wcp-move-multiple, .attachments-browser li.attachment",
             hoverClass: 'wcp-drop-hover',
+            tolerance: "pointer",
             classes: {
                 "ui-droppable-active": "ui-state-highlight"
             },
@@ -617,7 +722,6 @@
                         nonce = getSettingForPost(folderID, 'nonce');
                         $.ajax({
                             url: wcp_settings.ajax_url,
-                            //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID+"&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                             data: {
                                 post_ids: chkStr,
                                 type: wcp_settings.post_type,
@@ -634,6 +738,7 @@
                                 if(res.status == "1") {
                                     resetMediaAndPosts();
                                     checkForUndoFunctionality();
+                                    $("#upgrade-modal-popup").show();
                                 } else {
                                     $(".folder-popup-form").hide();
                                     $(".folder-popup-form").removeClass("disabled");
@@ -654,7 +759,6 @@
                     });
                     $.ajax({
                         url: wcp_settings.ajax_url,
-                        //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID+"&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                         method: 'post',
                         data: {
                             post_ids: chkStr,
@@ -672,6 +776,7 @@
                                 // window.location.reload();
                                 resetMediaAndPosts();
                                 checkForUndoFunctionality();
+                                $("#upgrade-modal-popup").show();
                             } else {
                                 $(".folder-popup-form").hide();
                                 $(".folder-popup-form").removeClass("disabled");
@@ -705,6 +810,7 @@
                         method: 'post',
                         success: function (res) {
                             // window.location.reload();
+                            $("#upgrade-modal-popup").show();
                             resetMediaAndPosts();
                             checkForUndoFunctionality();
                         }
@@ -716,6 +822,7 @@
         $(".un-categorised-items:not(.ui-droppable)").droppable({
             accept: ".wcp-move-file, .wcp-move-multiple, .attachments-browser li.attachment",
             hoverClass: 'wcp-hover-list',
+            tolerance: "pointer",
             classes: {
                 "ui-droppable-active": "ui-state-highlight"
             },
@@ -779,6 +886,7 @@
         $(".tree-structure .folder-item:not(.ui-droppable)").droppable({
             accept: ".wcp-move-file, .wcp-move-multiple, .attachments-browser li.attachment",
             hoverClass: 'wcp-drop-hover-list',
+            tolerance: "pointer",
             classes: {
                 "ui-droppable-active": "ui-state-highlight"
             },
@@ -794,7 +902,6 @@
                         });
                         $.ajax({
                             url: wcp_settings.ajax_url,
-                            //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID + "&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                             method: 'post',
                             data: {
                                 post_ids: chkStr,
@@ -825,7 +932,6 @@
                     });
                     $.ajax({
                         url: wcp_settings.ajax_url,
-                        //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID + "&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                         method: 'post',
                         data: {
                             post_ids: chkStr,
@@ -880,6 +986,7 @@
         $(".sticky-folders li a:not(.ui-droppable)").droppable({
             accept: ".wcp-move-file, .wcp-move-multiple, .attachments-browser li.attachment",
             hoverClass: 'wcp-drop-hover',
+            tolerance: "pointer",
             classes: {
                 "ui-droppable-active": "ui-state-highlight"
             },
@@ -895,7 +1002,6 @@
                         $.ajax({
                             url: wcp_settings.ajax_url,
                             method: 'post',
-                            //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID+"&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                             data: {
                                 post_ids: chkStr,
                                 type: wcp_settings.post_type,
@@ -933,7 +1039,6 @@
                     $.ajax({
                         url: wcp_settings.ajax_url,
                         method: 'post',
-                        //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID+"&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                         data: {
                             post_ids: chkStr,
                             type: wcp_settings.post_type,
@@ -971,7 +1076,6 @@
                     folderIDs = chkStr;
                     $.ajax({
                         url: wcp_settings.ajax_url,
-                        //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID + "&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                         data: {
                             post_ids: chkStr,
                             type: wcp_settings.post_type,
@@ -982,7 +1086,6 @@
                             taxonomy: activeRecordID,
                             post_status: wcp_settings.post_status
                         },
-                        //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + folderID + "&nonce="+nonce+"&status="+wcp_settings.taxonomy_status+"&taxonomy="+activeRecordID,
                         method: 'post',
                         success: function (res) {
                             // window.location.reload();
@@ -1134,11 +1237,176 @@
                             thisID = thisID.replace("post-","");
                             inlineEditPost.revert(thisID);
                         });
+
+                        check_for_wc_inline_edit();
                     }
                 });
             }
         }
     }
+
+    function check_for_wc_inline_edit() {
+        if(wcp_settings.custom_type != "product_folder" || wcp_settings.post_type != 'product' || typeof(woocommerce_quick_edit) != "object") {
+            return;
+        }
+        $( '#the-list' ).on(
+            'click',
+            '.editinline',
+            function() {
+
+                var post_id = $( this ).closest( 'tr' ).attr( 'id' );
+
+                post_id = post_id.replace( 'post-', '' );
+
+                var $wwop_inline_data = jQuery( '#wholesale_prices_inline_' + post_id ),
+                    $base_currency = $wwop_inline_data.find( ".product_base_currency" );
+
+                $wwop_inline_data.find( ".whole_price" ).each( function( index ) {
+                    if ( $base_currency.length > 0 ) {
+                        if ( jQuery( this ).attr( 'data-currencyCode' ) == $base_currency.text() ) {
+                            var $wholesale_price_field = jQuery( 'input[name="' + jQuery( this ).attr( 'data-wholesalePriceKeyWithCurrency' ) + '"]' , '.inline-edit-row' );
+
+                            if ( $wholesale_price_field.length <= 0 ) // meaning we already modified the name, so we use the name with no currency instead
+                                $wholesale_price_field = jQuery( 'input[name="' + jQuery( this ).attr( 'id' ) + '"]' , '.inline-edit-row' );
+
+                            $wholesale_price_field.val( jQuery( this ).text() );
+
+                            $wholesale_price_field.attr( 'placeholder' , '' );
+
+                            $wholesale_price_field.siblings( '.title' ).html( $wholesale_price_field.siblings( '.title' ).html() + ' <em><b>Base Currency</b></em>' );
+
+                            $wholesale_price_field.attr( "name" , jQuery( this ).attr( 'id' ) );
+
+                            var $parent_section_container = $wholesale_price_field.closest( ".section-container" );
+                            $wholesale_price_field.closest( "label" ).detach().prependTo( $parent_section_container );
+                        } else
+                            jQuery( 'input[name="' + jQuery( this ).attr( 'id' ) + '"]' , '.inline-edit-row' ).val( jQuery( this ).text() );
+
+                    } else
+                        jQuery( 'input[name="' + jQuery( this ).attr( 'id' ) + '"]' , '.inline-edit-row' ).val( jQuery( this ).text() );
+
+                } );
+
+                var $wc_inline_data = $( '#woocommerce_inline_' + post_id );
+
+                var sku        = $wc_inline_data.find( '.sku' ).text(),
+                    regular_price  = $wc_inline_data.find( '.regular_price' ).text(),
+                    sale_price     = $wc_inline_data.find( '.sale_price ' ).text(),
+                    weight         = $wc_inline_data.find( '.weight' ).text(),
+                    length         = $wc_inline_data.find( '.length' ).text(),
+                    width          = $wc_inline_data.find( '.width' ).text(),
+                    height         = $wc_inline_data.find( '.height' ).text(),
+                    shipping_class = $wc_inline_data.find( '.shipping_class' ).text(),
+                    visibility     = $wc_inline_data.find( '.visibility' ).text(),
+                    stock_status   = $wc_inline_data.find( '.stock_status' ).text(),
+                    stock          = $wc_inline_data.find( '.stock' ).text(),
+                    featured       = $wc_inline_data.find( '.featured' ).text(),
+                    manage_stock   = $wc_inline_data.find( '.manage_stock' ).text(),
+                    menu_order     = $wc_inline_data.find( '.menu_order' ).text(),
+                    tax_status     = $wc_inline_data.find( '.tax_status' ).text(),
+                    tax_class      = $wc_inline_data.find( '.tax_class' ).text(),
+                    backorders     = $wc_inline_data.find( '.backorders' ).text(),
+                    product_type   = $wc_inline_data.find( '.product_type' ).text();
+
+                var formatted_regular_price = regular_price.replace( '.', woocommerce_admin.mon_decimal_point ),
+                    formatted_sale_price        = sale_price.replace( '.', woocommerce_admin.mon_decimal_point );
+
+                $( 'input[name="_sku"]', '.inline-edit-row' ).val( sku );
+                $( 'input[name="_regular_price"]', '.inline-edit-row' ).val( formatted_regular_price );
+                $( 'input[name="_sale_price"]', '.inline-edit-row' ).val( formatted_sale_price );
+                $( 'input[name="_weight"]', '.inline-edit-row' ).val( weight );
+                $( 'input[name="_length"]', '.inline-edit-row' ).val( length );
+                $( 'input[name="_width"]', '.inline-edit-row' ).val( width );
+                $( 'input[name="_height"]', '.inline-edit-row' ).val( height );
+
+                $( 'select[name="_shipping_class"] option:selected', '.inline-edit-row' ).attr( 'selected', false ).trigger( 'change' );
+                $( 'select[name="_shipping_class"] option[value="' + shipping_class + '"]' ).attr( 'selected', 'selected' )
+                    .trigger( 'change' );
+
+                $( 'input[name="_stock"]', '.inline-edit-row' ).val( stock );
+                $( 'input[name="menu_order"]', '.inline-edit-row' ).val( menu_order );
+
+                $(
+                    'select[name="_tax_status"] option, ' +
+                    'select[name="_tax_class"] option, ' +
+                    'select[name="_visibility"] option, ' +
+                    'select[name="_stock_status"] option, ' +
+                    'select[name="_backorders"] option'
+                ).prop( 'selected', false ).removeAttr( 'selected' );
+
+                var is_variable_product = 'variable' === product_type;
+                $( 'select[name="_stock_status"] ~ .wc-quick-edit-warning', '.inline-edit-row' ).toggle( is_variable_product );
+                $( 'select[name="_stock_status"] option[value="' + (is_variable_product ? '' : stock_status) + '"]', '.inline-edit-row' )
+                    .attr( 'selected', 'selected' );
+
+                $( 'select[name="_tax_status"] option[value="' + tax_status + '"]', '.inline-edit-row' ).attr( 'selected', 'selected' );
+                $( 'select[name="_tax_class"] option[value="' + tax_class + '"]', '.inline-edit-row' ).attr( 'selected', 'selected' );
+                $( 'select[name="_visibility"] option[value="' + visibility + '"]', '.inline-edit-row' ).attr( 'selected', 'selected' );
+                $( 'select[name="_backorders"] option[value="' + backorders + '"]', '.inline-edit-row' ).attr( 'selected', 'selected' );
+
+                if ( 'yes' === featured ) {
+                    $( 'input[name="_featured"]', '.inline-edit-row' ).prop( 'checked', true );
+                } else {
+                    $( 'input[name="_featured"]', '.inline-edit-row' ).prop( 'checked', false );
+                }
+
+                // Conditional display.
+                var product_is_virtual = $wc_inline_data.find( '.product_is_virtual' ).text();
+
+                var product_supports_stock_status = 'external' !== product_type;
+                var product_supports_stock_fields = 'external' !== product_type && 'grouped' !== product_type;
+
+                $( '.stock_fields, .manage_stock_field, .stock_status_field, .backorder_field' ).show();
+
+                if ( product_supports_stock_fields ) {
+                    if ( 'yes' === manage_stock ) {
+                        $( '.stock_qty_field, .backorder_field', '.inline-edit-row' ).show().removeAttr( 'style' );
+                        $( '.stock_status_field' ).hide();
+                        $( '.manage_stock_field input' ).prop( 'checked', true );
+                    } else {
+                        $( '.stock_qty_field, .backorder_field', '.inline-edit-row' ).hide();
+                        $( '.stock_status_field' ).show().removeAttr( 'style' );
+                        $( '.manage_stock_field input' ).prop( 'checked', false );
+                    }
+                } else if ( product_supports_stock_status ) {
+                    $( '.stock_fields, .manage_stock_field, .backorder_field' ).hide();
+                } else {
+                    $( '.stock_fields, .manage_stock_field, .stock_status_field, .backorder_field' ).hide();
+                }
+
+                if ( 'simple' === product_type || 'external' === product_type ) {
+                    $( '.price_fields', '.inline-edit-row' ).show().removeAttr( 'style' );
+                } else {
+                    $( '.price_fields', '.inline-edit-row' ).hide();
+                }
+
+                if ( 'yes' === product_is_virtual ) {
+                    $( '.dimension_fields', '.inline-edit-row' ).hide();
+                } else {
+                    $( '.dimension_fields', '.inline-edit-row' ).show().removeAttr( 'style' );
+                }
+
+                // Rename core strings.
+                $( 'input[name="comment_status"]' ).parent().find( '.checkbox-title' ).text( woocommerce_quick_edit.strings.allow_reviews );
+            }
+        );
+
+        $( '#the-list' ).on(
+            'change',
+            '.inline-edit-row input[name="_manage_stock"]',
+            function() {
+
+                if ( $( this ).is( ':checked' ) ) {
+                    $( '.stock_qty_field, .backorder_field', '.inline-edit-row' ).show().removeAttr( 'style' );
+                    $( '.stock_status_field' ).hide();
+                } else {
+                    $( '.stock_qty_field, .backorder_field', '.inline-edit-row' ).hide();
+                    $( '.stock_status_field' ).show().removeAttr( 'style' );
+                }
+            }
+        );
+    }
+
 
     function urlParam(name) {
         var results = new RegExp('[\?&]' + name + '=([^&#]*)')
@@ -1171,6 +1439,8 @@
                 thisID = thisID.replace("post-","");
                 inlineEditPost.revert(thisID);
             });
+
+            check_for_wc_inline_edit();
         }
 
         if(wcp_settings.post_type == "attachment") {
@@ -1201,6 +1471,7 @@
                     }
                 }
             });
+            update_custom_folder_color_css();
         }
 
         folderId = 0;
@@ -1317,6 +1588,9 @@
 
     /* add folder code */
     $(document).ready(function(){
+        $(window).bind('popstate', function() {
+            window.location.reload();
+        });
         $(document).on("click", "#add-new-folder", function(){
             if($("#js-tree-menu a.jstree-clicked").length) {
                 fileFolderID = $("#js-tree-menu a.jstree-clicked").closest("li.jstree-node").attr("id");
@@ -1468,6 +1742,7 @@
                                         'is_sticky': result.data[i]['is_sticky'],
                                         'is_high': result.data[i]['is_high'],
                                         'nonce': result.data[i]['nonce'],
+                                        'has_color': result.data[i]['has_color'],
                                         'slug': result.data[i]['slug'],
                                         'is_deleted': 0
                                     };
@@ -1573,7 +1848,7 @@
         });
 
 
-        $(document).on("click", ".form-cancel-btn", function(){
+        $(document).on("click", ".form-cancel-btn:not(.avoid-cancel)", function(){
             $(".folder-popup-form").hide();
             if($(".jstree-node[id='"+fileFolderID+"']").length) {
                 $(".jstree-node[id='"+fileFolderID+"'] > a.jstree-anchor").trigger("focus");
@@ -1582,12 +1857,93 @@
             }
         });
 
-        $(document).on("click", ".folder-popup-form", function (e) {
+        if($("#folder-rating").length && typeof(pr_rating_settings) == "object") {
+            $("#rating-modal-popup").show();
+            $("#folder-rating").starRating({
+                initialRating   : 0,
+                useFullStars    : true,
+                strokeColor     : '#FDB10C',
+                ratedColor      : '#FDB10C',
+                activeColor     : '#FDB10C',
+                strokeWidth     : 0,
+                minRating       : 1,
+                starSize        : 32,
+                useGradient     : 0,
+                onLeave: function() {
+                    $(".upgrade-user-rating span").text("0/5");
+                },
+                onHover: function(currentRate) {
+                    $(".upgrade-user-rating span").text(currentRate+"/5");
+                },
+                callback: function(currentRate) {
+                    if( currentRate !== 5 ) {
+                        $(".rating-modal-steps").removeClass("active");
+                        $(".rating-modal-steps#step-2").addClass("active");
+                        $("#folder-rated-rating").html("");
+                        for(i=0; i<parseInt(currentRate); i++) {
+                            var ratingStar = '<div class="jq-star"><svg shape-rendering="geometricPrecision" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="305px" height="305px" viewBox="60 -62 309 309" style="enable-background:new 64 -59 305 305; stroke-width:0px;" xml:space="preserve"> <polygon data-side="center" className="svg-empty-28" points="281.1,129.8 364,55.7 255.5,46.8 214,-59 172.5,46.8 64,55.4 146.8,129.7 121.1,241 212.9,181.1 213.9,181 306.5,241 " style="fill: transparent; stroke: #ffa83e;"></polygon> <polygon data-side="left" className="svg-empty-28" points="281.1,129.8 364,55.7 255.5,46.8 214,-59 172.5,46.8 64,55.4 146.8,129.7 121.1,241 213.9,181.1 213.9,181 306.5,241 " style="stroke-opacity: 0;"></polygon> <polygon data-side="right" className="svg-empty-28" points="364,55.7 255.5,46.8 214,-59 213.9,181 306.5,241 281.1,129.8 " style="stroke-opacity: 0;"></polygon> </svg></div>';
+                            $("#folder-rated-rating").append(ratingStar);
+                        }
+                    } else {
+                        window.open("https://wordpress.org/support/plugin/folders/reviews/#new-post", '_blank');
+                        $(".rating-logo").remove();
+                        $(".rating-modal-steps").removeClass("active");
+                        $(".rating-modal-steps#step-4").addClass("active");
+                    }
+                }
+            })
+        }
+
+        $(document).on("keyup", "#upgrade-review-comment", function(){
+            var commentLength = 1000 - parseInt($.trim($(this).val()).length);
+            if(commentLength < 0) {
+                var userComment = $.trim($(this).val());
+                userComment = userComment.slice(0, 1000);
+                $(".upgrade-review-textarea label span").text(0);
+                $(this).val(userComment);
+            } else {
+                $(".upgrade-review-textarea label span").text(commentLength);
+            }
+        });
+
+        $(document).on("change", "#upgrade-review-comment", function(){
+            var commentLength = 1000 - parseInt($.trim($(this).val()).length);
+            if(commentLength < 0) {
+                var userComment = $.trim($(this).val());
+                userComment = userComment.slice(0, 1000);
+                $(".upgrade-review-textarea label span").text(0);
+                $(this).val(userComment);
+            } else {
+                $(".upgrade-review-textarea label span").text(commentLength);
+            }
+        });
+
+        $(document).on("click", ".hide-upgrade-popup", function(e){
+            e.preventDefault();
+            $("#upgrade-modal-popup").remove();
+        });
+
+        $(document).on("click", ".upgrade-footer .upgrade-button", function(e){
+            $("#upgrade-modal-popup").remove();
+        });
+
+        $(document).on("click", ".folder-popup-form:not(.always-show)", function (e) {
             $(".folder-popup-form").hide();
             if($(".jstree-node[id='"+fileFolderID+"']").length) {
                 $(".jstree-node[id='"+fileFolderID+"'] > a.jstree-anchor").trigger("focus");
             } else if($("#js-tree-menu .jstree-anchor.jstree-clicked").length) {
                 $("#js-tree-menu .jstree-anchor.jstree-clicked").trigger("focus");
+            }
+            if($(this).attr("id") == "rating-modal-popup") {
+                if($(".rating-modal-steps#step-4").hasClass("active")) {
+                    set_review_reminder(-1);
+                    $(".rating-modal-popup").remove();
+                } else {
+                    set_review_reminder(14);
+                }
+            }
+            if($(this).attr("id") == "upgrade-modal-popup") {
+                $("#upgrade-modal-popup").remove();
             }
         });
 
@@ -1655,7 +2011,41 @@
             }
             return false;
         });
+
+        $(document).on("click", "#upgrade-review-button", function(){
+            $("#rating-modal-popup").hide();
+            $.ajax({
+                url: wcp_settings.ajax_url,
+                data: {
+                    action: "folders_review_box_message",
+                    rating: $("#folder-rated-rating .jq-star").length,
+                    nonce: wcp_settings.review_box_nonce,
+                    message: $.trim($("#upgrade-review-comment").val())
+                },
+                type: "post",
+                success: function() {
+                    set_review_reminder(-1);
+                }
+            });
+        });
+
+        $(document).on("click", "#update-review-time", function(){
+            set_review_reminder($("#upgrade-review-reminder").val());
+        });
     });
+
+    function set_review_reminder(noOfDays) {
+        $.ajax({
+            url: wcp_settings.ajax_url,
+            data: {
+                action: "folders_review_box",
+                days: noOfDays,
+                nonce: wcp_settings.review_nonce
+            },
+            type: "post",
+        });
+        $("#rating-modal-popup").remove();
+    }
 
     function updateFolder() {
         folderName = $.trim($("#js-tree-menu").jstree(true).get_node(fileFolderID).text);
@@ -1691,24 +2081,12 @@
 
         $(document).on("click","#menu-checkbox",function(){
             if($(this).is(":checked")) {
-                $("#js-tree-menu").addClass("show-folder-checkbox");
+                $(".js-tree-data").addClass("show-folder-checkbox");
                 $("#menu-checkbox").prop("checked", true);
             } else {
                 $("#js-tree-menu input.checkbox").attr("checked", false);
-                $("#js-tree-menu").removeClass("show-folder-checkbox");
+                $(".js-tree-data").removeClass("show-folder-checkbox");
                 $("#menu-checkbox").prop("checked", false);
-            }
-        });
-
-
-        $(document).on("click", "#menu-checkbox", function(){
-            if($(this).is(":checked")) {
-                $("#menu-checkbox").prop("checked", true);
-                $("#js-tree-menu").addClass("show-folder-checkbox");
-            } else {
-                $("#menu-checkbox").prop("checked", false);
-                $("#js-tree-menu input.checkbox").attr("checked", false);
-                $("#js-tree-menu").removeClass("show-folder-checkbox");
             }
         });
 
@@ -2243,6 +2621,7 @@
             //data.text is the new name:
             setDragAndDropElements();
         })).bind("move_node.jstree", (function(t, n) {
+
             if(!hasChildren) {
                 var oldPosition = n.old_position;
                 var currentParent = n.parent;
@@ -2252,6 +2631,8 @@
                     return false;
                 }
             }
+            setActionPosition();
+            setFolderCount();
             if(n.node.parent != "#") {
                 jQuery("#js-tree-menu").jstree("open_node",n.node.parent);
             }
@@ -2267,6 +2648,7 @@
             } else {
                 parentID = 0;
             }
+            setActionPosition();
             if(orderString != "") {
                 $(".form-loader-count").css("width","100%");
                 $.ajax({
@@ -2289,6 +2671,7 @@
                             $("#error-folder-popup").show();
                             window.location.reload(true);
                         }
+                        setActionPosition();
                     }
                 });
             }
@@ -2537,6 +2920,14 @@
             $(".jstree-node[id='" + foldersArray[i].term_id + "'] > a.jstree-anchor span.premio-folder-count").text(foldersArray[i].trash_count);
             $(".sticky-folder-"+foldersArray[i].term_id+" .premio-folder-count").text(foldersArray[i].trash_count);
         }
+
+        if($(".wp-filter #media_folder").length) {
+            for (var i = 0; i < foldersArray.length; i++) {
+                if($(".wp-filter #media_folder option[value='"+foldersArray[i].slug+"']").length) {
+                    $(".wp-filter #media_folder option[value='"+foldersArray[i].slug+"']").html(foldersArray[i].name + " (" + foldersArray[i].trash_count + ")");
+                }
+            }
+        }
         $("span.premio-folder-count").each(function(){
             if($(this).text() == "") {
                 $(this).text(0);
@@ -2654,7 +3045,6 @@
                         nonce = getSettingForPost($("#bulk-select").val(), 'nonce');
                         $.ajax({
                             url: wcp_settings.ajax_url,
-                            //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + $("#bulk-select").val() + "&nonce=" + nonce + "&status=" + wcp_settings.taxonomy_status + "&taxonomy=" + activeRecordID,
                             data: {
                                 post_ids: chkStr,
                                 type: wcp_settings.post_type,
@@ -2665,7 +3055,6 @@
                                 taxonomy: activeRecordID,
                                 post_status: wcp_settings.post_status
                             },
-                            //data: "post_ids=" + chkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + $("#bulk-select").val() + "&nonce=" + nonce + "&status=" + wcp_settings.taxonomy_status + "&taxonomy=" + activeRecordID,
                             method: 'post',
                             success: function (res) {
                                 res = $.parseJSON(res);
@@ -3015,7 +3404,6 @@
                         nonce = getSettingForPost($(this).val(), 'nonce');
                         $.ajax({
                             url: wcp_settings.ajax_url,
-                            //data: "post_ids=" + checkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + $(this).val() + "&nonce=" + nonce + "&status=" + wcp_settings.taxonomy_status + "&taxonomy=" + activeRecordID,
                             data: {
                                 post_ids: chkStr,
                                 type: wcp_settings.post_type,
@@ -3026,7 +3414,6 @@
                                 taxonomy: activeRecordID,
                                 post_status: wcp_settings.post_status
                             },
-                            //data: "post_ids=" + checkStr + "&type=" + wcp_settings.post_type + "&action=wcp_change_multiple_post_folder&folder_id=" + $(this).val() + "&nonce=" + nonce + "&status=" + wcp_settings.taxonomy_status + "&taxonomy=" + activeRecordID,
                             method: 'post',
                             success: function (res) {
                                 res = $.parseJSON(res);
@@ -3061,9 +3448,9 @@
             $(document).keydown(function (e) {
                 var isCtrlPressed = (e.ctrlKey || e.metaKey) ? true : false;
 
-                // Shift + N : New Folder
+                // Alt + N : New Folder
                 if(!($("input").is(":focus") || $("textarea").is(":focus"))) {
-                    if (e.shiftKey && (e.keyCode == 78 || e.which == 78)) {
+                    if (e.altKey && (e.keyCode == 78 || e.which == 78)) {
                         e.preventDefault();
                         $("#add-new-folder").trigger("click");
                     }
@@ -3079,7 +3466,7 @@
 
                 // Ctrl+C/CMD+C: Copy Folder
                 if(isCtrlPressed && (e.keyCode == 67 || e.which == 67)) {
-                    if($("#js-tree-menu .jstree-anchor").is(":focus")) {
+                    /*if($("#js-tree-menu .jstree-anchor").is(":focus")) {
                         isFolderCopy = $("#js-tree-menu .jstree-anchor:focus").closest("li.jstree-node").attr("id");
                         CPCAction = "copy";
                         $(".folders-undo-notification").removeClass("active");
@@ -3088,12 +3475,12 @@
                             $("#copy-message").removeClass("active");
                         }, 5000);
                         checkForCopyPaste();
-                    }
+                    }*/
                 }
 
                 // Ctrl+X/CMD+X: Cut Folder
                 if(isCtrlPressed && (e.keyCode == 88 || e.which == 88)) {
-                    if($("#js-tree-menu .jstree-anchor").is(":focus")) {
+                    /*if($("#js-tree-menu .jstree-anchor").is(":focus")) {
                         e.preventDefault();
                         isFolderCopy = $("#js-tree-menu .jstree-anchor:focus").closest("li.jstree-node").attr("id");
                         CPCAction = "cut";
@@ -3103,12 +3490,12 @@
                             $("#cut-message").removeClass("active");
                         }, 5000);
                         checkForCopyPaste();
-                    }
+                    }*/
                 }
 
                 // Ctrl+V: Paste Folder
                 if(isCtrlPressed && (e.keyCode == 86 || e.which == 86)) {
-                    if($("#js-tree-menu .jstree-anchor").is(":focus")) {
+                    /*if($("#js-tree-menu .jstree-anchor").is(":focus")) {
                         e.preventDefault();
                         activeRecordID = $("#js-tree-menu .jstree-anchor:focus").closest("li.jstree-node").attr("id");
                         if(activeRecordID == "" || isNaN(activeRecordID)) {
@@ -3139,7 +3526,7 @@
                             CPCAction = "";
                             isFolderCopy = 0;
                         }
-                    }
+                    }*/
                 }
 
                 if(isCtrlPressed && (e.keyCode == 75 || e.which == 75)) {
@@ -3148,7 +3535,9 @@
 
                 // delete action
                 if((e.keyCode == 46 || e.which == 46) || (e.keyCode == 8 || e.which == 8)) {
-                    if($("#js-tree-menu .jstree-anchor").is(":focus")) {
+                    if ($("#menu-checkbox").is(":checked") && $("#js-tree-menu input.checkbox:checked").length > 0) {
+                        $(".delete-folder-action").trigger("click");
+                    } else if($("#js-tree-menu .jstree-anchor").is(":focus")) {
                         if(!$("#js-tree-menu .jstree-anchor:focus").closest("li.jstree-node").hasClass("is-locked")) {
                             fileFolderID = $("#js-tree-menu .jstree-anchor:focus").closest("li.jstree-node").attr("id");
                             removeFolderFromID(0);
@@ -3205,7 +3594,7 @@
 
                 // esc key
                 if(e.keyCode == 27 || e.which == 27) {
-                    $(".folder-popup-form").hide();
+                    $(".folder-popup-form:not(#rating-modal-popup)").hide();
                     if($(".jstree-node[id='"+fileFolderID+"']").length) {
                         $(".jstree-node[id='"+fileFolderID+"'] > a.jstree-anchor").trigger("focus");
                     } else if($("#js-tree-menu .jstree-anchor.jstree-clicked").length) {

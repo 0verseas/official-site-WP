@@ -47,6 +47,25 @@ class Dashboard {
 			5
 		);
 
+		if (defined('WP_FS__LOWEST_PRIORITY')) {
+			add_action(
+				'network_admin_menu',
+				function () {
+					global $menu;
+
+					foreach ($menu as $key => $item) {
+						if ($item[2] === 'ct-dashboard') {
+							$menu[$key][0] = __('Blocksy', 'blocksy-companion');
+							$menu[$key][3] = __('Blocksy', 'blocksy-companion');
+							$menu[$key][4] = "menu-top";
+							$menu[$key][6] = set_url_scheme($this->get_icon());
+						}
+					}
+				},
+				WP_FS__LOWEST_PRIORITY + 1
+			);
+		}
+
 		add_filter(
 			'blocksy:dashboard:redirect-after-activation',
 			function ($url) {
@@ -57,6 +76,26 @@ class Dashboard {
 				);
 			}
 		);
+
+		add_action('admin_notices', function () {
+			$blocksy_data = Plugin::instance()->is_blocksy_data;
+
+			if (
+				! Plugin::instance()->check_if_blocksy_is_activated()
+				&&
+				$blocksy_data
+				&&
+				$blocksy_data['is_correct_theme']
+			) {
+				echo blocksy_render_view(
+					dirname(__FILE__) . '/views/theme-mismatch.php',
+					[
+						'is_theme_version_ok' => $blocksy_data['is_theme_version_ok'],
+						'is_companion_version_ok' => $blocksy_data['is_companion_version_ok'],
+					]
+				);
+			}
+		});
 
 		add_action(
 			'admin_menu',
@@ -118,6 +157,8 @@ class Dashboard {
 
 			blc_fs()->add_filter('hide_freemius_powered_by', '__return_true');
 
+			blc_fs()->add_filter( 'show_deactivation_subscription_cancellation', '__return_false' );
+
 			blc_fs()->add_filter(
 				'connect-message_on-premium',
 				function ($text) {
@@ -144,7 +185,7 @@ class Dashboard {
 					$is_network_upgrade_mode = ( fs_is_network_admin() && blc_fs()->is_network_upgrade_mode() );
 					$slug = blc_fs()->get_slug();
 					$is_gdpr_required = \FS_GDPR_Manager::instance()->is_required();
-					$hey_x_text = esc_html( sprintf( fs_text_x_inline( 'Hey %s,', 'greeting', 'hey-x', $slug ), $user_first_name ) );
+					$hey_x_text = esc_html( blc_safe_sprintf( fs_text_x_inline( 'Hey %s,', 'greeting', 'hey-x', $slug ), $user_first_name ) );
 
 					$default_optin_message = $is_gdpr_required ?
 						fs_text_inline( 'Never miss an important update - opt in to our security & feature updates notifications, educational content, offers, and non-sensitive diagnostic tracking with %4$s. If you skip this, that\'s okay! %1$s will still work just fine.', 'connect-message_on-update', $slug ) :
@@ -157,7 +198,7 @@ class Dashboard {
 						/* translators: %s: name (e.g. Hey John,) */
 						'<span>' . $hey_x_text . '</span>'
 					) .
-					sprintf(
+					blc_safe_sprintf(
 						esc_html( $default_optin_message ),
 						'<b>' . esc_html( blc_fs()->get_plugin_name() ) . '</b>',
 						'<b>' . $user_login . '</b>',
@@ -171,8 +212,7 @@ class Dashboard {
 			blc_fs()->add_action('connect/before', function () {
 				$path = dirname(__FILE__) . '/views/optin.php';
 
-				echo blc_call_fn(
-					['fn' => 'blocksy_render_view'],
+				echo blocksy_render_view(
 					$path,
 					[]
 				);
@@ -193,15 +233,51 @@ class Dashboard {
 					wp_send_json_success();
 				}
 			);
+
+			add_action(
+				'wp_ajax_blocksy_dashboard_handle_incorrect_license',
+				function () {
+					if (! current_user_can(
+						blc_get_capabilities()->get_wp_capability_by('dashboard')
+					)) {
+						wp_send_json_error();
+					}
+
+					$blocksy_active_extensions_old = get_option(
+						'blocksy_active_extensions_old',
+						'__empty__'
+					);
+
+					if ($blocksy_active_extensions_old !== '__empty__') {
+						return;
+					}
+
+					$activated_extensions = get_option('blocksy_active_extensions', []);
+
+					update_option(
+						'blocksy_active_extensions_old',
+						$activated_extensions
+					);
+
+					delete_option('blocksy_active_extensions');
+
+					wp_send_json_success();
+				}
+			);
 		}
 
 		add_filter(
 			'blocksy_dashboard_localizations',
 			function ($d) {
+				$plugin_data = get_plugin_data(BLOCKSY__FILE__);
+
 				$result = [
 					'is_pro' => false,
 					'is_anonymous' => false,
-					'connect_template' => ''
+					'connect_template' => '',
+					'retrieve_demos_data' => [],
+					'plugin_version' => $plugin_data['Version'],
+					'is_multisite' => is_multisite()
 				];
 
 				if (function_exists('blc_fs')) {
@@ -214,10 +290,33 @@ class Dashboard {
 						$connect_template = ob_get_clean();
 					}
 
+					$current_plan = blc_get_capabilities()->get_plan();
+
+					// $current_plan = 'free';
+
+					$retrieve_demos_data = [
+					];
+
+					if (blc_fs()->_get_license()) {
+						$retrieve_demos_data['license_id'] = blc_fs()->_get_license()->id;
+					}
+
+					if (blc_fs()->get_site()) {
+						$retrieve_demos_data['install_id'] = blc_fs()->get_site()->id;
+					}
+
 					$result = [
-						'is_pro' => blc_fs()->can_use_premium_code(),
+						'is_pro' => $current_plan !== 'free',
+						'current_plan' => $current_plan,
+
+						'pro_starter_sites' => blc_get_capabilities()->get_features()['pro_starter_sites'],
+						'pro_starter_sites_enhanced' => blc_get_capabilities()->get_features()['pro_starter_sites_enhanced'],
+
 						'is_anonymous' => $is_anonymous,
-						'connect_template' => $connect_template
+						'connect_template' => $connect_template,
+						'retrieve_demos_data' => $retrieve_demos_data,
+						'plugin_version' => $plugin_data['Version'],
+						'is_multisite' => is_multisite()
 					];
 				}
 
@@ -230,6 +329,10 @@ class Dashboard {
 					])
 				) {
 					$result['has_beta_consent'] = Plugin::instance()->premium->user_wants_beta_updates();
+				}
+
+				if (function_exists('blocksy_get_pricing_links')) {
+					$result['modal_links'] = blocksy_get_pricing_links();
 				}
 
 				return array_merge($result, $d);
@@ -261,9 +364,10 @@ class Dashboard {
 	}
 
 	public function enqueue_static() {
-		if (! $this->is_dashboard_page()) return;
-
-		$data = get_plugin_data(BLOCKSY__FILE__);
+		if (! $this->is_dashboard_page()) {
+			$this->enqueue_static_global();
+			return;
+		}
 
 		$deps = apply_filters('blocksy-dashboard-scripts-dependencies', [
 			'wp-i18n',
@@ -276,7 +380,7 @@ class Dashboard {
 				'blocksy-dashboard-scripts',
 				BLOCKSY_URL . 'static/bundle/dashboard.js',
 				$deps,
-				$data['Version'],
+				blc_get_version(),
 				false
 			);
 		} else {
@@ -290,24 +394,48 @@ class Dashboard {
 					'wp-element',
 					'wp-date',
 					'wp-i18n',
-					'updates'
+					'wp-util'
 				],
-				$data['Version'],
+				blc_get_version(),
 				false
 			);
 
 			$slug = 'blocksy';
 
 			$localize_data = [
-				'themeIsInstalled' => !! wp_get_theme('blocksy'),
+				'themeIsInstalled' => (
+					!! wp_get_theme($slug)
+					&&
+					! wp_get_theme($slug)->errors()
+				),
+				'updatesNonce' => wp_installing() ? '' : wp_create_nonce('updates'),
 				'activate'=> current_user_can('switch_themes') ? wp_nonce_url(admin_url('themes.php?action=activate&amp;stylesheet=' . $slug), 'switch-theme_' . $slug) : null
 			];
 
 			$blocksy_data = Plugin::instance()->is_blocksy_data;
 
 			if ($blocksy_data && $blocksy_data['is_correct_theme']) {
-				$localize_data['theme_version_mismatch'] = true;
-				$localize_data['run_updates'] = self_admin_url('update-core.php');
+				$mismatched_product_name = 'Blocksy theme';
+				$mismatched_product_slug = 'blocksy';
+
+				if (
+					$blocksy_data['is_theme_version_ok']
+					&&
+					! $blocksy_data['is_companion_version_ok']
+				) {
+					$mismatched_product_name = 'Blocksy Companion plugin';
+					$mismatched_product_slug = 'blocksy-companion';
+
+					if (blc_can_use_premium_code()) {
+						$mismatched_product_name = 'Blocksy Companion Pro plugin';
+						$mismatched_product_slug = 'blocksy-companion-pro';
+					}
+				}
+
+				$localize_data['theme_version_mismatch'] = [
+					'productName' => $mismatched_product_name,
+					'slug' => $mismatched_product_slug
+				];
 			}
 
 			wp_localize_script(
@@ -322,28 +450,80 @@ class Dashboard {
 		wp_enqueue_style(
 			'blocksy-dashboard-styles',
 			BLOCKSY_URL . 'static/bundle/dashboard.min.css',
-			[],
-			$data['Version']
+			['wp-components'],
+			blc_get_version()
+		);
+	}
+
+	public function enqueue_static_global() {
+		$slug = 'blocksy';
+
+		$themeIsInstalled = (
+			!! wp_get_theme($slug)
+			&&
+			! wp_get_theme($slug)->errors()
+		);
+
+		$blocksy_data = Plugin::instance()->is_blocksy_data;
+
+		if (
+			! Plugin::instance()->check_if_blocksy_is_activated()
+			&&
+			$blocksy_data
+			&&
+			$blocksy_data['is_correct_theme']
+		) {
+			wp_enqueue_style(
+				'blocksy-dashboard-styles',
+				BLOCKSY_URL . 'static/bundle/dashboard.min.css',
+				[],
+				blc_get_version()
+			);
+
+			wp_enqueue_script(
+				'blocksy-admin-notifications-scripts',
+				BLOCKSY_URL . 'static/bundle/notifications.js',
+				[
+					'underscore',
+					'react',
+					'react-dom',
+					'wp-element',
+					'wp-date',
+					'wp-i18n'
+				],
+				blc_get_version(),
+				false
+			);
+
+			wp_localize_script(
+				'blocksy-admin-notifications-scripts',
+				'ctDashboardLocalizations',
+				[
+					'updatesNonce' => wp_installing() ? '' : wp_create_nonce('updates'),
+				]
+			);
+		}
+	}
+
+	public function get_icon() {
+		return apply_filters(
+			'blocksy:dashboard:icon-url',
+			'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMzUgMzUiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM1IDM1OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxwYXRoIGQ9Ik0yMS42LDIxLjNjMCwwLjYtMC41LDEuMS0xLjEsMS4xaC0zLjVsLTAuOS0yLjJoNC40QzIxLjEsMjAuMiwyMS42LDIwLjcsMjEuNiwyMS4zeiBNMjAuNiwxMy41aC00LjRsMC45LDIuMmgzLjUKCWMwLjYsMCwxLjEtMC41LDEuMS0xLjFDMjEuNiwxNCwyMS4xLDEzLjUsMjAuNiwxMy41eiBNMzUsMTcuNUMzNSwyNy4yLDI3LjIsMzUsMTcuNSwzNUM3LjgsMzUsMCwyNy4yLDAsMTcuNUMwLDcuOCw3LjgsMCwxNy41LDAKCUMyNy4yLDAsMzUsNy44LDM1LDE3LjV6IE0yNSwxNy45YzAuNy0wLjksMS4xLTIuMSwxLjEtMy40YzAtMS4yLTAuNC0yLjQtMS4xLTMuM2MtMS0xLjQtMi42LTIuMy00LjQtMi4zYzAsMC0wLjEsMC0wLjEsMHYwSDkuOQoJYy0wLjMsMC0wLjUsMC4zLTAuNCwwLjVsMi42LDYuMkg5LjljLTAuMywwLTAuNSwwLjMtMC40LDAuNUwxNCwyNi45aDYuNWMzLjEsMCw1LjYtMi41LDUuNi01LjZDMjYuMiwyMCwyNS44LDE4LjksMjUsMTcuOQoJQzI1LjEsMTcuOSwyNS4xLDE3LjksMjUsMTcuOXoiLz4KPC9zdmc+Cg=='
 		);
 	}
 
 	public function setup_framework_page() {
-		if (! current_user_can('activate_plugins')) {
+		if (! current_user_can(blc_get_capabilities()->get_wp_capability_by('dashboard'))) {
 			return;
 		}
-
-		$data = get_plugin_data(BLOCKSY__FILE__);
 
 		$options = [
 			'title' => __('Blocksy', 'blocksy-companion'),
 			'menu-title' => __('Blocksy', 'blocksy-companion'),
-			'permision' => 'activate_plugins',
+			'permision' => blc_get_capabilities()->get_wp_capability_by('dashboard'),
 			'top-level-handle' => 'ct-dashboard',
 			'callback' => [$this, 'welcome_page_template'],
-			'icon-url' => apply_filters(
-				'blocksy:dashboard:icon-url',
-				'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE4IDE4IiB2aWV3Qm94PSIwIDAgMTggMTgiPjxwYXRoIGQ9Ik05IDBjNSAwIDkgNCA5IDlzLTQgOS05IDktOS00LTktOSA0LTkgOS05em0yLjQgOS4yaC0uMmwtNC45IDQuNnYuMUgxMWMuMSAwIC4xIDAgLjItLjFsMi4yLTJjLjItLjIuMy0uNiAwLS44bC0yLTEuOHptMC01aC0uMkw1LjggOS4zbC0uMS4xdjMuOHMuMS4xLjEgMGw3LjEtNi42Yy4zLS4yLjMtLjggMC0xbC0xLjUtMS40em0tMS0uM0g1LjhjLS4xIDAtLjEgMC0uMS4xdjQuMnMuMS4xLjEgMGw0LjYtNC4zYy4xLjEuMSAwIDAgMHoiLz48L3N2Zz4='
-			),
+			'icon-url' => $this->get_icon(),
 			'position' => 2,
 		];
 
@@ -377,7 +557,7 @@ class Dashboard {
 	}
 
 	public function welcome_page_template() {
-		if (! current_user_can('manage_options')) {
+		if (! current_user_can(blc_get_capabilities()->get_wp_capability_by('dashboard'))) {
 			wp_die(
 				esc_html(
 					__( 'You do not have sufficient permissions to access this page.', 'blocksy-companion' )
@@ -386,5 +566,26 @@ class Dashboard {
 		}
 
 		echo '<div id="ct-dashboard"></div>';
+	}
+}
+
+if (! function_exists('blocksy_render_view')) {
+	function blocksy_render_view(
+		$file_path,
+		$view_variables = [],
+		$default_value = ''
+	) {
+		if (! is_file($file_path)) {
+			return $default_value;
+		}
+
+		// phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+		extract($view_variables, EXTR_REFS);
+		unset($view_variables);
+
+		ob_start();
+		require $file_path;
+
+		return ob_get_clean();
 	}
 }

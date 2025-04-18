@@ -135,9 +135,7 @@ class Plugin_Redirection_Logger extends Logger {
 				$bulk_items = explode( ',', $bulk_items );
 			}
 
-			if ( is_array( $bulk_items ) ) {
-				$bulk_items = array_map( 'intval', $bulk_items );
-			}
+			$bulk_items = array_map( 'intval', $bulk_items );
 
 			if ( empty( $bulk_items ) ) {
 				return $response;
@@ -182,7 +180,7 @@ class Plugin_Redirection_Logger extends Logger {
 	 * Log when a Redirection group is deleted.
 	 *
 	 * @param \WP_REST_Request $req Request.
-	 * @param array  $bulk_items Array with item ids.
+	 * @param array            $bulk_items Array with item ids.
 	 */
 	public function log_group_delete( $req, $bulk_items ) {
 		$context = array(
@@ -306,8 +304,8 @@ class Plugin_Redirection_Logger extends Logger {
 	/**
 	 * Log enable or disable of items.
 	 *
-	 * @param Object $req Req.
-	 * @param Array  $bulk_items Array.
+	 * @param object $req Req.
+	 * @param array  $bulk_items Array.
 	 */
 	protected function log_redirection_enable_or_disable( $req, $bulk_items ) {
 		$bulk_action = $req->get_param( 'bulk' );
@@ -328,7 +326,7 @@ class Plugin_Redirection_Logger extends Logger {
 	/**
 	 * Log when a Redirection is added.
 	 *
-	 * @param WP_REST_Request $req Request.
+	 * @param \WP_REST_Request $req Request.
 	 */
 	protected function log_redirection_add( $req ) {
 		$action_data = $req->get_param( 'action_data' );
@@ -348,7 +346,7 @@ class Plugin_Redirection_Logger extends Logger {
 	/**
 	 * Log when a Redirection is changed.
 	 *
-	 * @param WP_REST_Request $req Request.
+	 * @param \WP_REST_Request $req Request.
 	 */
 	protected function log_redirection_edit( $req ) {
 		$action_data = $req->get_param( 'action_data' );

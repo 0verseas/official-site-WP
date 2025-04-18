@@ -6,10 +6,10 @@
  */
 namespace Happy_Addons\Elementor\Widget;
 
-use Elementor\Core\Schemes\Typography;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Text_Shadow;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 
 defined( 'ABSPATH' ) || die();
 
@@ -46,6 +46,10 @@ class Archive_Title extends Base {
 	public function get_keywords() {
 		return [ 'archive title', 'Title', 'text' ];
 	}
+
+	public function get_categories() {
+        return [ 'happy_addons_category', 'happy_addons_theme_builder' ];
+    }
 
 	/**
      * Register widget content controls
@@ -183,7 +187,9 @@ class Archive_Title extends Base {
 				'name' => 'archive_title_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-archive-title',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -207,6 +213,10 @@ class Archive_Title extends Base {
             $this->add_render_attribute('title', 'class', 'elementor-size-' . $settings['size']);
         }
 
-        printf('<%1$s %2$s>%3$s</%1$s>', $settings['archive_title_tag'], $this->get_render_attribute_string('title'), get_the_archive_title() );
+        printf('<%1$s %2$s>%3$s</%1$s>',
+			ha_escape_tags($settings['archive_title_tag']),
+			$this->get_render_attribute_string('title'),
+			get_the_archive_title()
+		);
 	}
 }

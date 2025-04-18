@@ -4,8 +4,31 @@ if (! function_exists('blocksy_assemble_selector')) {
 	return;
 }
 
-// Offcanvas background
 $offcanvas_behavior = blocksy_akg('offcanvas_behavior', $atts, 'panel');
+
+
+// panel heading
+$has_offcanvas_heading = blocksy_akg('has_offcanvas_heading', $atts, 'no');
+
+if ($has_offcanvas_heading === 'yes') {
+	blocksy_output_colors([
+		'value' => blocksy_akg('offcanvas_heading_font_color', $atts),
+		'default' => [
+			'default' => [ 'color' => '#ffffff' ],
+		],
+		'css' => $css,
+		'tablet_css' => $tablet_css,
+		'mobile_css' => $mobile_css,
+		'variables' => [
+			'default' => [
+				'selector' => '#offcanvas .ct-panel-actions',
+				'variable' => 'theme-text-color'
+			],
+		],
+		'responsive' => true
+	]);
+}
+
 
 $offcanvasBackground = blocksy_akg(
 	'offcanvasBackground',
@@ -31,7 +54,20 @@ $offcanvasBackdrop = blocksy_akg(
 	])
 );
 
+// backdrop
+blocksy_output_background_css([
+	'selector' => blocksy_assemble_selector($root_selector),
+	'css' => $css,
+	'tablet_css' => $tablet_css,
+	'mobile_css' => $mobile_css,
+	'responsive' => true,
+	'value' => $offcanvas_behavior === 'panel' ? $offcanvasBackdrop : $offcanvasBackground,
+]);
+
+
+// panel type
 if ($offcanvas_behavior === 'panel') {
+
 	blocksy_output_background_css([
 		'selector' => blocksy_assemble_selector(blocksy_mutate_selector([
 			'selector' => $root_selector,
@@ -44,51 +80,43 @@ if ($offcanvas_behavior === 'panel') {
 		'responsive' => true,
 		'value' => $offcanvasBackground
 	]);
+
+	blocksy_output_box_shadow([
+		'css' => $css,
+		'tablet_css' => $tablet_css,
+		'mobile_css' => $mobile_css,
+		'selector' => blocksy_assemble_selector($root_selector[0] . ' #offcanvas'),
+		'value' => blocksy_akg('headerPanelShadow', $atts, blocksy_box_shadow_value([
+			'enable' => true,
+			'h_offset' => 0,
+			'v_offset' => 0,
+			'blur' => 70,
+			'spread' => 0,
+			'inset' => false,
+			'color' => [
+				'color' => 'rgba(0, 0, 0, 0.35)',
+			],
+		])),
+		'responsive' => true
+	]);
+
+	blocksy_output_responsive([
+		'css' => $css,
+		'tablet_css' => $tablet_css,
+		'mobile_css' => $mobile_css,
+		'selector' => blocksy_assemble_selector($root_selector),
+		'variableName' => 'side-panel-width',
+		'unit' => '',
+		'value' => blocksy_akg('side_panel_width', $atts, [
+			'desktop' => '500px',
+			'tablet' => '65vw',
+			'mobile' => '90vw',
+		])
+	]);
 }
 
-// Offcanvas backdrop
-blocksy_output_background_css([
-	'selector' => blocksy_assemble_selector($root_selector),
-	'css' => $css,
-	'tablet_css' => $tablet_css,
-	'mobile_css' => $mobile_css,
-	'responsive' => true,
-	'value' => $offcanvas_behavior === 'panel' ? $offcanvasBackdrop : $offcanvasBackground,
-]);
 
-blocksy_output_box_shadow([
-	'css' => $css,
-	'tablet_css' => $tablet_css,
-	'mobile_css' => $mobile_css,
-	'selector' => blocksy_assemble_selector($root_selector[0] . ' [data-behaviour*="side"]'),
-	'value' => blocksy_akg('headerPanelShadow', $atts, blocksy_box_shadow_value([
-		'enable' => true,
-		'h_offset' => 0,
-		'v_offset' => 0,
-		'blur' => 70,
-		'spread' => 0,
-		'inset' => false,
-		'color' => [
-			'color' => 'rgba(0, 0, 0, 0.35)',
-		],
-	])),
-	'responsive' => true
-]);
-
-blocksy_output_responsive([
-	'css' => $css,
-	'tablet_css' => $tablet_css,
-	'mobile_css' => $mobile_css,
-	'selector' => blocksy_assemble_selector($root_selector),
-	'variableName' => 'side-panel-width',
-	'unit' => '',
-	'value' => blocksy_akg('side_panel_width', $atts, [
-		'desktop' => '500px',
-		'tablet' => '65vw',
-		'mobile' => '90vw',
-	])
-]);
-
+// alignment
 $vertical_alignment = blocksy_akg('offcanvas_content_vertical_alignment', $atts, 'flex-start');
 
 if ($vertical_alignment !== 'flex-start') {
@@ -123,7 +151,7 @@ if ($horizontal_alignment !== 'initial') {
 	$text_horizontal_alignment = blocksy_map_values([
 		'value' => $horizontal_alignment,
 		'map' => [
-			'initial' => 'CT_CSS_SKIP_RULE',
+			// 'initial' => 'CT_CSS_SKIP_RULE',
 			'flex-end' => 'right'
 		]
 	]);
@@ -166,6 +194,7 @@ if ($horizontal_alignment !== 'initial') {
 
 }
 
+
 // close button
 $close_button_type = blocksy_akg('menu_close_button_type', $atts, 'type-1');
 
@@ -185,7 +214,7 @@ blocksy_output_colors([
 				'operation' => 'suffix',
 				'to_add' => '.ct-toggle-close'
 			])),
-			'variable' => 'icon-color'
+			'variable' => 'theme-icon-color'
 		],
 
 		'hover' => [
@@ -194,7 +223,7 @@ blocksy_output_colors([
 				'operation' => 'suffix',
 				'to_add' => '.ct-toggle-close:hover'
 			])),
-			'variable' => 'icon-color'
+			'variable' => 'theme-icon-color'
 		]
 	],
 	'responsive' => true
@@ -276,7 +305,7 @@ if ($menu_close_button_icon_size !== 12) {
 			'operation' => 'suffix',
 			'to_add' => '.ct-toggle-close'
 		])),
-		'--icon-size: ' . $menu_close_button_icon_size . 'px'
+		'--theme-icon-size: ' . $menu_close_button_icon_size . 'px'
 	);
 }
 

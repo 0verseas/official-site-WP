@@ -1,5 +1,7 @@
 import ctEvents from 'ct-events'
 import { isTouchDevice } from './frontend/helpers/is-touch-device'
+import { isIosDevice } from './frontend/helpers/is-ios-device'
+import $ from 'jquery'
 
 const loadSingleEntryPoint = ({
 	els,
@@ -25,6 +27,23 @@ const loadSingleEntryPoint = ({
 	if (!trigger) {
 		trigger = []
 	}
+
+	/*
+	[
+		{
+			id: 'click',
+		},
+	]
+    */
+	trigger = trigger.map((t) => {
+		if (typeof t === 'string') {
+			return {
+				id: t,
+			}
+		}
+
+		return t
+	})
 
 	if (!mount) {
 		mount = ({ mount, el, ...everything }) =>
@@ -61,8 +80,18 @@ const loadSingleEntryPoint = ({
 		return
 	}
 
-	if (trigger.length > 0) {
-		if (trigger.includes('click')) {
+	if (trigger.length === 0) {
+		load().then((arg) => {
+			allEls.map((el) => {
+				mount({ ...arg, el })
+			})
+		})
+
+		return
+	}
+
+	trigger.forEach((triggerDescriptor) => {
+		if (triggerDescriptor.id === 'click') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadClickListener) {
 					return
@@ -70,14 +99,55 @@ const loadSingleEntryPoint = ({
 
 				el.hasLazyLoadClickListener = true
 
-				el.addEventListener('click', (event) => {
-					event.preventDefault()
-					load().then((arg) => mount({ ...arg, event, el }))
-				})
+				el.addEventListener(
+					'click',
+					(event) => {
+						// stopPropagation(). is here because on touch devices the
+						// click event gets triggered for every child in the
+						// actual el.
+						//
+						// In result, mount is triggered a couple times.
+						//
+						// Context: https://github.com/sergiu-radu/blocksy/issues/3374
+						event.stopPropagation()
+
+						event.preventDefault()
+
+						load().then((arg) => mount({ ...arg, event, el }))
+					},
+					{
+						...(triggerDescriptor.once
+							? {
+									once: true,
+							  }
+							: {}),
+					}
+				)
 			})
 		}
 
-		if (trigger.includes('scroll')) {
+		if (triggerDescriptor.id === 'change') {
+			allEls.map((el) => {
+				if (el.hasLazyLoadChangeListener) {
+					return
+				}
+
+				el.hasLazyLoadChangeListener = true
+
+				const cb = (event) => {
+					event.preventDefault()
+					load().then((arg) => mount({ ...arg, event, el }))
+				}
+
+				if ($) {
+					$(el).on('change', cb)
+				} else {
+					el.addEventListener('change', cb)
+				}
+			})
+		}
+
+		if (triggerDescriptor.id === 'scroll') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadScrollListener) {
 					return
@@ -89,6 +159,15 @@ const loadSingleEntryPoint = ({
 					let prevScroll = scrollY
 
 					let cb = (event) => {
+						// If the element was removed from the DOM before the
+						// threshold was reached, we should remove the listener
+						// to prevent memory leaks and to prevent calling the
+						// mount on element being outside of DOM.
+						if (!el.parentNode) {
+							document.removeEventListener('scroll', cb)
+							return
+						}
+
 						if (Math.abs(scrollY - prevScroll) > 30) {
 							document.removeEventListener('scroll', cb)
 
@@ -105,7 +184,22 @@ const loadSingleEntryPoint = ({
 			})
 		}
 
-		if (trigger.includes('input')) {
+		if (triggerDescriptor.id === 'slight-mousemove') {
+			if (!document.body.hasSlightMousemoveListenerTheme) {
+				document.body.hasSlightMousemoveListenerTheme = true
+
+				const cb = (event) => {
+					allEls.map((el) => {
+						load().then((arg) => mount({ ...arg, el }))
+					})
+				}
+
+				document.addEventListener('mousemove', cb, { once: true })
+				// document.addEventListener('touchstart', cb, { once: true })
+			}
+		}
+
+		if (triggerDescriptor.id === 'input') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadInputListener) {
 					return
@@ -121,7 +215,7 @@ const loadSingleEntryPoint = ({
 			})
 		}
 
-		if (trigger.includes('hover-with-touch')) {
+		if (triggerDescriptor.id === 'hover-with-touch') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadMouseOverListener) {
 					return
@@ -135,7 +229,8 @@ const loadSingleEntryPoint = ({
 								el,
 							})
 						)
-					}, parseFloat(el.dataset.autoplay) * 1000)
+					}, 10)
+
 					return
 				}
 
@@ -148,15 +243,21 @@ const loadSingleEntryPoint = ({
 						el.addEventListener(
 							eventToRegister,
 							(event) => {
-								load().then((arg) =>
-									mount({
-										...arg,
-										...(event.type === 'touchstart'
-											? { event }
-											: {}),
-										el,
-									})
-								)
+								if (event.type === 'touchstart') {
+									document.addEventListener(
+										'touchmove',
+										() => {
+											el.forcedMount({
+												event,
+											})
+										},
+										{
+											once: true,
+										}
+									)
+								} else {
+									el.forcedMount()
+								}
 							},
 							{ once: true, passive: true }
 						)
@@ -165,7 +266,7 @@ const loadSingleEntryPoint = ({
 			})
 		}
 
-		if (trigger.includes('hover-with-click')) {
+		if (triggerDescriptor.id === 'hover-with-click') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadClickHoverListener) {
 					return
@@ -173,25 +274,76 @@ const loadSingleEntryPoint = ({
 
 				el.hasLazyLoadClickHoverListener = true
 
-				el.addEventListener(
-					isTouchDevice() ? 'click' : 'mouseover',
-					(event) => {
-						event.preventDefault()
+				const l = (event) => {
+					load().then((arg) =>
+						mount({
+							...arg,
+							event,
+							el,
+						})
+					)
+				}
 
-						load().then((arg) =>
-							mount({
-								...arg,
-								event,
-								el,
-							})
-						)
+				// Only relevant for touch devices
+				//
+				// false | number | true
+				let mouseOverState = false
+
+				el.addEventListener(
+					'mouseover',
+					(event) => {
+						// Add delay to wait for potential click event
+						// This should be done only on touch devices to facilitate
+						// devices that have both touch and pointin capabilities.
+						//
+						// Need to wait 500ms specifically because that is how
+						// much time is passing between mouseover and a full
+						// click event.
+						if (isTouchDevice()) {
+							mouseOverState = setTimeout(() => {
+								mouseOverState = true
+								l(event)
+							}, 500)
+						}
+
+						// Non touch device gets processed immediately, to not
+						// make it wait.
+						if (!isTouchDevice()) {
+							l(event)
+						}
 					},
 					{ once: true }
 				)
+
+				if (isTouchDevice()) {
+					el.addEventListener(
+						'click',
+						(event) => {
+							// Previously, iOS devices were handling such
+							// behavior out of the box, but now it is
+							// mandatory to prevent the default behavior of the
+							// click event even there.
+							event.preventDefault()
+
+							if (mouseOverState === true) {
+								return
+							}
+
+							if (mouseOverState !== false) {
+								clearTimeout(mouseOverState)
+							}
+
+							l(event)
+						},
+						{ once: true }
+					)
+				}
+
+				el.addEventListener('focus', l, { once: true })
 			})
 		}
 
-		if (trigger.includes('hover')) {
+		if (triggerDescriptor.id === 'hover') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadMouseOverListener) {
 					return
@@ -215,7 +367,7 @@ const loadSingleEntryPoint = ({
 			})
 		}
 
-		if (trigger.includes('submit')) {
+		if (triggerDescriptor.id === 'submit') {
 			allEls.map((el) => {
 				if (el.hasLazyLoadSubmitListener) {
 					return
@@ -224,18 +376,22 @@ const loadSingleEntryPoint = ({
 				el.hasLazyLoadSubmitListener = true
 
 				el.addEventListener('submit', (event) => {
+					if (
+						event.submitter &&
+						triggerDescriptor.ignoreSubmitter &&
+						triggerDescriptor.ignoreSubmitter.find((selector) =>
+							event.submitter.matches(selector)
+						)
+					) {
+						return
+					}
+
 					event.preventDefault()
 					load().then((arg) => mount({ ...arg, event, el }))
 				})
 			})
 		}
-	} else {
-		load().then((arg) => {
-			allEls.map((el) => {
-				mount({ ...arg, el })
-			})
-		})
-	}
+	})
 }
 
 export const onDocumentLoaded = (cb) => {

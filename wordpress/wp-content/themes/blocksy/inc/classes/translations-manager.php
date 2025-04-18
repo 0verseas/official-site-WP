@@ -1,11 +1,85 @@
 <?php
 
 class Blocksy_Translations_Manager {
+	public function init() {
+		add_action(
+			'customize_save_after',
+			[$this, 'register_wpml_translation_keys']
+		);
+
+		if (is_admin()) {
+			add_action(
+				'admin_init',
+				[$this, 'register_translation_keys']
+			);
+		}
+
+		add_action(
+			'init',
+			function () {
+				if (! class_exists('PLL_Translate_Option')) {
+					return;
+				}
+
+				$prefixes = blocksy_manager()->screen->get_single_prefixes();
+
+				$all_keys = [];
+
+				foreach ($prefixes as $prefix) {
+					if (
+						$prefix === 'single_blog_post'
+						||
+						$prefix === 'single_page'
+					) {
+						continue;
+					}
+
+					$related_label = blocksy_get_theme_mod(
+						$prefix . '_related_label',
+						'__empty__'
+					);
+
+					if ($related_label === '__empty__') {
+						continue;
+					}
+
+					$all_keys[$prefix . '_related_label'] = 1;
+				}
+
+				if (empty($all_keys)) {
+					return;
+				}
+
+				new PLL_Translate_Option('theme_mods_blocksy', $all_keys);
+				new PLL_Translate_Option('theme_mods_blocksy-child', $all_keys);
+
+				blocksy_manager()->db->wipe_cache();
+			}
+		);
+	}
+
 	public function get_all_translation_keys() {
 		$builder_keys = Blocksy_Manager::instance()->builder->translation_keys();
+		$all_cpt = blocksy_manager()->post_types->get_all([
+			'exclude_built_in' => true,
+			'exclude_woo' => true
+		]);
 
-		foreach (['blog', 'categories', 'search', 'author'] as $prefix) {
-			$archive_order = get_theme_mod($prefix . '_archive_order', null);
+		$all_cpt_archive_keys = [];
+		$all_cpt_single_keys = [];
+
+		foreach ($all_cpt as $cpt) {
+			$all_cpt_archive_keys[] = $cpt . '_archive';
+			$all_cpt_single_keys[] = $cpt . '_single';
+		}
+
+		foreach (
+			array_merge(
+				['blog', 'categories', 'search', 'author'],
+				$all_cpt_archive_keys
+			) as $prefix
+		) {
+			$archive_order = blocksy_get_theme_mod($prefix . '_archive_order', null);
 
 			if (! $archive_order) {
 				continue;
@@ -28,8 +102,13 @@ class Blocksy_Translations_Manager {
 			}
 		}
 
-		foreach (['blog', 'single_blog_post', 'single_page'] as $prefix) {
-			$hero_elements = get_theme_mod($prefix . '_hero_elements', null);
+		foreach (
+			array_merge(
+				['blog', 'single_blog_post', 'single_page'],
+				$all_cpt_single_keys
+			) as $prefix
+			) {
+			$hero_elements = blocksy_get_theme_mod($prefix . '_hero_elements', null);
 
 			if (! $hero_elements) {
 				continue;
@@ -84,13 +163,17 @@ class Blocksy_Translations_Manager {
 	}
 
 	public function register_translation_keys() {
-		if (!function_exists('pll_register_string')) {
+		if (! function_exists('pll_register_string')) {
 			return;
 		}
 
 		$builder_keys = $this->get_all_translation_keys();
 
 		foreach ($builder_keys as $single_key) {
+			if (! is_string($single_key['value'])) {
+				continue;
+			}
+
 			pll_register_string(
 				$single_key['key'],
 				$single_key['value'],
@@ -108,6 +191,10 @@ class Blocksy_Translations_Manager {
 		$builder_keys = $this->get_all_translation_keys();
 
 		foreach ($builder_keys as $single_key) {
+			if (! is_string($single_key['value'])) {
+				continue;
+			}
+
 			do_action(
 				'wpml_register_single_string',
 				'Blocksy',
@@ -204,6 +291,10 @@ if (! function_exists('blocksy_get_current_language')) {
 				return pll_current_language();
 			}
 
+			if (class_exists('Sitepress')) {
+				return apply_filters('wpml_current_language', null);
+			}
+
 			return '__NOT_KNOWN__';
 		}
 
@@ -214,11 +305,14 @@ if (! function_exists('blocksy_get_current_language')) {
 		if (
 			function_exists('icl_get_languages')
 			&&
-			defined('ICL_LANGUAGE_CODE')
-			&&
-			isset(icl_get_languages()[ICL_LANGUAGE_CODE])
+			class_exists('Sitepress')
 		) {
-			return icl_get_languages()[ICL_LANGUAGE_CODE]['default_locale'];
+			$all_languages = icl_get_languages();
+			$current_language = apply_filters('wpml_current_language', null);
+
+			if (isset($all_languages[$current_language])) {
+				return $all_languages[$current_language]['default_locale'];
+			}
 		}
 
 		global $TRP_LANGUAGE;
@@ -256,4 +350,67 @@ if (! function_exists('blocksy_translate_dynamic')) {
 
 		return $text;
 	}
+}
+
+function blocksy_translate_post_id($post_id, $args = []) {
+	$args = wp_parse_args($args, [
+		'use_wpml_default_language_woo' => false
+	]);
+
+	$language = null;
+
+	if ($args['use_wpml_default_language_woo']) {
+		global $sitepress, $woocommerce_wpml;
+
+		if (
+			$sitepress
+			&&
+			$woocommerce_wpml
+		) {
+			$language = $sitepress->get_default_language();
+		}
+	}
+
+	$post_type = get_post_type($post_id);
+
+	return apply_filters(
+		'wpml_object_id',
+		$post_id,
+		$post_type,
+		true,
+		$language
+	);
+}
+
+function blocksy_safe_sprintf($format, ...$args) {
+	$result = $format;
+
+	$is_error = false;
+
+	// vsprintf() triggers a warning on PHP < 8 and throws an exception on PHP 8+
+	// We need to handle both.
+	// https://www.php.net/manual/en/function.vsprintf.php#refsect1-function.vsprintf-errors
+
+	set_error_handler(function () use (&$is_error) {
+		$is_error = true;
+	});
+
+	if (interface_exists('Throwable')) {
+		try {
+			$result = vsprintf($format, $args);
+		} catch (\Throwable $e) {
+			$is_error = true;
+		}
+	} else {
+		$result = vsprintf($format, $args);
+	}
+
+	restore_error_handler();
+
+	if ($is_error) {
+		// TODO: maybe cleanup format from %s, %d, etc
+		return $format;
+	}
+
+	return $result;
 }

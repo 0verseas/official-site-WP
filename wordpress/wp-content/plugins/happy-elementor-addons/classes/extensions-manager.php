@@ -17,6 +17,10 @@ class Extensions_Manager {
 			include_once HAPPY_ADDONS_DIR_PATH . 'classes/review.php';
 		}
 
+		if ( is_user_logged_in() ) {
+			include_once HAPPY_ADDONS_DIR_PATH . 'classes/notice.php';
+		}
+
 		if ( is_user_logged_in() && ha_is_adminbar_menu_enabled() ) {
 			include_once HAPPY_ADDONS_DIR_PATH . 'classes/admin-bar.php';
 		}
@@ -87,7 +91,13 @@ class Extensions_Manager {
 				'icon' => 'hm hm-color-card',
 				'demo' => 'https://happyaddons.com/presets-demo/',
 				'is_pro' => true,
-			]
+			],
+			'global-badge' => [
+				'title' => __( 'Global Badge', 'happy-elementor-addons' ),
+				'icon' => 'hm hm-global-badge',
+				'demo' => 'https://happyaddons.com/global-badge/',
+				'is_pro' => true,
+			],
 		];
 	}
 
@@ -170,6 +180,18 @@ class Extensions_Manager {
 				// 'demo' => 'https://happyaddons.com/text-stroke/',
 				'is_pro' => false,
 			],
+			'reading-progress-bar' => [
+				'title' => __( 'Reading Progress Bar', 'happy-elementor-addons' ),
+				'icon' => 'hm hm-reading-glass-alt',
+				// 'demo' => 'https://happyaddons.com/text-reading-progress-bar/',
+				'is_pro' => false,
+			],
+			'custom-mouse-cursor' => [
+				'title' => __( 'Happy Mouse Cursor', 'happy-elementor-addons' ),
+				'icon' => 'hm hm-cursor-hover-click',
+				// 'demo' => 'https://happyaddons.com/custom-mouse-cursor/',
+				'is_pro' => false,
+			],
 		];
 	}
 
@@ -193,6 +215,10 @@ class Extensions_Manager {
 
 			case 'happy-particle-effects':
 				add_filter( 'happyaddons/extensions/happy_particle_effects', '__return_false' );
+				break;
+
+			case 'global-badge':
+				add_filter( 'happyaddons/extensions/happy_global_badge', '__return_false' );
 				break;
 
 			// case 'happy-preset':

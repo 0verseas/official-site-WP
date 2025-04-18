@@ -6,12 +6,12 @@
  */
 namespace Happy_Addons\Elementor\Widget;
 
-use Elementor\Core\Schemes\Typography;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Background;
 use Elementor\Group_Control_Text_Shadow;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 
 defined( 'ABSPATH' ) || die();
 
@@ -48,6 +48,10 @@ class Author_Meta extends Base {
 	public function get_keywords() {
 		return [ 'author', 'author_meta', 'author info' ];
 	}
+
+	public function get_categories() {
+        return [ 'happy_addons_category', 'happy_addons_theme_builder' ];
+    }
 
 	/**
      * Register widget content controls
@@ -135,7 +139,7 @@ class Author_Meta extends Base {
 				'return_value' => 'yes',
 			]
 		);
-		
+
 		$this->add_control(
 			'show_archive_btn',
 			[
@@ -240,7 +244,9 @@ class Author_Meta extends Base {
 				'name' => 'author_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-author-title',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -283,7 +289,9 @@ class Author_Meta extends Base {
 				'name' => 'bio_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-desc p',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -321,7 +329,7 @@ class Author_Meta extends Base {
 				],
 			]
 		);
-        
+
 		$this->add_responsive_control(
 			'avatar_width',
 			[
@@ -348,7 +356,7 @@ class Author_Meta extends Base {
 				],
 			]
 		);
-        
+
 		// $this->add_responsive_control(
 		// 	'avatar_margin',
 		// 	[
@@ -440,7 +448,9 @@ class Author_Meta extends Base {
 				'name' => 'author_info_button_hover_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-author-posts',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -585,7 +595,11 @@ class Author_Meta extends Base {
 			<div class="ha-desc">
 				<?php
 				if('yes' === $settings['show_author']){
-					printf('<%1$s %2$s>%3$s</%1$s>', esc_attr($settings['author_meta_tag']), $this->get_render_attribute_string('author-title'), esc_html($display_name));
+					printf('<%1$s %2$s>%3$s</%1$s>',
+					ha_escape_tags($settings['author_meta_tag']),
+					$this->get_render_attribute_string('author-title'),
+					esc_html($display_name)
+				);
 				}
 				if('yes' === $settings['show_bio']){
 					printf('<p>%1$s</p>', esc_html($bio));

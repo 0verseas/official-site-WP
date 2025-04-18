@@ -14,8 +14,7 @@ use RankMath\Helper;
 use RankMath\Runner;
 use RankMath\Traits\Ajax;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
-use MyThemeShop\Helpers\WordPress;
+use RankMath\Helpers\Param;
 use RankMath\Admin\Importers\Detector;
 
 defined( 'ABSPATH' ) || exit;
@@ -25,7 +24,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class Import_Export implements Runner {
 
-	use Hooker, Ajax;
+	use Hooker;
+	use Ajax;
 
 	/**
 	 * Register hooks.
@@ -96,7 +96,7 @@ class Import_Export implements Runner {
 	 * @return array
 	 */
 	public function get_panels() {
-		$dir = dirname( __FILE__ ) . '/views/import-export/';
+		$dir = __DIR__ . '/views/import-export/';
 
 		$panels = [
 			'import-export' => [
@@ -306,7 +306,7 @@ class Import_Export implements Runner {
 
 		// Add.
 		if ( 'add' === $action ) {
-			$key     = current_time( 'U' );
+			$key     = Helper::get_current_time();
 			$backups = [ $key => $this->get_export_data() ] + $backups;
 		}
 
@@ -348,7 +348,7 @@ class Import_Export implements Runner {
 		}
 
 		// Parse Options.
-		$wp_filesystem = WordPress::get_filesystem();
+		$wp_filesystem = Helper::get_filesystem();
 		if ( is_null( $wp_filesystem ) || ! Helper::is_filesystem_direct() ) {
 			Helper::add_notification( esc_html__( 'Uploaded file could not be read.', 'rank-math' ), [ 'type' => 'error' ] );
 			return false;
@@ -357,7 +357,7 @@ class Import_Export implements Runner {
 		$settings = $wp_filesystem->get_contents( $file['file'] );
 		$settings = json_decode( $settings, true );
 
-		\unlink( $file['file'] );
+		\wp_delete_file( $file['file'] );
 
 		if ( is_array( $settings ) && $this->do_import_data( $settings ) ) {
 			Helper::add_notification( esc_html__( 'Settings successfully imported. Your old configuration has been saved as a backup.', 'rank-math' ), [ 'type' => 'success' ] );
@@ -378,16 +378,11 @@ class Import_Export implements Runner {
 		$this->filter( 'wp_check_filetype_and_ext', 'filetype_and_ext', 10, 4 );
 
 		// Do the upload.
-		$file = wp_handle_upload( $_FILES['import-me'], [ 'test_form' => false ] );
+		$file = isset( $_FILES['import-me'] ) ? wp_handle_upload( $_FILES['import-me'], [ 'test_form' => false ] ) : '';
 
 		// Remove upload hooks.
 		$this->remove_filter( 'upload_mimes', 'allow_txt_upload', 10 );
 		$this->remove_filter( 'wp_check_filetype_and_ext', 'filetype_and_ext', 10 );
-
-		if ( is_wp_error( $file ) ) {
-			Helper::add_notification( esc_html__( 'Settings could not be imported:', 'rank-math' ) . ' ' . $file->get_error_message(), [ 'type' => 'error' ] );
-			return false;
-		}
 
 		if ( isset( $file['error'] ) ) {
 			Helper::add_notification( esc_html__( 'Settings could not be imported:', 'rank-math' ) . ' ' . $file['error'], [ 'type' => 'error' ] );
@@ -508,19 +503,19 @@ class Import_Export implements Runner {
 	private function set_redirections( $redirections ) {
 		foreach ( $redirections as $key => $redirection ) {
 			$matched = \RankMath\Redirections\DB::match_redirections_source( $redirection['sources'] );
-			if ( ! empty( $matched ) ) {
+			if ( ! empty( $matched ) || ! is_serialized( $redirection['sources'] ) ) {
 				continue;
 			}
 
-			$sources = maybe_unserialize( $redirection['sources'] );
-			if ( ! is_array( $sources ) ) {
+			$sources = unserialize( trim( $redirection['sources'] ), [ 'allowed_classes' => false ] ); // phpcs:ignore -- We are going to move Redirections sources to JSON, that will fix this issue.
+			if ( ! is_array( $sources ) || $sources instanceof \__PHP_Incomplete_Class ) {
 				continue;
 			}
 
 			\RankMath\Redirections\DB::add(
 				[
 					'url_to'      => $redirection['url_to'],
-					'sources'     => $sources,
+					'sources'     => $this->sanitize_sources( $sources ),
 					'header_code' => $redirection['header_code'],
 					'hits'        => $redirection['hits'],
 					'created'     => $redirection['created'],
@@ -528,6 +523,28 @@ class Import_Export implements Runner {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Sanitize the redirection source before storing it.
+	 *
+	 * @param array $sources An array of redirection sources.
+	 */
+	private function sanitize_sources( $sources ) {
+		$data = [];
+		foreach ( $sources as $source ) {
+			if ( empty( $source['pattern'] ) ) {
+				continue;
+			}
+
+			$data[] = [
+				'ignore'     => ! empty( $source['ignore'] ) ? 'case' : '',
+				'pattern'    => wp_strip_all_tags( $source['pattern'], true ),
+				'comparison' => in_array( $source['comparison'], [ 'exact', 'contains', 'start', 'end', 'regex' ], true ) ? $source['comparison'] : 'exact',
+			];
+		}
+
+		return $data;
 	}
 
 	/**
@@ -562,6 +579,7 @@ class Import_Export implements Runner {
 		}
 
 		$settings = rank_math()->settings->all_raw();
+		$data     = [];
 		foreach ( $panels as $panel ) {
 			if ( isset( $settings[ $panel ] ) ) {
 				$data[ $panel ] = $settings[ $panel ];

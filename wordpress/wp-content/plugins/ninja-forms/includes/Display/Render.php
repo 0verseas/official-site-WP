@@ -1,4 +1,5 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
+use NinjaForms\Includes\Handlers\Sanitizer;
 
 class NF_Display_Render
 {
@@ -38,6 +39,10 @@ class NF_Display_Render
     protected static $form_uses_helptext       = array();
     protected static $form_uses_starrating     = array();
 
+    protected static $thread_id      = 1;
+    protected static $recorded_forms       = [];
+    protected static $inline_vars_recorded  = [];
+
     public static function localize( $form_id )
     {
         global $wp_locale;
@@ -61,7 +66,7 @@ class NF_Display_Render
 
         $settings = $form->get_settings();
 
-        foreach( $settings as $name => $value ){
+        foreach( $settings as $name => &$value ){
             if( ! in_array(
                 $name,
                 array(
@@ -78,7 +83,10 @@ class NF_Display_Render
                 )
             ) ) continue;
 
-            if( $value ) continue;
+            if( $value ) {
+                $value = esc_html($value);
+                continue;
+            }
 
             unset( $settings[ $name ] );
         }
@@ -157,7 +165,6 @@ class NF_Display_Render
 
             // TODO: Replace unique field key checks with a refactored model/factory.
             $unique_field_keys = array();
-            $cache_updated = false;
 
             foreach ($form_fields as $field) {
 
@@ -178,25 +185,6 @@ class NF_Display_Render
                 $field_key = $field[ 'settings' ][ 'key' ];
 
                 if( in_array( $field_key, $unique_field_keys ) || '' == $field_key ){
-
-                    // Delete the field.
-                    Ninja_Forms()->request( 'delete-field' )->data( array( 'field_id' => $field_id ) )->dispatch();
-
-                    // Remove the field from cache.
-                    if( $form_cache ) {
-                        if( isset( $form_cache[ 'fields' ] ) ){
-                            foreach( $form_cache[ 'fields' ] as $cached_field_key => $cached_field ){
-                                if( ! isset( $cached_field[ 'id' ] ) ) continue;
-                                if( $field_id != $cached_field[ 'id' ] ) continue;
-
-                                // Flag cache to update.
-                                $cache_updated = true;
-
-                                unset( $form_cache[ 'fields' ][ $cached_field_key ] ); // Remove the field.
-                            }
-                        }
-                    }
-
                     continue; // Skip the duplicate field.
                 }
                 array_push( $unique_field_keys, $field_key ); // Log unique key.
@@ -300,6 +288,8 @@ class NF_Display_Render
                 $settings['old_classname'] = $field_class->get_old_classname();
                 $settings['wrap_template'] = $field_class->get_wrap_template();
 
+                $settings['label']=\wp_kses_post(Sanitizer::preventScriptTriggerInHtmlOutput($settings['label']));
+                
                 $fields[] = apply_filters( 'ninja_forms_localize_field_settings_' . $field_type, $settings, $form );
 
                 if( 'recaptcha' == $field[ 'settings' ][ 'type' ] ){
@@ -330,10 +320,6 @@ class NF_Display_Render
                     array_push( self::$form_uses_helptext, $form_id );
                 }
             }
-
-            if( $cache_updated ) {
-                WPN_Helper::update_nf_cache( $form_id, $form_cache ); // Update form cache without duplicate fields.
-            }
         }
 
         $fields = apply_filters( 'ninja_forms_display_fields', $fields, $form_id );
@@ -360,17 +346,44 @@ class NF_Display_Render
         $form_id = "$form_id";
 
         ?>
-        <!-- TODO: Move to Template File. -->
+        <!-- That data is being printed as a workaround to page builders reordering the order of the scripts loaded-->
         <script>var formDisplay=1;var nfForms=nfForms||[];var form=[];form.id='<?php echo $form_id; ?>';form.settings=<?php echo wp_json_encode( $form->get_settings() ); ?>;form.fields=<?php echo wp_json_encode( $fields ); ?>;nfForms.push(form);</script>
         <?php
+
         self::enqueue_scripts( $form_id );
     }
 
     /**
+     * Transform the inline JS into a variable passed to wp_localize_script
+     *
+     * @param array $fields
+     * @param string $form_id
+     * @param object $form
+     * @return void
+     * */
+    protected static function transformInlineVars($fields, $form_id, $form_settings)
+    {
+        $thread_id = sprintf("%08x", abs(crc32($_SERVER['REMOTE_ADDR'] . $_SERVER['REQUEST_TIME'] . $_SERVER['REMOTE_PORT'])));
+        if($thread_id !== self::$thread_id || isset( $_GET['nf_preview_form'] ) ){
+            self::$recorded_forms = [];
+        }
+        self::$thread_id = $thread_id;
+        $set_form = [];
+        $set_form['id'] = $form_id;
+        $set_form['settings'] = $form_settings;
+        $set_form['fields'] = $fields;
+        array_push(self::$recorded_forms, $set_form);
+        self::$inline_vars_recorded = [
+            "formDisplay"   =>  1,
+            "form"          => $set_form,
+            "nfForms"       => self::$recorded_forms,
+        ];
+    }
+    /**
      * Ensure that product related costs on `localize` method have intended number format
      *
      * @param array $settings
-     * @param string$decimal_point
+     * @param string $decimal_point
      * @param string $thousands_sep
      * @return array
      */
@@ -678,25 +691,60 @@ class NF_Display_Render
         do_action( 'ninja_forms_before_container_preview', $form_id, $form[ 'settings' ], $fields );
         Ninja_Forms::template( 'display-form-container.html.php', compact( 'form_id' ) );
 
-        ?>
-        <!-- TODO: Move to Template File. -->
-        <script>
-            // Maybe initialize nfForms object
-            var nfForms = nfForms || [];
+        self::transformInlineVars($fields, $form_id, $form[ 'settings' ]);
 
-            // Build Form Data
-            var form = [];
-            form.id = '<?php echo $form['id']; ?>';
-            form.settings = JSON.parse( '<?php echo WPN_Helper::addslashes( wp_json_encode( $form['settings'] ) ); ?>' );
-
-            form.fields = JSON.parse( '<?php echo WPN_Helper::addslashes( wp_json_encode(  $fields ) ); ?>' );
-
-            // Add Form Data to nfForms object
-            nfForms.push( form );
-        </script>
-
-        <?php
         self::enqueue_scripts( $form_id, true );
+    }
+
+    /**
+     * Set root element that will insert the WP element
+     * 
+     * @since 3.7.4
+     * 
+     * @param string Form ID
+     * 
+     * @return void
+     */
+    public static function localize_iframe( $form_id )
+    {
+        //Render root div
+        echo "<div id='nf_form_iframe_" . (int)$form_id . "'></div>";
+        //Enqueue WP element
+       static::enqueue_iframe_scripts( $form_id );
+
+    }
+
+    /**
+     * Enqueue scripts and localize data needed to insert the iFrame
+     * 
+     * @since 3.7.4
+     * 
+     * @param string Form ID
+     * 
+     * @return void
+     */
+    public static function enqueue_iframe_scripts( $form_id ) {
+         //Get Dependencies and Version from build asset.php generated by wp-scripts
+         $dashboard_asset_php = [
+            "dependencies" => [],
+            "version"   => false
+        ];
+        if( file_exists( Ninja_Forms::$dir . "build/displayFrame.asset.php" ) ){
+            $asset_php = include( Ninja_Forms::$dir . "build/displayFrame.asset.php" );
+            $dashboard_asset_php["dependencies"] = array_merge( $dashboard_asset_php["dependencies"], $asset_php["dependencies"]);
+            $dashboard_asset_php["version"] = $asset_php["version"];
+        }
+         //Register displayFrame script
+         wp_register_script( 'ninja_forms_form_iframe', Ninja_Forms::$url . 'build/displayFrame.js',  $dashboard_asset_php["dependencies"], $dashboard_asset_php["version"], false );
+         wp_enqueue_script( 'ninja_forms_form_iframe' );
+
+         //Set parameters needed in the script
+         wp_localize_script('ninja_forms_form_iframe', 'ninja_forms_form_iframe_data', [
+            'formID'        =>  $form_id,
+            'homeUrl'       => esc_url_raw( home_url() ),
+            'previewToken'  => wp_create_nonce('nf_iframe' ),
+            'isBlock'       => false
+         ]);
     }
 
     protected static function ensureProductRelatedCostPreviewFormats(array $field, string $currencySymbol): array
@@ -736,7 +784,6 @@ class NF_Display_Render
     public static function enqueue_scripts( $form_id, $is_preview = false )
     {
         global $wp_locale;
-        $form = Ninja_Forms()->form( $form_id )->get();
 
         $ver     = Ninja_Forms::VERSION;
         $js_dir  = Ninja_Forms::$url . 'assets/js/min/';
@@ -795,7 +842,7 @@ class NF_Display_Render
             'use_merge_tags' => array(),
             'opinionated_styles' => Ninja_Forms()->get_setting( 'opinionated_styles' ),
             'filter_esc_status'  =>    json_encode( WPN_Helper::maybe_disallow_unfiltered_html_for_escaping() ),
-            'nf_consent_status_response'    => [],
+            'nf_consent_status_response'    => []
         ));
 
         foreach( Ninja_Forms()->fields as $field ){
@@ -805,6 +852,9 @@ class NF_Display_Render
         }
 
         wp_localize_script( 'nf-front-end', 'nfFrontEnd', $data );
+
+        // !!Todoed!! moved inline JS to data
+        wp_localize_script( 'nf-front-end', 'nfInlineVars', self::$inline_vars_recorded );
 
         do_action( 'ninja_forms_enqueue_scripts', array( 'form_id' => $form_id ) );
 

@@ -39,7 +39,20 @@ class Translations_Logger extends Logger {
 		add_action( 'upgrader_process_complete', array( $this, 'on_upgrader_process_complete' ), 10, 2 );
 	}
 
+	/**
+	 * Called when a translation is updated.
+	 * This is called from the upgrader_process_complete hook.
+	 *
+	 * @param \WP_Upgrader|\Language_Pack_Upgrader $upgrader The WP_Upgrader instance.
+	 * @param array                                $options  Array of bulk item update arguments.
+	 */
 	public function on_upgrader_process_complete( $upgrader, $options ) {
+
+		// Check that required array keys exists.
+		if ( ! isset( $options['type'] ) || ! isset( $options['action'] ) ) {
+			return;
+		}
+
 		if ( 'translation' !== $options['type'] ) {
 			return;
 		}
@@ -55,7 +68,12 @@ class Translations_Logger extends Logger {
 		$translations = $options['translations'];
 
 		foreach ( $translations as $translation ) {
-			$name = $upgrader->get_name_for_update( (object) $translation );
+			$name = '';
+
+			// Check that method exists before usage.
+			if ( method_exists( $upgrader, 'get_name_for_update' ) ) {
+				$name = $upgrader->get_name_for_update( (object) $translation );
+			}
 
 			// Name can be empty, this is the case for for example Polylang Pro.
 			// If so then use slug as name, so message won't be empty.

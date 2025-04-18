@@ -35,6 +35,14 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
         return 'https://wpmet.com/doc/accordion/';
     }
 
+    protected function is_dynamic_content(): bool {
+        return false;
+    }
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+	
     protected function register_controls() {
         
 
@@ -133,7 +141,14 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                 ],
             ]
         );
-
+        $this->add_control(
+			'ekit_accordian_faq_schema',
+			[
+				'label' => esc_html__( 'Accordian FAQ Schema', 'elementskit-lite' ),
+				'type' => Controls_Manager::SWITCHER,
+				'separator' => 'before',
+			]
+        );
         $this->end_controls_section();
         // Icon setting
         $this->start_controls_section(
@@ -703,8 +718,7 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link  .icon-open' => 'font-size: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link svg'  => 'max-width: {{SIZE}}{{UNIT}}; height: auto;'
+                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link .ekit_accordion_normal_icon'  => 'font-size: {{SIZE}}{{UNIT}};'
                 ],
             ]
         );
@@ -714,8 +728,7 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                 'label'		 =>esc_html__( 'Color', 'elementskit-lite' ),
                 'type'		 => Controls_Manager::COLOR,
                 'selectors'	 => [
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link .icon-open' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link[aria-expanded="false"] svg path' => 'stroke: {{VALUE}}; fill: {{VALUE}};',
+                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link .ekit_accordion_normal_icon' => 'color: {{VALUE}}; fill: {{VALUE}};',
                 ],
             ]
         );
@@ -783,8 +796,7 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card .elementskit-card-header .elementskit-btn-link .icon-closed' => 'font-size: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card .elementskit-card-header .elementskit-btn-link svg'  => 'max-width: {{SIZE}}{{UNIT}}; height: auto;'
+                    '{{WRAPPER}} .elementskit-accordion .elementskit-card .elementskit-card-header .elementskit-btn-link .ekit_accordion_active_icon' => 'font-size: {{SIZE}}{{UNIT}};',
                 ]
             ]
         );
@@ -794,8 +806,7 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                 'label'		 =>esc_html__( 'Color', 'elementskit-lite' ),
                 'type'		 => Controls_Manager::COLOR,
                 'selectors'	 => [
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link .icon-closed' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .elementskit-accordion .elementskit-card-header .elementskit-btn-link[aria-expanded="true"] svg path'   => 'stroke: {{VALUE}}; fill: {{VALUE}};',
+                    '{{WRAPPER}} .elementskit-accordion .elementskit-card .elementskit-card-header .elementskit-btn-link .ekit_accordion_active_icon' => 'color: {{VALUE}}; fill: {{VALUE}};',
                 ],
             ]
         );
@@ -925,43 +936,15 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                         <a href="#collapse-<?php echo esc_attr($accorion_content['_id'].$acc_id)?>" class="ekit-accordion--toggler elementskit-btn-link collapsed" data-ekit-toggle="collapse" data-target="#Collapse-<?php echo esc_attr($accorion_content['_id'].$acc_id)?>" aria-expanded="<?php echo esc_attr($is_active == ' collapse' ? 'false' : 'true');  ?>" aria-controls="Collapse-<?php echo esc_attr($accorion_content['_id'].$acc_id)?>">
                             <?php if(($ekit_accordion_icon_pos_style == 'left') || ($ekit_accordion_icon_pos_style == 'bothside')) :  ?>
                                 <div class="ekit_accordion_icon_left_group">
-
                                     <div class="ekit_accordion_normal_icon">
                                         <!-- Normal Icon -->
-                                        <?php
-                                            // new icon
-                                            $migrated = isset( $settings['__fa4_migrated']['ekit_accordion_left_icons'] );
-                                            // Check if its a new widget without previously selected icon using the old Icon control
-                                            $is_new = empty( $settings['ekit_accordion_left_icon'] );
-                                            if ( $is_new || $migrated ) {
-                                                // new icon
-                                                Icons_Manager::render_icon( $settings['ekit_accordion_left_icons'], [ 'aria-hidden' => 'true', 'class'    => 'icon-open icon-left' ] );
-                                            } else {
-                                                ?>
-                                                <i class="<?php echo esc_attr($settings['ekit_accordion_left_icon']); ?> icon-open icon-left" aria-hidden="true"></i>
-                                                <?php
-                                            }
-                                        ?>
+                                        <?php Icons_Manager::render_icon($settings['ekit_accordion_left_icons']); ?>
                                     </div>
 
                                     <div class="ekit_accordion_active_icon">
                                         <!-- Active Icon -->
-                                        <?php
-                                            // new icon
-                                            $migrated = isset( $settings['__fa4_migrated']['ekit_accordion_left_icon_actives'] );
-                                            // Check if its a new widget without previously selected icon using the old Icon control
-                                            $is_new = empty( $settings['ekit_accordion_left_icon_active'] );
-                                            if ( $is_new || $migrated ) {
-                                                // new icon
-                                                Icons_Manager::render_icon( $settings['ekit_accordion_left_icon_actives'], [ 'aria-hidden' => 'true', 'class'    => 'icon-closed icon-left' ] );
-                                            } else {
-                                                ?>
-                                                <i class="<?php echo esc_attr($settings['ekit_accordion_left_icon_active']); ?> icon-closed icon-left" aria-hidden="true"></i>
-                                                <?php
-                                            }
-                                        ?>
+										<?php Icons_Manager::render_icon($settings['ekit_accordion_left_icon_actives']); ?>
                                     </div>
-
                                 </div>
 
                             <?php  endif;
@@ -979,40 +962,13 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                                 <div class="ekit_accordion_icon_group">
                                     <div class="ekit_accordion_normal_icon">
                                         <!-- Normal Icon -->
-                                        <?php
-                                            // new icon
-                                            $migrated = isset( $settings['__fa4_migrated']['ekit_accordion_right_icons'] );
-                                            // Check if its a new widget without previously selected icon using the old Icon control
-                                            $is_new = empty( $settings['ekit_accordion_right_icon'] );
-                                            if ( $is_new || $migrated ) {
-                                                // new icon
-                                                Icons_Manager::render_icon( $settings['ekit_accordion_right_icons'], [ 'aria-hidden' => 'true', 'class'    => 'icon-open icon-right' ] );
-                                            } else {
-                                                ?>
-                                                <i class="<?php echo esc_attr($settings['ekit_accordion_right_icon']); ?> icon-open icon-right" aria-hidden="true"></i>
-                                                <?php
-                                            }
-                                        ?>
+										<?php Icons_Manager::render_icon($settings['ekit_accordion_right_icons']); ?>
                                     </div>
 
                                     <div class="ekit_accordion_active_icon">
                                         <!-- Active Icon -->
-                                        <?php
-                                            // new icon
-                                            $migrated = isset( $settings['__fa4_migrated']['ekit_accordion_right_icon_actives'] );
-                                            // Check if its a new widget without previously selected icon using the old Icon control
-                                            $is_new = empty( $settings['ekit_accordion_right_icon_active'] );
-                                            if ( $is_new || $migrated ) {
-                                                // new icon
-                                                Icons_Manager::render_icon( $settings['ekit_accordion_right_icon_actives'], [ 'aria-hidden' => 'true', 'class'    => 'icon-closed icon-right' ] );
-                                            } else {
-                                                ?>
-                                                <i class="<?php echo esc_attr($settings['ekit_accordion_right_icon_active']); ?> icon-closed icon-right" aria-hidden="true"></i>
-                                                <?php
-                                            }
-                                        ?>
+										<?php Icons_Manager::render_icon($settings['ekit_accordion_right_icon_actives']); ?>
                                     </div>
-
                                 </div>
 
                             <?php endif; ?>
@@ -1036,6 +992,30 @@ class ElementsKit_Widget_Accordion extends Widget_Base {
                 </div><!-- .elementskit-card END -->
 
                 <?php endforeach; ?>
+                <?php
+                    if ( isset( $settings['ekit_accordian_faq_schema'] ) && 'yes' === $settings['ekit_accordian_faq_schema'] ) {
+                        $json = [
+                            '@context' => 'https://schema.org',
+                            '@type' => 'FAQPage',
+                            'mainEntity' => [],
+                        ];
+
+                        foreach ( $settings['ekit_accordion_items'] as $index => $item ) {
+                            $faq_schema_text = !empty( $item['acc_content'] ) ? $item['acc_content'] : '';
+                            $json['mainEntity'][]  = [
+                                '@type' => 'Question',
+                                'name' => esc_html($item['acc_title']),
+                                'acceptedAnswer' => [
+                                    '@type' => 'Answer',
+                                    'text' =>  \ElementsKit_Lite\Utils::kses($faq_schema_text ) ,
+                                ],
+                            ];
+                        }
+                        ?>
+                        <script type="application/ld+json"><?php echo wp_json_encode( $json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); ?></script>
+                        <?php
+                    }
+                ?>
         </div>
     <?php
     }

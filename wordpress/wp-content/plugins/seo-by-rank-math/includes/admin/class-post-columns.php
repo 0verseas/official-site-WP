@@ -11,11 +11,11 @@
 namespace RankMath\Admin;
 
 use RankMath\Helper;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Param;
 use RankMath\Runner;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\Param;
-use MyThemeShop\Database\Database;
+use RankMath\Admin\Database\Database;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,7 +50,6 @@ class Post_Columns implements Runner {
 
 		$this->register_post_columns();
 		$this->register_media_columns();
-		$this->action( 'admin_enqueue_scripts', 'enqueue' );
 
 		// Column Content.
 		$this->filter( 'rank_math_title', 'get_column_title', 5 );
@@ -62,7 +61,8 @@ class Post_Columns implements Runner {
 	 * Register post column hooks.
 	 */
 	private function register_post_columns() {
-		foreach ( Helper::get_allowed_post_types() as $post_type ) {
+		$post_types = Helper::get_allowed_post_types();
+		foreach ( $post_types as $post_type ) {
 			$this->filter( 'edd_download_columns', 'add_columns', 11 );
 			$this->filter( "manage_{$post_type}_posts_columns", 'add_columns', 11 );
 			$this->action( "manage_{$post_type}_posts_custom_column", 'columns_contents', 11, 2 );
@@ -95,31 +95,6 @@ class Post_Columns implements Runner {
 
 		$this->filter( 'manage_media_columns', 'add_media_columns', 11 );
 		$this->action( 'manage_media_custom_column', 'media_contents', 11, 2 );
-	}
-
-	/**
-	 * Enqueue styles and scripts.
-	 */
-	public function enqueue() {
-		$screen = get_current_screen();
-
-		$allowed_post_types   = Helper::get_allowed_post_types();
-		$allowed_post_types[] = 'attachment';
-		if ( ! in_array( $screen->post_type, $allowed_post_types, true ) ) {
-			return;
-		}
-
-		wp_enqueue_style( 'rank-math-post-bulk-edit', rank_math()->plugin_url() . 'assets/admin/css/post-list.css', null, rank_math()->version );
-
-		$allow_editing = Helper::get_settings( 'titles.pt_' . $screen->post_type . '_bulk_editing', true );
-		if ( ! $allow_editing || 'readonly' === $allow_editing ) {
-			return;
-		}
-
-		wp_enqueue_script( 'rank-math-post-bulk-edit', rank_math()->plugin_url() . 'assets/admin/js/post-list.js', null, rank_math()->version, true );
-		Helper::add_json( 'bulkEditTitle', esc_attr__( 'Bulk Edit This Field', 'rank-math' ) );
-		Helper::add_json( 'buttonSaveAll', esc_attr__( 'Save All Edits', 'rank-math' ) );
-		Helper::add_json( 'buttonCancel', esc_attr__( 'Cancel', 'rank-math' ) );
 	}
 
 	/**
@@ -264,7 +239,11 @@ class Post_Columns implements Runner {
 			<label><?php esc_html_e( 'Focus Keyword', 'rank-math' ); ?>:</label>
 			<span class="rank-math-column-display">
 				<strong title="Focus Keyword"><?php esc_html_e( 'Keyword', 'rank-math' ); ?>:</strong>
-				<span><?php echo $keyword ? esc_html( $keyword ) : esc_html__( 'Not Set', 'rank-math' ); ?></span>
+				<span>
+					<?php
+						echo $keyword ? wp_kses_post( $this->do_filter( 'post/column/seo_details/focus_keyword', $keyword ) ) : esc_html__( 'Not Set', 'rank-math' );
+					?>
+				</span>
 			</span>
 
 			<input class="rank-math-column-value" data-field="focus_keyword" tabindex="11" value="<?php echo esc_attr( $keyword ); ?>" />
@@ -317,21 +296,10 @@ class Post_Columns implements Runner {
 	 * Get SEO data.
 	 */
 	private function get_seo_data() {
-		global $wp_query;
 		$post_ids = [];
 
-		if ( $wp_query->posts ) {
-			$post_ids = array_filter(
-				array_map(
-					function( $post ) {
-						return isset( $post->ID ) ? $post->ID : '';
-					},
-					$wp_query->posts
-				)
-			);
-		}
-
-		$post_id = (int) Param::post( 'post_ID' );
+		$post_ids = array_filter( $this->get_post_ids() );
+		$post_id  = (int) Param::post( 'post_ID' );
 		if ( $post_id ) {
 			$post_ids[] = $post_id;
 		}
@@ -347,6 +315,88 @@ class Post_Columns implements Runner {
 
 		foreach ( $results as $result ) {
 			$this->data[ $result['post_id'] ][ $result['meta_key'] ] = $result['meta_value'];
+		}
+	}
+
+	/**
+	 * Get Post IDs dispalyed on the Post lists page.
+	 */
+	private function get_post_ids() {
+		global $wp_query, $per_page;
+		if ( empty( $wp_query->posts ) ) {
+			return [];
+		}
+
+		$pages = $wp_query->posts;
+		if (
+			! is_post_type_hierarchical( Param::get( 'post_type' ) ) ||
+			'menu_order title' !== $wp_query->query['orderby']
+		) {
+			return array_map(
+				function ( $post ) {
+					return isset( $post->ID ) ? $post->ID : '';
+				},
+				$pages
+			);
+		}
+
+		$children_pages = [];
+		if ( empty( Param::request( 's' ) ) ) {
+			$top_level_pages = [];
+
+			foreach ( $pages as $page ) {
+				if ( $page->post_parent > 0 ) {
+					$children_pages[ $page->post_parent ][] = $page;
+				} else {
+					$top_level_pages[] = $page;
+				}
+			}
+
+			$pages = &$top_level_pages;
+		}
+
+		$pagenum = max( 1, Param::request( 'paged', 0 ) );
+		$count   = 0;
+		$start   = ( $pagenum - 1 ) * $per_page;
+		$end     = $start + $per_page;
+		$ids     = [];
+
+		foreach ( $pages as $page ) {
+			if ( $count >= $end ) {
+				break;
+			}
+
+			if ( $count >= $start ) {
+				$ids[] = $page->ID;
+			}
+
+			++$count;
+
+			$this->add_child_page_ids( $children_pages, $page->ID, $ids, $count );
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Add the child page IDs to the list of IDs to be processed.
+	 *
+	 * @param array $children_pages Child Pages.
+	 * @param int   $id             Current page ID.
+	 * @param array $ids            IDs to be processed.
+	 * @param int   $count          Counter.
+	 */
+	private function add_child_page_ids( $children_pages, $id, &$ids, &$count ) {
+		if ( empty( $children_pages ) || empty( $children_pages[ $id ] ) ) {
+			return;
+		}
+
+		foreach ( $children_pages[ $id ] as $child_page ) {
+			$id    = $child_page->ID;
+			$ids[] = $child_page->ID;
+			++$count;
+
+			$this->add_child_page_ids( $children_pages, $id, $ids, $count );
 		}
 	}
 

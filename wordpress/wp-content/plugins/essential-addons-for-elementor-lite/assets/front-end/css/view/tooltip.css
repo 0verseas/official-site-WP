@@ -1,14 +1,12 @@
 .eael-tooltip {
   position: relative;
   display: inline-block;
-  min-width: 150px;
   padding: 12px 24px;
   font-size: 0.93rem;
   color: #333;
   line-height: 1;
   cursor: pointer;
   -webkit-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
 }
 
@@ -30,6 +28,11 @@
   margin: 0;
 }
 
+.eael-tooltip .eael-tooltip-text a {
+  -webkit-transition: none;
+  transition: none;
+}
+
 .eael-tooltip .eael-tooltip-text::after {
   content: "";
   position: absolute;
@@ -37,7 +40,8 @@
   border-style: solid;
 }
 
-.eael-tooltip:hover .eael-tooltip-text {
+.eael-tooltip:hover .eael-tooltip-text,
+.eael-tooltip-content:focus + .eael-tooltip-text {
   visibility: visible;
 }
 
@@ -52,9 +56,10 @@
   margin-right: 10px;
 }
 
-.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-left {
-  -webkit-animation: tooltipLeftIn 300ms ease-in-out;
-          animation: tooltipLeftIn 300ms ease-in-out;
+.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-left,
+.eael-tooltip-content:focus + .eael-tooltip-text.eael-tooltip-left {
+  -webkit-animation: eaelTooltipLeftIn 300ms ease-in-out;
+          animation: eaelTooltipLeftIn 300ms ease-in-out;
 }
 
 .eael-tooltip .eael-tooltip-text.eael-tooltip-left::after {
@@ -72,14 +77,14 @@
       -ms-transform: translateY(-50%);
           transform: translateY(-50%);
   -webkit-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
   margin-left: 10px;
 }
 
-.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-right {
-  -webkit-animation: tooltipRightIn 300ms linear;
-          animation: tooltipRightIn 300ms linear;
+.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-right,
+.eael-tooltip-content:focus + .eael-tooltip-text.eael-tooltip-right {
+  -webkit-animation: eaelTooltipRightIn 300ms linear;
+          animation: eaelTooltipRightIn 300ms linear;
 }
 
 .eael-tooltip .eael-tooltip-text.eael-tooltip-right::after {
@@ -92,42 +97,48 @@
 
 .eael-tooltip .eael-tooltip-text.eael-tooltip-top {
   bottom: 100%;
-  left: 0;
-  right: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+      -ms-transform: translateX(-50%);
+          transform: translateX(-50%);
   margin: 0 auto 10px auto;
 }
 
 .eael-tooltip .eael-tooltip-text.eael-tooltip-top::after {
-  margin-top: 0px;
+  margin-top: 0;
   top: 100%;
   left: calc(50% - 5px);
   border-color: black transparent transparent transparent;
 }
 
-.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-top {
-  -webkit-animation: tooltipTopIn 300ms linear;
-          animation: tooltipTopIn 300ms linear;
+.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-top,
+.eael-tooltip-content:focus + .eael-tooltip-text.eael-tooltip-top {
+  -webkit-animation: eaelTooltipTopIn 300ms linear;
+          animation: eaelTooltipTopIn 300ms linear;
 }
 
 /*--- Bottom ---*/
 
 .eael-tooltip .eael-tooltip-text.eael-tooltip-bottom {
   top: 100%;
-  left: 0;
-  right: 0;
-  margin: 10px auto 0px auto;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+      -ms-transform: translateX(-50%);
+          transform: translateX(-50%);
+  margin: 10px auto 0 auto;
 }
 
 .eael-tooltip .eael-tooltip-text.eael-tooltip-bottom::after {
-  margin-top: 0px;
+  margin-top: 0;
   bottom: 100%;
   left: calc(50% - 5px);
   border-color: transparent transparent black transparent;
 }
 
-.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-bottom {
-  -webkit-animation: tooltipBottomIn 300ms linear;
-          animation: tooltipBottomIn 300ms linear;
+.eael-tooltip:hover .eael-tooltip-text.eael-tooltip-bottom,
+.eael-tooltip-content:focus + .eael-tooltip-text.eael-tooltip-bottom {
+  -webkit-animation: eaelTooltipBottomIn 300ms linear;
+          animation: eaelTooltipBottomIn 300ms linear;
 }
 
 /*--- Alignments ---*/
@@ -204,7 +215,7 @@
 
 /*--- Tooltip Keyframes ---*/
 
-@-webkit-keyframes tooltipRightIn {
+@-webkit-keyframes eaelTooltipRightIn {
   0% {
     opacity: 0;
     left: 105%;
@@ -215,7 +226,7 @@
   }
 }
 
-@keyframes tooltipRightIn {
+@keyframes eaelTooltipRightIn {
   0% {
     opacity: 0;
     left: 105%;
@@ -226,7 +237,7 @@
   }
 }
 
-@-webkit-keyframes tooltipLeftIn {
+@-webkit-keyframes eaelTooltipLeftIn {
   0% {
     opacity: 0;
     right: 105%;
@@ -237,7 +248,7 @@
   }
 }
 
-@keyframes tooltipLeftIn {
+@keyframes eaelTooltipLeftIn {
   0% {
     opacity: 0;
     right: 105%;
@@ -248,7 +259,7 @@
   }
 }
 
-@-webkit-keyframes tooltipTopIn {
+@-webkit-keyframes eaelTooltipTopIn {
   0% {
     opacity: 0;
     bottom: 110%;
@@ -259,7 +270,7 @@
   }
 }
 
-@keyframes tooltipTopIn {
+@keyframes eaelTooltipTopIn {
   0% {
     opacity: 0;
     bottom: 110%;
@@ -270,7 +281,7 @@
   }
 }
 
-@-webkit-keyframes tooltipBottomIn {
+@-webkit-keyframes eaelTooltipBottomIn {
   0% {
     opacity: 0;
     top: 110%;
@@ -281,7 +292,7 @@
   }
 }
 
-@keyframes tooltipBottomIn {
+@keyframes eaelTooltipBottomIn {
   0% {
     opacity: 0;
     top: 110%;

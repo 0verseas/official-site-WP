@@ -128,11 +128,10 @@ blocksy_output_colors([
 					'to_add' => '.widget-title'
 				])
 			),
-			'variable' => 'heading-color'
+			'variable' => 'theme-heading-color'
 		],
 	],
 ]);
-
 
 // Widgets font & color
 blocksy_output_font_css([
@@ -172,7 +171,7 @@ blocksy_output_colors([
 					'to_add' => '.ct-widget'
 				])
 			),
-			'variable' => 'color'
+			'variable' => 'theme-text-color'
 		],
 
 		'link_initial' => [
@@ -183,7 +182,7 @@ blocksy_output_colors([
 					'to_add' => '.ct-widget'
 				])
 			),
-			'variable' => 'linkInitialColor'
+			'variable' => 'theme-link-initial-color'
 		],
 
 		'link_hover' => [
@@ -194,7 +193,7 @@ blocksy_output_colors([
 					'to_add' => '.ct-widget'
 				])
 			),
-			'variable' => 'linkHoverColor'
+			'variable' => 'theme-link-hover-color'
 		],
 	],
 ]);
@@ -212,7 +211,7 @@ blocksy_output_border([
 			'to_add' => '> div'
 		])
 	),
-	'variableName' => 'border',
+	'variableName' => 'theme-border',
 	'value' => blocksy_akg('footerColumnsDivider', $atts),
 	'default' => [
 		'width' => 1,
@@ -258,13 +257,15 @@ $footerRowTopDivider = blocksy_akg(
 	$footerRowTopDividerDefault
 );
 
+$footerRowTopDivider = blocksy_expand_responsive_value($footerRowTopDivider);
+
 if (isset($footerRowTopDivider['desktop']) || is_customize_preview()) {
 	blocksy_output_border([
 		'css' => $css,
 		'tablet_css' => $tablet_css,
 		'mobile_css' => $mobile_css,
 		'selector' => blocksy_assemble_selector($top_has_border_selector),
-		'variableName' => 'border-top',
+		'variableName' => 'theme-border-top',
 		'value' => $footerRowTopDivider,
 		'default' => $footerRowTopDividerDefault,
 		'responsive' => true
@@ -275,7 +276,7 @@ if (isset($footerRowTopDivider['desktop']) || is_customize_preview()) {
 		'tablet_css' => $tablet_css,
 		'mobile_css' => $mobile_css,
 		'selector' => blocksy_assemble_selector($top_has_no_border_selector),
-		'variableName' => 'border-top',
+		'variableName' => 'theme-border-top',
 		'value' => [
 			'desktop' => 'none',
 			'tablet' => 'none',
@@ -320,13 +321,15 @@ $footerRowBottomDivider = blocksy_akg(
 	$footerRowBottomDividerDefault
 );
 
+$footerRowBottomDivider = blocksy_expand_responsive_value($footerRowBottomDivider);
+
 if (isset($footerRowBottomDivider['desktop']) || is_customize_preview()) {
 	blocksy_output_border([
 		'css' => $css,
 		'tablet_css' => $tablet_css,
 		'mobile_css' => $mobile_css,
 		'selector' => blocksy_assemble_selector($bottom_has_border_selector),
-		'variableName' => 'border-bottom',
+		'variableName' => 'theme-border-bottom',
 		'value' => $footerRowBottomDivider,
 		'default' => $footerRowBottomDividerDefault,
 		'responsive' => true
@@ -337,7 +340,7 @@ if (isset($footerRowBottomDivider['desktop']) || is_customize_preview()) {
 		'tablet_css' => $tablet_css,
 		'mobile_css' => $mobile_css,
 		'selector' => blocksy_assemble_selector($bottom_has_no_border_selector),
-		'variableName' => 'border-bottom',
+		'variableName' => 'theme-border-bottom',
 		'value' => [
 			'desktop' => 'none',
 			'tablet' => 'none',
@@ -346,7 +349,6 @@ if (isset($footerRowBottomDivider['desktop']) || is_customize_preview()) {
 		'unit' => ''
 	]);
 }
-
 
 // Row background
 if (empty($default_background)) {
@@ -369,7 +371,6 @@ blocksy_output_background_css([
 	),
 	'responsive' => true
 ]);
-
 
 $count = count($primary_item['columns']);
 
@@ -418,6 +419,8 @@ if ($count === 6) {
 		'mobile' => 'initial'
 	]);
 }
+
+$gridTemplate = blocksy_expand_responsive_value($gridTemplate);
 
 $css->put(
 	blocksy_assemble_selector(blocksy_mutate_selector([

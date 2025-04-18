@@ -10,7 +10,7 @@ use \Elementor\Controls_Manager;
 use \Elementor\Group_Control_Background;
 use \Elementor\Group_Control_Box_Shadow;
 use \Elementor\Group_Control_Typography;
-use \Elementor\Core\Schemes\Typography;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use \Elementor\Widget_Base;
 
 use \Essential_Addons_Elementor\Classes\Helper;
@@ -52,6 +52,14 @@ class Progress_Bar extends Widget_Base
             'scroll indicator',
             'essential addons',
         ];
+    }
+
+    protected function is_dynamic_content():bool {
+        return false;
+    }
+
+    public function has_widget_inner_wrapper(): bool {
+        return ! Helper::eael_e_optimized_markup();
     }
 
     public function get_custom_help_url()
@@ -126,6 +134,9 @@ class Progress_Bar extends Widget_Base
                 ],
                 'default' => __('Progress Bar', 'essential-addons-for-elementor-lite'),
                 'separator' => 'before',
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -178,6 +189,9 @@ class Progress_Bar extends Widget_Base
                     'progress_bar_layout' => $style_condition,
                     'progress_bar_title_inner_show' => 'yes',
                 ],
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -277,6 +291,9 @@ class Progress_Bar extends Widget_Base
                     'progress_bar_layout' => 'half_circle',
                 ],
                 'separator' => 'before',
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -291,6 +308,9 @@ class Progress_Bar extends Widget_Base
                     'progress_bar_layout' => 'half_circle',
                 ],
                 'separator' => 'before',
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -768,7 +788,9 @@ class Progress_Bar extends Widget_Base
             [
                 'name' => 'progress_bar_title_typography',
                 'label' => __('Title', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_1,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+                ],
                 'selector' => '{{WRAPPER}} .eael-progressbar-title',
             ]
         );
@@ -791,7 +813,9 @@ class Progress_Bar extends Widget_Base
             [
                 'name' => 'progress_bar_inner_title_typography',
                 'label' => __('Inner Title', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_1,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+                ],
                 'selector' => '{{WRAPPER}} .eael-progressbar-line-fill.eael-has-inner-title',
             ]
         );
@@ -826,7 +850,9 @@ class Progress_Bar extends Widget_Base
             [
                 'name' => 'progress_bar_count_typography',
                 'label' => __('Counter', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_1,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+                ],
                 'selector' => '{{WRAPPER}} .eael-progressbar-count-wrap',
             ]
         );
@@ -849,7 +875,9 @@ class Progress_Bar extends Widget_Base
             [
                 'name' => 'progress_bar_after_typography',
                 'label' => __('Prefix/Postfix', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_1,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+                ],
                 'selector' => '{{WRAPPER}} .eael-progressbar-half-circle-after span',
                 'condition' => [
                     'progress_bar_layout' => 'half_circle',
@@ -919,12 +947,13 @@ class Progress_Bar extends Widget_Base
                 'style' => '-webkit-transition-duration:' . $settings['progress_bar_animation_duration']['size'] . 'ms;-o-transition-duration:' . $settings['progress_bar_animation_duration']['size'] . 'ms;transition-duration:' . $settings['progress_bar_animation_duration']['size'] . 'ms;',
             ]);
 
-            echo '<div class="eael-progressbar-line-container ' . $settings['progress_bar_line_alignment'] . '">
-                ' . ($settings['progress_bar_title'] ? sprintf('<%1$s class="%2$s">', Helper::eael_validate_html_tag($settings['progress_bar_title_html_tag']), 'eael-progressbar-title') . Helper::eael_wp_kses($settings['progress_bar_title']) . sprintf('</%1$s>', Helper::eael_validate_html_tag($settings['progress_bar_title_html_tag'])) : '') . '
+            $title_tag = Helper::eael_validate_html_tag( $settings['progress_bar_title_html_tag'] );
+            echo '<div class="eael-progressbar-line-container ' . esc_attr( $settings['progress_bar_line_alignment'] ) . '">
+                ' . ($settings['progress_bar_title'] ? sprintf('<%1$s class="eael-progressbar-title">%2$s</%1$s>', esc_html( $title_tag ), wp_kses( $settings['progress_bar_title'], Helper::eael_allowed_tags() )) : '') . '
 
-                <div ' . $this->get_render_attribute_string('eael-progressbar-line') . '>
-                    ' . ($settings['progress_bar_show_count'] === 'yes' ? '<span class="eael-progressbar-count-wrap"><span class="eael-progressbar-count">0</span><span class="postfix">' . __('%', 'essential-addons-for-elementor-lite') . '</span></span>' : '') . '
-                    <span ' . $this->get_render_attribute_string('eael-progressbar-line-fill') . '>' . Helper::eael_wp_kses( $settings['progress_bar_title_inner'] ) . '</span>
+                <div '; $this->print_render_attribute_string('eael-progressbar-line'); echo '>
+                    ' . ($settings['progress_bar_show_count'] === 'yes' ? '<span class="eael-progressbar-count-wrap"><span class="eael-progressbar-count">0</span><span class="postfix">' . esc_html__('%', 'essential-addons-for-elementor-lite') . '</span></span>' : '') . '
+                    <span '; $this->print_render_attribute_string('eael-progressbar-line-fill'); echo '>' . wp_kses( $settings['progress_bar_title_inner'], Helper::eael_allowed_tags() ) . '</span>
                 </div>
             </div>';
         }
@@ -943,22 +972,24 @@ class Progress_Bar extends Widget_Base
                 ]
             );
 
-            echo '<div class="eael-progressbar-circle-container ' . $settings['progress_bar_circle_alignment'] . '">
-                ' . ($settings['progress_bar_circle_box_shadow_box_shadow'] ? '<div class="eael-progressbar-circle-shadow">' : '') . '
-
-                <div ' . $this->get_render_attribute_string('eael-progressbar-circle') . '>
+            $has_shadow = isset( $settings['progress_bar_circle_box_shadow_box_shadow'] ) && !empty( $settings['progress_bar_circle_box_shadow_box_shadow'] );
+            
+            echo '<div class="eael-progressbar-circle-container ' . esc_attr( $settings['progress_bar_circle_alignment'] ) . '">
+                ' . ( $has_shadow ? '<div class="eael-progressbar-circle-shadow">' : '') . '
+            
+                <div '; $this->print_render_attribute_string('eael-progressbar-circle'); echo '>
                     <div class="eael-progressbar-circle-pie">
                         <div class="eael-progressbar-circle-half-left eael-progressbar-circle-half"></div>
                         <div class="eael-progressbar-circle-half-right eael-progressbar-circle-half"></div>
                     </div>
                     <div class="eael-progressbar-circle-inner"></div>
                     <div class="eael-progressbar-circle-inner-content">
-                        ' . ($settings['progress_bar_title'] ? sprintf('<%1$s class="%2$s">', Helper::eael_validate_html_tag($settings['progress_bar_title_html_tag']), 'eael-progressbar-title') . $settings['progress_bar_title'] . sprintf('</%1$s>', Helper::eael_validate_html_tag($settings['progress_bar_title_html_tag'])) : '') . '
-                        ' . ($settings['progress_bar_show_count'] === 'yes' ? '<span class="eael-progressbar-count-wrap"><span class="eael-progressbar-count">0</span><span class="postfix">' . __('%', 'essential-addons-for-elementor-lite') . '</span></span>' : '<span class="eael-progressbar-count-wrap" style="display: none;"><span class="eael-progressbar-count">0</span><span class="postfix">' . __('%', 'essential-addons-for-elementor-lite') . '</span></span>') . '
+                        ' . ($settings['progress_bar_title'] ? sprintf('<%1$s class="eael-progressbar-title">%2$s</%1$s>', esc_html( Helper::eael_validate_html_tag( $settings['progress_bar_title_html_tag'] ) ), wp_kses( $settings['progress_bar_title'], Helper::eael_allowed_tags() ) ) : '') . '
+                        ' . ($settings['progress_bar_show_count'] === 'yes' ? '<span class="eael-progressbar-count-wrap"><span class="eael-progressbar-count">0</span><span class="postfix">' . esc_html__('%', 'essential-addons-for-elementor-lite') . '</span></span>' : '<span class="eael-progressbar-count-wrap" style="display: none;"><span class="eael-progressbar-count">0</span><span class="postfix">' . esc_html__('%', 'essential-addons-for-elementor-lite') . '</span></span>') . '
                     </div>
                 </div>
 
-                ' . ($settings['progress_bar_circle_box_shadow_box_shadow'] ? '</div>' : '') . '
+                ' . ( $has_shadow ? '</div>' : '') . '
             </div>';
         }
 
@@ -990,22 +1021,22 @@ class Progress_Bar extends Widget_Base
                 ]
             );
 
-            echo '<div class="eael-progressbar-circle-container ' . $settings['progress_bar_circle_alignment'] . '">
-                <div ' . $this->get_render_attribute_string('eael-progressbar-half-circle') . '>
+            echo '<div class="eael-progressbar-circle-container ' . esc_attr( $settings['progress_bar_circle_alignment'] ) . '">
+                <div '; $this->print_render_attribute_string('eael-progressbar-half-circle'); echo '>
                     <div class="eael-progressbar-circle">
                         <div class="eael-progressbar-circle-pie">
-                            <div ' . $this->get_render_attribute_string('eael-progressbar-circle-half') . '></div>
+                            <div '; $this->print_render_attribute_string('eael-progressbar-circle-half'); echo '></div>
                         </div>
                         <div class="eael-progressbar-circle-inner"></div>
                     </div>
                     <div class="eael-progressbar-circle-inner-content">
-                        ' . ($settings['progress_bar_title'] ? sprintf('<%1$s class="%2$s">', Helper::eael_validate_html_tag($settings['progress_bar_title_html_tag']), 'eael-progressbar-title') . $settings['progress_bar_title'] . sprintf('</%1$s>', Helper::eael_validate_html_tag($settings['progress_bar_title_html_tag'])) : '') . '
-                        ' . ($settings['progress_bar_show_count'] === 'yes' ? '<span class="eael-progressbar-count-wrap"><span class="eael-progressbar-count">0</span><span class="postfix">' . __('%', 'essential-addons-for-elementor-lite') . '</span></span>' : '') . '
+                        ' . ($settings['progress_bar_title'] ? sprintf('<%1$s class="eael-progressbar-title">%2$s</%1$s>', esc_html( Helper::eael_validate_html_tag( $settings['progress_bar_title_html_tag'] ) ), wp_kses( $settings['progress_bar_title'], Helper::eael_allowed_tags() ) ) : '') . '
+                        ' . ($settings['progress_bar_show_count'] === 'yes' ? '<span class="eael-progressbar-count-wrap"><span class="eael-progressbar-count">0</span><span class="postfix">' . esc_html__('%', 'essential-addons-for-elementor-lite') . '</span></span>' : '') . '
                     </div>
                 </div>
                 <div class="eael-progressbar-half-circle-after">
-                    ' . ($settings['progress_bar_prefix_label'] ? sprintf('<span class="eael-progressbar-prefix-label">%1$s</span>', Helper::eael_wp_kses($settings['progress_bar_prefix_label'])) : '') . '
-                    ' . ($settings['progress_bar_postfix_label'] ? sprintf('<span class="eael-progressbar-postfix-label">%1$s</span>', Helper::eael_wp_kses($settings['progress_bar_postfix_label'])) : '') . '
+                    ' . ($settings['progress_bar_prefix_label'] ? sprintf('<span class="eael-progressbar-prefix-label">%1$s</span>', wp_kses($settings['progress_bar_prefix_label'], Helper::eael_allowed_tags() ) ) : '') . '
+                    ' . ($settings['progress_bar_postfix_label'] ? sprintf('<span class="eael-progressbar-postfix-label">%1$s</span>', wp_kses( $settings['progress_bar_postfix_label'], Helper::eael_allowed_tags() ) ) : '') . '
                 </div>
             </div>';
         }

@@ -31,30 +31,9 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 	 */
 	private $user_api_services;
 	/**
-	 * @var Language_Service_Weglot
-	 */
-	private $language_services;
-	/**
-	 * @var Button_Service_Weglot
-	 */
-	private $button_services;
-	/**
-	 * @var array
+	 * @var array<string|int,mixed>
 	 */
 	private $options;
-	/**
-	 * @var array|array[]
-	 */
-	private $tabs;
-	/**
-	 * @var string
-	 */
-	private $tab_active;
-	/**
-	 * @var Wc_Active
-	 */
-	private $wc_active_services;
-
 
 	/**
 	 * @since 2.0
@@ -62,17 +41,14 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 	public function __construct() {
 		$this->option_services    = weglot_get_service( 'Option_Service_Weglot' );
 		$this->user_api_services  = weglot_get_service( 'User_Api_Service_Weglot' );
-		$this->language_services  = weglot_get_service( 'Language_Service_Weglot' );
-		$this->button_services    = weglot_get_service( 'Button_Service_Weglot' );
-		$this->wc_active_services = weglot_get_service( 'Wc_Active' );
-		return $this;
+
 	}
 
 	/**
+	 * @return void
+	 * @since 2.0
 	 * @see Hooks_Interface_Weglot
 	 *
-	 * @since 2.0
-	 * @return void
 	 */
 	public function hooks() {
 		add_action( 'admin_menu', array( $this, 'weglot_plugin_menu' ) );
@@ -80,13 +56,26 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 	}
 
 	/**
-	 * @since 3.1.7
 	 * @return void
+	 * @throws \Exception
+	 * @since 3.1.7
 	 */
 	public function add_admin_bar_menu() {
 
 		global $wp_admin_bar;
 		global $wp;
+		$current_user = wp_get_current_user();
+		$user_roles = $current_user->roles;
+		$role = array_shift($user_roles);
+		$email = $current_user->user_email;
+		$organization_slug = $this->option_services->get_option('organization_slug');
+		$project_slug = $this->option_services->get_option('project_slug');
+
+		$display_menu = apply_filters('display_admin_bar_menu_weglot', true, $role, $email);
+
+		if (!$display_menu && !current_user_can('administrator')) {
+			return;
+		}
 
 		$wp_admin_bar->add_menu(
 			array(
@@ -116,7 +105,7 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 				'id'     => 'weglot-dashboard',
 				'parent' => 'weglot',
 				'title'  => __( 'Weglot dashboard', 'weglot' ),
-				'href'   => esc_url( 'https://dashboard.weglot.com/translations/', 'weglot' ),
+				'href'   => esc_url( 'https://dashboard.weglot.com/workspaces/' . $organization_slug . '/projects/'. $project_slug .'/translations/languages/' ),
 				'meta'   => array(
 					'target' => '_blank',
 				),
@@ -128,7 +117,7 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 				'id'     => 'weglot-visual-editor',
 				'parent' => 'weglot',
 				'title'  => __( 'Edit with visual editor', 'weglot' ),
-				'href'   => add_query_arg( 'url', $url_to_edit, 'https://dashboard.weglot.com/translations/visual-editor/' ),
+				'href'   => esc_url( 'https://dashboard.weglot.com/workspaces/' . $organization_slug . '/projects/'. $project_slug .'/translations/visual-editor/launch?url='.$url_to_edit.'&mode=translations' ),
 				'meta'   => array(
 					'target' => '_blank',
 				),
@@ -140,10 +129,10 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 	/**
 	 * Add menu and sub pages
 	 *
+	 * @return void
+	 * @since 2.0
 	 * @see admin_menu
 	 *
-	 * @since 2.0
-	 * @return void
 	 */
 	public function weglot_plugin_menu() {
 
@@ -151,7 +140,10 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 
 		$menu_icon = 'data:image/svg+xml;base64,' . base64_encode( $weglot_logo_svg );
 
-		add_menu_page( 'Weglot', 'Weglot', 'manage_options', Helper_Pages_Weglot::SETTINGS, array( $this, 'weglot_plugin_settings_page' ), $menu_icon );
+		add_menu_page( 'Weglot', 'Weglot', 'manage_options', Helper_Pages_Weglot::SETTINGS, array(
+			$this,
+			'weglot_plugin_settings_page'
+		), $menu_icon );
 	}
 
 	/**
@@ -163,23 +155,34 @@ class Pages_Weglot implements Hooks_Interface_Weglot {
 	 *
 	 */
 	public function weglot_plugin_settings_page() {
-		$this->tabs       = Helper_Tabs_Admin_Weglot::get_full_tabs();
-		$this->tab_active = Helper_Tabs_Admin_Weglot::SETTINGS;
+		$tabs       = Helper_Tabs_Admin_Weglot::get_full_tabs();
+		$tab_active = Helper_Tabs_Admin_Weglot::SETTINGS;
 
 		if ( isset( $_GET['tab'] ) ) { // phpcs:ignore
-			$this->tab_active = sanitize_text_field( wp_unslash( $_GET['tab'] ) ); // phpcs:ignore
+			$tab_active = sanitize_text_field( wp_unslash( $_GET['tab'] ) ); // phpcs:ignore
 		}
 
 		$this->options = $this->option_services->get_options();
 
-		try {
-			$user_info = $this->user_api_services->get_user_info();
-			if ( isset( $user_info['allowed'] ) ) {
-				$this->option_services->set_option_by_key( 'allowed', $user_info['allowed'] );
+		if ( ! $this->options['has_first_settings'] ) :
+			try {
+				$user_info = $this->user_api_services->get_user_info();
+
+				if ( $user_info['limit'] <= $user_info['usage'] ) {
+					if ( ! file_exists( WEGLOT_TEMPLATES_ADMIN_NOTICES . '/limit-reach.php' ) ) {
+						return;
+					}
+					include_once WEGLOT_TEMPLATES_ADMIN_NOTICES . '/limit-reach.php';
+				}
+
+				if ( isset( $user_info['allowed'] ) ) {
+					$this->option_services->set_option_by_key( 'allowed', $user_info['allowed'] );
+				}
+			} catch ( \Exception $e ) {
+				// If an exception occurs, do nothing, keep wg_allowed.
 			}
-		} catch ( \Exception $e ) {
-			// If an exception occurs, do nothing, keep wg_allowed.
-		}
+		endif;
+
 
 		include_once WEGLOT_TEMPLATES_ADMIN_PAGES . '/settings.php';
 	}

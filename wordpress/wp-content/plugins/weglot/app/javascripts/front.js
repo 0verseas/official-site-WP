@@ -1,22 +1,26 @@
 //find and place wg-ajax-button-switcher
 
 function switcherPlacement() {
-	const button_switcher_ajax = document.querySelectorAll(".weglot-custom-switcher-ajax")
-	Array.prototype.forEach.call(button_switcher_ajax, function (el, i) {
-		let button_target = document.querySelector(el.getAttribute('data-wg-target'))
-		let button_sibling = document.querySelector(el.getAttribute('data-wg-sibling'))
+	const buttons = document.querySelectorAll(".weglot-custom-switcher-ajax");
 
-		if (button_target && button_sibling) {
-			button_target.insertBefore(el, button_sibling)
-			el.classList.remove("weglot-custom-switcher-ajax")
-		} else if (button_target) {
-			button_target.insertBefore(el, button_target.firstChild)
-			el.classList.remove("weglot-custom-switcher-ajax")
-		} else if (button_sibling) {
-			button_sibling.parentNode.insertBefore(el, button_sibling)
-			el.classList.remove("weglot-custom-switcher-ajax")
+	buttons.forEach(button => {
+		const targetSelector = button.getAttribute('data-wg-target');
+		const siblingSelector = button.getAttribute('data-wg-sibling');
+		const target = targetSelector ? document.querySelector(targetSelector) : null;
+		const sibling = siblingSelector ? document.querySelector(siblingSelector) : null;
+
+		if (target && sibling) {
+			target.insertBefore(button, sibling);
+		} else if (target) {
+			target.insertBefore(button, target.firstChild);
+		} else if (sibling) {
+			sibling.parentNode.insertBefore(button, sibling);
+		}else{
+			button.classList.add("weglot-default", "weglot-invert");
 		}
-	})
+
+		button.classList.remove("weglot-custom-switcher-ajax");
+	});
 }
 
 //detect iframe
@@ -28,11 +32,30 @@ function inFrame() {
 	}
 }
 
-if (document.readyState === "loading") {
-	document.addEventListener( "DOMContentLoaded", () => switcherPlacement() );
-} else {
-	switcherPlacement();
-}
+setTimeout(() => {
+	if (document.readyState === "loading") {
+		document.addEventListener( "DOMContentLoaded", () => switcherPlacement() );
+	} else {
+		switcherPlacement();
+	}
+}, 1500);
+
+window.WeglotSwitcherControl = {
+	hideSwitchers: true, // Default behavior to hide switchers
+	updateSwitchers: function () {
+		const switchers = document.querySelectorAll('.weglot-dropdown');
+		if (switchers !== null) {
+			[].forEach.call(switchers, function (switcher) {
+				switcher.style.display = window.WeglotSwitcherControl.hideSwitchers ? "none" : "";
+			});
+		}
+	}
+};
+
+document.addEventListener("WeglotSwitcherUpdate", function () {
+	window.WeglotSwitcherControl.updateSwitchers();
+});
+
 
 document.addEventListener( "DOMContentLoaded", function ( event ) {
 
@@ -65,14 +88,9 @@ document.addEventListener( "DOMContentLoaded", function ( event ) {
 		button.className += " weglot-invert";
 	}
 
-	//check if your page is load by an iframe
 	if (inFrame()) {
-		const switchers = document.querySelectorAll('.weglot-dropdown')
-		if (switchers !== null) {
-			[].forEach.call(switchers, function (switcher) {
-				switcher.style.display = "none";
-			});
-		}
+		// Initial update based on the default setting
+		window.WeglotSwitcherControl.updateSwitchers();
 	}
 
 	document.addEventListener("click", (evt) => {
@@ -166,7 +184,7 @@ document.addEventListener( "DOMContentLoaded", function ( event ) {
 				}
 			});
 
-			aside.addEventListener("mousedown", event => {
+			function handleMouseDown(event) {
 				if (focusedLang) {
 					const destinationLanguage = focusedLang.getAttribute("data-l");
 					setAriaLabel(destinationLanguage);
@@ -174,7 +192,34 @@ document.addEventListener( "DOMContentLoaded", function ( event ) {
 				}
 				toggleSwitcher();
 				return;
-			});
+			}
+
+			aside.addEventListener("mousedown", handleMouseDown);
+
+			if(aside.className.includes("open_hover")){
+				aside.addEventListener("mouseenter", event => {
+					if (focusedLang) {
+						const destinationLanguage = focusedLang.getAttribute("data-l");
+						setAriaLabel(destinationLanguage);
+						aside.focus();
+					}
+					toggleSwitcher();
+					aside.querySelector("input.weglot_choice").checked = true
+					return;
+				});
+
+				aside.addEventListener("mouseleave", event => {
+					if (focusedLang) {
+						const destinationLanguage = focusedLang.getAttribute("data-l");
+						setAriaLabel(destinationLanguage);
+						aside.focus();
+					}
+					toggleSwitcher();
+					aside.querySelector("input.weglot_choice").checked = false
+					return;
+				});
+			}
+
 
 			const moveFocus = keyCode => {
 				const direction = keyCode === KEYCODE.ARROWDOWN ? "nextSibling" : "previousSibling";

@@ -1,16 +1,21 @@
 <?php
 
+$is_pro = function_exists('blc_fs') && blc_fs()->can_use_premium_code();
+
 $cpt_choices = [
 	'post' => __('Posts', 'blocksy'),
-	'page' => __('Pages', 'blocksy'),
-	'product' => __('Products', 'blocksy')
+	'page' => __('Pages', 'blocksy')
 ];
 
 $cpt_options = [
 	'post' => true,
-	'page' => true,
-	'product' => true
+	'page' => true
 ];
+
+if (class_exists('WooCommerce')) {
+	$cpt_choices['product'] = __('Products', 'blocksy');
+	$cpt_options['product'] = true;
+}
 
 $all_cpts = blocksy_manager()->post_types->get_supported_post_types();
 
@@ -29,7 +34,7 @@ foreach ($all_cpts as $single_cpt) {
 		$cpt_choices[$single_cpt] = ucfirst($single_cpt);
 	}
 
-	$cpt_options[$single_cpt] = true;
+	$cpt_options[$single_cpt] = false;
 }
 
 $options = [
@@ -37,7 +42,6 @@ $options = [
 		'title' => __( 'General', 'blocksy' ),
 		'type' => 'tab',
 		'options' => [
-
 			apply_filters(
 				'blocksy:header:search:options:icon',
 				[]
@@ -60,12 +64,11 @@ $options = [
 				'divider' => 'top',
 				'allow_empty' => true,
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'desktop' => false,
 					'tablet' => false,
 					'mobile' => false,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'desktop' => __( 'Desktop', 'blocksy' ),
 					'tablet' => __( 'Tablet', 'blocksy' ),
@@ -104,7 +107,10 @@ $options = [
 						'divider' => 'top',
 						'design' => 'block',
 						'value' => __( 'Search', 'blocksy' ),
-						'sync' => 'live'
+						'sync' => 'live',
+						'responsive' => [
+							'tablet' => 'skip'
+						],
 					],
 				],
 			],
@@ -187,13 +193,13 @@ $options = [
 									[
 										'title' => __( 'Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--color)'
+										'inherit' => 'var(--theme-text-color)'
 									],
 
 									[
 										'title' => __( 'Hover', 'blocksy' ),
 										'id' => 'hover',
-										'inherit' => 'var(--linkHoverColor)'
+										'inherit' => 'var(--theme-link-hover-color)'
 									],
 								],
 							],
@@ -313,13 +319,13 @@ $options = [
 							[
 								'title' => __( 'Initial', 'blocksy' ),
 								'id' => 'default',
-								'inherit' => 'var(--color)'
+								'inherit' => 'var(--theme-text-color)'
 							],
 
 							[
 								'title' => __( 'Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--paletteColor2)'
+								'inherit' => 'var(--theme-palette-color-2)'
 							],
 						],
 					],
@@ -391,9 +397,7 @@ $options = [
 				'type' => 'ct-spacing',
 				'divider' => 'top',
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => blocksy_spacing_value([
-					'linked' => true,
-				]),
+				'value' => blocksy_spacing_value(),
 				'responsive' => true
 			],
 
@@ -410,68 +414,88 @@ $options = [
 		'type' => 'tab',
 		'options' => [
 
-			'header_search_placeholder' => [
-				'label' => __( 'Placeholder Text', 'blocksy' ),
-				'type' => 'text',
-				'design' => 'block',
-				'value' => __( 'Search', 'blocksy' ),
-				'sync' => 'live'
-			],
+			[
+				'header_search_placeholder' => [
+					'label' => __( 'Placeholder Text', 'blocksy' ),
+					'type' => 'text',
+					'design' => 'block',
+					'value' => __( 'Search', 'blocksy' ),
+					'sync' => 'live'
+				],
 
-			'enable_live_results' => [
-				'label' => __( 'Live Results', 'blocksy' ),
-				'type' => 'ct-switch',
-				'value' => 'yes',
-			],
+				'enable_live_results' => [
+					'label' => __( 'Live Results', 'blocksy' ),
+					'type' => 'ct-switch',
+					'value' => 'yes',
+				],
 
-			blocksy_rand_md5() => [
-				'type' => 'ct-condition',
-				'condition' => [ 'enable_live_results' => 'yes' ],
-				'options' => [
+				blocksy_rand_md5() => [
+					'type' => 'ct-condition',
+					'condition' => [ 'enable_live_results' => 'yes' ],
+					'options' => [
 
-					'searchHeaderImages' => [
-						'label' => __( 'Live Results Images', 'blocksy' ),
-						'type' => 'ct-switch',
-						'value' => 'yes',
-						'divider' => 'top',
-						'setting' => [ 'transport' => 'postMessage' ],
+						'searchHeaderImages' => [
+							'label' => __( 'Live Results Images', 'blocksy' ),
+							'type' => 'ct-switch',
+							'value' => 'yes',
+							'divider' => 'top',
+							'setting' => [ 'transport' => 'postMessage' ],
+						],
+
+						blocksy_rand_md5() => [
+							'type' => 'ct-condition',
+							'condition' => [ 'search_through/product' => true ],
+							'options' => [
+								'searchHeaderProductPrice' => [
+									'label' => __( 'Live Results Product Price', 'blocksy' ),
+									'type' => 'ct-switch',
+									'value' => 'no',
+									'divider' => 'top',
+									'setting' => [ 'transport' => 'postMessage' ],
+								],
+
+								'searchHeaderProductStatus' => [
+									'label' => __( 'Live Results Product Status', 'blocksy' ),
+									'type' => 'ct-switch',
+									'value' => 'no',
+									'divider' => 'top',
+									'setting' => [ 'transport' => 'postMessage' ],
+								],
+							]
+						],
+
 					],
+				],
 
-					blocksy_rand_md5() => [
-						'type' => 'ct-condition',
-						'condition' => [ 'search_through/product' => true ],
-						'options' => [
-							'searchHeaderProductPrice' => [
-								'label' => __( 'Live Results Product Price', 'blocksy' ),
-								'type' => 'ct-switch',
-								'value' => 'no',
-								'divider' => 'top',
-								'setting' => [ 'transport' => 'postMessage' ],
-							],
-						]
-					],
 
+				blocksy_rand_md5() => [
+					'type' => 'ct-title',
+					'label' => __('Search Through Criteria', 'blocksy'),
+					'desc' => __(
+						'Chose in which post types do you want to perform searches.',
+						'blocksy'
+					)
+				],
+
+				'search_through' => [
+					'label' => false,
+					'type' => 'ct-checkboxes',
+					'attr' => ['data-columns' => '2'],
+					'disableRevertButton' => true,
+					'choices' => blocksy_ordered_keys($cpt_choices),
+					'value' => $cpt_options
 				],
 			],
 
-
-			blocksy_rand_md5() => [
-				'type' => 'ct-title',
-				'label' => __('Search Through Criteria', 'blocksy'),
-				'desc' => __(
-					'Chose in which post types do you want to perform searches.',
-					'blocksy'
-				)
-			],
-
-			'search_through' => [
-				'label' => false,
-				'type' => 'ct-checkboxes',
-				'attr' => ['data-columns' => '2'],
-				'disableRevertButton' => true,
-				'choices' => blocksy_ordered_keys($cpt_choices),
-				'value' => $cpt_options
-			],
+			$is_pro ? [
+				'search_through_taxonomy' => [
+					'label' => __('Search Through Taxonomies', 'blocksy'),
+					'type' => 'ct-switch',
+					'value' => 'no',
+					'divider' => 'top',
+					'desc' => __('Search through taxonomies from selected custom post types.', 'blocksy'),
+				]
+			] : []
 
 		],
 	],
@@ -518,7 +542,7 @@ $options = [
 					[
 						'title' => __( 'Hover', 'blocksy' ),
 						'id' => 'hover',
-						'inherit' => 'var(--linkHoverColor)'
+						'inherit' => 'var(--theme-link-hover-color)'
 					],
 				],
 			],
@@ -527,7 +551,6 @@ $options = [
 				'label' => __( 'Input Font Color', 'blocksy' ),
 				'type'  => 'ct-color-picker',
 				'design' => 'inline',
-				'divider' => 'bottom',
 				'setting' => [ 'transport' => 'postMessage' ],
 
 				'value' => [
@@ -553,6 +576,36 @@ $options = [
 				],
 			],
 
+			'searchHeaderInputBorderColor' => [
+				'label' => __( 'Input Border Color', 'blocksy' ),
+				'type'  => 'ct-color-picker',
+				'design' => 'inline',
+				'divider' => 'bottom',
+				'setting' => [ 'transport' => 'postMessage' ],
+
+				'value' => [
+					'default' => [
+						'color' => 'rgba(255, 255, 255, 0.2)',
+					],
+
+					'focus' => [
+						'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+					],
+				],
+
+				'pickers' => [
+					[
+						'title' => __( 'Initial', 'blocksy' ),
+						'id' => 'default',
+					],
+
+					[
+						'title' => __( 'Focus', 'blocksy' ),
+						'id' => 'focus',
+						'inherit' => 'var(--theme-form-field-border-focus-color)'
+					],
+				],
+			],
 
 			'search_button_icon_color' => [
 				'label' => __( 'Search Icon Color', 'blocksy' ),
@@ -562,11 +615,11 @@ $options = [
 
 				'value' => [
 					'default' => [
-						'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+						'color' => 'rgba(255, 255, 255, 0.7)',
 					],
 
 					'hover' => [
-						'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+						'color' => '#ffffff',
 					],
 				],
 
@@ -574,13 +627,11 @@ $options = [
 					[
 						'title' => __( 'Initial', 'blocksy' ),
 						'id' => 'default',
-						'inherit' => 'rgba(255, 255, 255, 0.7)'
 					],
 
 					[
 						'title' => __( 'Hover', 'blocksy' ),
 						'id' => 'hover',
-						'inherit' => '#ffffff'
 					],
 				],
 			],
@@ -593,11 +644,11 @@ $options = [
 
 				'value' => [
 					'default' => [
-						'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+						'color' => 'var(--theme-palette-color-1)',
 					],
 
 					'hover' => [
-						'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+						'color' => 'var(--theme-palette-color-1)',
 					],
 				],
 
@@ -605,13 +656,11 @@ $options = [
 					[
 						'title' => __( 'Initial', 'blocksy' ),
 						'id' => 'default',
-						'inherit' => 'var(--paletteColor1)'
 					],
 
 					[
 						'title' => __( 'Hover', 'blocksy' ),
 						'id' => 'hover',
-						'inherit' => 'var(--paletteColor1)'
 					],
 				],
 			],
@@ -637,7 +686,7 @@ $options = [
 				'value' => 'type-1',
 				'view' => 'text',
 				'design' => 'inline',
-				'divider' => 'top',
+				'divider' => 'top:full',
 				'setting' => [ 'transport' => 'postMessage' ],
 				'choices' => blocksy_ordered_keys(
 					[
@@ -648,10 +697,22 @@ $options = [
 				),
 			],
 
+			'search_close_button_icon_size' => [
+				'label' => __( 'Icon Size', 'blocksy' ),
+				'type' => 'ct-number',
+				'design' => 'inline',
+				'value' => 12,
+				'min' => 5,
+				'max' => 50,
+				'divider' => 'top',
+				'setting' => [ 'transport' => 'postMessage' ],
+			],
+
 			'search_close_button_color' => [
 				'label' => __( 'Icon Color', 'blocksy' ),
 				'type'  => 'ct-color-picker',
 				'design' => 'inline',
+				'divider' => 'top',
 				'setting' => [ 'transport' => 'postMessage' ],
 
 				'value' => [
@@ -757,17 +818,6 @@ $options = [
 				],
 			],
 
-			'search_close_button_icon_size' => [
-				'label' => __( 'Icon Size', 'blocksy' ),
-				'type' => 'ct-number',
-				'design' => 'inline',
-				'value' => 12,
-				'min' => 5,
-				'max' => 50,
-				'divider' => 'top',
-				'setting' => [ 'transport' => 'postMessage' ],
-			],
-
 			blocksy_rand_md5() => [
 				'type' => 'ct-condition',
 				'condition' => [ 'search_close_button_type' => '!type-1' ],
@@ -805,11 +855,10 @@ $options = [
 				'design' => 'block',
 				'setting' => [ 'transport' => 'postMessage' ],
 				'allow_empty' => true,
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'tablet' => true,
 					'mobile' => true,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'tablet' => __( 'Tablet', 'blocksy' ),
 					'mobile' => __( 'Mobile', 'blocksy' ),

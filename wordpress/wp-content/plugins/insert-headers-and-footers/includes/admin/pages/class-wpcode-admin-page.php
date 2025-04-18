@@ -86,6 +86,13 @@ abstract class WPCode_Admin_Page {
 	public $hide_menu = false;
 
 	/**
+	 * The capability needed for the current user to view this page.
+	 *
+	 * @var string
+	 */
+	protected $capability = 'wpcode_edit_snippets';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -108,7 +115,11 @@ abstract class WPCode_Admin_Page {
 		if ( $this->page_slug !== $page ) {
 			return;
 		}
+		if ( ! current_user_can( $this->capability ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'insert-headers-and-footers' ) );
+		}
 		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
 		add_action( 'wpcode_admin_page', array( $this, 'output' ) );
 		add_action( 'wpcode_admin_page', array( $this, 'output_footer' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'page_scripts' ) );
@@ -122,13 +133,21 @@ abstract class WPCode_Admin_Page {
 	}
 
 	/**
+	 * Get the post type for this page.
+	 *
+	 * @return string
+	 */
+	public function get_post_type() {
+		return wpcode_get_post_type();
+	}
+
+	/**
 	 * Override in child class to define page-specific hooks that will run only
 	 * after checks have been passed.
 	 *
 	 * @return void
 	 */
 	public function page_hooks() {
-
 	}
 
 	/**
@@ -141,7 +160,7 @@ abstract class WPCode_Admin_Page {
 			'wpcode',
 			$this->page_title,
 			$this->menu_title,
-			'wpcode_edit_snippets',
+			$this->capability,
 			$this->page_slug,
 			array(
 				wpcode()->admin_page_loader,
@@ -156,7 +175,6 @@ abstract class WPCode_Admin_Page {
 	 * @return void
 	 */
 	protected function setup_views() {
-
 	}
 
 	/**
@@ -208,6 +226,8 @@ abstract class WPCode_Admin_Page {
 				<div class="wpcode-header-right">
 					<?php $this->output_header_right(); ?>
 				</div>
+			</div>
+			<div id="wpcode-header-between">
 			</div>
 			<div class="wpcode-header-bottom">
 				<?php $this->output_header_bottom(); ?>
@@ -390,12 +410,13 @@ abstract class WPCode_Admin_Page {
 	 * @return void
 	 */
 	public function logo_image( $id = 'wpcode-header-logo' ) {
-		$logo_src = WPCODE_PLUGIN_URL . 'admin/images/wpcode-logo.png';
-		// Translators: This simply adds the plugin name before the logo text.
-		$alt = sprintf( __( '%s logo', 'insert-headers-and-footers' ), 'WPCode' )
-		?>
-		<img src="<?php echo esc_url( $logo_src ); ?>" width="132" alt="<?php echo esc_attr( $alt ); ?>" id="<?php echo esc_attr( $id ); ?>"/>
-		<?php
+		$logo = get_wpcode_icon( 'logo-text', 132, 33, '0 0 132 33', $id );
+
+		if ( wpcode()->settings->get_option( 'dark_mode' ) ) {
+			$logo = str_replace( '11293E', 'CCCCCC', $logo );
+		}
+
+		echo wp_kses( $logo, wpcode_get_icon_allowed_tags() );
 	}
 
 	/**
@@ -413,6 +434,9 @@ abstract class WPCode_Admin_Page {
 				absint( $notifications_count )
 			);
 		}
+		echo '<span class="wpcode-toggle-testing-mode-wrap">';
+		echo $this->get_checkbox_toggle( wpcode_testing_mode_enabled(), 'wpcode-toggle-testing-mode', '', '', esc_html__( 'Testing Mode', 'insert-headers-and-footers' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '</span>';
 		?>
 		<button
 				type="button"
@@ -436,7 +460,6 @@ abstract class WPCode_Admin_Page {
 	 * @return void
 	 */
 	public function output_header_bottom() {
-
 	}
 
 	/**
@@ -531,7 +554,8 @@ abstract class WPCode_Admin_Page {
 	}
 
 	/**
-	 * Add a page-specific body class using the page slug variable..
+	 * Add a page-specific body class using the page slug variable.
+	 * Add a body class specific to the plugin version (lite/pro).
 	 *
 	 * @param string $body_class The body class to append.
 	 *
@@ -539,7 +563,13 @@ abstract class WPCode_Admin_Page {
 	 */
 	public function page_specific_body_class( $body_class ) {
 
-		$body_class .= ' ' . $this->page_slug;
+		$body_class .= ' ' . $this->page_slug . ' ';
+
+		if ( ! class_exists( 'WPCode_Premium' ) ) {
+			$body_class .= ' wpcode-lite-version ';
+		} else {
+			$body_class .= ' wpcode-pro-version ';
+		}
 
 		return $body_class;
 	}
@@ -556,8 +586,11 @@ abstract class WPCode_Admin_Page {
 		if ( ! empty( $this->view ) ) {
 			$args['view'] = $this->view;
 		}
+		if ( ! empty( $this->snippet_id ) ) {
+			$args['snippet_id'] = $this->snippet_id;
+		}
 
-		return add_query_arg( $args, admin_url( 'admin.php' ) );
+		return add_query_arg( $args, $this->admin_url( 'admin.php' ) );
 	}
 
 	/**
@@ -576,7 +609,7 @@ abstract class WPCode_Admin_Page {
 		<div class="wpcode-metabox">
 			<div class="wpcode-metabox-title">
 				<div class="wpcode-metabox-title-text">
-					<?php echo esc_html( $title ); ?>
+					<?php echo wp_kses_post( $title ); ?>
 					<?php $this->help_icon( $help ); ?>
 				</div>
 				<div class="wpcode-metabox-title-toggle">
@@ -625,23 +658,25 @@ abstract class WPCode_Admin_Page {
 	 *
 	 * @param string $label The label of the field.
 	 * @param string $input The field input (html).
-	 * @param string $id The id for the row.
+	 * @param string $input_id The id of the input that we use in the label.
 	 * @param string $show_if_id Conditional logic id, automatically hide if the value of the field with this id doesn't match show if value.
 	 * @param string $show_if_value Value(s) to match against, can be comma-separated string for multiple values.
 	 * @param string $description Description to show under the input.
 	 * @param bool   $is_pro Whether this is a pro feature and the pro indicator should be shown next to the label.
+	 * $param string $id The id of the metabox row.
 	 *
 	 * @return void
 	 */
-	public function metabox_row( $label, $input, $id = '', $show_if_id = '', $show_if_value = '', $description = '', $is_pro = false ) {
+	public function metabox_row( $label, $input, $input_id = '', $show_if_id = '', $show_if_value = '', $description = '', $is_pro = false, $id = '' ) {
 		$show_if_rules = '';
 		if ( ! empty( $show_if_id ) ) {
-			$show_if_rules = sprintf( 'data-show-if-id="%1$s" data-show-if-value="%2$s"', $show_if_id, $show_if_value );
+			$show_if_rules = sprintf( 'data-show-if-id="%1$s" data-show-if-value="%2$s"', esc_attr( $show_if_id ), esc_attr( $show_if_value ) );
 		}
+		$id = ! empty( $id ) ? 'id="' . esc_attr( $id ) . '"' : '';
 		?>
-		<div class="wpcode-metabox-form-row" <?php echo $show_if_rules; ?>>
+		<div class="wpcode-metabox-form-row" <?php echo $show_if_rules; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php echo $id; ?>>
 			<div class="wpcode-metabox-form-row-label">
-				<label for="<?php echo esc_attr( $id ); ?>">
+				<label for="<?php echo esc_attr( $input_id ); ?>">
 					<?php echo esc_html( $label ); ?>
 					<?php
 					if ( $is_pro ) {
@@ -691,15 +726,14 @@ abstract class WPCode_Admin_Page {
 		$button_text           = __( 'Use snippet', 'insert-headers-and-footers' );
 		$pill_text             = '';
 		$pill_class            = 'blue';
+		if ( isset( $snippet['button_text'] ) ) {
+			$button_text = $snippet['button_text'];
+		}
+		if ( isset( $snippet['button_icon'] ) ) {
+			$button_text = get_wpcode_icon( $snippet['button_icon'], 16, 16, '0 96 960 960' ) . ' ' . $button_text;
+		}
 		if ( ! empty( $snippet ) ) {
-			$url = add_query_arg(
-				array(
-					'page'   => 'wpcode-snippet-manager',
-					'custom' => true,
-				),
-				admin_url( 'admin.php' )
-			);
-			if ( 0 !== $snippet['library_id'] ) {
+			if ( empty( $snippet['url'] ) ) {
 				if ( ! empty( $used_library_snippets[ $snippet['library_id'] ] ) ) {
 					$url         = wpcode()->library->get_edit_snippet_url( $used_library_snippets[ $snippet['library_id'] ] );
 					$button_text = __( 'Edit snippet', 'insert-headers-and-footers' );
@@ -707,6 +741,8 @@ abstract class WPCode_Admin_Page {
 				} else {
 					$url = wpcode()->library->get_install_snippet_url( $snippet['library_id'] );
 				}
+			} else {
+				$url = $snippet['url'];
 			}
 			$title       = $snippet['title'];
 			$description = $snippet['note'];
@@ -718,16 +754,19 @@ abstract class WPCode_Admin_Page {
 		}
 		$categories = isset( $snippet['categories'] ) ? $snippet['categories'] : array();
 
-
 		$button_2 = array(
 			'text'  => $button_2_text,
 			'class' => 'wpcode-button wpcode-button-secondary wpcode-library-preview-button',
 		);
 
 		if ( ! empty( $snippet['needs_auth'] ) ) {
+			$unlock_text = __( 'Connect to library to unlock (Free)', 'insert-headers-and-footers' );
+			if ( isset( $snippet['needs_auth_text'] ) ) {
+				$unlock_text = $snippet['needs_auth_text'];
+			}
 			$button_1 = array(
 				'tag'   => 'button',
-				'text'  => get_wpcode_icon( 'lock', 17, 22, '0 0 17 22' ) . __( 'Connect to library to unlock (Free)', 'insert-headers-and-footers' ),
+				'text'  => get_wpcode_icon( 'lock', 17, 22, '0 0 17 22' ) . $unlock_text,
 				'class' => 'wpcode-button wpcode-item-use-button wpcode-start-auth wpcode-button-icon',
 			);
 		} else {
@@ -737,8 +776,18 @@ abstract class WPCode_Admin_Page {
 				'text' => $button_text,
 			);
 		}
+		if ( ! empty( $snippet['pill_text'] ) ) {
+			$pill_text = $snippet['pill_text'];
+		}
+		if ( ! empty( $snippet['pill_class'] ) ) {
+			$pill_class = $snippet['pill_class'];
+		}
+		$extra_classes = array();
+		if ( ! empty( $snippet['extra_classes'] ) && is_array( $snippet['extra_classes'] ) ) {
+			$extra_classes = $snippet['extra_classes'];
+		}
 
-		$this->get_list_item( $id, $title, $description, $button_1, $button_2, $categories, $pill_text, $pill_class, $category );
+		$this->get_list_item( $id, $title, $description, $button_1, $button_2, $categories, $pill_text, $pill_class, $category, $extra_classes );
 	}
 
 	/**
@@ -753,15 +802,19 @@ abstract class WPCode_Admin_Page {
 	 * @param string $pill_text (optional) Display a "pill" with some text in the top right corner.
 	 * @param string $pill_class (optional) Custom CSS class for the pill.
 	 * @param string $selected_category (optional) Slug of the category selected by default.
+	 * @param array  $extra_classes (optional) Extra classes to add to the list item.
 	 *
 	 * @return void
 	 */
-	public function get_list_item( $id, $title, $description, $button_1, $button_2 = array(), $categories = array(), $pill_text = '', $pill_class = 'blue', $selected_category = '*' ) {
+	public function get_list_item( $id, $title, $description, $button_1, $button_2 = array(), $categories = array(), $pill_text = '', $pill_class = 'blue', $selected_category = '*', $extra_classes = array() ) {
 		$item_class = array(
 			'wpcode-list-item',
 		);
 		if ( ! empty( $pill_text ) ) {
 			$item_class[] = 'wpcode-list-item-has-pill';
+		}
+		if ( ! empty( $extra_classes ) ) {
+			$item_class = array_merge( $item_class, $extra_classes );
 		}
 		$style = '';
 		if ( '*' !== $selected_category && ! in_array( $selected_category, $categories, true ) ) {
@@ -872,12 +925,12 @@ abstract class WPCode_Admin_Page {
 	 *
 	 * @return void
 	 */
-	public function get_library_markup( $categories, $snippets, $item_method = 'get_library_snippet_item' ) {
+	public function get_library_markup( $categories, $snippets, $item_method = 'get_library_snippet_item', $type = 'library' ) {
 		$selected_category = isset( $categories[0]['slug'] ) ? $categories[0]['slug'] : '*';
 		$count             = 0;
 		foreach ( $snippets as $snippet ) {
-			if ( isset( $snippet['needs_auth'] ) ) {
-				$count ++;
+			if ( isset( $snippet['needs_auth'] ) && empty( $snippet['skip_count'] ) ) {
+				++ $count;
 			}
 		}
 		$categories = $this->add_item_counts( $categories, $snippets );
@@ -886,7 +939,7 @@ abstract class WPCode_Admin_Page {
 		?>
 		<div class="wpcode-items-metabox wpcode-metabox">
 			<?php $this->get_items_list_sidebar( $categories, __( 'All Snippets', 'insert-headers-and-footers' ), __( 'Search Snippets', 'insert-headers-and-footers' ), $selected_category, $count ); ?>
-			<div class="wpcode-items-list">
+			<div class="wpcode-items-list" data-type="<?php echo esc_attr( $type ); ?>">
 				<?php
 				if ( empty( $snippets ) ) {
 					?>
@@ -929,7 +982,7 @@ abstract class WPCode_Admin_Page {
 				if ( ! isset( $category_counts[ $category ] ) ) {
 					$category_counts[ $category ] = 0;
 				}
-				$category_counts[ $category ] ++;
+				++ $category_counts[ $category ];
 			}
 		}
 
@@ -961,17 +1014,20 @@ abstract class WPCode_Admin_Page {
 		$need_auth_count = 0;
 		foreach ( $snippets as $snippet ) {
 			if ( ! empty( $snippet['needs_auth'] ) ) {
-				$need_auth_count ++;
+				++ $need_auth_count;
 			}
 		}
 		if ( $need_auth_count > 0 ) {
-			$categories = array_merge( array(
+			$categories = array_merge(
 				array(
-					'name'  => __( 'Available Snippets', 'insert-headers-and-footers' ),
-					'slug'  => 'available',
-					'count' => $total - $need_auth_count,
-				)
-			), $categories );
+					array(
+						'name'  => __( 'Available Snippets', 'insert-headers-and-footers' ),
+						'slug'  => 'available',
+						'count' => $total - $need_auth_count,
+					),
+				),
+				$categories
+			);
 		}
 
 		return $categories;
@@ -1014,7 +1070,7 @@ abstract class WPCode_Admin_Page {
 						<span class="screen-reader-text"><?php echo esc_html( $search_label ); ?></span>
 						<?php wpcode_icon( 'search', 16, 16 ); ?>
 					</label>
-					<input type="search" id="wpcode-items-search" placeholder="<?php echo esc_html( $search_label ); ?>"/>
+					<input type="search" class="wpcode-items-search-input" placeholder="<?php echo esc_html( $search_label ); ?>"/>
 				</div>
 			<?php } ?>
 			<ul class="wpcode-items-categories-list wpcode-items-filters">
@@ -1067,6 +1123,8 @@ abstract class WPCode_Admin_Page {
 			</div>
 			<div class="wpcode-library-preview-buttons">
 				<a class="wpcode-button wpcode-button-wide" id="wpcode-preview-use-code"><?php esc_html_e( 'Use Snippet', 'insert-headers-and-footers' ); ?></a>
+				<a class="wpcode-button wpcode-button-secondary wpcode-my-library-buttons" id="wpcode-preview-edit-snippet" target="_blank"><?php esc_html_e( 'Edit in Library', 'insert-headers-and-footers' ); ?></a>
+				<div class="wpcode-preview-updated wpcode-my-library-buttons" id="wpcode-preview-updated"></div>
 			</div>
 		</div>
 		<?php
@@ -1105,7 +1163,7 @@ abstract class WPCode_Admin_Page {
 				'page' => $this->page_slug,
 				'view' => $view,
 			),
-			admin_url( 'admin.php' )
+			$this->admin_url( 'admin.php' )
 		);
 	}
 
@@ -1201,7 +1259,6 @@ abstract class WPCode_Admin_Page {
 		$html .= '</div>';
 
 		return $html;
-
 	}
 
 	/**
@@ -1212,6 +1269,10 @@ abstract class WPCode_Admin_Page {
 	public function library_connect_banner_template() {
 
 		if ( wpcode()->library_auth->has_auth() ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'wpcode_manage_settings' ) ) {
 			return;
 		}
 
@@ -1227,7 +1288,7 @@ abstract class WPCode_Admin_Page {
 					<h3>
 						<?php
 						/* translators: %d - snippets count. */
-						printf( esc_html__( 'Get Access to Our Library of %d FREE Snippets', 'insert-headers-and-footers' ), $count );
+						printf( esc_html__( 'Get Access to Our Library of %d FREE Snippets', 'insert-headers-and-footers' ), absint( $count ) );
 						?>
 					</h3>
 
@@ -1256,8 +1317,72 @@ abstract class WPCode_Admin_Page {
 		}
 		if ( false !== get_transient( 'wpcode_deploy_snippet_id' ) ) {
 			// Don't delete the transient here, it will be deleted in the 1-click page.
-			wp_safe_redirect( admin_url( 'admin.php?page=wpcode-click' ) );
+			wp_safe_redirect( $this->admin_url( 'admin.php?page=wpcode-click' ) );
 			exit;
 		}
+	}
+
+	/**
+	 * Get a text field markup.
+	 *
+	 * @param string $id The id of the text field.
+	 * @param string $value The value of the text field.
+	 * @param string $description The description of the text field.
+	 * @param bool   $wide Whether the text field should be wide.
+	 * @param string $type The type of the text field.
+	 *
+	 * @return string
+	 */
+	public function get_input_text( $id, $value = '', $description = '', $wide = false, $type = 'text' ) {
+		$allowed_types = array(
+			'text',
+			'email',
+			'url',
+			'number',
+			'password',
+		);
+		if ( in_array( $type, $allowed_types, true ) ) {
+			$type = esc_attr( $type );
+		} else {
+			$type = 'text';
+		}
+		$class = 'wpcode-regular-text';
+		if ( $wide ) {
+			$class .= ' wpcode-wide-text';
+		}
+		if ( 'text' !== $type ) {
+			$class .= ' wpcode-input-' . $type;
+		}
+		$markup = '<input type="' . esc_attr( $type ) . '" id="' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" class="' . esc_attr( $class ) . '" autocomplete="off">';
+		if ( ! empty( $description ) ) {
+			$markup .= '<p>' . wp_kses_post( $description ) . '</p>';
+		}
+
+		return $markup;
+	}
+
+	/**
+	 * Get an email field.
+	 *
+	 * @param string $id The id of the text field.
+	 * @param string $value The value of the text field.
+	 * @param string $description The description of the text field.
+	 * @param bool   $wide Whether the text field should be wide.
+	 *
+	 * @return string
+	 */
+	public function get_input_email( $id, $value = '', $description = '', $wide = false ) {
+		return $this->get_input_text( $id, $value, $description, $wide, 'email' );
+	}
+
+	/**
+	 * Get an admin URL.
+	 *
+	 * @param string $path The path to append to the admin URL.
+	 *
+	 * @return string
+	 */
+	public function admin_url( $path ) {
+		return admin_url( $path );
 	}
 }

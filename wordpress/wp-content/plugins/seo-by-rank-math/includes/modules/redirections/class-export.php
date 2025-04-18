@@ -14,7 +14,7 @@ use RankMath\KB;
 use RankMath\Redirections\Import_Export;
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -111,7 +111,7 @@ class Export {
 
 		foreach ( $sources as $from ) {
 			$url = $from['pattern'];
-			if ( 'regex' !== $from['comparison'] && strpos( $url, '?' ) !== false || strpos( $url, '&' ) !== false ) {
+			if ( ( 'regex' !== $from['comparison'] && strpos( $url, '?' ) !== false ) || strpos( $url, '&' ) !== false ) {
 				$url_parts = wp_parse_url( $url );
 				$url       = $url_parts['path'];
 				$output[]  = sprintf( 'RewriteCond %%{QUERY_STRING} ^%s$', preg_quote( $url_parts['query'], null ) );

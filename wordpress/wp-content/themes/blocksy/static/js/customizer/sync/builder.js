@@ -61,6 +61,7 @@ const handleItemChangeFor = (args = {}) => {
 			? itemDescriptors({
 					itemId: shortenItemId(itemId),
 					fullItemId: itemId,
+					values,
 			  })
 			: itemDescriptors
 	)[optionId]
@@ -96,11 +97,11 @@ const makeShortcutFor = (item) => {
 		return
 	}
 
-	if (!item.dataset.location) {
+	if (!item.dataset.shortcutLocation) {
 		return
 	}
 
-	const shortcut = document.createElement('a')
+	const shortcut = document.createElement('span')
 
 	shortcut.classList.add('ct-customizer-shortcut')
 
@@ -110,7 +111,7 @@ const makeShortcutFor = (item) => {
 		let text = __('Edit', 'blocksy')
 
 		if (
-			(item.dataset.location || '').indexOf(
+			(item.dataset.shortcutLocation || '').indexOf(
 				'header:builder_panel_top-row'
 			) > -1
 		) {
@@ -118,7 +119,7 @@ const makeShortcutFor = (item) => {
 		}
 
 		if (
-			(item.dataset.location || '').indexOf(
+			(item.dataset.shortcutLocation || '').indexOf(
 				'header:builder_panel_middle-row'
 			) > -1
 		) {
@@ -126,7 +127,7 @@ const makeShortcutFor = (item) => {
 		}
 
 		if (
-			(item.dataset.location || '').indexOf(
+			(item.dataset.shortcutLocation || '').indexOf(
 				'header:builder_panel_bottom-row'
 			) > -1
 		) {
@@ -143,7 +144,7 @@ const makeShortcutFor = (item) => {
 		e.stopPropagation()
 		wp.customize.preview.send(
 			'ct-initiate-deep-link',
-			item.dataset.location
+			item.dataset.shortcutLocation
 		)
 	})
 
@@ -159,16 +160,37 @@ const makeAllShortcuts = () => {
 		),
 		...document.querySelectorAll('.hero-section'),
 		...document.querySelectorAll('.entries[data-cards]'),
+		...document.querySelectorAll('.entries[data-layout="gutenberg"]'),
 		...document.querySelectorAll('aside#sidebar'),
 		...document.querySelectorAll('#main-container > footer [data-row]'),
 		...document.querySelectorAll('#offcanvas .ct-bag-container'),
 		...document.querySelectorAll('.ct-trending-block'),
+		...document.querySelectorAll('.ct-pagination'),
+		...document.querySelectorAll(
+			'.archive .products, .woocommerce > .products'
+		),
+		...document.querySelectorAll('.products.related'),
+		...document.querySelectorAll('.products.upsells'),
+		...document.querySelectorAll('.woocommerce-tabs'),
+		...document.querySelectorAll('.ct-compare-bar'),
+		...document.querySelectorAll('.product-entry-wrapper > .summary'),
+		...document.querySelectorAll(
+			'.product-entry-wrapper > .woocommerce-product-gallery'
+		),
+		...document.querySelectorAll('.post-navigation'),
+		...document.querySelectorAll('.entry-tags'),
+		...document.querySelectorAll('.ct-share-box'),
+		...document.querySelectorAll('.author-box'),
+		...document.querySelectorAll('.ct-shortcuts-bar'),
+		...document.querySelectorAll('.ct-related-posts-container'),
+		...document.querySelectorAll('.ct-related-posts'),
+		...document.querySelectorAll('.ct-floating-bar'),
 	].map((el) => makeShortcutFor(el))
 }
 
 makeAllShortcuts()
 
-ctEvents.on('ct:header:render-frame', () => {
+ctEvents.on('blocksy:frontend:init', () => {
 	makeAllShortcuts()
 })
 
@@ -238,15 +260,22 @@ wp.customize.bind('preview-ready', () => {
 					$(placement.container)
 						.find(loader_selector)
 						.toArray()
-						.filter(
-							(el) =>
-								$(el.parentNode)
-									.find(loader_selector)
-									.toArray()
-									.indexOf(el) +
-									1 ===
-								parseInt(index, 10)
-						)
+						.filter((el) => {
+							let loaderSelector = loader_selector
+
+							if (loaderSelector.indexOf(' ') > -1) {
+								loaderSelector = loaderSelector
+									.split(' ')
+									.reverse()[0]
+							}
+
+							const foundIndex = $(el.parentNode)
+								.find(loaderSelector)
+								.toArray()
+								.indexOf(el)
+
+							return foundIndex + 1 === parseInt(index, 10)
+						})
 						.map((el) =>
 							el.classList.add('customize-partial-refreshing')
 						)
@@ -264,6 +293,7 @@ wp.customize.bind('preview-ready', () => {
 
 	wp.customize.selectiveRefresh.Partial.prototype.createEditShortcutForPlacement =
 		() => {}
+
 	wp.customize.selectiveRefresh.Partial.prototype.ready = function () {
 		var partial = this
 
@@ -294,6 +324,10 @@ wp.customize.bind('preview-ready', () => {
 			}
 
 			if (!setting) {
+				return false
+			}
+
+			if (skipNextRefresh) {
 				return false
 			}
 
@@ -448,12 +482,15 @@ wp.customize.bind('preview-ready', () => {
 	wp.customize.preview.bind(
 		'ct:sync:refresh_partial',
 		({ id, shouldSkip = false }) => {
+			id = Array.isArray(id) ? id : [id]
+
 			if (shouldSkip) {
 				skipNextRefresh = true
 				setTimeout(() => (skipNextRefresh = false), 100)
 
 				return
 			}
+
 			if (
 				Object.keys(
 					wp.customize.selectiveRefresh._pendingPartialRequests
@@ -462,21 +499,23 @@ wp.customize.bind('preview-ready', () => {
 				return
 			}
 
-			let partial = wp.customize.selectiveRefresh.partial(id)
+			id.map((id) => {
+				let partial = wp.customize.selectiveRefresh.partial(id)
 
-			if (partial && !skipNextRefresh) {
-				if (partial.params.loader_selector === 'skip') {
-					skipNextRefresh = true
-					setTimeout(() => (skipNextRefresh = false), 300)
-					return
+				if (partial && !skipNextRefresh) {
+					if (partial.params.loader_selector === 'skip') {
+						skipNextRefresh = true
+						setTimeout(() => (skipNextRefresh = false), 300)
+						return
+					}
+
+					if (!document.querySelector(partial.params.selector)) {
+						return
+					}
+
+					partial.refresh()
 				}
-
-				if (!document.querySelector(partial.params.selector)) {
-					return
-				}
-
-				partial.refresh()
-			}
+			})
 		}
 	)
 })

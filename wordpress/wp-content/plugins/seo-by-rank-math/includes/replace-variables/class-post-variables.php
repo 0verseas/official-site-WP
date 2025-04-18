@@ -11,10 +11,9 @@
 namespace RankMath\Replace_Variables;
 
 use RankMath\Helper;
+use RankMath\Helpers\Str;
 use RankMath\Post;
 use RankMath\Paper\Paper;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -506,9 +505,7 @@ class Post_Variables extends Advanced_Variables {
 		$terms = wp_get_object_terms(
 			$this->args->ID,
 			$main_tax,
-			[
-				'fields' => 'names'
-			]
+			[ 'fields' => 'names' ]
 		);
 
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
@@ -521,18 +518,18 @@ class Post_Variables extends Advanced_Variables {
 	/**
 	 * Get the auto generated post content.
 	 *
-	 * @param array $object Post Object.
+	 * @param array $post Post Object.
 	 * @return string|null
 	 */
-	private function get_post_content( $object ) {
-		if ( empty( $object->post_content ) ) {
+	private function get_post_content( $post ) {
+		if ( empty( $post->post_content ) ) {
 			return '';
 		}
 
-		$keywords     = Post::get_meta( 'focus_keyword', $object->ID );
-		$post_content = Paper::should_apply_shortcode() ? do_shortcode( $object->post_content ) : $object->post_content;
+		$keywords     = Post::get_meta( 'focus_keyword', $post->ID );
+		$post_content = Paper::should_apply_shortcode() ? do_shortcode( $post->post_content ) : $post->post_content;
 		$post_content = \preg_replace( '/<!--[\s\S]*?-->/iu', '', $post_content );
-		$post_content = wpautop( WordPress::strip_shortcodes( $post_content ) );
+		$post_content = wpautop( Helper::strip_shortcodes( $post_content ) );
 		$post_content = wp_kses( $post_content, [ 'p' => [] ] );
 
 		// Remove empty paragraph tags.

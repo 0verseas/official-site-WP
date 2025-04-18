@@ -8,20 +8,22 @@
 namespace WeglotWP\Helpers;
 
 // Exit if accessed directly.
+use AllowDynamicProperties;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
+#[AllowDynamicProperties]
 class Helper_Rollback_Weglot extends \Plugin_Upgrader {
 
 	/**
 	 * Plugin rollback.
 	 *
-	 * @param $plugin
-	 * @param array $args
+	 * @param mixed $plugin
+	 * @param array<int|string,mixed> $args
 	 *
-	 * @return array|bool|\WP_Error
+	 * @return array<int|string,mixed>|bool|\WP_Error
 	 */
 	public function rollback( $plugin, $args = array() ) {
 		$defaults    = array(
@@ -32,15 +34,7 @@ class Helper_Rollback_Weglot extends \Plugin_Upgrader {
 		$this->init();
 		$this->upgrade_strings();
 
-		if ( 0 ) {
-			$this->skin->before();
-			$this->skin->set_result( false );
-			$this->skin->error( 'up_to_date' );
-			$this->skin->after();
-
-			return false;
-		}
-
+		/** @phpstan-ignore-next-line */
 		$plugin_slug = $this->skin->plugin;
 
 		$plugin_version = $this->skin->options['version'];

@@ -27,11 +27,6 @@ abstract class Helper_Tabs_Admin_Weglot {
 	/**
 	 * @var string
 	 */
-	const CUSTOM_URLS = 'custom-urls';
-
-	/**
-	 * @var string
-	 */
 	const SUPPORT = 'support';
 
 	/**
@@ -39,7 +34,7 @@ abstract class Helper_Tabs_Admin_Weglot {
 	 * @static
 	 * @since 2.0
 	 *
-	 * @return array
+	 * @return array<int|string,mixed>
 	 */
 	public static function get_full_tabs() {
 		return array(
@@ -50,10 +45,6 @@ abstract class Helper_Tabs_Admin_Weglot {
 			self::STATUS      => array(
 				'title' => __( 'Status', 'weglot' ),
 				'url'   => get_admin_url( null, sprintf( 'admin.php?page=%s&tab=%s', Helper_Pages_Weglot::SETTINGS, self::STATUS ) ),
-			),
-			self::CUSTOM_URLS => array(
-				'title' => __( 'Custom URLs', 'weglot' ),
-				'url'   => get_admin_url( null, sprintf( 'admin.php?page=%s&tab=%s', Helper_Pages_Weglot::SETTINGS, self::CUSTOM_URLS ) ),
 			),
 		);
 	}

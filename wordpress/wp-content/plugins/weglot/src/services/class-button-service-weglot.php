@@ -46,7 +46,7 @@ class Button_Service_Weglot {
 	}
 
 	/**
-	 * @param array $switcher
+	 * @param array<string,mixed> $switcher
 	 *
 	 * @return string
 	 * @since 2.3.0
@@ -73,7 +73,7 @@ class Button_Service_Weglot {
 
 	/**
 	 * @param LanguageEntry $language_entry
-	 * @param array $switcher
+	 * @param array<string,mixed> $switcher
 	 *
 	 * @return string
 	 * @version 3.0.0
@@ -102,8 +102,10 @@ class Button_Service_Weglot {
 		return apply_filters( 'weglot_get_name_with_language_entry', $name, $language_entry );
 	}
 
+
+
 	/**
-	 * @param array $switcher
+	 * @param array<string,mixed> $switcher
 	 *
 	 * @return string
 	 * @since 2.3.0
@@ -115,12 +117,17 @@ class Button_Service_Weglot {
 			$class = $is_dropdown ? 'weglot-dropdown ' : 'weglot-inline ';
 			if ( isset( $switcher['opts'] ) ) {
 				$opts                = $switcher['opts'];
-				$close_outside_click = $opts['close_outside_click'];
-				$class               .= $close_outside_click ? 'close_outside_click ' : '';
+				$open_hover = $opts['open_hover'] ?? false;
+				$close_outside_click = $opts['close_outside_click'] ?? false;
+				if($open_hover){
+					$class               .= 'open_hover ';
+				}else{
+					$class               .= $close_outside_click ? 'close_outside_click ' : '';
+				}
 			}
 		} else {
 			$is_dropdown = $this->option_services->get_option_button( 'is_dropdown' );
-			$class = $is_dropdown ? 'weglot-dropdown close_outside_click ' : 'weglot-inline ';
+			$class = $is_dropdown ? 'weglot-dropdown close_outside_click closed ' : 'weglot-inline ';
 		}
 
 		return apply_filters( 'weglot_get_class_dropdown', $class );
@@ -133,13 +140,19 @@ class Button_Service_Weglot {
 	 * @param string $add_class
 	 * @param string $add_attr_target
 	 * @param string $add_attr_sibling
-	 * @param array $switcher
+	 * @param string $pos
+	 * @param array<string,mixed> $switcher
 	 *
 	 * @return string
 	 * @version 2.3.1
 	 * @since 2.0
 	 */
-	public function get_html( $add_class = '', $switcher = array(), $add_attr_target = '', $add_attr_sibling = '' ) {
+	public function get_html( $add_class = '', $switcher = array(), $add_attr_target = '', $add_attr_sibling = '', $pos = '') {
+
+		$force_validate_button_option = apply_filters( 'weglot_validate_button_option', true );
+		if($force_validate_button_option ){
+			$this->option_services->validate_button_option();
+		}
 
 		$weglot_url                = $this->request_url_services->get_weglot_url();
 		$amp_regex                 = $this->amp_services->get_regex( true );
@@ -153,7 +166,6 @@ class Button_Service_Weglot {
 		// if empty destination languages we don't display the switcher.
 		if ( empty( $destination_languages ) ) {
 			$button_html = '';
-
 			return apply_filters( 'weglot_button_html', $button_html, $add_class );
 		}
 
@@ -172,26 +184,34 @@ class Button_Service_Weglot {
 
 		$flag_class  = $this->get_flag_class( $switcher );
 		$class_aside = $this->get_class_dropdown( $switcher );
-
+		$add_class .= ' wg-'.$pos;
 		$button_html = sprintf( '<!--Weglot %s-->', WEGLOT_VERSION );
 
+		$accessibility_tag     = apply_filters( 'weglot_change_open_close_tag_switcher', false );
+		$open_switcher_tag = '<aside ';
+		$close_switcher_tag = '</aside>';
+		if($accessibility_tag){
+			$open_switcher_tag = '<div role=listbox ';
+			$close_switcher_tag = '</div>';
+		}
+
 		if ( ! empty( $add_attr_target ) ) {
-			$button_html .= sprintf( '<aside data-wg-notranslate="" class="country-selector %s" tabindex="0" aria-expanded="false" aria-label="Language selected: ' . $current_language->getEnglishName() . '" data-wg-target="%s" data-wg-sibling="%s">', $class_aside . $add_class, $add_attr_target, $add_attr_sibling );
+			$button_html .= sprintf( $open_switcher_tag.'data-wg-notranslate="" class="country-selector %s" tabindex="0" aria-expanded="false" aria-label="Language selected: ' . $current_language->getEnglishName() . '" data-wg-target="%s" data-wg-sibling="%s">', $class_aside . $add_class, $add_attr_target, $add_attr_sibling );
 		} else {
-			$button_html .= sprintf( '<aside data-wg-notranslate="" class="country-selector %s" tabindex="0" aria-expanded="false" aria-label="Language selected: ' . $current_language->getEnglishName() . '">', $class_aside . $add_class );
+			$button_html .= sprintf( $open_switcher_tag.'data-wg-notranslate="" class="country-selector %s" tabindex="0" aria-expanded="false" aria-label="Language selected: ' . $current_language->getEnglishName() . '">', $class_aside . $add_class );
 		}
 
 		$name = $this->get_name_with_language_entry( $current_language, $switcher );
 
 		$display_first = false;
 		if ( $this->request_url_services->is_eligible_url( $this->request_url_services->get_full_url() ) || $language_button_displayed ) {
-			$uniq_id       = 'wg' . uniqid( strtotime( 'now' ) ) . wp_rand( 1, 1000 );
+			$uniq_id = 'wg' . uniqid( '', true ) . strval( strtotime( 'now' ) ) . wp_rand( 1, 1000 );
 			$button_html   .= sprintf( '<input id="%s" class="weglot_choice" type="checkbox" name="menu"/><label data-l="' . $current_language->getExternalCode() . '" tabindex="-1" for="%s" class="wgcurrent wg-li weglot-lang weglot-language %s" data-code-language="%s" data-name-language="%s"><span class="wglanguage-name">%s</span></label>', esc_attr( $uniq_id ), esc_attr( $uniq_id ), esc_attr( $flag_class . $current_language->getInternalCode() ), esc_attr( $current_language->getInternalCode() ), esc_html( $name ), esc_html( $name ) );
 			$display_first = true;
 		}
 
 		if ( ! $display_first && ! $hide_all_language ) {
-			$uniq_id       = 'wg' . uniqid( strtotime( 'now' ) ) . wp_rand( 1, 1000 );
+			$uniq_id = 'wg' . uniqid( '', true ) . strval( strtotime( 'now' ) ) . wp_rand( 1, 1000 );
 			$button_html   .= sprintf( '<input id="%s" class="weglot_choice" type="checkbox" name="menu"/><label tabindex="-1" for="%s" class="wgcurrent wg-li weglot-lang weglot-language %s" data-code-language="%s" data-name-language="%s"><span class="wglanguage-name">%s</span></label>', esc_attr( $uniq_id ), esc_attr( $uniq_id ), esc_attr( $flag_class . $current_language->getInternalCode() ), esc_attr( $current_language->getInternalCode() ), esc_html( $name ), esc_html( $name ) );
 			$display_first = true;
 		}
@@ -199,7 +219,7 @@ class Button_Service_Weglot {
 		$button_html .= '<ul role="none">';
 
 		foreach ( $this->language_services->get_original_and_destination_languages( $this->request_url_services->is_allowed_private() ) as $language ) {
-			// check if for this button we ant to exclude the button from switcher.
+			// check if for this button we want to exclude the button from switcher.
 			$language_button_displayed = $this->request_url_services->get_weglot_url()->getExcludeOption( $language, 'language_button_displayed' );
 			$link_button               = $this->request_url_services->get_weglot_url()->getForLanguage( $language, true );
 
@@ -217,8 +237,12 @@ class Button_Service_Weglot {
 			}
 
 			if ( $link_button ) {
-				$button_html .= sprintf( '<li data-l="' . $language->getExternalCode() . '" class="wg-li weglot-lang weglot-language %s" data-code-language="%s" role="option">', $flag_class . $language->getInternalCode(), $language->getInternalCode() );
-				$name        = $this->get_name_with_language_entry( $language, $switcher );
+				$button_html .= sprintf(
+					'<li data-l="' . $language->getExternalCode() . '" class="wg-li weglot-lang weglot-language %s" data-code-language="%s" role="option">',
+					$flag_class . $language->getInternalCode(),
+					$language->getInternalCode()
+				);
+				$name = $this->get_name_with_language_entry( $language, $switcher );
 
 				if ( $this->option_services->get_option( 'auto_redirect' ) ) {
 					$is_orig = $language === $this->language_services->get_original_language() ? 'true' : 'false';
@@ -229,11 +253,30 @@ class Button_Service_Weglot {
 					}
 				}
 
-				$button_html .= sprintf(
-					'<a title="Language switcher : ' . $language->getEnglishName() . '" class="weglot-language-' . $language->getExternalCode() . '" role="option" data-wg-notranslate="" href="%s">%s</a>',
-					esc_url( $link_button ),
-					esc_html( $name )
-				);
+				$wg_original_no_follow = apply_filters( 'weglot_autoredirect_no_follow', false );
+
+				// Check if $add_class contains "weglot-preview"
+				if ( strpos( $add_class, 'weglot-preview' ) === false ) {
+					if ( strpos( $link_button, 'wg-choose-original' ) !== false && $wg_original_no_follow ) {
+						$button_html .= sprintf(
+							'<a rel="nofollow" title="Language switcher : ' . $language->getEnglishName() . '" class="weglot-language-' . $language->getExternalCode() . '" role="option" data-wg-notranslate="" href="%s">%s</a>',
+							esc_url( $link_button ),
+							esc_html( $name )
+						);
+					} else {
+						$button_html .= sprintf(
+							'<a title="Language switcher : ' . $language->getEnglishName() . '" class="weglot-language-' . $language->getExternalCode() . '" role="option" data-wg-notranslate="" href="%s">%s</a>',
+							esc_url( $link_button ),
+							esc_html( $name )
+						);
+					}
+				} else {
+					// If "weglot-preview" is in $add_class, use a <span> instead
+					$button_html .= sprintf(
+						'<span title="Language switcher : ' . $language->getEnglishName() . '" class="weglot-language-' . $language->getExternalCode() . '" role="option" data-wg-notranslate="">%s</span>',
+						esc_html( $name )
+					);
+				}
 
 				$button_html .= '</li>';
 			}
@@ -241,7 +284,7 @@ class Button_Service_Weglot {
 
 		$button_html .= '</ul>';
 
-		$button_html .= '</aside>';
+		$button_html .= $close_switcher_tag;
 
 		return apply_filters( 'weglot_button_html', $button_html, $add_class );
 	}

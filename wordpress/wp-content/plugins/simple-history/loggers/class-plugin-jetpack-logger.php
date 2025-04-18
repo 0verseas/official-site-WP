@@ -73,7 +73,7 @@ class Plugin_Jetpack_Logger extends Logger {
 	 *
 	 * @param string $slug Slug of module to get info for.
 	 *
-	 * @return Array Array with module info.
+	 * @return array|bool Array with info or false if module not found
 	 */
 	private function get_jetpack_module( $slug = null ) {
 		if ( empty( $slug ) ) {
@@ -87,6 +87,10 @@ class Plugin_Jetpack_Logger extends Logger {
 
 	/**
 	 * Called when a module is activated.
+	 *
+	 * @param string $module_slug Slug of module that was activated.
+	 * @param bool   $success Whether the module activation was successful.
+	 * @return void
 	 */
 	public function on_jetpack_activate_module( $module_slug = null, $success = null ) {
 		if ( true !== $success ) {
@@ -97,7 +101,11 @@ class Plugin_Jetpack_Logger extends Logger {
 
 		$module = $this->get_jetpack_module( $module_slug );
 
-		if ( $module ) {
+		if ( $module === false ) {
+			return;
+		}
+
+		if ( $module !== [] ) {
 			$context['module_slug'] = $module_slug;
 			$context['module_name'] = $module['name'];
 			$context['module_description'] = $module['description'];
@@ -111,6 +119,9 @@ class Plugin_Jetpack_Logger extends Logger {
 
 	/**
 	 * Called when a module is deactivated.
+	 *
+	 * @param string $module_slug Slug of module that was deactivated.
+	 * @param bool   $success Whether the module deactivation was successful.
 	 */
 	public function on_jetpack_deactivate_module( $module_slug = null, $success = null ) {
 		if ( true !== $success ) {
@@ -121,7 +132,7 @@ class Plugin_Jetpack_Logger extends Logger {
 
 		$module = $this->get_jetpack_module( $module_slug );
 
-		if ( $module ) {
+		if ( $module !== [] ) {
 			$context['module_slug'] = $module_slug;
 			$context['module_name'] = $module['name'];
 			$context['module_description'] = $module['description'];

@@ -14,7 +14,6 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
     
     public function __construct( $data = [], $args = null ) {
 		parent::__construct( $data, $args );
-		// $this->add_script_depends('ekit-slick'); // deprecated
 	}
 
 	public function get_name() {
@@ -40,6 +39,18 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
     public function get_help_url() {
         return 'https://wpmet.com/doc/client-logo/';
     }
+
+	public function get_style_depends() {
+		return ['swiper'];
+	}
+
+    protected function is_dynamic_content(): bool {
+        return false;
+    }
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
 
     protected function register_controls() {
 
@@ -194,6 +205,15 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'label' => esc_html__( 'Spacing Left Right', 'elementskit-lite' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px' ],
+				'default' => [
+					'size' => 15,
+				],
+				'tablet_default' => [
+					'size' => 10,
+				],
+				'mobile_default' => [
+					'size' => 10,
+				],
 				'range' => [
 					'px' => [
 						'min' => 0,
@@ -201,64 +221,9 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 						'step' => 1,
 					],
 				],
-				'devices' => [ 'desktop', 'tablet', 'mobile' ],
-				'desktop_default' => [
-					'size' => 15,
-					'unit' => 'px',
-				],
-				'tablet_default' => [
-					'size' => 10,
-					'unit' => 'px',
-				],
-				'mobile_default' => [
-					'size' => 10,
-					'unit' => 'px',
-				],
-				'default' => [
-					'size' => 15,
-					'unit' => 'px',
-				],
 				'render_type' => 'template',
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-slide' => 'margin-right: {{SIZE}}{{UNIT}};margin-left: {{SIZE}}{{UNIT}};',
 					'{{WRAPPER}} .elementskit-clients-slider' => '--ekit_client_logo_left_right_spacing: {{SIZE}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'ekit_client_logo_top_bottom_spacing',
-			[
-				'label' => esc_html__( 'Spacing Top Bottom', 'elementskit-lite' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px' ],
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-						'step' => 1,
-					],
-				],
-				'devices' => [ 'desktop', 'tablet', 'mobile' ],
-				'desktop_default' => [
-					'size' => 15,
-					'unit' => 'px',
-				],
-				'tablet_default' => [
-					'size' => 10,
-					'unit' => 'px',
-				],
-				'mobile_default' => [
-					'size' => 10,
-					'unit' => 'px',
-				],
-				'default' => [
-					'size' => 15,
-					'unit' => 'px',
-				],
-				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-slide > div' => 'margin-bottom: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .elementskit-clients-slider .slick-list' => 'margin-bottom: -{{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -490,7 +455,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'name' => 'ekit_client_logo_container_bg_color',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-clients-slider .slick-list'
+				'selector' => '{{WRAPPER}} .elementskit-clients-slider .ekit-main-swiper'
 			]
 		);
 
@@ -501,7 +466,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-list' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -512,7 +477,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-list' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-wrapper' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
         );
@@ -896,18 +861,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					'size' => 20,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow' => 'font-size: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button' => 'font-size: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button svg' => 'font-size: {{SIZE}}{{UNIT}}; width: 1em; height: 1em;',
 				],
 			]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'ekit_client_logo_arrow_icon_typography',
-                'label' => esc_html__( 'Typography', 'elementskit-lite' ),
-                'selector' => '{{WRAPPER}} .elementskit-clients-slider .slick-arrow i',
-            ]
         );
 
         $this->add_responsive_control(
@@ -916,8 +873,16 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'label' => esc_html__( 'Padding', 'elementskit-lite' ),
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
+				'default'    => [
+					'unit'     => 'px',
+					'top'      => 15,
+					'right'    => 15,
+					'bottom'   => 15,
+					'left'     => 15,
+					'isLinked' => true
+				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
         );
@@ -927,7 +892,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 			[
 				'name' => 'ekit_client_logo_arrow_border_group',
 				'label' => esc_html__( 'Border', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-clients-slider .slick-arrow',
+				'selector' => '{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button',
 			]
         );
 
@@ -938,7 +903,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
         );
@@ -946,7 +911,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         $this->add_group_control(
             Group_Control_Box_Shadow::get_type(), [
                 'name'      => 'ekit_client_logo_arrow_shadow',
-                'selector'  => '{{WRAPPER}} .elementskit-clients-slider .slick-arrow',
+                'selector'  => '{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button',
             ]
 		);
         		
@@ -991,7 +956,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				],
 
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-prev' => 'left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button.swiper-button-prev' => 'left: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+						"ekit_client_logo_position_popover_toggle!" => '',
 				],
 			]
         );
@@ -1015,7 +983,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				],
 
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-prev' => 'top: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button.swiper-button-prev' => 'top: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+						"ekit_client_logo_position_popover_toggle!" => '',
 				],
 			]
         );
@@ -1047,7 +1018,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-next' => 'right: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button.swiper-button-next' => 'right: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+						"ekit_client_logo_position_popover_toggle!" => '',
 				],
 			]
         );
@@ -1070,7 +1044,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow.slick-next' => 'top: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button.swiper-button-next' => 'top: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+						"ekit_client_logo_position_popover_toggle!" => '',
 				],
 			]
         );
@@ -1090,10 +1067,12 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         $this->add_control(
 			'ekit_client_logo_arrow_color',
 			[
-				'label' => esc_html__( 'Arrow Color', 'elementskit-lite' ),
+				'label' => esc_html__( 'Color', 'elementskit-lite' ),
 				'type' => Controls_Manager::COLOR,
+				'default' => '#101010',
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button svg' => 'fill: {{VALUE}}',
 				],
 			]
         );
@@ -1101,10 +1080,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         $this->add_control(
 			'ekit_client_logo_arrow_background',
 			[
-				'label' => esc_html__( 'Arrow Background', 'elementskit-lite' ),
+				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow' => 'background: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button' => 'background: {{VALUE}}',
 				],
 			]
         );
@@ -1123,10 +1102,11 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         $this->add_control(
 			'ekit_client_logo_arrow_hv_color',
 			[
-				'label' => esc_html__( 'Arrow Color', 'elementskit-lite' ),
+				'label' => esc_html__( 'Color', 'elementskit-lite' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow:hover' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button:hover' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button:hover svg' => 'fill: {{VALUE}}',
 				],
 			]
         );
@@ -1134,10 +1114,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         $this->add_control(
 			'ekit_client_logo_arrow_hover_background',
 			[
-				'label' => esc_html__( 'Arrow Background', 'elementskit-lite' ),
+				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-arrow:hover' => 'background: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-navigation-button:hover' => 'background: {{VALUE}}',
 				],
 			]
         );
@@ -1182,6 +1162,15 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'label' => esc_html__( 'Spacing Left Right', 'elementskit-lite' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px' ],
+				'default' => [
+					'size' => 8,
+				],
+				'tablet_default' => [
+					'size' => 10,
+				],
+				'mobile_default' => [
+					'size' => 10,
+				],
 				'range' => [
 					'px' => [
 						'min' => 0,
@@ -1189,25 +1178,8 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 						'step' => 1,
 					],
 				],
-				'devices' => [ 'desktop', 'tablet', 'mobile' ],
-				'desktop_default' => [
-					'size' => 8,
-					'unit' => 'px',
-				],
-				'tablet_default' => [
-					'size' => 10,
-					'unit' => 'px',
-				],
-				'mobile_default' => [
-					'size' => 10,
-					'unit' => 'px',
-				],
-				'default' => [
-					'size' => 8,
-					'unit' => 'px',
-				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-dots li' => 'margin-right: {{SIZE}}{{UNIT}};margin-left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-pagination > span' => 'margin-right: {{SIZE}}{{UNIT}};margin-left: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1227,11 +1199,11 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 0,
+					'size' => -50,
                 ],
 
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-clients-slider ul.slick-dots' => ' -webkit-transform:translateY( {{SIZE}}{{UNIT}});transform: translateY( {{SIZE}}{{UNIT}});',
+                    '{{WRAPPER}} .elementskit-clients-slider .swiper-pagination' => 'bottom: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -1242,7 +1214,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
                 'label' => esc_html__( 'Dot Color', 'elementskit-lite' ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-clients-slider.dot_paginated .slick-dots li' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .elementskit-clients-slider.dot_paginated .swiper-pagination > span' => 'color: {{VALUE}}',
 				],
 				'condition' => [
 					'ekit_client_logo_client_logo_dot_style' => 'dot_paginated'
@@ -1268,7 +1240,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					'size' => 8,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-dots li button' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-pagination > span' => 'width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1291,7 +1263,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					'size' => 8,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-dots li button' => 'height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-pagination > span' => 'height: {{SIZE}}{{UNIT}};',
 				],
 			]
         );
@@ -1303,7 +1275,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-dots li button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-pagination > span' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -1314,7 +1286,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'name' => 'ekit_client_logo_dot_background',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-clients-slider .slick-dots li button',
+				'selector' => '{{WRAPPER}} .elementskit-clients-slider .swiper-pagination > span',
 			]
 		);
 
@@ -1333,7 +1305,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 				'name' => 'ekit_client_logo_dot_active_background',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-clients-slider .slick-dots li.slick-active button',
+				'selector' => '{{WRAPPER}} .elementskit-clients-slider .swiper-pagination span.swiper-pagination-bullet-active',
 			]
 		);
 
@@ -1355,7 +1327,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					'size' => 40,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-dots li.slick-active button' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-pagination span.swiper-pagination-bullet-active' => 'width: {{SIZE}}{{UNIT}};',
                 ],
                 'condition' => [
                     'ekit_client_logo_client_logo_dot_style' => 'dot_dashed'
@@ -1381,7 +1353,7 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 					'size' => 1.2,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-clients-slider .slick-dots li.slick-active button' => 'transform: scale({{SIZE}});',
+					'{{WRAPPER}} .elementskit-clients-slider .swiper-pagination span.swiper-pagination-bullet-active' => 'transform: scale({{SIZE}});',
                 ],
                 'condition' => [
                     'ekit_client_logo_client_logo_dot_style' => 'dot_dotted'
@@ -1554,81 +1526,73 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
         $settings = $this->get_settings_for_display();
         extract($settings);
         $logos = $settings['ekit_client_logo_repiter'];
-        
-		// Left Arrow Icon
-        $migrated = isset( $settings['__fa4_migrated']['ekit_client_logo_left_arrow_icon'] );
-        // - Check if its a new widget without previously selected icon using the old Icon control
-        $is_new = empty( $settings['ekit_client_logo_left_arrow'] );
-        $prevArrowIcon = ($is_new || $migrated) ? (!empty($ekit_client_logo_left_arrow_icon) && $ekit_client_logo_left_arrow_icon['library'] != 'svg' ? $ekit_client_logo_left_arrow_icon['value'] : '') : $ekit_client_logo_left_arrow;
-
-		// Right Arrow Icon
-        $migrated = isset( $settings['__fa4_migrated']['ekit_client_logo_right_arrow_icon'] );
-        // - Check if its a new widget without previously selected icon using the old Icon control
-        $is_new = empty( $settings['ekit_client_logo_right_arrow'] );
-        $nextArrowIcon = ($is_new || $migrated) ? (!empty($ekit_client_logo_right_arrow_icon) && $ekit_client_logo_right_arrow_icon['library'] != 'svg' ? $ekit_client_logo_right_arrow_icon['value'] : '') : $ekit_client_logo_right_arrow;
 
         // Config
         $config = [
             'rtl'				=> is_rtl(),
             'arrows'			=> !empty($settings['ekit_client_logo_show_arrow']),
             'dots'				=> !empty($settings['ekit_client_logo_show_dot']),
-            'pauseOnHover'		=> !empty($settings['ekit_client_logo_pause_on_hover']),
             'autoplay'			=> !empty($settings['ekit_client_logo_autoplay']),
-            'speed'		=> !empty($settings['ekit_client_logo_speed']) ? $settings['ekit_client_logo_speed'] : 1000,
+            'speed'				=> !empty($settings['ekit_client_logo_speed']) ? $settings['ekit_client_logo_speed'] : 1000,
             'slidesPerView'		=> !empty($settings['ekit_client_logo_slidetosho']['size']) ? $settings['ekit_client_logo_slidetosho']['size'] : 4,
             'slidesPerGroup'	=> !empty($settings['ekit_client_logo_slidesToScroll']['size']) ? $settings['ekit_client_logo_slidesToScroll']['size'] : 1,
-            'pauseOnHover'	    => !empty($settings['ekit_client_logo_pause_on_hover']),
-            'slidesPerColumn'	            => !empty($settings['ekit_client_logo_rows']) ? (int) $settings['ekit_client_logo_rows'] : 1,
-            'loop'  => ( !empty($ekit_client_logo_loop) && $ekit_client_logo_loop == 'yes' && !empty($ekit_client_logo_rows) && $ekit_client_logo_rows == 1 ) ? true : false,
+            'pauseOnHover'		=> !empty($settings['ekit_client_logo_pause_on_hover']),
+            'loop'				=> ( !empty($ekit_client_logo_loop) && $ekit_client_logo_loop == 'yes' && !empty($ekit_client_logo_rows) && $ekit_client_logo_rows == 1 ) ? true : false,
             'breakpoints'		=> [
                 320 => [
-                    'slidesPerView'      => !empty($settings['ekit_client_logo_slidetosho_mobile']['size']) ? $settings['ekit_client_logo_slidetosho_mobile']['size'] : 1,
-                    'slidesPerGroup'    => !empty($settings['ekit_client_logo_slidesToScroll_mobile']['size']) ? $settings['ekit_client_logo_slidesToScroll_mobile']['size'] : 1
+                    'slidesPerView'		=> !empty($settings['ekit_client_logo_slidetosho_mobile']['size']) ? $settings['ekit_client_logo_slidetosho_mobile']['size'] : 1,
+                    'slidesPerGroup'	=> !empty($settings['ekit_client_logo_slidesToScroll_mobile']['size']) ? $settings['ekit_client_logo_slidesToScroll_mobile']['size'] : 1,
+                    'spaceBetween'		=> !empty($ekit_client_logo_left_right_spacing_mobile['size']) ? $ekit_client_logo_left_right_spacing_mobile['size'] : 10,
                 ],
                 768 => [
-                    'slidesPerView'      => !empty($settings['ekit_client_logo_slidetosho_tablet']['size']) ? $settings['ekit_client_logo_slidetosho_tablet']['size'] : 2,
-                    'slidesPerGroup'    => !empty($settings['ekit_client_logo_slidesToScroll_tablet']['size']) ? $settings['ekit_client_logo_slidesToScroll_tablet']['size'] : 1,
+                    'slidesPerView'		=> !empty($settings['ekit_client_logo_slidetosho_tablet']['size']) ? $settings['ekit_client_logo_slidetosho_tablet']['size'] : 2,
+                    'slidesPerGroup'	=> !empty($settings['ekit_client_logo_slidesToScroll_tablet']['size']) ? $settings['ekit_client_logo_slidesToScroll_tablet']['size'] : 1,
+                    'spaceBetween'		=> !empty($ekit_client_logo_left_right_spacing_tablet['size']) ? $ekit_client_logo_left_right_spacing_tablet['size'] : 10,
                 ],
                 1024 => [
-                    'slidesPerView'      => !empty($settings['ekit_client_logo_slidetosho']['size']) ? $settings['ekit_client_logo_slidetosho']['size'] : 2,
-                    'slidesPerGroup'    => !empty($settings['ekit_client_logo_slidesToScroll']['size']) ? $settings['ekit_client_logo_slidesToScroll']['size'] : 1,
-                ]
-            ],
-        ];
+                    'slidesPerView'		=> !empty($settings['ekit_client_logo_slidetosho']['size']) ? $settings['ekit_client_logo_slidetosho']['size'] : 2,
+                    'slidesPerGroup'	=> !empty($settings['ekit_client_logo_slidesToScroll']['size']) ? $settings['ekit_client_logo_slidesToScroll']['size'] : 1,
+					'spaceBetween'		=> !empty($ekit_client_logo_left_right_spacing['size']) ? $ekit_client_logo_left_right_spacing['size'] : 15,
+				]
+			],
+		];
 
-        $this->add_render_attribute( 'wrapper', 'class', 'elementskit-clients-slider slick-slider');
-        $this->add_render_attribute( 'wrapper', 'class', !empty($settings['ekit_client_logo_show_dot']) ? 'slick-dotted' : '');
-        $this->add_render_attribute( 'wrapper', 'class', $settings['ekit_client_logo_arrow_pos']);
-        $this->add_render_attribute( 'wrapper', 'class', $settings['ekit_client_logo_client_logo_dot_style']);
+		if(!empty($settings['ekit_client_logo_rows']) && $settings['ekit_client_logo_rows'] > 1) {
+			$config['grid'] = [
+				'fill'	=> 'row',
+				'rows'	=> (int) $settings['ekit_client_logo_rows']
+			];
+		}
+
+		$this->add_render_attribute( 'wrapper', 'class', 'elementskit-clients-slider');
+		$this->add_render_attribute( 'wrapper', 'class', !empty($settings['ekit_client_logo_show_dot']) ? 'slider-dotted' : '');
+		$this->add_render_attribute( 'wrapper', 'class', $settings['ekit_client_logo_arrow_pos']);
+		$this->add_render_attribute( 'wrapper', 'class', $settings['ekit_client_logo_client_logo_dot_style']);
 		$this->add_render_attribute( 'wrapper', 'class', $settings['ekit_client_logo_hover_animation_driction']);
 		$this->add_render_attribute( 'wrapper', 'class', $settings['ekit_client_logo_slide_style']);
 
-        $this->add_render_attribute( 'wrapper', 'data-config', wp_json_encode($config) );
+		$this->add_render_attribute( 'wrapper', 'data-config', wp_json_encode($config) );
 
 		$this->add_render_attribute( 'wrapper', 'data-direction', $settings['ekit_client_logo_hover_animation_driction']);
 
-        $seperotor_enable = $settings['ekit_client_logo_separator'] == 'yes' ? 'log-separator' : '';
-        ?>
-        <div <?php echo $this->get_render_attribute_string( 'wrapper' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped by elementor ?>>
-            <div class="<?php echo esc_attr(\ElementsKit_Lite\Utils::swiper_class()); ?>">
-                <div class="slick-list swiper-wrapper">
-                    <?php
-
-                        $count = 1;
-
-                        foreach ($logos as $logo) :
-                        if ( ! empty( $logo['ekit_client_logo_website_link']['url'] ) ) {
-                            $this->add_link_attributes( 'button-' . $count, $logo['ekit_client_logo_website_link'] );
-                        }
-                        ?>
-                        <div class="elementskit-client-slider-item swiper-slide <?php echo esc_attr($seperotor_enable);?>">
-                            <div class="slick-slide">
-                                <div class="single-client image-switcher" title="<?php echo esc_attr( $logo['ekit_client_logo_list_title'] ); ?>">
-                                    <?php if($logo['ekit_client_logo_enable_link'] == 'yes') :  ?>
-
-
-                                        <a <?php echo $this->get_render_attribute_string( 'button-' . esc_attr($count) ); ?> <?php echo $this->get_render_attribute_string( 'link_' . esc_attr($count) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped by elementor ?>>
-                                            <span class="content-image">
+		$seperotor_enable = $settings['ekit_client_logo_separator'] == 'yes' ? 'log-separator' : '';
+		?>
+		<div <?php echo $this->get_render_attribute_string( 'wrapper' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped by elementor ?>>
+			<div class="<?php echo esc_attr(\ElementsKit_Lite\Utils::swiper_class()); ?>">
+				<div class="swiper-wrapper">
+					<?php
+						$count = 1;
+						foreach ($logos as $logo) :
+						if ( ! empty( $logo['ekit_client_logo_website_link']['url'] ) ) {
+							$this->add_link_attributes( 'button-' . $count, $logo['ekit_client_logo_website_link'] );
+						}
+						?>
+						<div class="elementskit-client-slider-item swiper-slide <?php echo esc_attr($seperotor_enable);?>">
+							<div class="swiper-slide-inner">
+								<div class="single-client image-switcher" title="<?php echo esc_attr( $logo['ekit_client_logo_list_title'] ); ?>">
+									<?php if($logo['ekit_client_logo_enable_link'] == 'yes') :  ?>
+										<a <?php $this->print_render_attribute_string( 'button-' . esc_attr($count) ); ?>>
+											<span class="content-image">
 												<?php
 												echo wp_kses(
 													\Elementskit_Lite\Utils::get_attachment_image_html($logo, 'ekit_client_logo_image_normal', null, [
@@ -1646,13 +1610,10 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 													);
 												}
 												?>
-                                            </span>
-                                        </a>
-
-                                    <?php else:  ?>
-
-                                        <div class="content-image">
-
+											</span>
+										</a>
+									<?php else:  ?>
+										<div class="content-image">
 											<?php
 											echo wp_kses(
 												\Elementskit_Lite\Utils::get_attachment_image_html($logo, 'ekit_client_logo_image_normal', 'full', [
@@ -1669,27 +1630,29 @@ class ElementsKit_Widget_Client_Logo extends Widget_Base {
 													\ElementsKit_Lite\Utils::get_kses_array()
 												);
 											}
-                                            ?>
-                                        </div>
+											?>
+										</div>
+									<?php endif; ?>
+								</div>
+							</div>
+						</div>
+					<?php  $count++; endforeach; ?>
+				</div>
 
-                                    <?php endif; ?>
+				<?php if($settings['ekit_client_logo_show_dot'] == 'yes') : ?>
+					<div class="swiper-pagination"></div>
+				<?php endif; ?>
 
-                                </div>
-                            </div>
-                        </div>
-
-                    <?php  $count++; endforeach; ?>
-                </div>
-
-            </div><!-- .elementskit-clients-slider END -->
-           
-            <ul class="slick-dots swiper-pagination swiper-pagination-clickable swiper-pagination-bullets"></ul>
-            <?php if(!empty($settings['ekit_client_logo_show_arrow'])) : ?>
-                <button type="button" class="slick-prev slick-arrow"><i class="<?php echo esc_attr($prevArrowIcon); ?>"></i></button>
-                <button type="button" class="slick-next slick-arrow"><i class="<?php echo esc_attr($nextArrowIcon); ?>"></i></button>
-            <?php endif; ?>
-        </div>
-
-    <?php
-    }
+				<?php if(!empty($settings['ekit_client_logo_show_arrow'])) : ?>
+					<div class="swiper-navigation-button swiper-button-prev">
+						<?php Icons_Manager::render_icon($settings['ekit_client_logo_left_arrow_icon'], [ 'aria-hidden' => 'true' ]); ?>
+					</div>
+					<div class="swiper-navigation-button swiper-button-next">
+						<?php Icons_Manager::render_icon($settings['ekit_client_logo_right_arrow_icon'], [ 'aria-hidden' => 'true' ]); ?>
+					</div>
+				<?php endif; ?>
+			</div><!-- .elementskit-clients-slider END -->
+		</div>
+		<?php
+	}
 }

@@ -124,12 +124,12 @@ blocksy_output_colors([
 	'variables' => [
 		'default' => [
 			'selector' => blocksy_prefix_selector('.entry-header .entry-meta', $prefix),
-			'variable' => 'color'
+			'variable' => 'theme-text-color'
 		],
 
 		'hover' => [
 			'selector' => blocksy_prefix_selector('.entry-header .entry-meta', $prefix),
-			'variable' => 'linkHoverColor'
+			'variable' => 'theme-link-hover-color'
 		],
 	],
 ]);
@@ -144,12 +144,12 @@ blocksy_output_colors([
 	'variables' => [
 		'default' => [
 			'selector' => blocksy_prefix_selector('.entry-header [data-type="pill"]', $prefix),
-			'variable' => 'buttonTextInitialColor'
+			'variable' => 'theme-button-text-initial-color'
 		],
 
 		'hover' => [
 			'selector' => blocksy_prefix_selector('.entry-header [data-type="pill"]', $prefix),
-			'variable' => 'buttonTextHoverColor'
+			'variable' => 'theme-button-text-hover-color'
 		],
 	],
 ]);
@@ -170,7 +170,7 @@ blocksy_output_colors([
 				'.entry-header [data-type="pill"]',
 				$prefix
 			),
-			'variable' => 'buttonInitialColor'
+			'variable' => 'theme-button-background-initial-color'
 		],
 
 		'hover' => [
@@ -178,7 +178,7 @@ blocksy_output_colors([
 				'.entry-header [data-type="pill"]',
 				$prefix
 			),
-			'variable' => 'buttonHoverColor'
+			'variable' => 'theme-button-background-hover-color'
 		],
 	],
 ]);
@@ -207,7 +207,7 @@ blocksy_output_colors([
 	'variables' => [
 		'default' => [
 			'selector' => blocksy_prefix_selector('.entry-header .page-description', $prefix),
-			'variable' => 'color'
+			'variable' => 'theme-text-color'
 		],
 	],
 ]);
@@ -220,7 +220,7 @@ $default_hero_elements[] = [
 	'enabled' => $prefix === 'product',
 ];
 
-foreach (get_theme_mod(
+foreach (blocksy_get_theme_mod(
 	$prefix . '_hero_elements',
 	$default_hero_elements
 ) as $layer) {
@@ -257,7 +257,7 @@ blocksy_output_colors([
 				'.entry-header .ct-breadcrumbs',
 				$prefix
 			),
-			'variable' => 'color'
+			'variable' => 'theme-text-color'
 		],
 
 		'initial' => [
@@ -265,7 +265,7 @@ blocksy_output_colors([
 				'.entry-header .ct-breadcrumbs',
 				$prefix
 			),
-			'variable' => 'linkInitialColor'
+			'variable' => 'theme-link-initial-color'
 		],
 
 		'hover' => [
@@ -273,10 +273,52 @@ blocksy_output_colors([
 				'.entry-header .ct-breadcrumbs',
 				$prefix
 			),
-			'variable' => 'linkHoverColor'
+			'variable' => 'theme-link-hover-color'
 		],
 	],
 ]);
+
+
+blocksy_output_colors([
+	'value' => blocksy_akg_or_customizer('page_social_icons_color', $source),
+	'default' => [
+		'default' => [ 'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT') ],
+		'hover' => [ 'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT') ],
+	],
+	'css' => $css,
+	'variables' => [
+		'default' => [
+			'selector' => blocksy_prefix_selector('.entry-header .author-box-socials', $prefix),
+			'variable' => 'theme-icon-color'
+		],
+
+		'hover' => [
+			'selector' => blocksy_prefix_selector('.entry-header .author-box-socials', $prefix),
+			'variable' => 'theme-icon-hover-color'
+		],
+	],
+]);
+
+blocksy_output_colors([
+	'value' => blocksy_akg_or_customizer('page_social_icons_background', $source),
+	'default' => [
+		'default' => [ 'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT') ],
+		'hover' => [ 'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT') ],
+	],
+	'css' => $css,
+	'variables' => [
+		'default' => [
+			'selector' => blocksy_prefix_selector('.entry-header .author-box-socials', $prefix),
+			'variable' => 'background-color'
+		],
+
+		'hover' => [
+			'selector' => blocksy_prefix_selector('.entry-header .author-box-socials', $prefix),
+			'variable' => 'background-hover-color'
+		],
+	],
+]);
+
 
 if ($type === 'type-1') {
 	$hero_alignment1 = blocksy_akg_or_customizer(
@@ -302,9 +344,9 @@ if ($type === 'type-1') {
 		'unit' => '',
 	]);
 
-	$hero_margin_bottom = blocksy_akg_or_customizer('hero_margin', $source, 40);
+	$hero_margin_bottom = blocksy_akg_or_customizer('hero_margin', $source, '40px');
 
-	if ($hero_margin_bottom !== 40) {
+	if ($hero_margin_bottom !== '40px') {
 		blocksy_output_responsive([
 			'css' => $css,
 			'tablet_css' => $tablet_css,
@@ -315,6 +357,8 @@ if ($type === 'type-1') {
 			),
 			'variableName' => 'margin-bottom',
 			'value' => $hero_margin_bottom,
+			'unit' => '',
+			'previousUnit' => 'px',
 		]);
 	}
 }
@@ -376,15 +420,15 @@ if ($type === 'type-2') {
 				$prefix
 			),
 			'variableName' => 'min-height',
-			'unit' => '',
 			'value' => $hero_height,
+			'unit' => '',
 		]);
 	}
 
 	// overlay color
 	blocksy_output_background_css([
 		'selector' => blocksy_prefix_selector(
-			'.hero-section[data-type="type-2"] > figure .ct-image-container:after',
+			'.hero-section[data-type="type-2"] > figure .ct-media-container:after',
 			$prefix
 		),
 		'css' => $css,
@@ -414,7 +458,7 @@ if ($type === 'type-2') {
 			blocksy_background_default_value([
 				'backgroundColor' => [
 					'default' => [
-						'color' => 'var(--paletteColor6)'
+						'color' => 'var(--theme-palette-color-6)'
 					],
 				],
 			])
@@ -440,7 +484,6 @@ if ($type === 'type-2') {
 				'left' => 'auto',
 				'right' => 'auto',
 				'bottom' => '50px',
-				'linked' => true,
 			])
 		)
 	]);
@@ -506,7 +549,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 			'variables' => [
 				'default' => [
 					'selector' => blocksy_prefix_selector('.entry-header .page-title', $prefix),
-					'variable' => 'heading-color'
+					'variable' => 'theme-heading-color'
 				],
 			],
 		]);
@@ -543,7 +586,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 						$single_hero_element['__id'],
 						0, 6
 					) . '"]', $prefix),
-					'variable' => 'color'
+					'variable' => 'theme-text-color'
 				],
 
 				'hover' => [
@@ -551,7 +594,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 						$single_hero_element['__id'],
 						0, 6
 					) . '"]', $prefix),
-					'variable' => 'linkHoverColor'
+					'variable' => 'theme-link-hover-color'
 				],
 			],
 		]);
@@ -630,7 +673,7 @@ if ($prefix === 'courses_single') {
 		'variables' => [
 			'default' => [
 				'selector' => blocksy_prefix_selector('.tutor-course-details-title', $prefix),
-				'variable' => 'heading-color'
+				'variable' => 'theme-heading-color'
 			],
 		],
 	]);
@@ -662,12 +705,12 @@ if ($prefix === 'courses_single') {
 		'variables' => [
 			'default' => [
 				'selector' => blocksy_prefix_selector('.tutor-meta', $prefix),
-				'variable' => 'color'
+				'variable' => 'theme-text-color'
 			],
 
 			'hover' => [
 				'selector' => blocksy_prefix_selector('.tutor-meta', $prefix),
-				'variable' => 'linkHoverColor'
+				'variable' => 'theme-link-hover-color'
 			],
 		],
 	]);
@@ -699,12 +742,12 @@ if ($prefix === 'courses_single') {
 		'variables' => [
 			'default' => [
 				'selector' => blocksy_prefix_selector('.tutor-course-details-actions > a', $prefix),
-				'variable' => 'color'
+				'variable' => 'theme-text-color'
 			],
 
 			'hover' => [
 				'selector' => blocksy_prefix_selector('.tutor-course-details-actions > a', $prefix),
-				'variable' => 'linkHoverColor'
+				'variable' => 'theme-link-hover-color'
 			],
 		],
 	]);
@@ -734,7 +777,7 @@ if ($prefix === 'courses_single') {
 		'variables' => [
 			'default' => [
 				'selector' => blocksy_prefix_selector('.tutor-ratings', $prefix),
-				'variable' => 'color'
+				'variable' => 'theme-text-color'
 			],
 		],
 	]);

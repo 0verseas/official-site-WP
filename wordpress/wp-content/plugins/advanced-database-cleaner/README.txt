@@ -1,11 +1,11 @@
 === Advanced Database Cleaner ===
 Contributors: symptote
 Donate Link: https://www.sigmaplugin.com/donation
-Tags: clean, clean up, cleanup, database, optimize, performance, speed, optimizing, clean-up, orphan, orphaned, tables, options
+Tags: clean, database, optimize, performance, postmeta
 Requires at least: 3.1.0
 Requires PHP: 5.0
-Tested up to: 6.1
-Stable tag: 3.1.2
+Tested up to: 6.7
+Stable tag: 3.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -139,6 +139,40 @@ This section describes how to install the plugin. In general, there are 3 ways t
 8. Overview and settings page
 
 == Changelog ==
+
+= 3.1.6 - 24/03/2025 =
+- Fix: names containing HTML were not displayed correctly.
+- Fix: certain transients, options, tables, and cron jobs could not be deleted.
+- Fix: function _load_textdomain_just_in_time was called incorrectly.
+- Fix: after optimizing tables, the plugin now refreshes the data to accurately reflect the database’s real status.
+- Fix: enhanced the plugin's security.
+- Fix (PRO): sometimes users were unable to deactivate their license.
+- Tweak: improved how the plugin edits the autoload value for options.
+- Tweak: increased the max_execution_time only after a scan has started, and under specific conditions.
+- Tweak: cleaned up and enhanced some PHP, CSS, and JS code parts.
+- New: the Options tab now displays the total size of autoloaded options.
+- New: in Multisite, users can now choose to display the plugin menu in the Network Admin panel.
+- New (PRO): added support for new autoload option values in filters: on, auto, auto-on, auto-off.
+- New (PRO): users can now assign items to WordPress using the “manual categorization” feature.
+
+= 3.1.5 - 19/09/2024 =
+- Fix: Automatic conversion of false to array is deprecated
+- Fix: Cannot modify header information - headers already sent..
+- Fix: Object of class stdClass could not be converted to string
+
+= 3.1.4 - 23/01/2024 =
+- Security: enhancing the security by avoiding deserialization (thanks to Richard Telleng from Wordfence)
+- PRO: fix endless scan reloading
+- PRO: fix PHP warning: Implicit conversion from float to int
+- PRO: some code cleanup
+
+= 3.1.3 - 12/09/2023 =
+- Security: enhancing the security by sanitizing some parameters
+- Fix: fixed 'Constant FILTER_SANITIZE_STRING is deprecated in PHP 8'
+- Fix: fixed 'Undefined property : stdClass::$data_free'
+- Fix: fixed 'PHP Fatal error:  Uncaught TypeError: date(): Argument #2 ($timestamp) must be of type ?int'
+- Tweak: better handling of nonces
+- Compatibility: tested with the latest version of WordPress 6.3.1
 
 = 3.1.2 - 22/02/2023 =
 - Security fix: when saving the settings

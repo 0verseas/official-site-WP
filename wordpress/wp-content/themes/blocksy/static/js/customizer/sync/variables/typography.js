@@ -5,7 +5,7 @@ const withPrefix = (value, prefix = '') => {
 		return value
 	}
 
-	return `${prefix}${value.charAt(0).toUpperCase()}${value.slice(1)}`
+	return value.replace('theme-', `theme-${prefix}-`)
 }
 
 const getWeightFor = ({ variation }) => {
@@ -67,6 +67,9 @@ const loadGoogleFonts = (font_family, variation) => {
 		return
 	}
 
+	let italVars = []
+	let wghtVars = []
+
 	if (loadedFonts[font_family]) {
 		if (loadedFonts[font_family].indexOf(variation) > -1) return
 		loadedFonts[font_family] = [...loadedFonts[font_family], variation]
@@ -74,10 +77,51 @@ const loadGoogleFonts = (font_family, variation) => {
 		loadedFonts[font_family] = [variation]
 	}
 
+	for (let variation of loadedFonts[font_family]) {
+		let varToPush = parseInt(variation[1]) * 100
+
+		varToPush += variation[0] === 'i' ? 'i' : ''
+
+		if (variation[0] === 'i') {
+			italVars.push(parseInt(variation[1]) * 100)
+		} else {
+			wghtVars.push(parseInt(variation[1]) * 100)
+		}
+	}
+
+	italVars.sort((a, b) => a - b)
+	wghtVars.sort((a, b) => a - b)
+
+	let axisTagList = []
+
+	if (italVars.length > 0) {
+		axisTagList.push('ital')
+	}
+
+	axisTagList.push('wght')
+
+	let toPush = axisTagList.join(',') + '@'
+
+	let allVars = []
+
+	for (let wghtVar of wghtVars) {
+		if (axisTagList.length > 1) {
+			allVars.push('0,' + wghtVar)
+		} else {
+			allVars.push(wghtVar)
+		}
+	}
+
+	for (let italVar of italVars) {
+		allVars.push('1,' + italVar)
+	}
+
+	toPush += allVars.join(';')
+
 	WebFontLoader.load({
 		google: {
 			api: 'https://fonts.googleapis.com/css2',
-			families: [font_family],
+			families: [`${font_family}:${toPush}`],
 		},
 		classes: false,
 		text: 'abcdefghijklmnopqrstuvwxyz',
@@ -92,7 +136,7 @@ export const typographyOption = ({
 }) => ({
 	[id]: [
 		{
-			variable: withPrefix('fontFamily', prefix),
+			variable: withPrefix('theme-font-family', prefix),
 			selector,
 			extractValue: (value) => {
 				value = extractValue(value)
@@ -122,12 +166,12 @@ export const typographyOption = ({
 
 				let { variation } = extractValue(value)
 
-				loadGoogleFonts(extractedValue, variation)
+				loadGoogleFonts(extractedValue.replace(/\'/g, ''), variation)
 			},
 		},
 
 		{
-			variable: withPrefix('fontWeight', prefix),
+			variable: withPrefix('theme-font-weight', prefix),
 			selector,
 			extractValue: (value) => {
 				value = extractValue(value)
@@ -142,7 +186,7 @@ export const typographyOption = ({
 		},
 
 		{
-			variable: withPrefix('fontStyle', prefix),
+			variable: withPrefix('theme-font-style', prefix),
 			selector,
 			extractValue: (value) => {
 				value = extractValue(value)
@@ -158,7 +202,7 @@ export const typographyOption = ({
 		},
 
 		{
-			variable: withPrefix('textTransform', prefix),
+			variable: withPrefix('theme-text-transform', prefix),
 			selector,
 			extractValue: (value) => {
 				value = extractValue(value)
@@ -167,7 +211,7 @@ export const typographyOption = ({
 		},
 
 		{
-			variable: withPrefix('textDecoration', prefix),
+			variable: withPrefix('theme-text-decoration', prefix),
 			selector,
 			extractValue: (value) => {
 				value = extractValue(value)
@@ -176,7 +220,7 @@ export const typographyOption = ({
 		},
 
 		{
-			variable: withPrefix('fontSize', prefix),
+			variable: withPrefix('theme-font-size', prefix),
 			selector,
 			unit: '',
 			responsive: true,
@@ -187,7 +231,7 @@ export const typographyOption = ({
 		},
 
 		{
-			variable: withPrefix('lineHeight', prefix),
+			variable: withPrefix('theme-line-height', prefix),
 			selector,
 			unit: '',
 			responsive: true,
@@ -198,7 +242,7 @@ export const typographyOption = ({
 		},
 
 		{
-			variable: withPrefix('letterSpacing', prefix),
+			variable: withPrefix('theme-letter-spacing', prefix),
 			selector,
 			unit: '',
 			responsive: true,
@@ -254,19 +298,22 @@ export const getTypographyVariablesFor = () => ({
 
 	...typographyOption({
 		id: 'quote',
-		selector:
-			'.wp-block-quote',
+		selector: '.wp-block-quote',
 	}),
 
 	...typographyOption({
 		id: 'pullquote',
-		selector:
-			'.wp-block-pullquote, .ct-quote-widget blockquote',
+		selector: '.wp-block-pullquote',
 	}),
 
 	...typographyOption({
 		id: 'pre',
-		selector: 'code, kbd, samp, pre',
+		selector: 'pre, code, samp, kbd',
+	}),
+
+	...typographyOption({
+		id: 'figcaption',
+		selector: '.entry-content figcaption',
 	}),
 
 	...typographyOption({
@@ -276,13 +323,7 @@ export const getTypographyVariablesFor = () => ({
 
 	...typographyOption({
 		id: 'sidebarWidgetsFont',
-		selector:
-			'.ct-sidebar .ct-widget > *:not(.widget-title):not(blockquote)',
-	}),
-
-	...typographyOption({
-		id: 'singleProductTitleFont',
-		selector: '.entry-summary .entry-title',
+		selector: '.ct-sidebar .ct-widget > *:not(.widget-title)',
 	}),
 
 	...typographyOption({
@@ -296,23 +337,12 @@ export const getTypographyVariablesFor = () => ({
 	}),
 
 	...typographyOption({
-		id: 'singleProductPriceFont',
-		selector: '.entry-summary .price',
-	}),
-
-	...typographyOption({
-		id: 'cardProductTitleFont',
-		selector:
-			'[data-products] .woocommerce-loop-product__title, [data-products] .woocommerce-loop-category__title',
-	}),
-
-	...typographyOption({
-		id: 'cardProductExcerptFont',
-		selector: '[data-products] .entry-excerpt',
-	}),
-
-	...typographyOption({
 		id: 'breadcrumbsFont',
 		selector: '.ct-breadcrumbs',
+	}),
+
+	...typographyOption({
+		id: 'shop_results_count_font',
+		selector: '.woo-listing-top .woocommerce-result-count',
 	}),
 })

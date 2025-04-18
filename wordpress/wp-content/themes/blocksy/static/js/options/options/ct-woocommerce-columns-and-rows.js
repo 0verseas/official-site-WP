@@ -18,6 +18,7 @@ const WooColumnsAndRows = ({
 	onChangeFor,
 	values,
 	values: { woocommerce_catalog_columns, woocommerce_catalog_rows },
+	liftedOptionStateDescriptor,
 }) => {
 	const rowsValue = rows_id ? values[rows_id] : woocommerce_catalog_rows
 
@@ -27,6 +28,7 @@ const WooColumnsAndRows = ({
 			{...(device !== 'desktop' ? { 'data-disabled-last': '' } : {})}>
 			<div>
 				<NumberOption
+					liftedOptionStateDescriptor={liftedOptionStateDescriptor}
 					option={{
 						...option,
 						attr: {
@@ -46,15 +48,16 @@ const WooColumnsAndRows = ({
 					}}
 				/>
 				<p className="ct-option-description">
-					{__('Number of columns', 'blc')}
+					{__('Number of columns', 'blocksy')}
 				</p>
 			</div>
 
 			<div>
 				<NumberOption
+					liftedOptionStateDescriptor={liftedOptionStateDescriptor}
 					option={{
 						min: 1,
-						max: 100,
+						max: 200,
 						responsive: false,
 						value: 4,
 						attr: {
@@ -80,7 +83,7 @@ const WooColumnsAndRows = ({
 					}}
 				/>
 				<p className="ct-option-description">
-					{__('Number of rows', 'blc')}
+					{__('Number of rows', 'blocksy')}
 				</p>
 			</div>
 		</div>
@@ -97,36 +100,38 @@ WooColumnsAndRows.renderingConfig = {
 		device,
 	}) => {
 		const rowsValue = rows_id ? values[rows_id] : woocommerce_catalog_rows
+		const columnsValue = columns_id
+			? values[columns_id]
+			: woocommerce_catalog_columns
 
 		let myResult = {
 			...value,
-			desktop: woocommerce_catalog_columns,
-			woocommerce_catalog_columns,
-			woocommerce_catalog_rows,
+			woocommerce_catalog_columns: columnsValue,
+			woocommerce_catalog_rows: rowsValue,
 		}
 
 		return myResult
 	},
 
-	computeOptionValue: (v) => ({
-		...v,
-		woocommerce_catalog_columns: 4,
-		woocommerce_catalog_rows: 4,
-	}),
-
-	computeOptionValue: (v) => {
-		const result = {
+	computeOptionValue: (v, { option, values }) => {
+		let result = {
 			...v,
-			woocommerce_catalog_columns: 4,
-			woocommerce_catalog_rows: 4,
+			woocommerce_catalog_columns: option.columns_value || 4,
+			woocommerce_catalog_rows: option.rows_value || 4,
 		}
 
 		return result
 	},
 
-	performRevert: ({ onChangeFor }) => {
-		onChangeFor('woocommerce_catalog_columns', 4)
-		onChangeFor('woocommerce_catalog_rows', 4)
+	performRevert: ({ onChangeFor, option }) => {
+		onChangeFor(
+			option.columns_id || 'woocommerce_catalog_columns',
+			option.columns_value || 4
+		)
+		onChangeFor(
+			option.rows_id || 'woocommerce_catalog_rows',
+			option.rows_value || 4
+		)
 	},
 }
 

@@ -14,7 +14,7 @@ use Embera\Url;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Providers
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @copyright   Copyright (C) 2023 WPDeveloper. All rights reserved.
  * @license     GPLv3 or later
  * @since       1.5.0
  */
@@ -114,7 +114,7 @@ class Twitch extends ProviderAdapter implements ProviderInterface
 
             $pars_url = wp_parse_url(get_site_url());
             $src = !empty($pars_url['host'])?$src.'&parent='.$pars_url['host']:$src;
-            $html = '<iframe src="' . $src . '" height="'.$height.'" width="'.$width.'" ' . $attrs . '></iframe>';
+            $html = '<iframe src="' . esc_url($src) . '" height="'.esc_attr($height).'" width="'.esc_attr($width).'" ' . $attrs . '></iframe>';
 
             $response = [
                 'type'          => $type,

@@ -2,6 +2,8 @@ import { onDocumentLoaded } from '../../helpers'
 import ctEvents from 'ct-events'
 import $ from 'jquery'
 
+import './handle-events'
+
 function isTouchDevice() {
 	try {
 		document.createEvent('TouchEvent')
@@ -14,122 +16,64 @@ function isTouchDevice() {
 export const wooEntryPoints = [
 	{
 		els: 'body.single-product .woocommerce-product-gallery',
-		condition: () =>
-			!!document.querySelector(
-				'.woocommerce-product-gallery .ct-image-container'
-			),
 		load: () => import('./single-product-gallery'),
-		trigger: ['hover-with-click'],
+		trigger: [
+			{
+				id: 'hover-with-click',
+			},
+		],
 	},
 
 	{
 		els: 'form.variations_form',
 		condition: () =>
 			!!document.querySelector(
-				'.woocommerce-product-gallery .ct-image-container'
+				'.woocommerce-product-gallery .ct-media-container'
 			),
 		load: () => import('./variable-products'),
-		...(isTouchDevice()
+		...(isTouchDevice() ||
+		document.querySelectorAll(
+			'form.variations_form[data-product_variations="false"]'
+		)
 			? {}
 			: {
-				trigger: ['hover'],
-			}),
+					trigger: ['hover'],
+			  }),
 	},
 
 	{
-		els: '.quantity > *',
+		els: '.quantity .ct-increase, .quantity .ct-decrease',
 		load: () => import('./quantity-input'),
 		trigger: ['click'],
 	},
 
 	{
-		els: () => [
-			...document.querySelectorAll('.ct-ajax-add-to-cart .cart')
-		],
-		load: () => import('./add-to-cart-single'),
-		trigger: ['submit'],
+		els: '.ct-woocommerce-cart-form .quantity .qty',
+		load: () => import('./quantity-input'),
+		trigger: ['change'],
 	},
 
 	{
-		els: '.ct-header-cart, .ajax_add_to_cart',
+		els: () => [...document.querySelectorAll('.ct-ajax-add-to-cart .cart')],
+		load: () => import('./add-to-cart-single'),
+		trigger: [
+			{
+				id: 'submit',
+				ignoreSubmitter: ['button[name]:not([name="add-to-cart"])'],
+			},
+		],
+	},
+
+	{
+		els: '.ct-header-cart > .ct-cart-item, .ajax_add_to_cart, .ct-ajax-add-to-cart',
 		load: () => import('./mini-cart'),
 		events: ['ct:header:update'],
 		trigger: ['hover-with-touch'],
 	},
+
+	{
+		els: '#woo-cart-panel .qty',
+		trigger: ['change'],
+		load: () => import('./quantity-update'),
+	},
 ]
-
-const initShortcut = () => {
-	setTimeout(() => {
-		let maybeShortcutCart = document.querySelector(
-			'.ct-shortcuts-container [data-shortcut="cart"]'
-		)
-
-		if (maybeShortcutCart && !maybeShortcutCart.hasClickListener) {
-			maybeShortcutCart.hasClickListener = true
-
-			const handleEvent = (event) => {
-				let maybeCart = document.querySelector(
-					'.ct-header-cart .ct-offcanvas-trigger'
-				)
-
-				if (!maybeCart) {
-					return
-				}
-
-				event.preventDefault()
-
-				maybeCart.dispatchEvent(
-					new MouseEvent(event.type, {
-						view: window,
-						bubbles: true,
-						cancelable: true,
-					})
-				)
-			}
-
-			maybeShortcutCart.addEventListener('mouseover', handleEvent)
-			maybeShortcutCart.addEventListener('click', handleEvent)
-		}
-
-		;[...document.querySelectorAll('#woo-cart-panel .qty')].map((el) => {
-			if (el.hasChangeListener) {
-				return
-			}
-
-			el.hasChangeListener = true
-
-			let request = null
-
-			$(el).on('change', (e) => {
-				var item_hash = $(el)
-					.attr('name')
-					.replace(/cart\[([\w]+)\]\[qty\]/g, '$1')
-
-				var item_quantity = $(el).val()
-				var currentVal = parseFloat(item_quantity)
-
-				if (request) {
-					request.abort()
-					request = null
-				}
-
-				request = $.ajax({
-					type: 'POST',
-					url: ct_localizations.ajax_url,
-					data: {
-						action: 'blocksy_update_qty_cart',
-						hash: item_hash,
-						quantity: currentVal,
-					},
-					success: (data) => {
-						jQuery('body').trigger('updated_wc_div')
-						ctEvents.trigger('ct:header:update')
-					},
-				})
-			})
-		})
-	}, 100)
-}
-
-onDocumentLoaded(initShortcut)
-ctEvents.on('blocksy:frontend:init', initShortcut)

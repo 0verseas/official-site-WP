@@ -24,18 +24,9 @@
 		border: initial;
 		transform: initial;
 	}
+
+	// quantity input
+	.wcf-qty {
+		--has-height: var(--false);
+	}
 }
-
-// wpfunels
-// #wpfnl-checkout-form {
-	
-// 	#payment .payment_methods > li {
-// 		border-top: 0;
-// 		border-left: 0;
-// 		border-right: 0;
-
-// 		> input[type="radio"]:first-child:checked + label:before {
-// 			border-width: 2px;
-// 		}
-// 	}
-// }

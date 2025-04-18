@@ -173,7 +173,7 @@ class Sitemap_XML extends XML {
 	 * @param integer $current_page The part that should be generated.
 	 */
 	public function set_n( $current_page ) {
-		if ( is_scalar( $current_page ) ) {
+		if ( ! empty( $current_page ) && is_scalar( $current_page ) ) {
 			$this->maybe_redirect( $current_page );
 			$this->current_page = max( intval( $current_page ), 1 );
 		}
@@ -204,7 +204,7 @@ class Sitemap_XML extends XML {
 		// Redirect when there are leading zeros.
 		$zeros_stripped = ltrim( $current_page, '0' );
 		if ( (string) $zeros_stripped !== (string) $current_page ) {
-			Helper::redirect( preg_replace( '/' . preg_quote( $current_page ) . '\.xml$/', $zeros_stripped . '.xml', Helper::get_current_page_url() ) );
+			Helper::redirect( preg_replace( '/' . preg_quote( $current_page, '/' ) . '\.xml$/', $zeros_stripped . '.xml', Helper::get_current_page_url() ) );
 			die();
 		}
 	}

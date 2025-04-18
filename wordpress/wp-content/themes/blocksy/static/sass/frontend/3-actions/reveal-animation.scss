@@ -5,15 +5,15 @@
 		transition-timing-function: cubic-bezier(0.2, 1, 0.2, 1);
 
 		&[data-reveal*='no'] {
-			opacity: 0;
+			opacity: 0.01; // fixes links double tap on Chrome iOS
+		}
+
+		&[data-reveal*='yes'] {
+			opacity: 1;
 		}
 
 		&[data-reveal*='bottom'] {
 			transform: translateY(100px);
-		}
-
-		&[data-reveal*='left'] {
-			transform: translateX(-100px);
 		}
 	}
 

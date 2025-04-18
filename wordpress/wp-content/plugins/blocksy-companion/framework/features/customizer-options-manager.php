@@ -49,9 +49,7 @@ class CustomizerOptionsManager {
 			// The above code will only import stuff from $data['mods']
 			// that is actually a customizer control. Everything else will be ignored
 			if (isset($data['mods'])) {
-				$importer = new DemoInstallOptionsInstaller([
-					'has_streaming' => false
-				]);
+				$importer = new DemoInstallOptionsInstaller();
 
 				$demo_data = null;
 
@@ -68,9 +66,7 @@ class CustomizerOptionsManager {
 			// widget. Everything else is going to be ignored from being
 			// processed.
 			if (isset($data['blocksy_widgets'])) {
-				$importer = new DemoInstallWidgetsInstaller([
-					'has_streaming' => false
-				]);
+				$importer = new DemoInstallWidgetsInstaller();
 
 				$importer->import_data($data['blocksy_widgets']);
 			}
@@ -115,11 +111,13 @@ class CustomizerOptionsManager {
 
 			$data = $this->get_data($theme_for_data);
 
-			$importer = new DemoInstallOptionsInstaller([
-				'has_streaming' => false
-			]);
+			$importer = new DemoInstallOptionsInstaller();
 
 			$importer->import_options($data);
+
+			do_action('customize_save_after');
+			do_action('blocksy:dynamic-css:refresh-caches');
+			do_action('blocksy:cache-manager:purge-all');
 
 			wp_send_json_success([]);
 		});
@@ -140,7 +138,8 @@ class CustomizerOptionsManager {
 				'template' => $theme_slug,
 				'site_url' => get_site_url(),
 				'mods' => $mods ? $mods : array(),
-				'options' => array()
+				'options' => array(),
+				'custom_palettes' => get_option('blocksy_custom_palettes', []),
 			];
 
 			$core_options = [
@@ -175,7 +174,7 @@ class CustomizerOptionsManager {
 			}
 
 			if (function_exists('wp_get_custom_css_post')) {
-				$data['wp_css'] = wp_get_custom_css();
+				$data['wp_css'] = wp_get_custom_css($theme_slug);
 			}
 		}
 

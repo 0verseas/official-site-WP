@@ -10,7 +10,7 @@
  */
 
 ?><!doctype html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?><?php echo blocksy_html_attr() ?>>
 <head>
 	<?php do_action('blocksy:head:start') ?>
 
@@ -29,10 +29,6 @@
 ?>
 
 <body <?php body_class(); ?> <?php echo blocksy_body_attr() ?>>
-
-<a class="skip-link show-on-focus" href="<?php echo apply_filters('blocksy:head:skip-to-content:href', '#main') ?>">
-	<?php echo __('Skip to content', 'blocksy'); ?>
-</a>
 
 <?php
 	if (function_exists('wp_body_open')) {

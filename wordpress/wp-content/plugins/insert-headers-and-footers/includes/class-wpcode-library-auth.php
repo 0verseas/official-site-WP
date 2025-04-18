@@ -41,7 +41,6 @@ class WPCode_Library_Auth {
 	 * Library auth constructor.
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_wpcode_library_start_auth', array( $this, 'ajax_auth_url' ) );
 		add_action( 'wp_ajax_wpcode_library_store_auth', array( $this, 'store_auth_key' ) );
 		add_action( 'wp_ajax_wpcode_library_delete_auth', array( $this, 'delete_auth' ) );
 	}
@@ -49,13 +48,12 @@ class WPCode_Library_Auth {
 	/**
 	 * Ajax handler that returns the auth url used to start the Connect process.
 	 *
-	 * @return void
+	 * @return string
 	 */
-	public function ajax_auth_url() {
-		check_ajax_referer( 'wpcode_admin' );
+	public function auth_url() {
 
-		if ( ! current_user_can( 'wpcode_activate_snippets' ) ) {
-			wp_send_json_error( esc_html__( 'You do not have permissions to connect WPCode to the library.', 'insert-headers-and-footers' ) );
+		if ( $this->has_auth() ) {
+			return '';
 		}
 
 		$site_name = get_bloginfo( 'name' );
@@ -66,20 +64,18 @@ class WPCode_Library_Auth {
 		// This is needed, so we don't run into issues with special characters.
 		// Base64 encode without padding for better compatibility between PHP versions.
 		$site_name = rtrim( strtr( base64_encode( $site_name ), '+/', '-_' ), '=' );
+		$ajax_url  = rtrim( strtr( base64_encode( admin_url( 'admin-ajax.php' ) ), '+/', '-_' ), '=' );
 
 		$auth_url = add_query_arg(
 			array(
 				'site'    => $site_name,
 				'version' => WPCODE_VERSION,
+				'ajax'    => $ajax_url,
 			),
 			$this->get_api_url( 'connect' )
 		);
 
-		wp_send_json_success(
-			array(
-				'url' => $auth_url,
-			)
-		);
+		return $auth_url;
 	}
 
 	/**
@@ -109,21 +105,14 @@ class WPCode_Library_Auth {
 		$username          = ! empty( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : false;
 		$origin            = ! empty( $_POST['origin'] ) ? esc_url_raw( wp_unslash( $_POST['origin'] ) ) : false;
 		$deploy_snippet_id = ! empty( $_POST['deploy_snippet_id'] ) ? sanitize_key( $_POST['deploy_snippet_id'] ) : false;
+		$webhook_secret    = ! empty( $_POST['webhook_secret'] ) ? sanitize_key( $_POST['webhook_secret'] ) : '';
+		$client_id         = ! empty( $_POST['client_id'] ) ? sanitize_key( $_POST['client_id'] ) : false;
 
 		if ( ! $key || $this->library_url !== $origin ) {
 			wp_send_json_error();
 		}
 
-		// Don't autoload this as we'll only need it on some pages and in specific requests.
-		update_option(
-			'wpcode_library_api_auth',
-			array(
-				'key'          => $key,
-				'username'     => $username,
-				'connected_at' => time(),
-			),
-			false
-		);
+		$this->save_auth_data( $key, $username, $webhook_secret, $client_id );
 
 		if ( ! empty( $deploy_snippet_id ) ) {
 			// If we have a snippet id from the deployment process, set that as a transient to show a notice, so they can pick up where they started.
@@ -146,6 +135,31 @@ class WPCode_Library_Auth {
 	}
 
 	/**
+	 * Save the auth data to the db.
+	 *
+	 * @param string $key The auth key.
+	 * @param string $username The username.
+	 * @param string $webhook_secret The webhook secret.
+	 * @param string $client_id The client id.
+	 *
+	 * @return void
+	 */
+	public function save_auth_data( $key, $username, $webhook_secret, $client_id ) {
+		// Don't autoload this as we'll only need it on some pages and in specific requests.
+		update_option(
+			'wpcode_library_api_auth',
+			array(
+				'key'            => $key,
+				'username'       => $username,
+				'webhook_secret' => $webhook_secret,
+				'client_id'      => $client_id,
+				'connected_at'   => time(),
+			),
+			false
+		);
+	}
+
+	/**
 	 * Ajax handler to delete the auth data and disconnect the site from the WPCode Library.
 	 *
 	 * @return void
@@ -157,12 +171,21 @@ class WPCode_Library_Auth {
 			wp_send_json_error( esc_html__( 'You do not have permissions to connect WPCode to the library.', 'insert-headers-and-footers' ) );
 		}
 
-		if ( delete_option( 'wpcode_library_api_auth' ) ) {
+		if ( $this->delete_auth_data() ) {
 			do_action( 'wpcode_library_api_auth_deleted' );
 			wp_send_json_success();
 		}
 
 		wp_send_json_error();
+	}
+
+	/**
+	 * Delete the auth data from the db.
+	 *
+	 * @return bool
+	 */
+	public function delete_auth_data() {
+		return delete_option( 'wpcode_library_api_auth' );
 	}
 
 	/**
@@ -195,16 +218,47 @@ class WPCode_Library_Auth {
 	}
 
 	/**
+	 * The webhook secret.
+	 *
+	 * @return bool|string
+	 */
+	public function get_webhook_secret() {
+		$data = $this->get_auth_data();
+
+		return isset( $data['webhook_secret'] ) ? $data['webhook_secret'] : false;
+	}
+
+	/**
+	 * The client id.
+	 *
+	 * @return bool|string
+	 */
+	public function get_client_id() {
+		$data = $this->get_auth_data();
+
+		return isset( $data['client_id'] ) ? $data['client_id'] : false;
+	}
+
+	/**
 	 * Get the auth data from the db.
 	 *
 	 * @return array|bool
 	 */
 	public function get_auth_data() {
 		if ( ! isset( $this->auth_data ) ) {
-			$this->auth_data = get_option( 'wpcode_library_api_auth', false );
+			$this->auth_data = $this->load_auth_data();
 		}
 
 		return $this->auth_data;
+	}
+
+	/**
+	 * Get the auth data from the db.
+	 *
+	 * @return array|bool
+	 */
+	public function load_auth_data() {
+		return get_option( 'wpcode_library_api_auth', false );
 	}
 
 	/**
@@ -216,5 +270,22 @@ class WPCode_Library_Auth {
 		$data = $this->get_auth_data();
 
 		return isset( $data['username'] ) ? $data['username'] : false;
+	}
+
+	/**
+	 * Use the API key saved in the db to sign a value, used for authenticating requests from the library to the plugin.
+	 *
+	 * @param string $string The string to sign.
+	 *
+	 * @return string
+	 */
+	public function sign( $string ) {
+		$api_key = $this->get_webhook_secret();
+
+		if ( empty( $api_key ) ) {
+			return false;
+		}
+
+		return hash_hmac( 'sha256', (string) $string, $api_key );
 	}
 }

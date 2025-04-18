@@ -37,33 +37,31 @@ class Front_Enqueue_Weglot implements Hooks_Interface_Weglot {
 	public function hooks() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'weglot_wp_enqueue_scripts' ) );
 		add_action( 'login_enqueue_scripts', array( $this, 'weglot_wp_enqueue_scripts' ) );
-		add_action( 'wp_footer', array( $this, 'weglot_pageviews_script' ) ); // @phpstan-ignore-line
+		add_action( 'wp_footer', array( $this, 'weglot_pageviews_script' ) );
 	}
 
 	/**
 	 *
-	 * @return string
+	 * @return void
 	 * @since 2.0
 	 */
 	public function weglot_pageviews_script() {
 		$options = $this->option_services->get_options();
-		$pageviews_script = "<script>
-				var request = new XMLHttpRequest();
-				var url = 'ht' + 'tps:' + '//' + 'cdn-api.weglot.com/' + 'pageviews?api_key=' + 'esc_js(" . $options['api_key'] . " )';
-				var data = JSON.stringify({
-						url: location.protocol + '//' + location.host + location.pathname,
-						language: document.getElementsByTagName('html')[0].getAttribute('lang'),
-						browser_language: (navigator.language || navigator.userLanguage)
-					}
-				);
-				request.open('POST', url , true);
-				request.send(data);
-			</script>";
-		if ( $options['page_views_enabled'] ) {
-			return $pageviews_script;
-		} else {
-			return '';
-		}
+		if ( $options['page_views_enabled'] ) { ?>
+			<script>
+				(function(){let request = new XMLHttpRequest();
+					let url = 'ht' + 'tps:' + '//' + 'api.weglot.com/' + 'pageviews?api_key=' + '<?= esc_js( $options['api_key'] ); ?>';
+					let data = JSON.stringify({
+							url: location.protocol + '//' + location.host + location.pathname,
+							language: document.getElementsByTagName('html')[0].getAttribute('lang'),
+							browser_language: (navigator.language || navigator.userLanguage)
+						}
+					);
+					request.open('POST', url, true);
+					request.send(data);
+				})();
+			</script>
+		<?php }
 	}
 
 	/**
@@ -74,11 +72,11 @@ class Front_Enqueue_Weglot implements Hooks_Interface_Weglot {
 	 */
 	public function weglot_wp_enqueue_scripts() {
 		// Add JS.
-		wp_register_script( 'wp-weglot-js', WEGLOT_URL_DIST . '/front-js.js', false, WEGLOT_VERSION, false );
+		wp_register_script( 'wp-weglot-js', WEGLOT_URL_DIST . '/front-js.js', array(), WEGLOT_VERSION, false );
 		wp_enqueue_script( 'wp-weglot-js' );
 
 		// Add CSS
-		wp_register_style( 'weglot-css', WEGLOT_URL_DIST . '/css/front-css.css', false, WEGLOT_VERSION, false );
+		wp_register_style( 'weglot-css', WEGLOT_URL_DIST . '/css/front-css.css', array(), WEGLOT_VERSION, 'all' );
 		wp_enqueue_style( 'weglot-css' );
 
 		//display new flags

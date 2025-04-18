@@ -34,6 +34,9 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
     public function get_help_url() {
         return 'https://wpmet.com/doc/page-list/';
     }
+    protected function is_dynamic_content(): bool {
+        return false;
+    }
 
 	protected function register_controls() {
 		$this->start_controls_section(
@@ -78,9 +81,7 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
 				'selector' => '{{WRAPPER}} .ekit-wid-con {{CURRENT_ITEM}}',
-				'exclude' => [
-					'image'
-				]
+				'exclude' => ['image'] // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			]
 		);
 
@@ -165,11 +166,6 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
 				],
 				'placeholder' => esc_html__( 'https://wpmet.com', 'elementskit-lite' ),
 				'show_external' => true,
-				'default' => [
-					'url' => '',
-					'is_external' => true,
-					'nofollow' => true,
-				],
 				'condition' => [
 					'ekit_page_list_select_page_or_custom_link!' => 'yes'
 				]
@@ -211,9 +207,7 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', ],
 				'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} .ekit_menu_label',
-				'exclude' => [
-					'image'
-				],
+				'exclude' => ['image'], // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 				'condition' => [
 					'ekit_menu_list_show_label' => 'yes'
 				]
@@ -389,9 +383,7 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
 				'selector' => '{{WRAPPER}} .elementor-icon-list-item > a',
-				'exclude' => [
-					'image'
-				]
+				'exclude' => ['image'] // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			]
 		);
 		$this->add_control(
@@ -409,9 +401,7 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
 				'label' => esc_html__( 'Background Hover', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
 				'selector' => '{{WRAPPER}} .elementor-icon-list-item > a:hover',
-				'exclude' => [
-					'image'
-				]
+				'exclude' => ['image'] // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			]
 		);
 
@@ -1012,79 +1002,55 @@ class ElementsKit_Widget_Page_List extends Widget_Base {
 			$this->add_render_attribute( 'list_item', 'class', 'elementor-inline-item' );
 		}
 		?>
-		<div <?php echo ($this->get_render_attribute_string( 'icon_list' )); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped by elementor ?>>
+		<div <?php $this->print_render_attribute_string( 'icon_list' ); ?>>
 			<?php
 			foreach ( $settings['icon_list'] as $index => $item ) :
-				$post = '';
-				if ($item['ekit_page_list_select_page_or_custom_link'] == 'yes') {
-					$post = !empty( $item['link'] ) ? get_post($item['link']) : 0;
-				} else {
-					$post = $item['ekit_page_list_website_link']['url'];
-				}
+				$post = !empty( $item['link'] ) ? get_post($item['link']) : null;
+				$text_title = empty($item['text']) ? ($post instanceof \WP_Post ? $post->post_title : '') : $item['text'];
 
-				$href = '';
-				if ($item['ekit_page_list_select_page_or_custom_link'] == 'yes') {
-					$href = !empty($post) ? get_the_permalink($post->ID) : '';
-				} else {
-					$href = $post;
+				if ( ! empty( $item['ekit_page_list_website_link']['url'] ) ) {
+					$this->add_link_attributes( 'link_' . $index, $item['ekit_page_list_website_link'] );
+				} else if ( ! empty( $item['link']  && (get_permalink($post) !== 0)) ) {
+					$this->add_link_attributes( 'link_' . $index, ['url' => get_permalink($item['link'])] );
 				}
-
-				$target = ' target="_self"';
-				if ($item['ekit_page_list_select_page_or_custom_link'] == 'yes') {
-					$target = '_blank' === $settings['ekit_href_target'] ? ' target=_blank' : ' target=_self';
-					
-				} else {
-					$target = (isset($item['ekit_page_list_website_link']['is_external']) && $item['ekit_page_list_website_link']['is_external'] !='') ? ' target=_blank' : ' target=_self';
-				}
-				
-				$rel = '';
-				if ($item['ekit_page_list_select_page_or_custom_link'] == 'yes') {
-					$rel = $settings['ekit_href_rel'] == 'yes' ? 'nofollow' : '';
-					$rel = !empty($item['ekit_page_list_website_link']['nofollow']) ? 'nofollow' : '';
-				}
-
-                if($post != null):
-					$text = empty($item['text']) ? $post->post_title : $item['text'];
 				?>
-				<div class="elementor-icon-list-item <?php echo esc_attr($grid_d); ?> <?php echo esc_attr($grid_t); ?> <?php echo esc_attr($grid_m); ?>" >
-					<a <?php echo esc_attr($target); ?> rel="<?php echo esc_attr($rel);?>"  href="<?php echo esc_url($href); ?>" class="elementor-repeater-item-<?php echo esc_attr( $item[ '_id' ] ); ?> <?php echo  esc_attr( $settings['ekit_menu_list_label_align'] ); ?>">
-						<div class="ekit_page_list_content">
-							<?php if ( ! empty( $item['icons'] ) && $item['ekit_page_list_show_icon'] == 'yes') : ?>
-								<span class="elementor-icon-list-icon">
-									<?php
-										// new icon
-										$migrated = isset( $item['__fa4_migrated']['icons'] );
-										// Check if its a new widget without previously selected icon using the old Icon control
-										$is_new = empty( $item['icon'] );
-										if ( $is_new || $migrated ) {
+				<div class="elementor-icon-list-item <?php echo esc_attr($grid_d); ?> <?php echo esc_attr($grid_t); ?> <?php echo esc_attr($grid_m); ?>">
+						<a class="elementor-repeater-item-<?php echo esc_attr( $item[ '_id' ] ); ?> <?php echo  esc_attr( $settings['ekit_menu_list_label_align'] ); ?>" <?php $this->print_render_attribute_string( 'link_' . $index ); ?>>
+							<div class="ekit_page_list_content">
+								<?php if ( ! empty( $item['icons'] ) && $item['ekit_page_list_show_icon'] == 'yes') : ?>
+									<span class="elementor-icon-list-icon">
+										<?php
 											// new icon
-											Icons_Manager::render_icon( $item['icons'], [ 'aria-hidden' => 'true' ] );
-										} else {
-											?>
-											<i class="<?php echo esc_attr($item['icon']); ?>" aria-hidden="true"></i>
-											<?php
-										}
-									?>
+											$migrated = isset( $item['__fa4_migrated']['icons'] );
+											// Check if its a new widget without previously selected icon using the old Icon control
+											$is_new = empty( $item['icon'] );
+											if ( $is_new || $migrated ) {
+												// new icon
+												Icons_Manager::render_icon( $item['icons'], [ 'aria-hidden' => 'true' ] );
+											} else {
+												?>
+												<i class="<?php echo esc_attr($item['icon']); ?>" aria-hidden="true"></i>
+												<?php
+											}
+										?>
+									</span>
+								<?php endif; ?>
+								<span class="elementor-icon-list-text">
+									<span class="ekit_page_list_title_title"><?php echo esc_html( $text_title ); ?></span>
+									<?php if ($item['ekit_menu_widget_sub_title'] != '') : ?>
+										<span class="ekit_menu_subtitle"><?php echo esc_html($item['ekit_menu_widget_sub_title']); ?></span>
+									<?php endif; ?>
+								</span>
+							</div>
+							<?php if ( ! empty( $item['ekit_menu_list_label_title'] ) && $item['ekit_menu_list_show_label'] == 'yes') : ?>
+								<span class="ekit_menu_label">
+									<?php echo esc_html( $item['ekit_menu_list_label_title'] ); ?>
 								</span>
 							<?php endif; ?>
-							<span class="elementor-icon-list-text">
-								<span class="ekit_page_list_title_title"><?php echo esc_html( $text ); ?></span>
-								<?php if ($item['ekit_menu_widget_sub_title'] != '') : ?>
-								<span class="ekit_menu_subtitle"><?php echo esc_html($item['ekit_menu_widget_sub_title']); ?></span>
-								<?php endif; ?>
-							</span>
-						</div>
-						<?php if ( ! empty( $item['ekit_menu_list_label_title'] ) && $item['ekit_menu_list_show_label'] == 'yes') : ?>
-						    <span class="ekit_menu_label">
-                                <?php echo esc_html( $item['ekit_menu_list_label_title'] ); ?>
-						    </span>
-						<?php endif; ?>
-					</a>
-				</div>
+						</a>
+					</div>
 				<?php
-                endif;
-			endforeach;
-			?>
+			endforeach; ?>
 		</div>
 		<?php
 	}

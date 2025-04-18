@@ -14,8 +14,8 @@ namespace RankMath;
 
 use RankMath\Traits\Hooker;
 use RankMath\Admin\Watcher;
+use RankMath\Helper;
 use RankMath\Admin\Admin_Helper;
-use MyThemeShop\Helpers\WordPress;
 use RankMath\Role_Manager\Capability_Manager;
 
 defined( 'ABSPATH' ) || exit;
@@ -153,12 +153,13 @@ class Installer {
 
 		// Save install date.
 		if ( false === boolval( get_option( 'rank_math_install_date' ) ) ) {
-			update_option( 'rank_math_install_date', current_time( 'timestamp' ) ); // phpcs:ignore
+			update_option( 'rank_math_install_date', Helper::get_current_time() );
 		}
 
 		// Activate Watcher.
 		$watcher = new Watcher();
 		$watcher->check_activated_plugin();
+		$watcher->check_search_engine_visibility( ! get_option( 'blog_public' ) );
 
 		$this->clear_rewrite_rules( true );
 		Helper::clear_cache( 'activate' );
@@ -205,7 +206,7 @@ class Installer {
 		if ( in_array( 'redirections', $modules, true ) ) {
 			$table_schema[] = "CREATE TABLE {$wpdb->prefix}rank_math_redirections (
 				id bigint(20) unsigned NOT NULL auto_increment,
-				sources text CHARACTER SET {$wpdb->charset} COLLATE {$wpdb->charset}_bin NOT NULL,
+				sources longtext CHARACTER SET {$wpdb->charset} COLLATE {$wpdb->charset}_bin NOT NULL,
 				url_to text NOT NULL,
 				header_code smallint(4) unsigned NOT NULL,
 				hits bigint(20) unsigned NOT NULL default '0',
@@ -237,7 +238,8 @@ class Installer {
 				target_post_id bigint(20) unsigned NOT NULL,
 				type varchar(8) NOT NULL,
 				PRIMARY KEY  (id),
-				KEY link_direction (post_id, type)
+				KEY link_direction (post_id, type),
+				KEY target_post_id (target_post_id)
 			) $collate;";
 
 			$table_schema[] = "CREATE TABLE {$wpdb->prefix}rank_math_internal_meta (
@@ -251,7 +253,7 @@ class Installer {
 
 		$table_schema = apply_filters( 'rank_math/admin/create_tables', $table_schema, $modules );
 
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php'; // @phpstan-ignore-line
 		foreach ( $table_schema as $table ) {
 			dbDelta( $table );
 		}
@@ -366,6 +368,10 @@ class Installer {
 					'frontend_seo_score_position'         => 'top',
 					'setup_mode'                          => 'advanced',
 					'content_ai_post_types'               => array_keys( $post_types ),
+					'content_ai_country'                  => 'all',
+					'content_ai_tone'                     => 'Formal',
+					'content_ai_audience'                 => 'General Audience',
+					'content_ai_language'                 => Helper::content_ai_default_language(),
 					'analytics_stats'                     => 'on',
 					'toc_block_title'                     => 'Table of Contents',
 					'toc_block_list_style'                => 'ul',
@@ -382,7 +388,6 @@ class Installer {
 			'items_per_page'          => 200,
 			'include_images'          => 'on',
 			'include_featured_image'  => 'off',
-			'ping_search_engines'     => 'on',
 			'exclude_roles'           => $this->get_excluded_roles(),
 			'html_sitemap'            => 'on',
 			'html_sitemap_display'    => 'shortcode',
@@ -555,7 +560,6 @@ class Installer {
 
 		$titles['remove_product_cat_snippet_data'] = 'on';
 		$titles['remove_product_tag_snippet_data'] = 'on';
-
 	}
 
 	/**
@@ -598,7 +602,8 @@ class Installer {
 		$midnight = strtotime( 'tomorrow midnight' );
 		foreach ( $this->get_cron_jobs() as $job => $recurrence ) {
 			if ( ! wp_next_scheduled( "rank_math/{$job}" ) ) {
-				wp_schedule_event( $midnight, $this->do_filter( "{$job}_recurrence", $recurrence ), "rank_math/{$job}" );
+				$timestamp = 'content-ai/update_prompts' === $job ? $midnight + wp_rand( 60, 86400 ) : $midnight;
+				wp_schedule_event( $timestamp, $this->do_filter( "{$job}_recurrence", $recurrence ), "rank_math/{$job}" );
 			}
 		}
 	}
@@ -619,8 +624,9 @@ class Installer {
 	 */
 	private function get_cron_jobs() {
 		return [
-			'redirection/clean_trashed' => 'daily',     // Add cron for cleaning trashed redirects.
-			'links/internal_links'      => 'daily',     // Add cron for counting links.
+			'redirection/clean_trashed' => 'daily', // Add cron for cleaning trashed redirects.
+			'links/internal_links'      => 'daily', // Add cron for counting links.
+			'content-ai/update_prompts' => 'daily', // Add cron for updating the prompts data.
 		];
 	}
 
@@ -648,10 +654,10 @@ class Installer {
 	 * @return array
 	 */
 	private function get_excluded_roles() {
-		$roles = WordPress::get_roles();
+		$roles = Helper::get_roles();
 		unset( $roles['administrator'], $roles['editor'], $roles['author'] );
 
-		return $roles;
+		return array_keys( $roles );
 	}
 
 	/**
@@ -692,5 +698,4 @@ class Installer {
 			)
 		);
 	}
-
 }

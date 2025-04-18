@@ -2,7 +2,6 @@
 
 class Blocksy_Static_Css_Files {
 	public function all_static_files() {
-
 		$should_load_comments_css = (
 			is_singular()
 			&&
@@ -18,10 +17,60 @@ class Blocksy_Static_Css_Files {
 			$should_load_comments_css
 		);
 
+		global $post;
+
+		$should_load_share_box = (
+			is_singular()
+			&&
+			(
+				blocksy_has_share_box()
+				||
+				is_customize_preview()
+				||
+				is_page(
+					blocksy_get_theme_mod('woocommerce_wish_list_page', '__EMPTY__')
+				)
+				||
+				(
+					function_exists('blocksy_has_product_specific_layer')
+					&&
+					blocksy_has_product_specific_layer('product_sharebox')
+				)
+				||
+				(
+					function_exists('is_account_page')
+					&&
+					is_account_page()
+				)
+				||
+				(
+					$post
+					&&
+					has_shortcode($post->post_content, 'product_page')
+				)
+			)
+		);
+
+		$prefix = blocksy_manager()->screen->get_prefix();
+
+		$woo_extra_settings = get_option('blocksy_ext_woocommerce_extra_settings', [
+			'features' => []
+		]);
+
 		return [
 			[
 				'id' => 'ct-main-styles',
 				'url' => '/static/bundle/main.min.css'
+			],
+
+			[
+				'id' => 'ct-woocommerce-cart-checkout-blocks',
+				'url' => '/static/bundle/woocommerce-cart-checkout-blocks.min.css',
+				'enabled' => (
+					has_block('woocommerce/cart')
+					||
+					has_block('woocommerce/checkout')
+				)
 			],
 
 			[
@@ -41,16 +90,6 @@ class Blocksy_Static_Css_Files {
 					is_customize_preview()
 					||
 					blocksy_get_page_title_source()
-				)
-			],
-
-			[
-				'id' => 'ct-back-to-top-styles',
-				'url' => '/static/bundle/back-to-top.min.css',
-				'enabled' => (
-					is_customize_preview()
-					||
-					get_theme_mod('has_back_top', 'no') === 'yes'
 				)
 			],
 
@@ -82,10 +121,28 @@ class Blocksy_Static_Css_Files {
 			],
 
 			[
+				'id' => 'ct-elementor-woocommerce-styles',
+				'url' => '/static/bundle/elementor-woocommerce-frontend.min.css',
+				'deps' => ['ct-main-styles'],
+				'enabled' => (
+					did_action('elementor/loaded')
+					&&
+					function_exists('is_woocommerce')
+				)
+			],
+
+			[
 				'id' => 'ct-tutor-styles',
 				'url' => '/static/bundle/tutor.min.css',
 				'deps' => ['ct-main-styles'],
 				'enabled' => function_exists('tutor_course_enrolled_lead_info')
+			],
+
+			[
+				'id' => 'ct-tribe-events-styles',
+				'url' => '/static/bundle/tribe-events.min.css',
+				'deps' => ['ct-main-styles'],
+				'enabled' => class_exists('Tribe__Events__Main')
 			],
 
 			[
@@ -102,7 +159,19 @@ class Blocksy_Static_Css_Files {
 						&&
 						is_woocommerce()
 						&&
-						get_theme_mod('has_woo_offcanvas_filter', 'no') === 'yes'
+						(
+							is_shop()
+							||
+							is_product_category()
+							||
+							is_product_tag()
+							||
+							is_product_taxonomy()
+							||
+							is_search()
+						)
+						&&
+						blocksy_get_theme_mod('has_woo_offcanvas_filter', 'no') === 'yes'
 					)
 				)
 			],
@@ -111,33 +180,7 @@ class Blocksy_Static_Css_Files {
 				'id' => 'ct-share-box-styles',
 				'url' => '/static/bundle/share-box.min.css',
 				'deps' => ['ct-main-styles'],
-				'enabled' => (
-					is_singular()
-					&&
-					(
-						blocksy_has_share_box()
-						||
-						is_customize_preview()
-						||
-						(
-							function_exists('is_product')
-							&&
-							is_product()
-							&&
-							get_theme_mod('product_has_share_box', 'no') === 'yes'
-						)
-						||
-						is_page(
-							get_theme_mod('woocommerce_wish_list_page', '__EMPTY__')
-						)
-						||
-						(
-							function_exists('is_account_page')
-							&&
-							is_account_page()
-						)
-					)
-				)
+				'enabled' => $should_load_share_box
 			],
 
 			[
@@ -182,9 +225,76 @@ class Blocksy_Static_Css_Files {
 				'url' => '/static/bundle/flexy.min.css',
 				'deps' => ['ct-main-styles'],
 				'enabled' => (
-					function_exists('is_woocommerce')
+					(
+						function_exists('is_woocommerce')
+						&&
+						blocksy_manager()->screen->is_product()
+					)
 					||
 					is_singular('blc-product-review')
+					||
+					(
+						is_singular()
+						&&
+						(
+							blocksy_get_theme_mod($prefix . '_related_posts_slideshow') === 'slider'
+							||
+							is_customize_preview()
+							||
+							(
+								$post
+								&&
+								has_shortcode(
+									$post->post_content,
+									'blocksy_posts'
+								)
+								&&
+								strpos(
+									$post->post_content,
+									'view="slider"'
+								) !== false
+							)
+							||
+							(
+								$post
+								&&
+								has_shortcode($post->post_content, 'product_page')
+							)
+							||
+							(
+								$post
+								&&
+								(
+									has_block('blocksy/query', $post->post_content)
+									||
+									has_block('blocksy/tax-query', $post->post_content)
+								)
+								&&
+								strpos(
+									$post->post_content,
+									'"has_slideshow":"yes"'
+								) !== false
+							)
+						)
+					)
+					||
+					(
+						(
+							function_exists('is_woocommerce')
+							&&
+							is_woocommerce()
+							||
+							(
+								$post
+								&&
+								has_shortcode($post->post_content, 'products')
+							)
+						)
+						&&
+						isset($woo_extra_settings['features']['added-to-cart-popup'])
+						&&
+						$woo_extra_settings['features']['added-to-cart-popup']
+					)
 				)
 			],
 
@@ -204,13 +314,6 @@ class Blocksy_Static_Css_Files {
 			],
 
 			[
-				'id' => 'ct-tribe-events-styles',
-				'url' => '/static/bundle/tribe-events.min.css',
-				'deps' => ['ct-main-styles'],
-				'enabled' => class_exists('Tribe__Events__Main')
-			],
-
-			[
 				'id' => 'ct-beaver-styles',
 				'url' => '/static/bundle/beaver.min.css',
 				'deps' => ['ct-main-styles'],
@@ -224,12 +327,12 @@ class Blocksy_Static_Css_Files {
 				'enabled' => class_exists('ET_Builder_Plugin')
 			],
 
-			[
-				'id' => 'ct-vc-styles',
-				'url' => '/static/bundle/vc.min.css',
-				'deps' => ['ct-main-styles'],
-				'enabled' => defined('VCV_Version')
-			],
+			// [
+			// 	'id' => 'ct-vc-styles',
+			// 	'url' => '/static/bundle/vc.min.css',
+			// 	'deps' => ['ct-main-styles'],
+			// 	'enabled' => defined('VCV_Version')
+			// ],
 
 			[
 				'id' => 'ct-cf-7-styles',
@@ -238,12 +341,12 @@ class Blocksy_Static_Css_Files {
 				'enabled' => defined('WPCF7_VERSION')
 			],
 
-			[
-				'id' => 'ct-cf-7-styles',
-				'url' => '/static/bundle/cf-7.min.css',
-				'deps' => ['ct-main-styles'],
-				'enabled' => defined('WPCF7_VERSION')
-			],
+			// [
+			// 	'id' => 'ct-fluent-form-styles',
+			// 	'url' => '/static/bundle/fluent-form.min.css',
+			// 	'deps' => ['ct-main-styles'],
+			// 	'enabled' => defined('FLUENTFORM')
+			// ],
 
 			[
 				'id' => 'ct-stackable-styles',

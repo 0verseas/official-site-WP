@@ -28,7 +28,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class Jobs {
 
-	use Hooker, Cache;
+	use Hooker;
+	use Cache;
 
 	/**
 	 * Main instance
@@ -127,6 +128,8 @@ class Jobs {
 
 	/**
 	 * Set the console start and end dates.
+	 *
+	 * @param array $args Args containing start and end date.
 	 */
 	public function get_console_days( $args = [] ) {
 		set_time_limit( 300 );
@@ -265,7 +268,6 @@ class Jobs {
 			null,
 			null
 		);
-
 	}
 
 	/**

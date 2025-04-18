@@ -11,7 +11,7 @@
 namespace RankMath\Analytics\Workflow;
 
 use Exception;
-use MyThemeShop\Helpers\DB;
+use RankMath\Helpers\DB;
 use RankMath\Traits\Hooker;
 use RankMath\Analytics\DB as AnalyticsDB;
 use RankMath\Analytics\Url_Inspection;
@@ -89,8 +89,6 @@ class Inspections {
                 coverage_state text NOT NULL,                  /* String, e.g. 'Submitted and indexed'. */
                 page_fetch_state varchar(64) NOT NULL,         /* SUCCESSFUL, SOFT_404, BLOCKED_ROBOTS_TXT, NOT_FOUND, ACCESS_DENIED, SERVER_ERROR, REDIRECT_ERROR, ACCESS_FORBIDDEN, BLOCKED_4XX, INTERNAL_CRAWL_ERROR, INVALID_URL, PAGE_FETCH_STATE_UNSPECIFIED */
                 robots_txt_state varchar(64) NOT NULL,         /* ALLOWED, DISALLOWED, ROBOTS_TXT_STATE_UNSPECIFIED */
-                mobile_usability_verdict varchar(64) NOT NULL, /* PASS, PARTIAL, FAIL, NEUTRAL, VERDICT_UNSPECIFIED */
-                mobile_usability_issues longtext NOT NULL,     /* JSON */
                 rich_results_verdict varchar(64) NOT NULL,     /* PASS, PARTIAL, FAIL, NEUTRAL, VERDICT_UNSPECIFIED */
                 rich_results_items longtext NOT NULL,          /* JSON */
                 last_crawl_time timestamp NOT NULL,
@@ -106,11 +104,10 @@ class Inspections {
                 KEY index_verdict (index_verdict),
                 KEY page_fetch_state (page_fetch_state),
                 KEY robots_txt_state (robots_txt_state),
-                KEY mobile_usability_verdict (mobile_usability_verdict),
                 KEY rich_results_verdict (rich_results_verdict)
             ) $collate;";
 
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php'; // @phpstan-ignore-line
 		try {
 			dbDelta( $schema );
 		} catch ( Exception $e ) { // phpcs:ignore
@@ -118,8 +115,8 @@ class Inspections {
 		}
 
 		// Make sure that collations match the objects table.
-		$objects_coll = \RankMath\Helper::get_table_collation( 'rank_math_analytics_objects' );
-		\RankMath\Helper::check_collation( $table, 'all', $objects_coll );
+		$objects_coll = DB::get_table_collation( 'rank_math_analytics_objects' );
+		DB::check_collation( $table, 'all', $objects_coll );
 	}
 
 	/**
@@ -148,7 +145,7 @@ class Inspections {
 
 		$count = 0;
 		foreach ( $objects as $object ) {
-			$count++;
+			++$count;
 			$time = time() + ( $count * self::REQUEST_GAP_SECONDS );
 			if ( $count > self::API_LIMIT ) {
 				$delay_days = floor( $count / self::API_LIMIT );
@@ -158,5 +155,4 @@ class Inspections {
 			as_schedule_single_action( $time, 'rank_math/analytics/get_inspections_data', [ $object->page ], 'rank-math' );
 		}
 	}
-
 }

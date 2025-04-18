@@ -1,5 +1,7 @@
 <?php
 
+namespace Blocksy;
+
 /**
  * Theme Update
  *
@@ -8,20 +10,32 @@
  * @package   Blocksy
  */
 
-class Blocksy_Db_Versioning {
+class DbVersioning {
 	public function __construct() {
-		if (is_admin()) {
-			add_action('admin_init', [$this, 'init'], 3);
-		} else {
-			add_action('wp', [$this, 'init'], 3);
-		}
+		add_action(
+			'init',
+			[$this, 'init'],
+
+			// Some CPT plugins are registering their CPTs on init with
+			// priority 10. We need to run this after them.
+			15
+		);
+
+		add_action(
+			'blocksy:db-versioning:trigger-migration',
+			[$this, 'init']
+		);
 	}
 
 	public function init() {
+		new \Blocksy\DbVersioning\CacheManager();
+
 		$saved_version = get_option('blocksy_db_version', '1.0.0');
 
 		$theme = blocksy_get_wp_parent_theme();
 		$current_version = $theme->get('Version');
+
+		$patches_to_run = [];
 
 		foreach ($this->get_patches() as $single_patch) {
 			if (
@@ -31,14 +45,31 @@ class Blocksy_Db_Versioning {
 					'<'
 				)
 			) {
-				call_user_func($single_patch['cb']);
+				$patches_to_run[] = $single_patch;
+			}
+		}
+
+		$successfull_patches = 0;
+
+		if (count($patches_to_run) > 0) {
+			// delete_transient('blocksy_dynamic_styles_descriptor');
+		}
+
+		foreach ($patches_to_run as $single_patch) {
+			$result = call_user_func($single_patch['cb']);
+
+			if ($result !== 'RETRY') {
+				$successfull_patches++;
 			}
 		}
 
 		if (version_compare($saved_version, $current_version, '<')) {
+			if (count($patches_to_run) === $successfull_patches) {
+				update_option('blocksy_db_version', $current_version);
+			}
+
 			do_action('blocksy:cache-manager:purge-all');
 			do_action('blocksy:dynamic-css:refresh-caches');
-			update_option('blocksy_db_version', $current_version);
 		}
 	}
 
@@ -147,6 +178,185 @@ class Blocksy_Db_Versioning {
 			[
 				'version' => '1.8.91',
 				'cb' => [$this, 'v_1_8_91']
+			],
+
+			[
+				'version' => '1.9.11',
+				'cb' => [$this, 'v_1_9_11']
+			],
+
+			[
+				'version' => '2.0.0-beta26',
+				'cb' => function () {
+					$obj = new DbVersioning\V200();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.2',
+				'cb' => function () {
+					$obj = new DbVersioning\V202();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.3',
+				'cb' => function () {
+					$obj = new DbVersioning\V203();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.9',
+				'cb' => function () {
+					$obj = new DbVersioning\V209();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.15',
+				'cb' => function () {
+					$obj = new DbVersioning\V2015();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.19',
+				'cb' => function () {
+					$obj = new DbVersioning\V2019();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.26',
+				'cb' => function () {
+					$obj = new DbVersioning\V2026();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.27',
+				'cb' => function () {
+					$obj = new DbVersioning\V2027();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.31',
+				'cb' => function () {
+					$obj = new DbVersioning\V2031();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.34',
+				'cb' => function () {
+					$obj = new DbVersioning\V2034();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.36',
+				'cb' => function () {
+					$obj = new DbVersioning\V2036();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.38',
+				'cb' => function () {
+					$obj = new DbVersioning\V2038();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.53',
+				'cb' => function () {
+					$obj = new DbVersioning\V2053();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.60',
+				'cb' => function () {
+					$obj = new DbVersioning\V2060();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.67',
+				'cb' => function () {
+					$obj = new DbVersioning\V2067();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.70',
+				'cb' => function () {
+					$obj = new DbVersioning\V2070();
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.72',
+				'cb' => function () {
+					$obj = new DbVersioning\V2072();
+
+					$obj->migrate();
+					$obj->migrate_compare_table_layers();
+				}
+			],
+
+			[
+				'version' => '2.0.73',
+				'cb' => function () {
+					$obj = new DbVersioning\V2073();
+
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.74',
+				'cb' => function () {
+					$obj = new DbVersioning\V2074();
+
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.75',
+				'cb' => function () {
+					$obj = new DbVersioning\V2075();
+
+					$obj->migrate();
+				}
+			],
+
+			[
+				'version' => '2.0.76',
+				'cb' => function () {
+					$obj = new DbVersioning\V2076();
+
+					$obj->migrate();
+				}
 			]
 		];
 	}
@@ -722,7 +932,7 @@ class Blocksy_Db_Versioning {
 			set_theme_mod('header_placements', $section_value);
 		}
 
-		$render = new Blocksy_Footer_Builder_Render();
+		$render = new \Blocksy_Footer_Builder_Render();
 		$section_value = $render->get_section_value();
 
 		$old_section_id = $section_value['current_section'];
@@ -1294,11 +1504,11 @@ class Blocksy_Db_Versioning {
 					'success_message_text_color',
 					[
 						'default' => [
-							'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+							'color' => \Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
 						],
 
 						'hover' => [
-							'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+							'color' => \Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
 						]
 					]
 				);
@@ -1425,6 +1635,36 @@ class Blocksy_Db_Versioning {
 		}
 	}
 
+	public function v_1_9_11() {
+		$polylang_wpml_strings = get_option('polylang_wpml_strings', '__EMPTY__');
+
+		if ($polylang_wpml_strings === '__EMPTY__') {
+			return;
+		}
+
+		$cleaned_value = [];
+
+		foreach ($polylang_wpml_strings as $key => $value) {
+			if (
+				isset($value['context'])
+				&&
+				isset($value['string'])
+				&&
+				$value['context'] === 'Blocksy'
+				&&
+				! is_string($value['string'])
+			) {
+				continue;
+			}
+
+			$cleaned_value[$key] = $value;
+		}
+
+		if (count($cleaned_value) !== count($polylang_wpml_strings)) {
+			update_option('polylang_wpml_strings', $cleaned_value);
+		}
+	}
+
 	private function transform_tags_in_layers($list, $post_type) {
 		foreach ($list as $index => $archive_element) {
 			if (
@@ -1456,7 +1696,7 @@ class Blocksy_Db_Versioning {
 		return $list;
 	}
 
-	private function migrate_options_values($options) {
+	public function migrate_options_values($options) {
 		foreach ($options as $single_option) {
 			$old_value = get_theme_mod($single_option['id'], '__empty__');
 
@@ -1492,7 +1732,7 @@ class Blocksy_Db_Versioning {
 		}
 	}
 
-	private function migrate_options($options) {
+	public function migrate_options($options) {
 		foreach ($options as $single_option) {
 			$old_id = $single_option['old'];
 			$new_id = $single_option['new'];
@@ -1514,6 +1754,4 @@ class Blocksy_Db_Versioning {
 		}
 	}
 }
-
-new Blocksy_Db_Versioning();
 

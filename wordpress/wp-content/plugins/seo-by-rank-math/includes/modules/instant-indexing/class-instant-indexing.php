@@ -15,7 +15,7 @@ use RankMath\Module\Base;
 use RankMath\Traits\Hooker;
 use RankMath\Traits\Ajax;
 use RankMath\Admin\Options;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,7 +24,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class Instant_Indexing extends Base {
 
-	use Hooker, Ajax;
+	use Hooker;
+	use Ajax;
 
 	/**
 	 * API Object.
@@ -42,11 +43,15 @@ class Instant_Indexing extends Base {
 
 	/**
 	 * Store previous post status that we can check agains in save_post.
+	 *
+	 * @var array
 	 */
 	private $previous_post_status = [];
 
 	/**
 	 * Store original permalinks for when they get trashed.
+	 *
+	 * @var array
 	 */
 	private $previous_post_permalinks = [];
 
@@ -68,7 +73,7 @@ class Instant_Indexing extends Base {
 		}
 
 		$post_types = $this->get_auto_submit_post_types();
-		if (  ! empty( $post_types ) ) {
+		if ( ! empty( $post_types ) ) {
 			$this->filter( 'wp_insert_post_data', 'before_save_post', 10, 4 );
 		}
 
@@ -82,7 +87,7 @@ class Instant_Indexing extends Base {
 		$this->filter( 'page_row_actions', 'post_row_actions', 10, 2 );
 		$this->filter( 'admin_init', 'handle_post_row_actions' );
 
-		$this->action( 'template_redirect', 'serve_api_key' );
+		$this->action( 'wp', 'serve_api_key' );
 		$this->action( 'rest_api_init', 'init_rest_api' );
 	}
 
@@ -209,21 +214,21 @@ class Instant_Indexing extends Base {
 				'title'   => esc_html__( 'Submit URLs', 'rank-math' ),
 				'desc'    => esc_html__( 'Send URLs directly to the IndexNow API.', 'rank-math' ) . ' <a href="' . KB::get( 'instant-indexing', 'Indexing Submit URLs' ) . '" target="_blank">' . esc_html__( 'Learn more', 'rank-math' ) . '</a>',
 				'classes' => 'rank-math-advanced-option',
-				'file'    => dirname( __FILE__ ) . '/views/console.php',
+				'file'    => __DIR__ . '/views/console.php',
 			],
 			'settings'       => [
 				'icon'  => 'rm-icon rm-icon-settings',
 				'title' => esc_html__( 'Settings', 'rank-math' ),
 				/* translators: Link to kb article */
 				'desc'  => sprintf( esc_html__( 'Instant Indexing module settings. %s.', 'rank-math' ), '<a href="' . KB::get( 'instant-indexing', 'Indexing Settings' ) . '" target="_blank">' . esc_html__( 'Learn more', 'rank-math' ) . '</a>' ),
-				'file'  => dirname( __FILE__ ) . '/views/options.php',
+				'file'  => __DIR__ . '/views/options.php',
 			],
 			'history'        => [
 				'icon'    => 'rm-icon rm-icon-htaccess',
 				'title'   => esc_html__( 'History', 'rank-math' ),
 				'desc'    => esc_html__( 'The last 100 IndexNow API requests.', 'rank-math' ),
 				'classes' => 'rank-math-advanced-option',
-				'file'    => dirname( __FILE__ ) . '/views/history.php',
+				'file'    => __DIR__ . '/views/history.php',
 			],
 		];
 
@@ -253,7 +258,7 @@ class Instant_Indexing extends Base {
 
 	/**
 	 * Store previous post status & permalink before saving the post.
-	 * 
+	 *
 	 * @param  array $data                Post data.
 	 * @param  array $postarr             Raw post data.
 	 * @param  array $unsanitized_postarr Unsanitized post data.
@@ -295,12 +300,20 @@ class Instant_Indexing extends Base {
 			return;
 		}
 
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || ! empty( Helper::get_post_meta( 'lock_modified_date', $post_id ) ) ) {
 			return;
 		}
 
 		if ( ! Helper::is_post_indexable( $post_id ) ) {
 			return;
+		}
+
+		// Check if it's a hidden product.
+		if ( 'product' === $post->post_type && Helper::is_woocommerce_active() ) {
+			$product = wc_get_product( $post_id );
+			if ( $product && ! $product->is_visible() ) {
+				return;
+			}
 		}
 
 		$url = get_permalink( $post );
@@ -406,8 +419,9 @@ class Instant_Indexing extends Base {
 			return false;
 		}
 
-		if ( ! $is_manual_submission ) {
-			$logs = array_values( array_reverse( $api->get_log() ) );
+		$api_logs = $api->get_log();
+		if ( ! $is_manual_submission && ! empty( $api_logs ) ) {
+			$logs = array_values( array_reverse( $api_logs ) );
 			if ( ! empty( $logs[0] ) && $logs[0]['url'] === $url && time() - $logs[0]['time'] < self::THROTTLE_LIMIT ) {
 				return false;
 			}
@@ -458,5 +472,4 @@ class Instant_Indexing extends Base {
 		$post_types = Helper::get_settings( 'instant_indexing.bing_post_types', [] );
 		return $post_types;
 	}
-
 }

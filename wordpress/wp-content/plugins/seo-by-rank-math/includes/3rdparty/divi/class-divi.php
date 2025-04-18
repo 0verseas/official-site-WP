@@ -12,13 +12,13 @@ namespace RankMath\Divi;
 
 use RankMath\KB;
 use RankMath\Helper;
+use RankMath\Helpers\Editor;
+use RankMath\Helpers\Str;
 use RankMath\Schema\DB as Schema_DB;
 use RankMath\Schema\Admin as Schema_Admin;
 use RankMath\Traits\Hooker;
-use RankMath\Helpers\Editor;
 use RankMath\Admin\Metabox\Screen;
 use WP_Dependencies;
-use MyThemeShop\Helpers\Str;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -118,6 +118,7 @@ class Divi {
 	 * Add JSON data.
 	 */
 	public function add_json_data() {
+		$this->maybe_load_editor_deps();
 
 		if ( Helper::has_cap( 'onpage_snippet' ) ) {
 
@@ -160,6 +161,7 @@ class Divi {
 		);
 
 		Helper::add_json( 'capitalizeTitle', Helper::get_settings( 'titles.capitalize_titles' ) );
+		Helper::add_json( 'blogName', get_bloginfo( 'name' ) );
 
 		if ( is_admin_bar_showing() && Helper::has_cap( 'admin_bar' ) ) {
 			Helper::add_json( 'objectID', get_the_ID() );
@@ -226,7 +228,7 @@ class Divi {
 		/**
 		 * Allow other plugins to enqueue/dequeue admin styles or scripts after plugin assets.
 		 */
-		$this->do_action( 'admin/editor_scripts' );
+		$this->do_action( 'admin/editor_scripts', $this->screen );
 	}
 
 	/**
@@ -350,5 +352,19 @@ class Divi {
 		];
 
 		return $schemas;
+	}
+
+	/**
+	 * Ensures required dependencies are loaded when toolbar is hidden.
+	 *
+	 * @return void
+	 */
+	private function maybe_load_editor_deps() {
+		if ( is_admin_bar_showing() ) {
+			return;
+		}
+
+		Helper::add_json( 'security', wp_create_nonce( 'rank-math-ajax-nonce' ) );
+		Helper::add_json( 'restNonce', ( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ) );
 	}
 }

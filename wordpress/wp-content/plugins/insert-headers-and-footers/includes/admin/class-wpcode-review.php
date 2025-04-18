@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Ask for some love.
  *
@@ -23,8 +27,6 @@ class WPCode_Review {
 
 	/**
 	 * Add admin notices as needed for reviews.
-	 *
-	 *
 	 */
 	public function review_request() {
 
@@ -36,6 +38,15 @@ class WPCode_Review {
 		// Don't show notice to headers & footers mode users.
 		if ( wpcode()->settings->get_option( 'headers_footers_mode' ) ) {
 			return;
+		}
+
+		// If this is a multisite and the user is a super admin let's see if they already dismissed this on other sites.
+		if ( is_multisite() && is_super_admin() ) {
+			$dismissed = get_user_meta( get_current_user_id(), 'wpcode_dismissed_review_request', true );
+
+			if ( ! empty( $dismissed ) ) {
+				return;
+			}
 		}
 
 		// Verify that we can do a check for reviews.
@@ -116,29 +127,19 @@ class WPCode_Review {
 		<div class="wpcode-review-step wpcode-review-step-1">
 			<p><?php esc_html_e( 'Are you enjoying WPCode?', 'insert-headers-and-footers' ); ?></p>
 			<p>
-				<a href="#" class="wpcode-review-switch-step"
-				   data-step="3"><?php esc_html_e( 'Yes', 'insert-headers-and-footers' ); ?></a><br/>
-				<a href="#" class="wpcode-review-switch-step"
-				   data-step="2"><?php esc_html_e( 'Not Really', 'insert-headers-and-footers' ); ?></a>
+				<a href="#" class="wpcode-review-switch-step" data-step="3"><?php esc_html_e( 'Yes', 'insert-headers-and-footers' ); ?></a>&nbsp;&bull;&nbsp;<a href="#" class="wpcode-review-switch-step" data-step="2"><?php esc_html_e( 'Not Really', 'insert-headers-and-footers' ); ?></a>
 			</p>
 		</div>
 		<div class="wpcode-review-step wpcode-review-step-2" style="display: none">
 			<p><?php esc_html_e( 'We\'re sorry to hear you aren\'t enjoying WPCode. We would love a chance to improve. Could you take a minute and let us know what we can do better?', 'insert-headers-and-footers' ); ?></p>
 			<p>
-				<a href="<?php echo esc_url( $feedback_url ); ?>"
-				   class="wpcode-notice-dismiss" target="_blank"><?php esc_html_e( 'Give Feedback', 'insert-headers-and-footers' ); ?></a><br>
-				<a href="#" class="wpcode-notice-dismiss"
-				   rel="noopener noreferrer"><?php esc_html_e( 'No thanks', 'insert-headers-and-footers' ); ?></a>
+				<a href="<?php echo esc_url( $feedback_url ); ?>" class="wpcode-notice-dismiss" target="_blank"><?php esc_html_e( 'Give Feedback', 'insert-headers-and-footers' ); ?></a>&nbsp;&bull;&nbsp;<a href="#" class="wpcode-notice-dismiss" rel="noopener noreferrer"><?php esc_html_e( 'No thanks', 'insert-headers-and-footers' ); ?></a>
 			</p>
 		</div>
 		<div class="wpcode-review-step wpcode-review-step-3" style="display: none">
-			<p><?php esc_html_e( 'That\'s awesome! Could you please do me a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'insert-headers-and-footers' ); ?></p>
+			<p><?php esc_html_e( 'That\'s awesome! Could you please do us a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'insert-headers-and-footers' ); ?></p>
 			<p>
-				<strong><?php echo wp_kses( __( '~ Syed Balkhi<br>Co-Founder of WPCode', 'insert-headers-and-footers' ), array( 'br' => array() ) ); ?></strong>
-			</p>
-			<p>
-				<a href="https://wordpress.org/support/plugin/insert-headers-and-footers/reviews/?filter=5#new-post" class="wpcode-notice-dismiss wpcode-review-out" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Give Feedback', 'insert-headers-and-footers' ); ?></a><br>
-				<a href="#" class="wpcode-notice-dismiss" rel="noopener noreferrer"><?php esc_html_e( 'No thanks', 'insert-headers-and-footers' ); ?></a><br>
+				<a href="https://wordpress.org/support/plugin/insert-headers-and-footers/reviews/?filter=5#new-post" class="wpcode-notice-dismiss wpcode-review-out" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Give Feedback', 'insert-headers-and-footers' ); ?></a>&nbsp;&bull;&nbsp;<a href="#" class="wpcode-notice-dismiss" rel="noopener noreferrer"><?php esc_html_e( 'No thanks', 'insert-headers-and-footers' ); ?></a><br>
 			</p>
 		</div>
 		<script type="text/javascript">

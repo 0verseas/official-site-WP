@@ -6,29 +6,29 @@ const isContentBlock = document.body.classList.contains(
 	'post-type-ct_content_block'
 )
 
+let selectors = {
+	desktop:
+		'.ct-desktop-view iframe[name="editor-canvas"], .ct-desktop-view .edit-post-visual-editor',
+	tablet: '.ct-tablet-view iframe[name="editor-canvas"]',
+	mobile: '.ct-mobile-view iframe[name="editor-canvas"]',
+}
+
+if (document.body.className.indexOf('version-6-4') > -1) {
+	let selectors = {
+		desktop:
+			'.ct-desktop-view iframe[name="editor-canvas"], .ct-desktop-view .edit-post-visual-editor, .ct-desktop-view .edit-post-visual-editor__content-area > div',
+		tablet: '.ct-tablet-view iframe[name="editor-canvas"]',
+		mobile: '.ct-mobile-view iframe[name="editor-canvas"]',
+	}
+}
+
 export const gutenbergVariables = {
 	...handleBackgroundOptionFor({
-		id: 'background',
-		selector: '.edit-post-visual-editor__content-area > div',
+		id: 'popup_background',
+		selector: selectors.desktop,
 		responsive: true,
 		addToDescriptors: {
-			fullValue: true,
 			important: true,
-		},
-		valueExtractor: ({ background }) => {
-			if (
-				!background.desktop &&
-				!isContentBlock &&
-				background.background_type === 'color' &&
-				background.backgroundColor.default.color &&
-				background.backgroundColor.default.color.indexOf(
-					'CT_CSS_SKIP_RULE'
-				) > -1
-			) {
-				return ct_editor_localizations.default_background
-			}
-
-			return background
 		},
 	}),
 
@@ -40,10 +40,15 @@ export const gutenbergVariables = {
 			'content_boxed_shadow',
 			'boxed_content_spacing',
 			'content_boxed_radius',
+			'content_boxed_border',
+			'page_structure_type',
+
+			'background',
 
 			...(isContentBlock
 				? [
 						'has_content_block_structure',
+						'content_block_structure',
 						'template_subtype',
 						'template_editor_width_source',
 						'template_editor_width',
@@ -51,39 +56,160 @@ export const gutenbergVariables = {
 				: []),
 		],
 		[
+			...['desktop', 'tablet', 'mobile'].reduce((result, breakpoint) => {
+				return [
+					...result,
+					...handleBackgroundOptionFor({
+						id: 'background',
+						selector: selectors[breakpoint],
+						responsive: false,
+						addToDescriptors: {
+							fullValue: true,
+							important: true,
+						},
+						valueExtractor: (props) => {
+							const {
+								background,
+
+								template_subtype,
+
+								has_content_block_structure,
+								content_block_structure,
+							} = props
+
+							let valueToUse = background
+
+							if (
+								!background.desktop &&
+								!isContentBlock &&
+								background.background_type === 'color' &&
+								background.backgroundColor.default.color &&
+								background.backgroundColor.default.color.indexOf(
+									'CT_CSS_SKIP_RULE'
+								) > -1
+							) {
+								valueToUse =
+									ct_editor_localizations.default_background
+							}
+
+							if (
+								isContentBlock &&
+								((has_content_block_structure &&
+									has_content_block_structure !== 'yes') ||
+									template_subtype === 'card')
+							) {
+								valueToUse = {
+									background_type: 'color',
+									backgroundColor: {
+										default: {
+											color: 'CT_CSS_SKIP_RULE',
+										},
+									},
+								}
+							}
+
+							return maybePromoteScalarValueIntoResponsive(
+								valueToUse
+							)[breakpoint]
+						},
+					}).background,
+				]
+			}, []),
+
 			{
-				selector: `.editor-styles-wrapper`,
-				variable: 'block-max-width',
+				selector: '.editor-styles-wrapper',
+				variable: 'theme-block-max-width',
 				extractValue: ({
 					template_subtype,
 					template_editor_width_source = 'small',
 					template_editor_width = 1290,
+
+					has_content_block_structure,
+					content_block_structure,
+
+					page_structure_type,
 				}) => {
-					if (!template_subtype) {
-						return 'CT_CSS_SKIP_RULE'
+					if (template_subtype && template_subtype === 'card') {
+						if (template_editor_width_source === 'small') {
+							return '500px'
+						}
+
+						if (template_editor_width_source === 'medium') {
+							return '900px'
+						}
+
+						return `${template_editor_width}px`
 					}
 
-					if (template_subtype !== 'card') {
-						return 'CT_CSS_SKIP_RULE'
+					if (page_structure_type === 'default') {
+						page_structure_type =
+							ct_editor_localizations.default_page_structure
 					}
 
-					if (template_editor_width_source === 'small') {
-						return 500
+					if (isContentBlock) {
+						page_structure_type = content_block_structure
+
+						if (
+							(has_content_block_structure !== 'yes' ||
+								template_subtype === 'card' ||
+								template_subtype === 'content') &&
+							template_subtype !== 'canvas'
+						) {
+							page_structure_type = 'type-4'
+						}
 					}
 
-					if (template_editor_width_source === 'medium') {
-						return 900
+					if (page_structure_type === 'type-4') {
+						return 'var(--theme-normal-container-max-width)'
 					}
 
-					return template_editor_width
+					return 'var(--theme-narrow-container-max-width)'
 				},
 				fullValue: true,
-				unit: 'px',
 				important: true,
+				unit: '',
 			},
 
 			{
-				selector: `.editor-styles-wrapper`,
+				selector: '.editor-styles-wrapper',
+				variable: 'theme-block-wide-max-width',
+				extractValue: ({
+					template_subtype,
+
+					has_content_block_structure,
+					content_block_structure,
+
+					page_structure_type,
+				}) => {
+					if (template_subtype && template_subtype === 'card') {
+						return 'CT_CSS_SKIP_RULE'
+					}
+
+					if (isContentBlock) {
+						page_structure_type = content_block_structure
+
+						if (has_content_block_structure !== 'yes') {
+							page_structure_type = 'type-4'
+						}
+					}
+
+					if (page_structure_type === 'default') {
+						page_structure_type =
+							ct_editor_localizations.default_page_structure
+					}
+
+					if (page_structure_type === 'type-4') {
+						return 'calc(var(--theme-normal-container-max-width) + var(--theme-wide-offset) * 2)'
+					}
+
+					return 'calc(var(--theme-narrow-container-max-width) + var(--theme-wide-offset) * 2)'
+				},
+				fullValue: true,
+				unit: '',
+			},
+
+			{
+				selector: '.editor-styles-wrapper',
 				variable: 'has-boxed',
 				responsive: true,
 				extractValue: ({
@@ -135,7 +261,7 @@ export const gutenbergVariables = {
 			},
 
 			{
-				selector: `.editor-styles-wrapper`,
+				selector: '.editor-styles-wrapper',
 				variable: 'has-wide',
 				responsive: true,
 				extractValue: ({
@@ -221,15 +347,15 @@ export const gutenbergVariables = {
 
 						content_background.desktop.background_type = 'color'
 						content_background.desktop.backgroundColor.default.color =
-							'CT_CSS_SKIP_RULE'
+							'transparent'
 
 						content_background.tablet.background_type = 'color'
 						content_background.tablet.backgroundColor.default.color =
-							'CT_CSS_SKIP_RULE'
+							'transparent'
 
 						content_background.mobile.background_type = 'color'
 						content_background.mobile.backgroundColor.default.color =
-							'CT_CSS_SKIP_RULE'
+							'transparent'
 					}
 
 					return content_background
@@ -239,7 +365,7 @@ export const gutenbergVariables = {
 			{
 				selector: '.editor-styles-wrapper',
 				type: 'spacing',
-				variable: 'boxed-content-spacing',
+				variable: 'theme-boxed-content-spacing',
 				responsive: true,
 				unit: '',
 				fullValue: true,
@@ -270,7 +396,7 @@ export const gutenbergVariables = {
 			{
 				selector: '.editor-styles-wrapper',
 				type: 'spacing',
-				variable: 'border-radius',
+				variable: 'theme-boxed-content-border-radius',
 				responsive: true,
 
 				fullValue: true,
@@ -300,8 +426,39 @@ export const gutenbergVariables = {
 
 			{
 				selector: '.editor-styles-wrapper',
+				type: 'border',
+				variable: 'theme-boxed-content-border',
+				responsive: true,
+
+				fullValue: true,
+				extractValue: ({
+					template_subtype,
+					content_style_source = 'inherit',
+					content_boxed_border,
+					has_content_block_structure = 'yes',
+				}) => {
+					if (!isContentBlock && content_style_source === 'inherit') {
+						content_boxed_border =
+							ct_editor_localizations.default_content_boxed_border
+					}
+
+					if (
+						isContentBlock &&
+						(has_content_block_structure !== 'yes' ||
+							template_subtype === 'card' ||
+							template_subtype === 'content')
+					) {
+						content_boxed_border = null
+					}
+
+					return content_boxed_border
+				},
+			},
+
+			{
+				selector: '.editor-styles-wrapper',
 				type: 'box-shadow',
-				variable: 'box-shadow',
+				variable: 'theme-boxed-content-box-shadow',
 				responsive: true,
 				fullValue: true,
 				extractValue: ({

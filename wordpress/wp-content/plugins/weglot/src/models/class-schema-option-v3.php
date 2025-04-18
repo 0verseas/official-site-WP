@@ -12,7 +12,184 @@ use WeglotWP\Helpers\Helper_Flag_Type;
 class Schema_Option_V3 {
 
 	/**
-	 * @return array
+	 * @var string
+	 */
+	public $api_key;
+	/**
+	 * @var string
+	 */
+	public $api_key_private;
+	/**
+	 * @var bool
+	 */
+	public $allowed;
+	/**
+	 * @var string
+	 */
+	public $original_language;
+	/**
+	 * @var string
+	 */
+	public $language_from_custom_flag;
+	/**
+	 * @var string
+	 */
+	public $language_from_custom_name;
+	/**
+	 * @var string
+	 */
+	public $translation_engine;
+	/**
+	 * @var string
+	 */
+	public $destination_language;
+	/**
+	 * @var string
+	 */
+	public $private_mode;
+	/**
+	 * @var string
+	 */
+	public $auto_redirect;
+	/**
+	 * @var string
+	 */
+	public $autoswitch_fallback;
+	/**
+	 * @var string
+	 */
+	public $exclude_urls;
+	/**
+	 * @var string
+	 */
+	public $exclude_blocks;
+	/**
+	 * @var string
+	 */
+	public $custom_settings;
+	/**
+	 * @var string
+	 */
+	public $is_dropdown;
+	/**
+	 * @var string
+	 */
+	public $is_fullname;
+	/**
+	 * @var string
+	 */
+	public $with_name;
+	/**
+	 * @var string
+	 */
+	public $with_flags;
+	/**
+	 * @var string
+	 */
+	public $type_flags;
+	/**
+	 * @var string
+	 */
+	public $override_css;
+	/**
+	 * @var string
+	 */
+	public $email_translate;
+	/**
+	 * @var string
+	 */
+	public $active_search;
+	/**
+	 * @var string
+	 */
+	public $translate_amp;
+	/**
+	 * @var string
+	 */
+	public $wp_user_version;
+	/**
+	 * @var string
+	 */
+	public $translate_inside_exclusions;
+	/**
+	 * @var string
+	 */
+	public $has_first_settings;
+	/**
+	 * @var string
+	 */
+	public $show_box_first_settings;
+	/**
+	 * @var string
+	 */
+	public $custom_urls;
+	/**
+	 * @var string
+	 */
+	public $media_enabled;
+	/**
+	 * @var string
+	 */
+	public $external_enabled;
+	/**
+	 * @var string
+	 */
+	public $page_views_enabled;
+	/**
+	 * @var string
+	 */
+	public $flag_css;
+	/**
+	 * @var string
+	 */
+	public $menu_switcher;
+	/**
+	 * @var string
+	 */
+	public $active_wc_reload;
+	/**
+	 * @var string
+	 */
+	public $versions;
+	/**
+	 * @var string
+	 */
+	public $slugTranslation;
+	/**
+	 * @var string
+	 */
+	public $translation;
+	/**
+	 * @var string
+	 */
+	public $category;
+	/**
+	 * @var string
+	 */
+	public $organization_slug;
+	/**
+	 * @var string
+	 */
+	public $project_slug;
+
+	/**
+	 * Overrides the "language_to" value in each language array based on a provided mapping.
+	 *
+	 * @param array $languages An array of language configurations, each containing a "language_to" key.
+	 * @param array $overrides An associative array mapping original "language_to" values to their custom replacements.
+	 * @return array The modified array of language configurations with updated "language_to" values.
+	 */
+	public static function overrideLanguageTo(array $languages, array $overrides) {
+		foreach ($languages as &$language) {
+			if (isset($language['language_to']) && isset($overrides[$language['language_to']])) {
+				$language['language_to'] = $overrides[$language['language_to']];
+			}
+		}
+		return $languages;
+	}
+
+	/**
+	 * @return array<string,mixed>
 	 * @since 3.0.0
 	 */
 	public static function get_schema_options_v3_compatible() {
@@ -31,14 +208,16 @@ class Schema_Option_V3 {
 					if ( ! $languages ) {
 						return $destinations;
 					}
+
 					foreach ( $languages as $item ) {
 						$destinations[] = array(
-							'language_to'       => $item['language_to'],
-							'custom_code'       => $item['custom_code'],
-							'custom_name'       => $item['custom_name'],
-							'custom_local_name' => $item['custom_local_name'],
-							'public'            => $item['enabled'],
+							'language_to'       => isset($item['language_to']) ? $item['language_to'] : null,
+							'custom_code'       => isset($item['custom_code']) ? $item['custom_code'] : null,
+							'custom_name'       => isset($item['custom_name']) ? $item['custom_name'] : null,
+							'custom_local_name' => isset($item['custom_local_name']) ? $item['custom_local_name'] : null,
+							'public'            => isset($item['enabled']) ? $item['enabled'] : null,
 						);
+
 					}
 
 					return $destinations;
@@ -95,6 +274,8 @@ class Schema_Option_V3 {
 			'email_translate'           => 'custom_settings.translate_email',
 			'active_search'             => 'custom_settings.translate_search',
 			'translate_amp'             => 'custom_settings.translate_amp',
+			'wp_user_version'           => 'custom_settings.wp_user_version',
+			'translate_inside_exclusions'           => 'custom_settings.translate_inside_exclusions',
 			'has_first_settings'        => 'has_first_settings',
 			'show_box_first_settings'   => 'show_box_first_settings',
 			'custom_urls'               => (object) array(
@@ -116,6 +297,9 @@ class Schema_Option_V3 {
 			'versions'                  => 'versions',
 			'slugTranslation'           => 'versions.slugTranslation',
 			'translation'               => 'versions.translation',
+			'category'               => 'category',
+			'organization_slug'               => 'organization_slug',
+			'project_slug'               => 'project_slug',
 		);
 
 		return $schema;

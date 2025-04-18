@@ -4,16 +4,16 @@
 		<section class="hero-section" data-type="type-1">
 			<header class="entry-header">
 				<h1 class="page-title" itemprop="headline">
-					<?php esc_html_e( 'Oops! That page can&rsquo;t be found.', 'blocksy' ); ?>	
+					<?php esc_html_e('Oops! That page can&rsquo;t be found.', 'blocksy'); ?>
 				</h1>
 
 				<div class="page-description">
-					<?php esc_html_e( 'It looks like nothing was found at this location. Maybe try to search for something else?', 'blocksy' ); ?>
+					<?php esc_html_e('It looks like nothing was found at this location. Maybe try to search for something else?', 'blocksy'); ?>
 				</div>
 			</header>
 		</section>
 
-		<div class="entry-content">
+		<div class="entry-content is-layout-flow">
 			<?php get_search_form(); ?>
 		</div>
 

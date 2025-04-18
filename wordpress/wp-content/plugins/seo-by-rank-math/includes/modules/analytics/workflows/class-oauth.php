@@ -13,10 +13,10 @@ namespace RankMath\Analytics\Workflow;
 use RankMath\Helper;
 use RankMath\Google\Api;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\Param;
-use RankMath\Analytics\DB;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Param;
 use RankMath\Helpers\Security;
+use RankMath\Analytics\DB;
 use RankMath\Google\Permissions;
 use RankMath\Google\Authentication;
 
@@ -86,7 +86,7 @@ class OAuth {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'rank_math_reconnect_google' ) ) {
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'rank_math_reconnect_google' ) ) {
 			wp_nonce_ays( 'rank_math_reconnect_google' );
 			die();
 		}

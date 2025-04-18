@@ -462,9 +462,6 @@ class NF_Database_Models_Submission
             '_date_submitted' => esc_html__( 'Date Submitted', 'ninja-forms' )
         );
 
-        // Legacy Filter from 2.9.*
-        $field_labels = apply_filters( 'nf_subs_csv_label_array_before_fields', $field_labels, $sub_ids );
-
         $fields = Ninja_Forms()->form( $form_id )->get_fields();
 
         /*
@@ -596,9 +593,6 @@ class NF_Database_Models_Submission
 
         $value_array = WPN_Helper::stripslashes( $value_array );
 
-        // Legacy Filter from 2.9.*
-        $value_array = apply_filters( 'nf_subs_csv_value_array', $value_array, $sub_ids );
-
         $csv_array[ 0 ][] = $field_labels;
         $csv_array[ 1 ][] = $value_array;
         
@@ -675,6 +669,20 @@ class NF_Database_Models_Submission
     protected function _save_extra_values()
     {
         if( ! $this->_extra_values ) return FALSE;
+
+        $maxCount = apply_filters('ninja_forms_max_extra_data_count',200,$this->_form_id);
+
+        /*
+         * if extra data has more than 200 elements, then stop.  Add-ons should
+         * not be adding those many individual pieces of data; rather, they
+         * should add data keyed on specific functional areas from their usage.
+         *
+         * Over the allowed limit, it is expected to be an attack.  Site
+         * developers can use filter to raise limit either globally or per-form
+         */
+        if($maxCount<count($this->_extra_values)){
+            return FALSE;
+        }
 
         foreach( $this->_extra_values as $key => $value )
         {

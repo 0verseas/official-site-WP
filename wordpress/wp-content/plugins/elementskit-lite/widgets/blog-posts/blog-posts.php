@@ -39,6 +39,14 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
         return str_replace('ekit', 'col', $str);
     }
 
+    protected function is_dynamic_content(): bool {
+        return true;
+    }
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
     protected function register_controls() {
 
         // Layout
@@ -108,7 +116,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                         'label' => esc_html__( 'Featured Image Size', 'elementskit-lite' ),
                     ],
                 ],
-                'exclude'           => [ 'custom' ],
+                'exclude'           => [ 'custom' ], // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
                 'default'           => 'large',
                 'condition'         => [
                     'ekit_blog_posts_feature_img'   => 'yes',
@@ -1134,8 +1142,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .post-meta-list > span > i' => 'font-size: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .post-meta-list > span > svg'  => 'max-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .post-meta-list > span :is(i, svg)'  => 'font-size: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -1156,8 +1163,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                 'label'      => esc_html__( 'Color', 'elementskit-lite' ),
                 'type'       => Controls_Manager::COLOR,
                 'selectors'  => [
-                    '{{WRAPPER}} .post-meta-list > span' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .post-meta-list > span > svg path' => 'strock: {{VALUE}}; fill: {{VALUE}};'
+                    '{{WRAPPER}} .post-meta-list > span' => 'color: {{VALUE}}; fill: {{VALUE}};',
                 ],
             ]
         );
@@ -1168,8 +1174,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                 'label'      => esc_html__( 'Icon Color', 'elementskit-lite' ),
                 'type'       => Controls_Manager::COLOR,
                 'selectors'  => [
-                    '{{WRAPPER}} .post-meta-list > span > i' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .post-meta-list > span > svg path' => 'stroke: {{VALUE}}; fill: {{VALUE}};'
+                    '{{WRAPPER}} .post-meta-list > span :is(i, svg)' => 'color: {{VALUE}}; fill: {{VALUE}};',
                 ],
             ]
         );
@@ -1181,9 +1186,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient', ],
                 'selector' => '{{WRAPPER}} .post-meta-list > span',
-                'exclude' => [
-                    'image'
-                ]
+                'exclude' => [ 'image'] // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			]
         );
 
@@ -1239,11 +1242,8 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                 'label'      => esc_html__( 'Color', 'elementskit-lite' ),
                 'type'       => Controls_Manager::COLOR,
                 'selectors'  => [
-                    '{{WRAPPER}} .post-meta-list > span:hover' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .post-meta-list > span:hover > svg path' => 'strock: {{VALUE}}; fill: {{VALUE}};',
-
-                    '{{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span' => 'color: {{VALUE}};',
-                    '{{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span > svg path' => 'strock: {{VALUE}}; fill: {{VALUE}};',
+                    '{{WRAPPER}} .post-meta-list > span:hover' => 'color: {{VALUE}}; fill: {{VALUE}};',
+                    '{{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span' => 'color: {{VALUE}}; fill: {{VALUE}};',
                 ],
             ]
         );
@@ -1254,11 +1254,8 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                 'label'      => esc_html__( 'Icon Color', 'elementskit-lite' ),
                 'type'       => Controls_Manager::COLOR,
                 'selectors'  => [
-                    '{{WRAPPER}} .post-meta-list > span:hover > i' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .post-meta-list > span:hover > svg path' => 'stroke: {{VALUE}}; fill: {{VALUE}};',
-
-                    '{{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span:hover > i' => 'color: {{VALUE}};',
-                    '{{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span > svg path' => 'strock: {{VALUE}}; fill: {{VALUE}};',
+                    '{{WRAPPER}} .post-meta-list > span:hover :is(i, svg)' => 'color: {{VALUE}}; fill: {{VALUE}};',
+                    '{{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span:hover :is(i, svg)' => 'color: {{VALUE}}; fill: {{VALUE}};',
                 ],
             ]
         );
@@ -1270,9 +1267,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient', ],
                 'selector' => '{{WRAPPER}} .post-meta-list > span:hover, {{WRAPPER}}.ekit-blog-posts--bg-hover .elementskit-post-image-card:hover .post-meta-list > span',
-                'exclude' => [
-                    'image'
-                ]
+                'exclude' => [ 'image' ] // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			]
         );
 
@@ -2591,7 +2586,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
        $this->add_responsive_control(
             'ekit_blog_posts_btn_normal_icon_font_size',
             array(
-                'label'      => esc_html__( 'Font Size', 'elementskit-lite' ),
+                'label'      => esc_html__( 'Icon Font Size', 'elementskit-lite' ),
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => array(
                     'px', 'em', 'rem',
@@ -2603,8 +2598,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .elementskit-btn i' => 'font-size: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .elementskit-btn svg'  => 'max-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .elementskit-btn :is(i, svg)' => 'font-size: {{SIZE}}{{UNIT}};',
                 ),
             )
         );
@@ -2634,8 +2628,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                'type' => Controls_Manager::COLOR,
                'default' => '',
                'selectors' => [
-                   '{{WRAPPER}} .elementskit-btn' => 'color: {{VALUE}};',
-                   '{{WRAPPER}} .elementskit-btn svg path'  => 'stroke: {{VALUE}}; fill: {{VALUE}};',
+                   '{{WRAPPER}} .elementskit-btn' => 'color: {{VALUE}}; fill: {{VALUE}};',
                ],
            ]
        );
@@ -2663,8 +2656,7 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
                'type' => Controls_Manager::COLOR,
                'default' => '#ffffff',
                'selectors' => [
-                   '{{WRAPPER}} .elementskit-btn:hover' => 'color: {{VALUE}};',
-                   '{{WRAPPER}} .elementskit-btn:hover svg path'  => 'stroke: {{VALUE}}; fill: {{VALUE}};',
+                   '{{WRAPPER}} .elementskit-btn:hover' => 'color: {{VALUE}}; fill: {{VALUE}};',
                ],
            ]
        );
@@ -2890,44 +2882,14 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
 												<?php echo get_avatar( get_the_author_meta( "ID" )); ?>
 											</span>
 										<?php else: ?>
-
-											<?php
-												// new icon
-												$migrated = isset( $settings['__fa4_migrated']['ekit_blog_posts_meta_author_icons'] );
-												// Check if its a new widget without previously selected icon using the old Icon control
-												$is_new = empty( $settings['ekit_blog_posts_meta_author_icon'] );
-												if ( $is_new || $migrated ) {
-													// new icon
-													Icons_Manager::render_icon( $settings['ekit_blog_posts_meta_author_icons'], [ 'aria-hidden' => 'true'] );
-												} else {
-													?>
-													<i class="<?php echo esc_attr($settings['ekit_blog_posts_meta_author_icon']); ?>" aria-hidden="true"></i>
-													<?php
-												}
-											?>
-
+											<?php Icons_Manager::render_icon($settings['ekit_blog_posts_meta_author_icons'], [ 'aria-hidden' => 'true' ]); ?>
 										<?php endif; ?>
 										<a href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>" class="author-name"><?php the_author_meta('display_name'); ?></a>
 									</span>
 								<?php endif; ?>
 								<?php if($meta == 'date'): ?>
 									<span class="meta-date">
-
-										<?php
-											// new icon
-											$migrated = isset( $settings['__fa4_migrated']['ekit_blog_posts_meta_date_icons'] );
-											// Check if its a new widget without previously selected icon using the old Icon control
-											$is_new = empty( $settings['ekit_blog_posts_meta_date_icon'] );
-											if ( $is_new || $migrated ) {
-												// new icon
-												Icons_Manager::render_icon( $settings['ekit_blog_posts_meta_date_icons'], [ 'aria-hidden' => 'true' ] );
-											} else {
-												?>
-												<i class="<?php echo esc_attr($settings['ekit_blog_posts_meta_date_icon']); ?>" aria-hidden="true"></i>
-												<?php
-											}
-										?>
-
+										<?php Icons_Manager::render_icon($settings['ekit_blog_posts_meta_date_icons'], [ 'aria-hidden' => 'true' ]); ?>
 										<span class="meta-date-text">
 											<?php echo esc_html( get_the_date() ); ?>
 										</span>
@@ -2935,43 +2897,13 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
 								<?php endif; ?>
 								<?php if($meta == 'category'): ?>
 									<span class="post-cat">
-
-										<?php
-											// new icon
-											$migrated = isset( $settings['__fa4_migrated']['ekit_blog_posts_meta_category_icons'] );
-											// Check if its a new widget without previously selected icon using the old Icon control
-											$is_new = empty( $settings['ekit_blog_posts_meta_category_icon'] );
-											if ( $is_new || $migrated ) {
-												// new icon
-												Icons_Manager::render_icon( $settings['ekit_blog_posts_meta_category_icons'], [ 'aria-hidden' => 'true' ] );
-											} else {
-												?>
-												<i class="<?php echo esc_attr($settings['ekit_blog_posts_meta_category_icon']); ?>" aria-hidden="true"></i>
-												<?php
-											}
-										?>
-
+										<?php Icons_Manager::render_icon($settings['ekit_blog_posts_meta_category_icons'], [ 'aria-hidden' => 'true' ]); ?>
 										<?php echo get_the_category_list( ' | ' ); // phpcs:ignore WordPress.Security.EscapeOutput -- Already escaped by WordPress ?>
 									</span>
 								<?php endif; ?>
 								<?php if($meta == 'comment'): ?>
 									<span class="post-comment">
-
-										<?php
-											// new icon
-											$migrated = isset( $settings['__fa4_migrated']['ekit_blog_posts_meta_comment_icons'] );
-											// Check if its a new widget without previously selected icon using the old Icon control
-											$is_new = empty( $settings['ekit_blog_posts_meta_comment_icon'] );
-											if ( $is_new || $migrated ) {
-												// new icon
-												Icons_Manager::render_icon( $settings['ekit_blog_posts_meta_comment_icons'], [ 'aria-hidden' => 'true' ] );
-											} else {
-												?>
-												<i class="<?php echo esc_attr($settings['ekit_blog_posts_meta_comment_icon']); ?>" aria-hidden="true"></i>
-												<?php
-											}
-										?>
-
+										<?php Icons_Manager::render_icon($settings['ekit_blog_posts_meta_comment_icons'], [ 'aria-hidden' => 'true' ]); ?>
 										<a href="<?php comments_link(); ?>"><?php echo esc_html( get_comments_number() ); ?></a>
 									</span>
 								<?php endif; ?>
@@ -3121,54 +3053,33 @@ class ElementsKit_Widget_Blog_Posts extends Widget_Base {
 									<?php echo $meta_data_html; // phpcs:ignore WordPress.Security.EscapeOutput -- Buffering output line number 2972 ?>
 							<?php endif; ?>
                             <?php
-                            if($ekit_blog_posts_read_more == 'yes'):
-                                $btn_text = $settings['ekit_blog_posts_btn_text'];
-                                $btn_class = ($settings['ekit_blog_posts_btn_class'] != '') ? $settings['ekit_blog_posts_btn_class'] : '';
-                                $btn_id = ($settings['ekit_blog_posts_btn_id'] != '') ? 'id='.$settings['ekit_blog_posts_btn_id'] : '';
-                                $icon_align = $settings['ekit_blog_posts_btn_icon_align'];
-                                
-                                // Reset Whitespace for this specific widget
-                                $btn_class .= ' whitespace--normal';
+                            if($ekit_blog_posts_read_more == 'yes') :
+								$post_id = get_the_ID();
+								$btn_text = $settings['ekit_blog_posts_btn_text'];
+								$icon_align = $settings['ekit_blog_posts_btn_icon_align'];
+
+								$this->add_render_attribute('read_more_link' . $post_id, 'class', 'elementskit-btn');
+								if(!empty($settings['ekit_blog_posts_btn_class'])) {
+									$this->add_render_attribute('read_more_link' . $post_id, 'class', $settings['ekit_blog_posts_btn_class']);
+								}
+								$this->add_render_attribute('read_more_link' . $post_id, 'class', 'whitespace--normal');
+								$this->add_render_attribute('read_more_link' . $post_id, 'id', $settings['ekit_blog_posts_btn_id']);
+								$this->add_render_attribute('read_more_link' . $post_id, 'href', get_the_permalink());
                                 ?>
                                 <div class="btn-wraper">
-                                    <?php if($icon_align == 'right'): ?>
-                                        <a href="<?php echo esc_url( the_permalink() ); ?>" class="elementskit-btn <?php echo esc_attr( $btn_class ); ?>" <?php echo esc_attr($btn_id); ?>>
+                                    <?php if($icon_align == 'right') : ?>
+                                        <a <?php $this->print_render_attribute_string( 'read_more_link' . $post_id ); ?>>
                                             <?php echo esc_html( $btn_text ); ?>
-                                            <?php if($settings['ekit_blog_posts_btn_icons__switch'] === 'yes'): 
-
-                                                // new icon
-                                                $migrated = isset( $settings['__fa4_migrated']['ekit_blog_posts_btn_icons'] );
-                                                // Check if its a new widget without previously selected icon using the old Icon control
-                                                $is_new = empty( $settings['ekit_blog_posts_btn_icon'] );
-                                                if ( $is_new || $migrated ) {
-                                                    // new icon
-                                                    Icons_Manager::render_icon( $settings['ekit_blog_posts_btn_icons'], [ 'aria-hidden' => 'true' ] );
-                                                } else {
-                                                    ?>
-                                                    <i class="<?php echo esc_attr($settings['ekit_blog_posts_btn_icon']); ?>" aria-hidden="true"></i>
-                                                    <?php
-                                                }
-                                                
-                                                endif; ?>
+                                            <?php if($settings['ekit_blog_posts_btn_icons__switch'] === 'yes') :
+												Icons_Manager::render_icon($settings['ekit_blog_posts_btn_icons'], [ 'aria-hidden' => 'true' ]);
+											endif; ?>
                                         </a>
                                     <?php endif; ?>
 
                                     <?php if($icon_align == 'left'): ?>
-                                        <a href="<?php echo esc_url( the_permalink() ); ?>" class="elementskit-btn <?php echo esc_attr( $btn_class ); ?>" <?php echo esc_attr($btn_id); ?>>
-                                        <?php if($settings['ekit_blog_posts_btn_icons__switch'] === 'yes'): 
-                                                // new icon
-                                                $migrated = isset( $settings['__fa4_migrated']['ekit_blog_posts_btn_icons'] );
-                                                // Check if its a new widget without previously selected icon using the old Icon control
-                                                $is_new = empty( $settings['ekit_blog_posts_btn_icon'] );
-                                                if ( $is_new || $migrated ) {
-                                                    // new icon
-                                                    Icons_Manager::render_icon( $settings['ekit_blog_posts_btn_icons'], [ 'aria-hidden' => 'true' ] );
-                                                } else {
-                                                    ?>
-                                                    <i class="<?php echo esc_attr($settings['ekit_blog_posts_btn_icon']); ?>" aria-hidden="true"></i>
-                                                    <?php
-                                                }
-                                                
+                                        <a <?php $this->print_render_attribute_string( 'read_more_link' . $post_id ); ?>>
+                                        	<?php if($settings['ekit_blog_posts_btn_icons__switch'] === 'yes') :
+												Icons_Manager::render_icon($settings['ekit_blog_posts_btn_icons'], [ 'aria-hidden' => 'true' ]);
                                             endif; ?>
                                             <?php echo esc_html( $btn_text ); ?>
                                         </a>

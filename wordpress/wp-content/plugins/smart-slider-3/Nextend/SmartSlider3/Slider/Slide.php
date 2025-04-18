@@ -4,7 +4,7 @@
 namespace Nextend\SmartSlider3\Slider;
 
 
-use JRoute;
+use Joomla\CMS\Router\Route;
 use Nextend\Framework\Cast;
 use Nextend\Framework\Data\Data;
 use Nextend\Framework\FastImageSize\FastImageSize;
@@ -283,7 +283,7 @@ class Slide extends AbstractRenderableOwner {
 
             $ariaLabel = $this->parameters->get('aria-label');
             if (!empty($ariaLabel)) {
-                $this->linkAttributes['aria-label'] = $ariaLabel;
+                $this->linkAttributes['aria-label'] = $this->fill($ariaLabel);
             }
 
             if (!isset($this->linkAttributes['onclick']) && !isset($this->linkAttributes['data-n2-lightbox'])) {
@@ -378,6 +378,11 @@ class Slide extends AbstractRenderableOwner {
                     'style'   => '',
                     'class'   => 'n2-ss-slide-thumbnail'
                 ));
+
+                $title = esc_attr($this->getThumbnailTitleDynamic());
+                if ($title) {
+                    $attributes['title'] = $title;
+                }
 
                 $this->html .= Html::image($this->sliderObject->features->optimize->optimizeThumbnail($thumbnail), esc_attr($this->getThumbnailAltDynamic()), $attributes);
             }
@@ -684,6 +689,10 @@ class Slide extends AbstractRenderableOwner {
         }
 
         return $alt;
+    }
+
+    public function getThumbnailTitleDynamic() {
+        return $this->fill($this->parameters->get('thumbnailTitle'));
     }
 
     public function getLightboxImage() {

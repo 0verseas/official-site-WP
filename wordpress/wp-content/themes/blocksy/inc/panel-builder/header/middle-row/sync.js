@@ -5,9 +5,7 @@ import {
 	withKeys,
 	disableTransitionsStart,
 	disableTransitionsEnd,
-} from '../../../../static/js/customizer/sync/helpers'
-
-import {
+	responsiveClassesFor,
 	getRootSelectorFor,
 	assembleSelector,
 	mutateSelector,
@@ -28,9 +26,17 @@ export const handleRowVariables = ({ itemId }) => ({
 	headerRowShadow: {
 		selector: assembleSelector(getRootSelectorFor({ itemId })),
 		type: 'box-shadow',
-		variable: 'box-shadow',
+		variable: 'theme-box-shadow',
 		forceOutput: true,
 		responsive: true,
+	},
+
+	headerRowBlur: {
+		selector: assembleSelector(getRootSelectorFor({ itemId })),
+		variable: 'theme-backdrop-blur',
+		responsive: true,
+		unit: 'px',
+		forceOutput: true,
 	},
 
 	...withKeys(
@@ -43,7 +49,7 @@ export const handleRowVariables = ({ itemId }) => ({
 		[
 			{
 				selector: assembleSelector(getRootSelectorFor({ itemId })),
-				variable: 'borderTop',
+				variable: 'theme-border-top',
 				type: 'border',
 				responsive: true,
 
@@ -70,7 +76,7 @@ export const handleRowVariables = ({ itemId }) => ({
 						to_add: '> div',
 					})
 				),
-				variable: 'borderTop',
+				variable: 'theme-border-top',
 				type: 'border',
 				responsive: true,
 				fullValue: true,
@@ -97,7 +103,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderTop',
+				variable: 'theme-border-top',
 				type: 'border',
 				responsive: true,
 
@@ -129,7 +135,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderTop',
+				variable: 'theme-border-top',
 				type: 'border',
 				responsive: true,
 				fullValue: true,
@@ -155,7 +161,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderTop',
+				variable: 'theme-border-top',
 				type: 'border',
 				responsive: true,
 
@@ -186,7 +192,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderTop',
+				variable: 'theme-border-top',
 				type: 'border',
 				responsive: true,
 				fullValue: true,
@@ -216,7 +222,7 @@ export const handleRowVariables = ({ itemId }) => ({
 		[
 			{
 				selector: assembleSelector(getRootSelectorFor({ itemId })),
-				variable: 'borderBottom',
+				variable: 'theme-border-bottom',
 				type: 'border',
 				responsive: true,
 
@@ -243,7 +249,7 @@ export const handleRowVariables = ({ itemId }) => ({
 						to_add: '> div',
 					})
 				),
-				variable: 'borderBottom',
+				variable: 'theme-border-bottom',
 				type: 'border',
 				responsive: true,
 				fullValue: true,
@@ -270,7 +276,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderBottom',
+				variable: 'theme-border-bottom',
 				type: 'border',
 				responsive: true,
 
@@ -302,7 +308,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderBottom',
+				variable: 'theme-border-bottom',
 				type: 'border',
 				responsive: true,
 				fullValue: true,
@@ -328,7 +334,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderBottom',
+				variable: 'theme-border-bottom',
 				type: 'border',
 				responsive: true,
 
@@ -359,7 +365,7 @@ export const handleRowVariables = ({ itemId }) => ({
 					})
 				),
 
-				variable: 'borderBottom',
+				variable: 'theme-border-bottom',
 				type: 'border',
 				responsive: true,
 				fullValue: true,
@@ -390,9 +396,24 @@ export const handleRowVariables = ({ itemId }) => ({
 		),
 
 		type: 'box-shadow',
-		variable: 'box-shadow',
+		variable: 'theme-box-shadow',
 		forceOutput: true,
 		responsive: true,
+	},
+
+	transparentHeaderRowBlur: {
+		selector: assembleSelector(
+			mutateSelector({
+				selector: getRootSelectorFor({ itemId }),
+				operation: 'el-prefix',
+				to_add: '[data-transparent-row="yes"]',
+			})
+		),
+
+		variable: 'theme-backdrop-blur',
+		responsive: true,
+		unit: 'px',
+		forceOutput: true,
 	},
 
 	// Sticky
@@ -405,8 +426,28 @@ export const handleRowVariables = ({ itemId }) => ({
 		),
 
 		type: 'box-shadow',
-		variable: 'box-shadow',
+		variable: 'theme-box-shadow',
 		forceOutput: true,
+		responsive: true,
+	},
+
+	stickyHeaderRowBlur: {
+		selector: assembleSelector(
+			mutateSelector({
+				selector: getRootSelectorFor({ itemId }),
+				to_add: '[data-sticky*="yes"]',
+			})
+		),
+		variable: 'theme-backdrop-blur',
+		responsive: true,
+		unit: 'px',
+		forceOutput: true,
+	},
+
+	header_row_border_radius: {
+		selector: assembleSelector(getRootSelectorFor({ itemId })),
+		type: 'spacing',
+		variable: 'row-border-radius',
 		responsive: true,
 	},
 })
@@ -415,6 +456,12 @@ export const handleRowOptions = ({
 	selector,
 	changeDescriptor: { optionId, optionValue, values },
 }) => {
+	if (optionId === 'headerRowVisibility') {
+		updateAndSaveEl(selector, (el) => {
+			responsiveClassesFor(optionValue, el)
+		})
+	}
+
 	if (optionId === 'headerRowHeight') {
 		ctEvents.trigger('blocksy:sticky:compute')
 	}

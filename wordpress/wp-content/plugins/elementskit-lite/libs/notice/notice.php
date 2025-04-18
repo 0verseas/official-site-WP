@@ -134,6 +134,13 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
 	
 	
 		/**
+		 * set if the notice will be shown to admins only
+		 */
+		protected $admin_only = true;
+
+	
+	
+		/**
 		 * get_version
 		 *
 		 * @return string
@@ -238,6 +245,11 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
 			return $this;
 		}
 
+		public function set_admin_only( $admin_only ) {
+			$this->$admin_only = $admin_only;
+			return $this;
+		}
+
 		public function set_title( $title = '' ) {
 			$this->title .= $title;
 
@@ -289,6 +301,10 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
 
 
 		public function call() {
+			// check if current user is admin
+			if (  ! current_user_can( 'manage_options' ) ) {
+				return false;
+			}
 			add_action( 'admin_notices', array( $this, 'get_notice' ) );
 		}
 	
@@ -386,8 +402,12 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
 		}
 
 		public static function dismiss_ajax_call() {
-
 			if( empty( $_POST['nonce'] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wpmet-notices' ) ){
+				return false;
+			}
+
+			// check if current user is admin
+			if ( ! current_user_can( 'manage_options' ) ) {
 				return false;
 			}
 
@@ -402,6 +422,11 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
 					set_transient( $notice_id, true, $expired_time );
 				}
 
+				if( $notice_id == 'elementskit-lite-edit_with_emailkit_banner' ) {
+					$counter = get_option('elementskit-lite-edit_with_emailkit_banner_dismissed_'.get_current_user_id(), 0);
+					update_option('elementskit-lite-edit_with_emailkit_banner_dismissed_'.get_current_user_id(), $counter+1);
+				}
+
 				wp_send_json_success();
 			}
 
@@ -409,6 +434,11 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
 		}
 	
 		public static function enqueue_scripts() {
+			// check if current user is admin
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
 			echo "
 			<script>
                 jQuery(document).ready(function ($) {
@@ -432,7 +462,7 @@ if ( ! class_exists( '\Oxaim\Libs\Notice' ) ) :
                             type: 'POST',
                             data: {
                                 action 	        : 'wpmet-notices',
-                                notice_id 		: notice_id,
+                                notice_id       : notice_id,
                                 dismissible 	: dismissible,
                                 expired_time 	: expired_time,
 								nonce 			: '" . esc_js( wp_create_nonce( 'wpmet-notices' ) ) . "'

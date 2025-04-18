@@ -71,7 +71,8 @@ class Business_Reviews extends Widget_Base {
 	public function get_style_depends() {
 		return [
 			'font-awesome-5-all',
-			'font-awesome-4-shim'
+			'font-awesome-4-shim',
+            'e-swiper'
 		];
 	}
 
@@ -80,6 +81,10 @@ class Business_Reviews extends Widget_Base {
 			'font-awesome-4-shim'
 		];
 	}
+
+	public function has_widget_inner_wrapper(): bool {
+        return ! Helper::eael_e_optimized_markup();
+    }
 
 	protected function register_controls() {
 
@@ -123,9 +128,15 @@ class Business_Reviews extends Widget_Base {
 			'placeholder' => esc_html__( 'Place ID', 'essential-addons-for-elementor-lite' ),
 			'label_block' => false,
 			'default'     => '',
+			'dynamic' => [
+				'active' => true,
+			],
 			'condition'   => [
 				'eael_business_reviews_sources' => 'google-reviews',
-			]
+			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control(
@@ -201,18 +212,33 @@ class Business_Reviews extends Widget_Base {
 			]
 		);
 
+		$image_path = EAEL_PLUGIN_URL . 'assets/admin/images/layout-previews/business-reviews-';
+		$layout_options = [
+			'preset-1' => [
+				'title' => esc_html__('Preset 1', 'essential-addons-for-elementor-lite'),
+				'image' => $image_path . 'preset-1.png'
+			],
+			'preset-2' => [
+				'title' => esc_html__('Preset 2', 'essential-addons-for-elementor-lite'),
+				'image' => $image_path . 'preset-2.png'
+			],
+			'preset-3' => [
+				'title' => esc_html__('Preset 3', 'essential-addons-for-elementor-lite'),
+				'image' => $image_path . 'preset-3.png'
+			],
+		];
+		
 		$this->add_control(
 			'eael_business_reviews_style_preset_slider',
 			[
-				'label'     => esc_html__( 'Style Preset', 'essential-addons-for-elementor-lite' ),
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'preset-1',
-				'options'   => [
-					'preset-1' => esc_html__( 'Preset 1', 'essential-addons-for-elementor-lite' ),
-					'preset-2' => esc_html__( 'Preset 2', 'essential-addons-for-elementor-lite' ),
-					'preset-3' => esc_html__( 'Preset 3', 'essential-addons-for-elementor-lite' ),
-				],
-				'condition' => [
+				'label'       => esc_html__( 'Style Preset', 'essential-addons-for-elementor-lite' ),
+				'type'        => Controls_Manager::CHOOSE,
+				'options'     => $layout_options,
+				'default'     => 'preset-1',
+				'label_block' => true,
+				'toggle'      => false,
+				'image_choose'=> true,
+				'condition'   => [
 					'eael_business_reviews_items_layout' => 'slider'
 				],
 			]
@@ -221,15 +247,14 @@ class Business_Reviews extends Widget_Base {
 		$this->add_control(
 			'eael_business_reviews_style_preset_grid',
 			[
-				'label'     => esc_html__( 'Style Preset', 'essential-addons-for-elementor-lite' ),
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'preset-1',
-				'options'   => [
-					'preset-1' => esc_html__( 'Preset 1', 'essential-addons-for-elementor-lite' ),
-					'preset-2' => esc_html__( 'Preset 2', 'essential-addons-for-elementor-lite' ),
-					'preset-3' => esc_html__( 'Preset 3', 'essential-addons-for-elementor-lite' ),
-				],
-				'condition' => [
+				'label'       => esc_html__( 'Style Preset', 'essential-addons-for-elementor-lite' ),
+				'type'        => Controls_Manager::CHOOSE,
+				'options'     => $layout_options,
+				'default'     => 'preset-1',
+				'label_block' => true,
+				'toggle'      => false,
+				'image_choose'=> true,
+				'condition'   => [
 					'eael_business_reviews_items_layout' => 'grid'
 				],
 			]
@@ -593,7 +618,10 @@ class Business_Reviews extends Widget_Base {
 			'default'     => '',
 			'condition'   => [
 				'eael_business_reviews_business_name' => 'yes'
-			]
+			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control(
@@ -617,6 +645,9 @@ class Business_Reviews extends Widget_Base {
 			'condition'   => [
 				'eael_business_reviews_sources'         => 'google-reviews',
 				'eael_business_reviews_business_rating' => 'yes'
+			],
+			'ai' => [
+				'active' => false,
 			],
 		] );
 
@@ -735,6 +766,46 @@ class Business_Reviews extends Widget_Base {
 				'label_off'    => __( 'Hide', 'essential-addons-for-elementor-lite' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
+			]
+		);
+
+		$this->end_controls_section();
+
+		/**
+		 * Accessibilty Controller
+		 */
+		$this->start_controls_section(
+			'eael_section_business_reviews_accessibilty',
+			[
+				'label' => esc_html__( 'Accessibilty', 'essential-addons-for-elementor-lite' ),
+			]
+		);
+
+		$this->add_control(
+			'eael_business_reviews_enable_accessibilty',
+			[
+				'label'        => __( 'Enable Accessibilty', 'essential-addons-for-elementor-lite' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'essential-addons-for-elementor-lite' ),
+				'label_off'    => __( 'No', 'essential-addons-for-elementor-lite' ),
+				'return_value' => 'yes',
+				'default'      => 'no',
+			]
+		);
+
+		$this->add_control(
+			'eael_business_reviews_link_in_same_tab',
+			[
+				'label'        => __( 'Open in same window', 'essential-addons-for-elementor-lite' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'essential-addons-for-elementor-lite' ),
+				'label_off'    => __( 'No', 'essential-addons-for-elementor-lite' ),
+				'return_value' => 'yes',
+				'default'      => 'no',
+				'description'  => __( 'Recommended to open link in the same tab instead of a new tab', 'essential-addons-for-elementor-lite' ),
+				'condition'    => [
+					'eael_business_reviews_enable_accessibilty' => 'yes'
+				]
 			]
 		);
 
@@ -1208,6 +1279,7 @@ class Business_Reviews extends Widget_Base {
 			[
 				'label'     => esc_html__( 'Text Color', 'essential-addons-for-elementor-lite' ),
 				'type'      => Controls_Manager::COLOR,
+				'default'   => '#5E5E5E',
 				'selectors' => [
 					'{{WRAPPER}} .eael-business-reviews-wrapper .eael-google-reviews-business-rating'   => 'color: {{VALUE}};',
 					'{{WRAPPER}} .eael-business-reviews-wrapper .eael-google-reviews-business-rating a' => 'color: {{VALUE}};',
@@ -1773,6 +1845,7 @@ class Business_Reviews extends Widget_Base {
 			[
 				'label'     => esc_html__( 'Text Color', 'essential-addons-for-elementor-lite' ),
 				'type'      => Controls_Manager::COLOR,
+				'default' 	=> '#4A4B50',
 				'selectors' => [
 					'{{WRAPPER}} .eael-business-reviews-wrapper .eael-google-review-time'   => 'color: {{VALUE}};',
 					'{{WRAPPER}} .eael-business-reviews-wrapper .eael-google-review-time a' => 'color: {{VALUE}};',
@@ -2456,7 +2529,7 @@ class Business_Reviews extends Widget_Base {
 	}
 
 	public function get_business_reviews_settings() {
-		$settings                                     		= $this->get_settings();
+		$settings                                     		= $this->get_settings_for_display();
 		$settings['eael_business_reviews_source_key'] 		= get_option( 'eael_br_google_place_api_key' );
 
 		$business_reviews                            		= [];
@@ -2528,6 +2601,13 @@ class Business_Reviews extends Widget_Base {
 			$business_reviews['columns'] 					= 3;
 		}
 
+		$business_reviews['accessibility_link_in_same_tab'] = 0;
+		$business_reviews['accessibility_enabled'] = ! empty( $settings['eael_business_reviews_enable_accessibilty'] ) && 'yes' === $settings['eael_business_reviews_enable_accessibilty'];
+
+		if ( $business_reviews['accessibility_enabled'] ) {
+			$business_reviews['accessibility_link_in_same_tab'] = ! empty( $settings['eael_business_reviews_link_in_same_tab'] ) && 'yes' === $settings['eael_business_reviews_link_in_same_tab'];
+		}
+
 		return $business_reviews;
 	}
 
@@ -2535,7 +2615,7 @@ class Business_Reviews extends Widget_Base {
 	 * API Call to Get Business Reviews
 	 */
 	public function fetch_business_reviews_from_api() {
-		$settings      = $this->get_settings();
+		$settings      = $this->get_settings_for_display();
 		$response      = [];
 		$error_message = '';
 
@@ -2662,7 +2742,7 @@ class Business_Reviews extends Widget_Base {
 	}
 
 	public function print_business_reviews( $business_reviews_items ) {
-		$settings 			= $this->settings_data         = $this->get_settings();
+		$settings 			= $this->settings_data         = $this->get_settings_for_display();
 		$business_reviews 	= $this->business_reviews_data = $this->get_business_reviews_settings();
 
 		ob_start();
@@ -2690,8 +2770,8 @@ class Business_Reviews extends Widget_Base {
 		);
 		?>
 
-        <div <?php echo $this->get_render_attribute_string( 'eael-business-reviews-wrapper' ); ?>>
-            <div <?php echo $this->get_render_attribute_string( 'eael-business-reviews-items' ); ?>>
+        <div <?php $this->print_render_attribute_string( 'eael-business-reviews-wrapper' ); ?>>
+            <div <?php $this->print_render_attribute_string( 'eael-business-reviews-items' ); ?>>
 				<?php
 				switch ( $business_reviews['source'] ) {
 					case 'google-reviews':
@@ -2706,11 +2786,12 @@ class Business_Reviews extends Widget_Base {
         </div>
 
 		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ob_get_clean();
 	}
 
 	public function print_business_reviews_google( $business_reviews_items ) {
-		$settings         = $this->get_settings();
+		$settings         = $this->get_settings_for_display();
 		$business_reviews = $this->get_business_reviews_settings();
 
 		$google_reviews_data = [];
@@ -2753,7 +2834,7 @@ class Business_Reviews extends Widget_Base {
 		] );
 
 		$this->add_render_attribute( 'eael-google-reviews-content', [
-			'class'               => [ 'eael-google-reviews-content', 'swiper', 'swiper-container', 'swiper-container-' . esc_attr( $this->get_id() ) ],
+			'class'               => [ 'eael-google-reviews-content', 'swiper', 'swiper-8', 'swiper-container-' . esc_attr( $this->get_id() ) ],
 			'data-pagination'     => '.swiper-pagination-' . esc_attr( $this->get_id() ),
 			'data-arrow-next'     => '.swiper-button-next-' . esc_attr( $this->get_id() ),
 			'data-arrow-prev'     => '.swiper-button-prev-' . esc_attr( $this->get_id() ),
@@ -2773,7 +2854,7 @@ class Business_Reviews extends Widget_Base {
 		if ( ! empty( $google_reviews_data['reviews'] ) && count( $google_reviews_data['reviews'] ) ) {
 			$single_review_data = [];
 			?>
-            <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-wrapper' ); ?>>
+            <div <?php $this->print_render_attribute_string( 'eael-google-reviews-wrapper' ); ?>>
 
                 <div class="eael-google-reviews-items eael-google-reviews-slider">
                     <div class="eael-google-reviews-arrows eael-google-reviews-arrows-outside">
@@ -2788,7 +2869,7 @@ class Business_Reviews extends Widget_Base {
 
                     </div>
 
-                    <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-content' ); ?>>
+                    <div <?php $this->print_render_attribute_string( 'eael-google-reviews-content' ); ?>>
                         <div class="eael-google-reviews-slider-header">
 							<?php if ( $business_reviews['business_logo'] ): ?>
                                 <div class="eael-google-reviews-business-logo">
@@ -2814,7 +2895,7 @@ class Business_Reviews extends Widget_Base {
 							<?php if ( $business_reviews['business_name'] ): ?>
                                 <div class="eael-google-reviews-business-name">
 									<?php $business_reviews['business_name_label'] = $business_reviews['business_name_label'] ? $business_reviews['business_name_label'] : $google_reviews_data['name']; ?>
-                                    <a href="<?php echo esc_url( $google_reviews_data['website'] ); ?>" target="_blank"><?php echo esc_html( $business_reviews['business_name_label'] ); ?></a>
+                                    <a href="<?php echo esc_url( $google_reviews_data['website'] ); ?>" <?php if ( ! $business_reviews['accessibility_link_in_same_tab'] ) : ?>  target="_blank" <?php endif; ?>  ><?php echo esc_html( $business_reviews['business_name_label'] ); ?></a>
                                 </div>
 							<?php endif; ?>
 
@@ -2822,7 +2903,7 @@ class Business_Reviews extends Widget_Base {
                                 <div class="eael-google-reviews-business-rating">
                                     <p><?php echo esc_html( $google_reviews_data['rating'] ); ?></p>
                                     <p><?php $this->print_business_reviews_ratings( $google_reviews_data['rating'] ); ?></p>
-                                    <p><a href="<?php echo esc_url( $google_reviews_data['url'] ); ?>" target="_blank"><?php echo esc_html( number_format( $google_reviews_data['user_ratings_total'] ) . ' ' . $business_reviews['google_reviews_label'] ); ?></a></p>
+                                    <p><a href="<?php echo esc_url( $google_reviews_data['url'] ); ?>" <?php if ( ! $business_reviews['accessibility_link_in_same_tab'] ) :  ?> target="_blank"  <?php endif; ?> ><?php echo esc_html( number_format( $google_reviews_data['user_ratings_total'] ) . ' ' . $business_reviews['google_reviews_label'] ); ?></a></p>
                                 </div>
 							<?php endif; ?>
 
@@ -2861,7 +2942,7 @@ class Business_Reviews extends Widget_Base {
 								] );
 								?>
 
-                                <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-slider-item-' . $i ); ?>>
+                                <div <?php $this->print_render_attribute_string( 'eael-google-reviews-slider-item-' . $i ); ?>>
                                     <div class="eael-google-review-reviewer-with-text">
 										<?php
 										switch ( $business_reviews['preset'] ) {
@@ -2901,13 +2982,13 @@ class Business_Reviews extends Widget_Base {
 	public function print_google_reviews_slider_preset_1( $business_reviews, $single_review_data ) {
 		if ( $business_reviews['reviewer_photo'] ): ?>
             <div class="eael-google-review-reviewer-photo">
-                <img src="<?php echo esc_url_raw( $single_review_data['profile_photo_url'] ); ?>" alt="">
+                <img src="<?php echo esc_url_raw( $single_review_data['profile_photo_url'] ); ?>" alt="<?php echo  $single_review_data['author_name'] ? esc_attr(  $single_review_data['author_name'] ) : esc_html__( 'Reviewer', 'essential-addons-for-elementor-lite' ); ?>">
             </div>
 		<?php endif;
 
 		if ( $business_reviews['reviewer_name'] ): ?>
             <div class="eael-google-review-reviewer-name">
-                <a href="<?php echo ! empty ( $single_review_data['author_url'] ) ? esc_url_raw( $single_review_data['author_url'] ) : '#'; ?>" target="_blank"><?php echo esc_html( $single_review_data['author_name'] ); ?></a>
+                <a href="<?php echo ! empty ( $single_review_data['author_url'] ) ? esc_url_raw( $single_review_data['author_url'] ) : '#'; ?>" <?php if ( ! $business_reviews['accessibility_link_in_same_tab'] ) : ?> target="_blank" <?php endif; ?> ><?php echo esc_html( $single_review_data['author_name'] ); ?></a>
             </div>
 		<?php endif;
 
@@ -2945,7 +3026,7 @@ class Business_Reviews extends Widget_Base {
                 <div class="preset-content-footer-photo">
 					<?php if ( $business_reviews['reviewer_photo'] ): ?>
                         <div class="eael-google-review-reviewer-photo">
-                            <img src="<?php echo esc_url_raw( $single_review_data['profile_photo_url'] ); ?>" alt="">
+                            <img src="<?php echo esc_url_raw( $single_review_data['profile_photo_url'] ); ?>" alt="<?php echo  $single_review_data['author_name'] ? esc_attr(  $single_review_data['author_name'] ) : esc_html__( 'Reviewer', 'essential-addons-for-elementor-lite' ); ?>">
                         </div>
 					<?php endif; ?>
                 </div>
@@ -2953,7 +3034,7 @@ class Business_Reviews extends Widget_Base {
                 <div class="preset-content-footer-reviewer-name">
 					<?php if ( $business_reviews['reviewer_name'] ): ?>
                         <div class="eael-google-review-reviewer-name">
-                            <a href="<?php echo ! empty ( $single_review_data['author_url'] ) ? esc_url_raw( $single_review_data['author_url'] ) : '#'; ?>" target="_blank"><?php echo esc_html( $single_review_data['author_name'] ); ?></a>
+                            <a href="<?php echo ! empty ( $single_review_data['author_url'] ) ? esc_url_raw( $single_review_data['author_url'] ) : '#'; ?>" <?php if ( ! $business_reviews['accessibility_link_in_same_tab'] ) : ?> target="_blank"  <?php endif; ?> ><?php echo esc_html( $single_review_data['author_name'] ); ?></a>
                         </div>
 					<?php endif;
 
@@ -3016,7 +3097,7 @@ class Business_Reviews extends Widget_Base {
             <div>
 				<?php if ( $business_reviews['reviewer_photo'] ): ?>
                     <div class="eael-google-review-reviewer-photo">
-                        <img src="<?php echo esc_url_raw( $single_review_data['profile_photo_url'] ); ?>" alt="">
+                        <img src="<?php echo esc_url_raw( $single_review_data['profile_photo_url'] ); ?>" alt="<?php echo $single_review_data['author_name'] ? esc_attr(  $single_review_data['author_name'] ) : esc_html__( 'Reviewer', 'essential-addons-for-elementor-lite' ); ?>">
                     </div>
 				<?php endif; ?>
             </div>
@@ -3024,7 +3105,7 @@ class Business_Reviews extends Widget_Base {
             <div>
 				<?php if ( $business_reviews['reviewer_name'] ): ?>
                     <div class="eael-google-review-reviewer-name">
-                        <a href="<?php echo ! empty ( $single_review_data['author_url'] ) ? esc_url_raw( $single_review_data['author_url'] ) : '#'; ?>" target="_blank"><?php echo esc_html( $single_review_data['author_name'] ); ?></a>
+                        <a href="<?php echo ! empty ( $single_review_data['author_url'] ) ? esc_url_raw( $single_review_data['author_url'] ) : '#'; ?>" <?php if( ! $business_reviews['accessibility_link_in_same_tab'] ) : ?> target="_blank"  <?php endif; ?> ><?php echo esc_html( $single_review_data['author_name'] ); ?></a>
                     </div>
 				<?php endif;
 
@@ -3062,11 +3143,11 @@ class Business_Reviews extends Widget_Base {
 		if ( ! empty( $google_reviews_data['reviews'] ) && count( $google_reviews_data['reviews'] ) ) {
 			$single_review_data = [];
 			?>
-            <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-wrapper' ); ?>>
+            <div <?php $this->print_render_attribute_string( 'eael-google-reviews-wrapper' ); ?>>
 
                 <div class="eael-google-reviews-items eael-google-reviews-grid">
 
-                    <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-content' ); ?>>
+                    <div <?php $this->print_render_attribute_string( 'eael-google-reviews-content' ); ?>>
                         <div class="eael-google-reviews-grid-header">
 							<?php if ( $business_reviews['business_logo'] ): ?>
                                 <div class="eael-google-reviews-business-logo">
@@ -3092,7 +3173,7 @@ class Business_Reviews extends Widget_Base {
 							<?php if ( $business_reviews['business_name'] ): ?>
                                 <div class="eael-google-reviews-business-name">
 									<?php $business_reviews['business_name_label'] = $business_reviews['business_name_label'] ? $business_reviews['business_name_label'] : $google_reviews_data['name']; ?>
-                                    <a href="<?php echo esc_url( $google_reviews_data['website'] ); ?>" target="_blank"><?php echo esc_html( $business_reviews['business_name_label'] ); ?></a>
+                                    <a href="<?php echo esc_url( $google_reviews_data['website'] ); ?>" <?php if( ! $business_reviews['accessibility_link_in_same_tab'] ) : ?> target="_blank"  <?php endif; ?> ><?php echo esc_html( $business_reviews['business_name_label'] ); ?></a>
                                 </div>
 							<?php endif; ?>
 
@@ -3100,7 +3181,7 @@ class Business_Reviews extends Widget_Base {
                                 <div class="eael-google-reviews-business-rating">
                                     <p><?php echo esc_html( $google_reviews_data['rating'] ); ?></p>
                                     <p><?php $this->print_business_reviews_ratings( $google_reviews_data['rating'] ); ?></p>
-                                    <p><a href="<?php echo esc_url( $google_reviews_data['url'] ); ?>" target="_blank"><?php echo esc_html( number_format( $google_reviews_data['user_ratings_total'] ) . ' ' . $business_reviews['google_reviews_label'] ); ?></a></p>
+                                    <p><a href="<?php echo esc_url( $google_reviews_data['url'] ); ?>" <?php if( ! $business_reviews['accessibility_link_in_same_tab'] ) : ?> target="_blank"  <?php endif; ?> ><?php echo esc_html( number_format( $google_reviews_data['user_ratings_total'] ) . ' ' . $business_reviews['google_reviews_label'] ); ?></a></p>
                                 </div>
 							<?php endif; ?>
 
@@ -3112,7 +3193,7 @@ class Business_Reviews extends Widget_Base {
 							<?php endif; ?>
                         </div>
 
-                        <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-grid-body' ); ?> >
+                        <div <?php $this->print_render_attribute_string( 'eael-google-reviews-grid-body' ); ?> >
 							<?php
 							$i = 0;
 
@@ -3139,7 +3220,7 @@ class Business_Reviews extends Widget_Base {
 								] );
 								?>
 
-                                <div <?php echo $this->get_render_attribute_string( 'eael-google-reviews-grid-item-' . $i ); ?>>
+                                <div <?php $this->print_render_attribute_string( 'eael-google-reviews-grid-item-' . $i ); ?>>
                                     <div class="eael-google-review-reviewer-with-text">
 										<?php
 										switch ( $business_reviews['preset'] ) {
@@ -3221,10 +3302,12 @@ class Business_Reviews extends Widget_Base {
 		';
 
 		for ( $i = 1; $i <= floor( $rating ); $i ++ ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			printf( "%s", $rating_svg );
 		}
 
 		if ( ! is_int( $rating ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			printf( "%s", $rating_svg_half );
 		}
 
@@ -3325,11 +3408,16 @@ class Business_Reviews extends Widget_Base {
 			</script>
 			<!-- EA LocalBusiness Schema : Ends-->
 			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo ob_get_clean();
 		}
 	}
 
 	protected function render() {
+		$business_reviews = $this->get_business_reviews_settings();
+		if( ! $business_reviews['api_key'] ) {
+			return false;
+		}
 		$business_reviews_items = $this->fetch_business_reviews_from_api();
 		$this->print_business_reviews( $business_reviews_items );
 		$this->print_localbusiness_schema( $business_reviews_items );

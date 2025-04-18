@@ -11,11 +11,10 @@
 namespace RankMath\Monitor;
 
 use RankMath\Helper;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Param;
 use RankMath\Traits\Ajax;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\Param;
-use MyThemeShop\Helpers\Conditional;
 use donatj\UserAgent\UserAgentParser;
 
 defined( 'ABSPATH' ) || exit;
@@ -25,7 +24,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class Monitor {
 
-	use Hooker, Ajax;
+	use Hooker;
+	use Ajax;
 
 	/**
 	 * Admin object.
@@ -42,11 +42,11 @@ class Monitor {
 			$this->admin = new Admin();
 		}
 
-		if ( Conditional::is_ajax() ) {
+		if ( Helper::is_ajax() ) {
 			$this->ajax( 'delete_log', 'delete_log' );
 		}
 
-		if ( Helper::has_cap( '404_monitor' ) && Conditional::is_rest() ) {
+		if ( Helper::has_cap( '404_monitor' ) && Helper::is_rest() ) {
 			$this->action( 'rank_math/dashboard/widget', 'dashboard_widget', 11 );
 		}
 
@@ -130,7 +130,7 @@ class Monitor {
 		}
 
 		$uri = untrailingslashit( Helper::get_current_page_url( Helper::get_settings( 'general.404_monitor_ignore_query_parameters' ) ) );
-		$uri = str_replace( home_url( '/' ), '', $uri );
+		$uri = str_replace( Helper::get_home_url( '/' ), '', $uri );
 
 		// Check if excluded.
 		if ( $this->is_url_excluded( $uri ) ) {
@@ -254,14 +254,17 @@ class Monitor {
 	 * @return string WP hook.
 	 */
 	private function get_hook() {
-		if ( defined( 'CT_VERSION' ) ) {
-			return 'oxygen_enqueue_frontend_scripts';
-		}
+		$hook = defined( 'CT_VERSION' ) ?
+			'oxygen_enqueue_frontend_scripts' :
+			(
+				function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ?
+				'wp_head' :
+				'get_header'
+			);
 
-		if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
-			return 'wp_head';
-		}
-
-		return 'get_header';
+		/**
+		 * Allow developers to change the action hook that will trigger the 404 capture.
+		*/
+		return $this->do_filter( '404_monitor/hook', $hook );
 	}
 }

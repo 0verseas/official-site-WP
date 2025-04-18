@@ -32,10 +32,16 @@ abstract class WPCode_Metabox_Snippets {
 	public $tabs;
 
 	/**
+	 * If true, the metabox will scroll into view when the page loads.
+	 *
+	 * @var bool
+	 */
+	protected $scroll_into_view = false;
+
+	/**
 	 * Register the metabox.
 	 */
 	public function __construct() {
-		$this->load_strings();
 		$this->hooks();
 	}
 
@@ -57,7 +63,8 @@ abstract class WPCode_Metabox_Snippets {
 			$this->tabs['body'] = __( 'Body', 'insert-headers-and-footers' );
 		}
 
-		$this->tabs['code'] = __( 'Custom Code Snippet', 'insert-headers-and-footers' );
+		$this->tabs['code']      = __( 'Custom Code Snippet', 'insert-headers-and-footers' );
+		$this->tabs['revisions'] = __( 'Revisions', 'insert-headers-and-footers' );
 
 	}
 
@@ -67,6 +74,7 @@ abstract class WPCode_Metabox_Snippets {
 	 * @return void
 	 */
 	public function hooks() {
+		add_action( 'admin_init', array( $this, 'load_strings' ) );
 		add_action( 'add_meta_boxes', array( $this, 'register_metabox' ) );
 		add_action( 'admin_head', array( $this, 'close_metabox_for_current_screen' ) );
 	}
@@ -119,7 +127,7 @@ abstract class WPCode_Metabox_Snippets {
 	 */
 	public function register_metabox( $post_type ) {
 		// Don't show the metabox to users who aren't allowed to manage snippets.
-		if ( ! current_user_can( 'wpcode_activate_snippets' ) ) {
+		if ( ! current_user_can( 'wpcode_edit_html_snippets' ) ) {
 			return;
 		}
 
@@ -177,8 +185,11 @@ abstract class WPCode_Metabox_Snippets {
 		<div class="wpcode-admin-tabs-navigation">
 			<ul class="wpcode-admin-tabs">
 				<?php
-				$class = 'active';
+				$class = '';
 				foreach ( $this->tabs as $tab_id => $tab_name ) {
+					if ( $this->get_active_tab() === $tab_id ) {
+						$class = 'active';
+					}
 					?>
 					<li>
 						<button type="button" data-target="<?php echo esc_attr( $this->get_tab_html_id( $tab_id ) ); ?>" class="<?php echo esc_attr( $class ); ?>"><?php echo esc_html( $tab_name ); ?></button>
@@ -186,6 +197,7 @@ abstract class WPCode_Metabox_Snippets {
 					<?php
 					$class = '';
 				}
+				do_action( 'wpcode_metabox_admin_tabs' )
 				?>
 			</ul>
 		</div>
@@ -201,11 +213,11 @@ abstract class WPCode_Metabox_Snippets {
 	 */
 	public function tabs_content( $post ) {
 		$tab_ids = array_keys( $this->tabs );
-		$active  = true;
+
 		foreach ( $tab_ids as $tab_id ) {
 			$class = 'wpcode-admin-tab-content';
 
-			$class .= $active ? ' active' : '';
+			$class .= $this->get_active_tab() === $tab_id ? ' active' : '';
 			printf(
 				'<div class="%1$s" id="%2$s">',
 				esc_attr( $class ),
@@ -216,7 +228,6 @@ abstract class WPCode_Metabox_Snippets {
 			} else {
 				$this->output_tab( $tab_id, $post );
 			}
-			$active = false;
 			echo '</div>';
 		}
 	}
@@ -230,6 +241,21 @@ abstract class WPCode_Metabox_Snippets {
 	 * @return void
 	 */
 	public function output_tab( $tab_id, $post ) {
+	}
+
+	/**
+	 * Get the active tab id.
+	 *
+	 * @return string
+	 */
+	public function get_active_tab() {
+		$active_tab = 'header';
+		if ( isset( $_GET['wpcode-show'] ) && array_key_exists( sanitize_key( $_GET['wpcode-show'] ), $this->tabs ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$active_tab             = sanitize_key( $_GET['wpcode-show'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$this->scroll_into_view = true;
+		}
+
+		return $active_tab;
 	}
 
 	/**

@@ -6,12 +6,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WeglotWP\Helpers\Helper_Tabs_Admin_Weglot;
 
+// manage link to add utm for tracking where in instawp env.
+$instawp     = get_option( 'weglot_instawp' );
+$signup_link = esc_url( 'https://dashboard.weglot.com/register-wordpress' );
+if ( $instawp ) {
+	$signup_link = esc_url( 'https://dashboard.weglot.com/register-wordpress?utm_source=partners&utm_medium=integration&utm_campaign=insta-wp' );
+}
+
 $options_available = apply_filters(
 	'weglot_tabs_admin_options_available', [
 		'api_key_private' => [
 			'key'         => 'api_key_private',
 			'label'       => __( 'API Key', 'weglot' ),
-			'description' => sprintf( esc_html__( 'Log in to %1$sWeglot%2$s to get your API key.', 'weglot' ), '<a target="_blank" href="https://dashboard.weglot.com/register-wordpress">', '</a>' ),
+			'description' => sprintf( esc_html__( 'Log in to %1$sWeglot%2$s to get your API key.', 'weglot' ), '<a target="_blank" href="' . $signup_link . '">', '</a>' ),
 		],
 		'language_from'   => [
 			'key'         => 'original_language',
@@ -31,7 +38,7 @@ $plans     = $this->user_api_services->get_plans();
 
 ?>
 
-<h3><?php esc_html_e( 'Main configuration', 'weglot' ); ?></h3>
+<h3 id="main_configuration"><?php esc_html_e( 'Main configuration', 'weglot' ); ?></h3>
 <hr>
 <table class="form-table">
 	<tbody>
@@ -76,10 +83,10 @@ $plans     = $this->user_api_services->get_plans();
 			>
 				<?php
 				$wplang = 'en';
-				if( ! empty(get_option( 'WPLANG' ))){
-					$wplang                      = substr( get_option( 'WPLANG' ), 0, 2 );
+				if ( ! empty( get_option( 'WPLANG' ) ) ) {
+					$wplang = substr( get_option( 'WPLANG' ), 0, 2 );
 				}
-				$original_languages_possible = $this->language_services->get_languages_available( [ 'sort' => true ] );
+				$original_languages_possible = $language_services->get_languages_available( [ 'sort' => true ] );
 				foreach ( $original_languages_possible as $language ) {
 					if ( $language->getInternalCode() !== 'br' ) {
 						?>
@@ -123,8 +130,8 @@ $plans     = $this->user_api_services->get_plans();
 				required
 			>
 				<?php
-				$languages             = $this->language_services->get_all_languages();
-				$destination_languages = $this->language_services->get_destination_languages( true );
+				$languages             = $language_services->get_all_languages();
+				$destination_languages = $language_services->get_destination_languages( true );
 				foreach ( $destination_languages as $language ) :
 					?>
 					<option
@@ -182,7 +189,7 @@ $plans     = $this->user_api_services->get_plans();
 
 
 <?php if ( ! $this->options['has_first_settings'] && $this->options['show_box_first_settings'] ) : ?>
-	<?php $this->option_services->set_option_by_key( 'show_box_first_settings', false ); ?>
+	<?php $option_services->set_option_by_key( 'show_box_first_settings', false ); ?>
 	<div id="weglot-box-first-settings" class="weglot-box-overlay">
 		<div class="weglot-box">
 			<a class="weglot-btn-close"><?php esc_html_e( 'Close', 'weglot' ); ?></a>

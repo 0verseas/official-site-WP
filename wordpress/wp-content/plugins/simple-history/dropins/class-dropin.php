@@ -2,6 +2,7 @@
 
 namespace Simple_History\Dropins;
 
+use Simple_History\Helpers;
 use Simple_History\Simple_History;
 
 /**
@@ -12,7 +13,7 @@ abstract class Dropin {
 	protected Simple_History $simple_history;
 
 	/**
-	 * @param Simple_History $simple_history
+	 * @param Simple_History $simple_history Simple_History instance.
 	 */
 	public function __construct( $simple_history ) {
 		$this->simple_history = $simple_history;
@@ -25,5 +26,15 @@ abstract class Dropin {
 	 */
 	public function loaded() {
 		// ...
+	}
+
+	/**
+	 * Get the slug for the dropin,
+	 * i.e. the unqualified class name.
+	 *
+	 * @return string
+	 */
+	public function get_slug() {
+		return Helpers::get_class_short_name( $this );
 	}
 }

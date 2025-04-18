@@ -48,8 +48,8 @@ class Maintenance_Tracking implements Hooks_Interface_Weglot {
 
 
 	/**
-	 * @param $options_available
-	 * @return mixed
+	 * @param array<string,mixed>$options_available
+	 * @return array<string,mixed>
 	 * @since 3.1.4
 	 */
 	public function weglot_maintenance_tracking( $options_available ) {
@@ -57,7 +57,7 @@ class Maintenance_Tracking implements Hooks_Interface_Weglot {
 		if ( isset( $options_available['api_key_private']['description'] ) ) {
 
 			$register_link         = 'https://dashboard.weglot.com/register-wordpress';
-			$register_link_tracked = 'https://weglot.com/ad-track?origin=maintenance&redirectTo=https://dashboard.weglot.com/register-wordpress';
+			$register_link_tracked = 'https://dashboard.weglot.com/register-wordpress?fpr=wp-maintenance';
 
 			$options_available['api_key_private']['description'] = \str_replace( $register_link, $register_link_tracked, $options_available['api_key_private']['description'] );
 		}

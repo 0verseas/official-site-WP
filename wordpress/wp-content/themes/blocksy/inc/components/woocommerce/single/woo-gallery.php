@@ -34,44 +34,118 @@ add_action(
 	4, 4
 );
 
-if (! function_exists('blocksy_retrieve_product_default_variation')) {
-	function blocksy_retrieve_product_default_variation($product) {
-		$is_default_variation = false;
-		$current_variation = null;
 
-		foreach($product->get_available_variations() as $variation_values ) {
-			foreach ($variation_values['attributes'] as $key => $attribute_value) {
-				$attribute_name = str_replace( 'attribute_', '', $key );
-				$default_value = $product->get_variation_default_attribute($attribute_name);
+add_filter(
+	'blocksy:woocommerce:single-product:post-class',
+	function($classes) {
+		if (! blocksy_manager()->screen->is_product()) {
+			return $classes;
+		}
 
-				if ($default_value == $attribute_value) {
-					$is_default_variation = true;
-				} else {
-					$is_default_variation = false;
-					break;
+		global $blocksy_is_quick_view;
+		global $product;
+
+		if (
+			! $blocksy_is_quick_view
+			&&
+			// Integration with Custom Product Boxes plugin
+			$product->get_type() !== 'wdm_bundle_product'
+		) {
+			$classes[] = 'ct-default-gallery';
+		}
+
+		return $classes;
+	}
+);
+
+add_filter(
+	'woocommerce_post_class',
+	'blocksy_woo_single_post_class',
+	999,
+	2
+);
+
+function blocksy_woo_single_post_class($classes, $product) {
+	if (! blocksy_manager()->screen->is_product()) {
+		return $classes;
+	}
+
+	$product_view_type = blocksy_get_product_view_type();
+
+	if (blocksy_woocommerce_has_flexy_view()) {
+		$has_gallery = count($product->get_gallery_image_ids()) > 0;
+
+		if ($product->get_type() === 'variable') {
+			$maybe_current_variation = blocksy_manager()
+				->woocommerce
+				->retrieve_product_default_variation($product);
+
+			if ($maybe_current_variation) {
+				$variation_values = blocksy_get_post_options(
+					blocksy_translate_post_id(
+						$maybe_current_variation->get_id(),
+						[
+							'use_wpml_default_language_woo' => true
+						]
+					)
+				);
+
+				$gallery_source = blocksy_akg(
+					'gallery_source',
+					$variation_values,
+					'default'
+				);
+
+				if ($gallery_source !== 'default') {
+					$has_gallery = count(blocksy_akg(
+						'images',
+						$variation_values,
+						[]
+					)) > 0;
 				}
 			}
+		}
 
-			if ($is_default_variation ) {
-				$variation_id = $variation_values['variation_id'];
-				break;
+		if ($has_gallery) {
+			if (
+				blocksy_get_theme_mod('gallery_style', 'horizontal') === 'vertical'
+				&&
+				$product_view_type === 'default-gallery'
+			) {
+				$classes[] = 'thumbs-left';
+			} else {
+				$classes[] = 'thumbs-bottom';
 			}
 		}
-
-		if ($is_default_variation) {
-			$default_variation = wc_get_product($variation_id);
-			$current_variation = $default_variation;
-		}
-
-		$maybe_variation = (new \WC_Product_Data_Store_CPT())->find_matching_product_variation(
-			$product,
-			$_GET
-		);
-
-		if ($maybe_variation) {
-			$current_variation = wc_get_product($maybe_variation);
-		}
-
-		return $current_variation;
 	}
+
+	if (
+		$product_view_type === 'default-gallery'
+		||
+		$product_view_type === 'stacked-gallery'
+	) {
+		if (blocksy_get_theme_mod('has_product_sticky_gallery', 'no') === 'yes') {
+			$classes[] = 'sticky-gallery';
+		}
+
+		if (blocksy_get_theme_mod('has_product_sticky_summary', 'no') === 'yes') {
+			$classes[] = 'sticky-summary';
+		}
+	}
+
+	return $classes;
+}
+
+function blocksy_get_product_view_type() {
+	return apply_filters(
+		'blocksy:woocommerce:product-single:view-type',
+		'default-gallery'
+	);
+}
+
+// Only for backwards compatibility with Companion <= 2.0.73
+function blocksy_retrieve_product_default_variation($product, $object = true) {
+	return blocksy_manager()
+		->woocommerce
+		->retrieve_product_default_variation($product, $object);
 }

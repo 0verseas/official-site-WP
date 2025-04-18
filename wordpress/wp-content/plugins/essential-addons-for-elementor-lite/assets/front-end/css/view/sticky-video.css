@@ -30,11 +30,9 @@
 .eael-sticky-video-wrapper {
   position: relative;
   width: 100%;
-  min-height: 200px;
   margin: 0px;
   padding: 0px;
   -webkit-transition: 0.5s;
-  -o-transition: 0.5s;
   transition: 0.5s;
   text-align: left;
   overflow: hidden;
@@ -100,7 +98,6 @@
   opacity: 0.8;
   text-shadow: 1px 0 6px rgba(0, 0, 0, 0.3);
   -webkit-transition: all 0.5s;
-  -o-transition: all 0.5s;
   transition: all 0.5s;
 }
 
@@ -163,4 +160,13 @@
 .eaelsv-overlay-visibility-transparent .plyr--stopped.plyr__poster-enabled .plyr__poster,
 .eaelsv-overlay-visibility-transparent .plyr--youtube.plyr--full-ui.plyr--video .plyr__control--overlaid {
   opacity: 0;
+}
+
+/*******************
+	Theme Support
+********************/
+
+.theme-blocksy .eael-sticky-video-player2[data-sticky*=yes]:not(.in, .out),
+.theme-blocksy .eael-sticky-video-player2[data-sticky*=fixed]:not(.in, .out) {
+  position: initial !important;
 }

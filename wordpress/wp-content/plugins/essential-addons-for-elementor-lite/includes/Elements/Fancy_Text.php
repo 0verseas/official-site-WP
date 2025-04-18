@@ -10,7 +10,7 @@ use \Elementor\Controls_Manager;
 use \Elementor\Group_Control_Background;
 use \Elementor\Group_Control_Border;
 use \Elementor\Group_Control_Typography;
-use \Elementor\Core\Schemes\Typography;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use \Elementor\Widget_Base;
 use \Elementor\Repeater;
 use Essential_Addons_Elementor\Classes\Helper as HelperClass;
@@ -51,6 +51,20 @@ class Fancy_Text extends Widget_Base {
 		];
     }
 
+	public function get_style_depends() {
+        return [
+            'e-animations',
+        ];
+    }
+
+	protected function is_dynamic_content():bool {
+        return false;
+    }
+
+	public function has_widget_inner_wrapper(): bool {
+        return ! HelperClass::eael_e_optimized_markup();
+    }
+
     public function get_custom_help_url() {
         return 'https://essential-addons.com/elementor/docs/fancy-text/';
     }
@@ -73,7 +87,10 @@ class Fancy_Text extends Widget_Base {
 				'placeholder' => esc_html__( 'Place your prefix text', 'essential-addons-for-elementor-lite'),
 				'type'        => Controls_Manager::TEXT,
 				'default'     => esc_html__( 'This is the ', 'essential-addons-for-elementor-lite'),
-				'dynamic'     => [ 'active' => true ]
+				'dynamic'     => [ 'active' => true ],
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -85,7 +102,10 @@ class Fancy_Text extends Widget_Base {
 				'label'			=> esc_html__( 'Fancy String', 'essential-addons-for-elementor-lite'),
 				'type'			=> Controls_Manager::TEXT,
 				'label_block'	=> true,
-				'dynamic'		=> [ 'active' => true ]
+				'dynamic'		=> [ 'active' => true ],
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -118,7 +138,10 @@ class Fancy_Text extends Widget_Base {
 				'placeholder' => esc_html__( 'Place your suffix text', 'essential-addons-for-elementor-lite'),
 				'type'        => Controls_Manager::TEXT,
 				'default'     => esc_html__( ' of the sentence.', 'essential-addons-for-elementor-lite'),
-				'dynamic'     => [ 'active' => true ]
+				'dynamic'     => [ 'active' => true ],
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -235,13 +258,10 @@ class Fancy_Text extends Widget_Base {
 		$this->add_control(
 			'eael_fancy_text_loop',
 			[
-				'label' => esc_html__( 'Loop the Typing', 'essential-addons-for-elementor-lite'),
+				'label' => esc_html__( 'Loop the animation', 'essential-addons-for-elementor-lite'),
 				'type' => Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
-				'default' => 'yes',
-				'condition' => [
-					'eael_fancy_text_transition_type' => 'typing',
-				],
+				'default' => 'yes'
 			]
 		);
 
@@ -313,7 +333,9 @@ class Fancy_Text extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			[
              'name' => 'typography',
-				'scheme' => Typography::TYPOGRAPHY_1,
+             'global' => [
+	             'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+             ],
 				'fields_options' => [
 					'typography' => ['default' => 'yes'],
 					'font_size' => ['default' => ['size' => 22]],
@@ -397,7 +419,7 @@ class Fancy_Text extends Widget_Base {
 				'types'    => ['gradient'],
 				'fields_options' => [
 					'background' => [
-						'label' => _x( 'Gradient Color', 'Text Shadow Control', 'elementor' ),
+						'label' => _x( 'Gradient Color', 'Text Shadow Control', 'essential-addons-for-elementor-lite' ),
 						'toggle' => false,
 						'default' => 'gradient',
 					],
@@ -420,7 +442,9 @@ class Fancy_Text extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			[
             'name' => 'eael_fancy_text_strings_typography',
-				'scheme' => Typography::TYPOGRAPHY_1,
+            'global' => [
+	            'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+            ],
 				'fields_options' => [
 					'typography' => ['default' => 'yes'],
 					'font_size' => ['default' => ['size' => 22]],
@@ -466,7 +490,7 @@ class Fancy_Text extends Widget_Base {
 				'label' => esc_html__( 'Typing Cursor Color', 'essential-addons-for-elementor-lite'),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .typed-cursor' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .eael-fancy-text-strings::after' => 'color: {{VALUE}};',
 				],
 				'condition' => [
 					'eael_fancy_text_cursor' => 'yes',
@@ -554,7 +578,9 @@ class Fancy_Text extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			[
              'name' => 'ending_typography',
-				'scheme' => Typography::TYPOGRAPHY_1,
+             'global' => [
+	             'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+             ],
 				'fields_options' => [
 					'typography' => ['default' => 'yes'],
 					'font_size' => ['default' => ['size' => 22]],
@@ -573,16 +599,16 @@ class Fancy_Text extends Widget_Base {
 	public function fancy_text($settings) {
 		$fancy_text = array("");
 		foreach ( $settings as $item ) {
-			if ( ! empty( $item['eael_fancy_text_strings_text_field'] ) )  {
-				$fancy_text[] = HelperClass::eael_wp_kses($item['eael_fancy_text_strings_text_field']) ;
+			if ( ! empty( $item['eael_fancy_text_strings_text_field'] ) ) {
+				$fancy_text[] = HelperClass::eael_wp_kses( html_entity_decode( $item['eael_fancy_text_strings_text_field'] ) );
 			}
 		}
-		return implode("|",$fancy_text);
+
+		$fancy_text = implode("|",$fancy_text);
+		return str_replace( '&', '&amp;', $fancy_text);
 	}
 
 	protected function render() {
-
-
 		$settings = $this->get_settings_for_display();
 		$fancy_text = $this->fancy_text($settings['eael_fancy_text_strings']);
 		if(!apply_filters('eael/pro_enabled', false)) { $settings['eael_fancy_text_style'] = 'style-1'; }
@@ -597,32 +623,32 @@ class Fancy_Text extends Widget_Base {
 		$this->add_render_attribute( 'fancy-text', 'data-fancy-text-loop', $settings['eael_fancy_text_loop'] );
 	?>
 
-	<div  <?php echo $this->get_render_attribute_string( 'fancy-text' ); ?> >
+	<div  <?php $this->print_render_attribute_string( 'fancy-text' ); ?> >
 		<?php if ( ! empty( $settings['eael_fancy_text_prefix'] ) ) : ?>
-			<span class="eael-fancy-text-prefix"><?php echo HelperClass::eael_wp_kses($settings['eael_fancy_text_prefix']); ?> </span>
+			<span class="eael-fancy-text-prefix"><?php echo wp_kses( $settings['eael_fancy_text_prefix'], HelperClass::eael_allowed_tags() ); ?> </span>
 		<?php endif; ?>
 
 		<?php if ( $settings['eael_fancy_text_transition_type']  == 'fancy' ) : ?>
 			<span id="eael-fancy-text-<?php echo esc_attr($this->get_id()); ?>" class="eael-fancy-text-strings
-			<?php echo $settings['eael_fancy_text_color_selector']?>"></span>
+			<?php echo esc_attr( $settings['eael_fancy_text_color_selector'] ) ?>"></span>
 		<?php endif; ?>
 
 		<?php if ( $settings['eael_fancy_text_transition_type']  != 'fancy' ) : ?>
-			<span id="eael-fancy-text-<?php echo esc_attr($this->get_id()); ?>" class="eael-fancy-text-strings <?php echo $settings['eael_fancy_text_color_selector']?>">
+			<span id="eael-fancy-text-<?php echo esc_attr($this->get_id()); ?>" class="eael-fancy-text-strings <?php echo esc_attr( $settings['eael_fancy_text_color_selector'] ); ?>">
 				<noscript>
 					<?php
 						$eael_fancy_text_strings_list = "";
 						foreach ( $settings['eael_fancy_text_strings'] as $item ) {
-							$eael_fancy_text_strings_list .=  HelperClass::eael_wp_kses($item['eael_fancy_text_strings_text_field']) . ', ';
+							$eael_fancy_text_strings_list .=  $item['eael_fancy_text_strings_text_field'] . ', ';
 						}
-						echo rtrim($eael_fancy_text_strings_list, ", ");
+						echo wp_kses( rtrim($eael_fancy_text_strings_list, ", "), HelperClass::eael_allowed_tags() );
 					?>
 				</noscript>
 			</span>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $settings['eael_fancy_text_suffix'] ) ) : ?>
-			<span class="eael-fancy-text-suffix"> <?php echo HelperClass::eael_wp_kses($settings['eael_fancy_text_suffix']); ?></span>
+			<span class="eael-fancy-text-suffix"> <?php echo wp_kses( $settings['eael_fancy_text_suffix'], HelperClass::eael_allowed_tags() ); ?></span>
 		<?php endif; ?>
 	</div><!-- close .eael-fancy-text-container -->
 
@@ -632,5 +658,4 @@ class Fancy_Text extends Widget_Base {
 
 	}
 
-	protected function content_template() {}
 }

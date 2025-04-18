@@ -81,6 +81,11 @@ $config = [
                     ],
                 ],
                 'js' => [
+	                [
+		                'file' => EAEL_PLUGIN_PATH . '/assets/front-end/js/lib-view/dom-purify/purify.min.js',
+		                'type' => 'lib',
+		                'context' => 'view',
+	                ],
                     [
                         'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/morphext/morphext.min.js',
                         'type' => 'lib',
@@ -109,6 +114,13 @@ $config = [
                         'context' => 'view',
                     ],
                 ],
+                'js' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/creative-btn.min.js',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
             ],
         ],
         'count-down' => [
@@ -127,6 +139,11 @@ $config = [
                         'type' => 'lib',
                         'context' => 'view',
                     ],
+	                [
+		                'file' => EAEL_PLUGIN_PATH . '/assets/front-end/js/lib-view/dom-purify/purify.min.js',
+		                'type' => 'lib',
+		                'context' => 'view',
+	                ],
                     [
                         'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/count-down.min.js',
                         'type' => 'self',
@@ -213,6 +230,11 @@ $config = [
                 'css' => [
                     [
                         'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/lib-view/tooltipster/tooltipster.bundle.min.css',
+                        'type' => 'lib',
+                        'context' => 'view',
+                    ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/lib-view/tooltipster/tooltipster-theme.min.css',
                         'type' => 'lib',
                         'context' => 'view',
                     ],
@@ -319,6 +341,11 @@ $config = [
                         'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-edit/quill/quill.min.js',
                         'type' => 'lib',
                         'context' => 'edit',
+                    ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . '/assets/front-end/js/lib-view/dom-purify/purify.min.js',
+                        'type' => 'lib',
+                        'context' => 'view',
                     ],
                     [
                         'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/advanced-data-table.min.js',
@@ -570,6 +597,142 @@ $config = [
                 ],
             ],
         ],
+        'woo-product-list' => [
+            'class' => '\Essential_Addons_Elementor\Elements\Woo_Product_List',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/load-more.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+	                [
+		                'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/quick-view.min.css',
+		                'type' => 'self',
+		                'context' => 'view',
+	                ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/woo-product-list.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+                'js'  => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/imagesloaded/imagesloaded.pkgd.min.js',
+                        'type' => 'lib',
+                        'context' => 'view',
+                    ],
+	                [
+		                'file'    => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/isotope/isotope.pkgd.min.js',
+		                'type'    => 'lib',
+		                'context' => 'view',
+	                ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/load-more.min.js',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                    [
+	                    'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/quick-view.min.js',
+	                    'type' => 'self',
+	                    'context' => 'view',
+                    ],
+	                [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/woo-product-list.min.js',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
+        ],
+        'woo-product-price' => [
+            'class' => '\Essential_Addons_Elementor\Elements\Woo_Product_Price',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/woo-product-price.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
+        ],
+        'woo-product-rating' => [
+            'class' => '\Essential_Addons_Elementor\Elements\Woo_Product_Rating',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/woo-product-rating.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
+        ],
+        'breadcrumbs' => [
+            'class' => '\Essential_Addons_Elementor\Elements\Breadcrumbs',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/breadcrumbs.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
+        ],
+        'woo-product-images' => [
+            'class' => '\Essential_Addons_Elementor\Elements\Woo_Product_Images',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/woo-product-images.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/lib-view/swiper/swiper-bundle.min.css',
+                        'type' => 'lib',
+                        'context' => 'view',
+                    ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/lib-view/magnific-popup/magnific-popup.min.css',
+                        'type' => 'lib',
+                        'context' => 'view',
+                    ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/filterable-gallery.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+                'js' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/woo-product-image.min.js',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/magnific-popup/jquery.magnific-popup.min.js',
+                        'type' => 'lib',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
+        ],
+        'woo-add-to-cart' => [
+            'class' => '\Essential_Addons_Elementor\Elements\Woo_Add_To_Cart',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/woo-add-to-cart.min.css',
+                        'type' => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
+        ],
         'contact-form-7' => [
             'class' => '\Essential_Addons_Elementor\Elements\Contact_Form_7',
             'dependency' => [
@@ -796,11 +959,16 @@ $config = [
                         'type' => 'lib',
                         'context' => 'view',
                     ],
-                    [
-                        'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/moment/moment.min.js',
-                        'type' => 'lib',
-                        'context' => 'view',
-                    ],
+	                [
+		                'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/moment/moment.min.js',
+		                'type' => 'lib',
+		                'context' => 'view',
+	                ],
+	                [
+		                'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/lib-view/fancy-table/fancy-table.min.js',
+		                'type' => 'lib',
+		                'context' => 'view',
+	                ],
                     [
                         'file' => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/event-calendar.min.js',
                         'type' => 'self',
@@ -817,34 +985,6 @@ $config = [
                 true,
             ],
         ],
-
-        'crowdfundly-organization' => [
-	        'class' => '\Essential_Addons_Elementor\Elements\Crowdfundly_Organization',
-	        'condition' => [
-		        'defined',
-		        'CROWDFUNDLY_VERSION',
-		        true,
-	        ],
-        ],
-
-        'crowdfundly-all-campaign' => [
-	        'class' => '\Essential_Addons_Elementor\Elements\Crowdfundly_All_Campaign',
-	        'condition' => [
-		        'defined',
-		        'CROWDFUNDLY_VERSION',
-		        true,
-	        ],
-        ],
-
-        'crowdfundly-single-campaign' => [
-	        'class' => '\Essential_Addons_Elementor\Elements\Crowdfundly_Single_Campaign',
-	        'condition' => [
-		        'defined',
-		        'CROWDFUNDLY_VERSION',
-		        true,
-	        ],
-        ],
-
         'woo-checkout' => [
             'class' => '\Essential_Addons_Elementor\Elements\Woo_Checkout',
             'dependency' => [
@@ -900,14 +1040,6 @@ $config = [
                         'context' => 'view',
                     ],
                 ],
-            ],
-        ],
-        'woocommerce-review' => [
-            'class' => '\Essential_Addons_Elementor\Elements\Woocommerce_Review',
-            'condition' => [
-                'function_exists',
-                'run_reviewx',
-                true,
             ],
         ],
         'career-page' => [
@@ -1189,14 +1321,7 @@ $config = [
         ],
         'wrapper-link' => [
 	        'class'      => '\Essential_Addons_Elementor\Extensions\Wrapper_Link',
-	        'dependency' => [
-		        'css' => [
-			        [
-				        'file'    => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/wrapper-link.min.css',
-				        'type'    => 'self',
-				        'context' => 'view',
-			        ],
-		        ],
+            'dependency' => [
 		        'js'  => [
 			        [
 				        'file'    => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/wrapper-link.min.js',
@@ -1205,6 +1330,25 @@ $config = [
 			        ],
 		        ],
 	        ],
+        ],
+        'special-hover-effect' => [
+            'class'      => '\Essential_Addons_Elementor\Extensions\Hover_Effect',
+            'dependency' => [
+                'css' => [
+                    [
+                        'file'    => EAEL_PLUGIN_PATH . 'assets/front-end/css/view/hover-effect.min.css',
+                        'type'    => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+                'js'  => [
+                    [
+                        'file'    => EAEL_PLUGIN_PATH . 'assets/front-end/js/view/hover-effect.min.js',
+                        'type'    => 'self',
+                        'context' => 'view',
+                    ],
+                ],
+            ],
         ],
     ],
 ];

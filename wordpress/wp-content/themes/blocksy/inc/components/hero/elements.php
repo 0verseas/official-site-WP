@@ -106,7 +106,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 	do_action('blocksy:hero:element:render', $single_hero_element);
 
 	if ($single_hero_element['id'] === 'breadcrumbs') {
-		$breadcrumbs_builder = new Blocksy_Breadcrumbs_Builder();
+		$breadcrumbs_builder = new \Blocksy\BreadcrumbsBuilder();
 
 		echo $breadcrumbs_builder->render([
 			'class' => blocksy_visibility_classes(
@@ -171,33 +171,22 @@ foreach ($hero_elements as $index => $single_hero_element) {
 						'has_label' => $has_category_label === 'yes'
 					]);
 
-					add_filter(
-						'get_the_archive_title',
-						[$archive_title_renderer, 'render_title'],
-						10, 3
-					);
-
-					$title = get_the_archive_title();
-
-					remove_filter(
-						'get_the_archive_title',
-						[$archive_title_renderer, 'render_title'],
-						10, 3
-					);
+					$title = $archive_title_renderer->get_the_archive_title();
 				}
 
 				if (is_author()) {
-					$title = get_the_author_meta('display_name', blocksy_get_author_id());
+					$title = blocksy_get_the_author_meta(
+						'display_name',
+						blocksy_get_author_id()
+					);
 				}
 			} else {
-				$title = sprintf(
-					// translators: 1: span opening 2: span closing 3: the number of results
+				$title = blocksy_safe_sprintf(
+					// translators: 1: the search query
 					__(
-						'%1$sSearch Results for%2$s %3$s',
+						'Search Results for %1$s',
 						'blocksy'
 					),
-					'<span>',
-					'</span>',
 					get_search_query()
 				);
 			}
@@ -211,6 +200,12 @@ foreach ($hero_elements as $index => $single_hero_element) {
 					function_exists('is_shop') && is_shop()
 				) ? __('Products', 'blocksy') : __('Home', 'blocksy')
 			), $prefix . '_hero_custom_title');
+		}
+
+		// woocommerce_page_title gives plain text title, without any html tags.
+		// Thus, we need to call it before we wrap the title in a tag.
+		if (function_exists('is_woocommerce') && is_woocommerce()) {
+			$title = apply_filters('woocommerce_page_title', $title);
 		}
 
 		if (! empty($title)) {
@@ -240,12 +235,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 			$title = blocksy_simple_image(
 				apply_filters(
 					'blocksy:hero:title:author:author-avatar-url',
-					get_avatar_url(
-						blocksy_get_author_id(),
-						[
-							'size' => $avatar_size
-						]
-					)
+					blocksy_get_avatar_url(['size' => $avatar_size])
 				),
 				[
 					'tag_name' => 'span',
@@ -257,14 +247,10 @@ foreach ($hero_elements as $index => $single_hero_element) {
 						'style' => 'height:' . (
 							intval($avatar_size) / 2
 						) . 'px',
-						'alt' => blocksy_get_avatar_alt_for(get_the_author_meta('ID'))
+						'alt' => blocksy_get_avatar_alt_for(blocksy_get_the_author_meta('ID'))
 					],
 				]
 			) . $title;
-		}
-
-		if (function_exists('is_woocommerce') && is_woocommerce()) {
-			$title = apply_filters('woocommerce_page_title', $title);
 		}
 
 		do_action('blocksy:hero:title:before');
@@ -322,12 +308,12 @@ foreach ($hero_elements as $index => $single_hero_element) {
 				}
 
 				if (is_author()) {
-					if (! empty(trim(get_the_author_meta('description', blocksy_get_author_id())))) {
-						$description = '<div class="' . $description_class . '">' . wp_kses_post(get_the_author_meta('description', blocksy_get_author_id())) . '</div>';
+					if (! empty(trim(blocksy_get_the_author_meta('description', blocksy_get_author_id())))) {
+						$description = '<div class="' . $description_class . '">' . wp_kses_post(blocksy_get_the_author_meta('description', blocksy_get_author_id())) . '</div>';
 					}
 				}
 			} else {
-				$title = sprintf(
+				$title = blocksy_safe_sprintf(
 					// translators: 1: span opening 2: span closing 3: the number of results
 					__(
 						'%1$sSearch Results for%2$s %3$s',
@@ -340,7 +326,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 
 				if (! have_posts()) {
 					// translators: %s are the opening and closing of the html tags
-					$description = sprintf(
+					$description = blocksy_safe_sprintf(
 						__('%sSorry, but nothing matched your search terms. Please try again with some different keywords.%s', 'blocksy'),
 						'<div class="' . $description_class . '">',
 						'</div>'
@@ -375,6 +361,12 @@ foreach ($hero_elements as $index => $single_hero_element) {
 			blocksy_author_social_channels([
 				'new_tab' => blocksy_akg(
 					'link_target',
+					$single_hero_element,
+					'no'
+				) === 'yes',
+
+				'nofollow' => blocksy_akg(
+					'link_nofollow',
 					$single_hero_element,
 					'no'
 				) === 'yes'
@@ -450,6 +442,7 @@ foreach ($hero_elements as $index => $single_hero_element) {
 			'no'
 		) === 'yes';
 
+
 		$single_meta_elements = null;
 
 		if (is_singular() || $is_page) {
@@ -480,21 +473,41 @@ foreach ($hero_elements as $index => $single_hero_element) {
 				])
 			);
 
+			$has_term_accent_color = 'yes';
+
+			foreach ($single_meta_elements as $single_meta_element) {
+				if ($single_meta_element['id'] === 'categories') {
+					$has_term_accent_color = blocksy_akg(
+						'has_term_accent_color',
+						$single_meta_element,
+						'yes'
+					);
+				}
+			}
+
+			$attr = apply_filters(
+				'blocksy:hero:meta:container-attr',
+				$attr
+			);
+
+			$meta_input = [
+				'attr' => $attr,
+				'meta_type' => $meta_type,
+				'meta_divider' => $meta_divider,
+				'force_icons' => $force_icons,
+				'prefix' => $prefix . '_hero_meta'
+			];
+
+			if ($has_term_accent_color === 'no') {
+				$meta_input['has_term_class'] = false;
+			}
+
 			/**
 			 * Note to code reviewers: This line doesn't need to be escaped.
 			 * Function blocksy_post_meta() used here escapes the value properly.
 			 * Mainly because the function outputs SVG.
 			 */
-			echo blocksy_post_meta(
-				$single_meta_elements,
-				[
-					'attr' => $attr,
-					'meta_type' => $meta_type,
-					'meta_divider' => $meta_divider,
-					'force_icons' => $force_icons,
-					'prefix' => $prefix . '_hero_meta'
-				]
-			);
+			echo blocksy_post_meta($single_meta_elements, $meta_input);
 		}
 
 		if (

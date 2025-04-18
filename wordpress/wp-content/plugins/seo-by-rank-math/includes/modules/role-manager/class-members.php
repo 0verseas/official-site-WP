@@ -11,7 +11,7 @@
 namespace RankMath\Role_Manager;
 
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -41,6 +41,7 @@ class Members {
 	 * Registers cap group.
 	 */
 	public function register_cap_groups() {
+		// @phpstan-ignore-next-line
 		\members_register_cap_group(
 			self::GROUP,
 			[
@@ -62,6 +63,7 @@ class Members {
 		}
 
 		foreach ( $caps as $key => $value ) {
+			// @phpstan-ignore-next-line
 			\members_register_cap(
 				$key,
 				[

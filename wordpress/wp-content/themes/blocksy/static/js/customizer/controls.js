@@ -13,7 +13,7 @@ import { initAllPanels } from '../options/initPanels'
 
 import { initBuilder } from './panels-builder'
 
-import Options from './controls/options.js'
+import Options from './controls/options'
 import { initWidget } from '../backend/widgets'
 
 import $ from 'jquery'
@@ -135,17 +135,23 @@ document.addEventListener('DOMContentLoaded', () => {
 		})
 
 		var urlParams = new URLSearchParams(window.location.search)
+
 		if (urlParams.get('ct_autofocus')) {
-			wp.customize.previewer.trigger(
-				'ct-initiate-deep-link',
-				urlParams.get('ct_autofocus')
-			)
+			setTimeout(() => {
+				wp.customize.previewer.trigger(
+					'ct-initiate-deep-link',
+					urlParams.get('ct_autofocus')
+				)
+			}, 800)
 		}
 	}
 })
 
 export { default as Overlay } from './components/Overlay'
-export { getValueFromInput } from '../options/helpers/get-value-from-input'
+export {
+	getValueFromInput,
+	getFirstLevelOptions,
+} from '../options/helpers/get-value-from-input'
 export { default as OptionsPanel } from '../options/OptionsPanel'
 export { default as Panel, PanelMetaWrapper } from '../options/options/ct-panel'
 export { DeviceManagerProvider } from './components/useDeviceManager'
@@ -153,12 +159,23 @@ export { default as PanelLevel } from '../options/components/PanelLevel'
 export { default as Switch } from '../options/options/ct-switch'
 export { default as ImageUploader } from '../options/options/ct-image-uploader'
 export { default as Select } from '../options/options/ct-select'
+export { default as DateTimePicker } from '../options/options/date-time-picker'
 
 export { default as OutsideClickHandler } from '../options/options/react-outside-click-handler'
 
-export { Transition, animated } from 'react-spring/renderprops'
+export { Transition, animated } from 'react-spring'
 export { default as bezierEasing } from 'bezier-easing'
 export { default as usePopoverMaker } from '../options/helpers/usePopoverMaker'
+
+export {
+	getAttributesFromOptions,
+	getDefaultsFromOptions,
+	getOptionsForBlock,
+} from '../editor/utils'
+
+export { getColorsDefaults } from '../editor/utils/colors'
+
+export * as syncHelpers from 'customizer-sync-helpers'
 
 /**
  * Expose builder values

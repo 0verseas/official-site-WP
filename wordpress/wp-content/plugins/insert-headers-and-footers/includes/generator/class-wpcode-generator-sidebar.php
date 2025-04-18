@@ -136,7 +136,7 @@ class WPCode_Generator_Sidebar extends WPCode_Generator_Type {
 						array(
 							'type'        => 'text',
 							'label'       => __( 'Description', 'insert-headers-and-footers' ),
-							'description' => __( 'A short description for the the admin area..', 'insert-headers-and-footers' ),
+							'description' => __( 'A short description for the the admin area.', 'insert-headers-and-footers' ),
 							'id'          => 'sidebar_description',
 							'name'        => 'sidebar_description[]',
 							'repeater'    => 'sidebars',
@@ -252,13 +252,11 @@ register_sidebar( \$args );
 			}
 		}
 
-		return <<<EOD
-// Add Sidebars
-function {$this->get_value( 'function_name' )}() {
-	$sidebar_code
+		return '// Add Sidebars
+function ' . $this->get_value( 'function_name' ) . '() {
+    ' . $sidebar_code . '
 }
-add_action( 'widgets_init', '{$this->get_value( 'function_name' )}' );
-EOD;
+add_action( \'widgets_init\', \'' . $this->get_value( 'function_name' ) . '\' );';
 	}
 
 }

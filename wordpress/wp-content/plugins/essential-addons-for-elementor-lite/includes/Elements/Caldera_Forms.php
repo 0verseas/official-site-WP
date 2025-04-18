@@ -10,7 +10,7 @@ use \Elementor\Controls_Manager;
 use \Elementor\Group_Control_Border;
 use \Elementor\Group_Control_Box_Shadow;
 use \Elementor\Group_Control_Typography;
-use \Elementor\Core\Schemes\Typography;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use \Elementor\Widget_Base;
 use \Essential_Addons_Elementor\Classes\Helper;
 
@@ -49,6 +49,10 @@ class Caldera_Forms extends Widget_Base
             'ea',
             'essential addons'
         ];
+    }
+
+    public function has_widget_inner_wrapper(): bool {
+        return ! Helper::eael_e_optimized_markup();
     }
 
     public function get_custom_help_url() {
@@ -124,6 +128,9 @@ class Caldera_Forms extends Widget_Base
                     'default' => '',
                     'condition' => [
                         'custom_title_description' => 'yes',
+                    ],
+                    'ai' => [
+                        'active' => false,
                     ],
                 ]
             );
@@ -345,7 +352,9 @@ class Caldera_Forms extends Widget_Base
             [
                 'name' => 'form_description_typography',
                 'label' => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_4,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_ACCENT,
+                ],
                 'selector' => '{{WRAPPER}} .eael-contact-form-description',
                 'condition' => [
                     'custom_title_description' => 'yes',
@@ -1479,6 +1488,7 @@ class Caldera_Forms extends Widget_Base
     protected function render()
     {
 	    if ( ! class_exists( '\Caldera_Forms' ) ) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		    printf( '<center>%s</center>', __( '<strong>Caldera Forms</strong> has been closed as of April 5, 2022 and is not available for download. You can try the other Form plugins instead', 'essential-addons-for-elementor-lite' ) );
 
 		    return;
@@ -1513,7 +1523,7 @@ class Caldera_Forms extends Widget_Base
         }
 
         if (!empty($settings['contact_form_list'])) {?>
-            <div <?php echo $this->get_render_attribute_string('contact-form'); ?>>
+            <div <?php $this->print_render_attribute_string('contact-form'); ?>>
                 <?php if ($settings['custom_title_description'] == 'yes') {?>
                     <div class="eael-caldera-form-heading">
                         <?php if ($settings['form_title_custom'] != '') {?>
@@ -1523,12 +1533,14 @@ class Caldera_Forms extends Widget_Base
                         <?php }?>
                         <?php if ($settings['form_description_custom'] != '') {?>
                             <div class="eael-contact-form-description eael-caldera-form-description">
-                                <?php echo $this->parse_text_editor($settings['form_description_custom']); ?>
+                                <?php 
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                                echo $this->parse_text_editor($settings['form_description_custom']); ?>
                             </div>
                         <?php }?>
                     </div>
                 <?php }?>
-                <?php echo do_shortcode('[caldera_form id="' . $settings['contact_form_list'] . '" ]'); ?>
+                <?php echo do_shortcode('[caldera_form id="' . esc_attr( $settings['contact_form_list'] ) . '" ]'); ?>
             </div>
             <?php
         }

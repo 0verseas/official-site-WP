@@ -91,13 +91,13 @@ $overridable_card_options = [
 					'sync' => [
 						blocksy_sync_whole_page([
 							'prefix' => $prefix,
-							'loader_selector' => '.entries > article[id]'
+							'loader_selector' => '.entries .entry-card'
 						]),
 
 						blocksy_sync_whole_page([
 							'id' => $prefix . 'dynamic_data_sync',
 							'prefix' => $prefix,
-							'loader_selector' => '.entries > article[id] .ct-dynamic-data'
+							'loader_selector' => '.entries .ct-dynamic-data-layer'
 						]),
 
 						[
@@ -110,7 +110,7 @@ $overridable_card_options = [
 						[
 							'prefix' => $prefix,
 							'id' => $prefix . 'archive_order_image',
-							'loader_selector' => '.ct-image-container',
+							'loader_selector' => '.ct-media-container',
 							'container_inclusive' => false
 						],
 
@@ -131,14 +131,14 @@ $overridable_card_options = [
 						[
 							'prefix' => $prefix,
 							'id' => $prefix . 'archive_order_meta_first',
-							'loader_selector' => '.entry-meta:1',
+							'loader_selector' => '.entries .entry-meta:1',
 							'container_inclusive' => false
 						],
 
 						[
 							'prefix' => $prefix,
 							'id' => $prefix . 'archive_order_meta_second',
-							'loader_selector' => '.entry-meta:2',
+							'loader_selector' => '.entries .entry-meta:2',
 							'container_inclusive' => false
 						],
 					],
@@ -155,12 +155,14 @@ $overridable_card_options = [
 							]),
 							'meta_type' => 'simple',
 							'meta_divider' => 'slash',
+							'__id' => 'meta_1',
 						],
 
 						[
 							'id' => 'title',
 							'heading_tag' => 'h2',
 							'enabled' => true,
+							'has_link' => 'yes',
 						],
 
 						[
@@ -169,6 +171,7 @@ $overridable_card_options = [
 							'is_boundless' => 'yes',
 							'image_size' => 'medium_large',
 							'enabled' => true,
+							'has_link' => 'yes',
 						],
 
 						[
@@ -204,6 +207,7 @@ $overridable_card_options = [
 							]),
 							'meta_type' => 'simple',
 							'meta_divider' => 'slash',
+							'__id' => 'meta_2',
 						],
 
 						[
@@ -218,11 +222,11 @@ $overridable_card_options = [
 							'options' => [
 
 								'heading_tag' => [
-									'label' => __('Heading tag', 'blocksy'),
+									'label' => __('Heading Tag', 'blocksy'),
 									'type' => 'ct-select',
 									'value' => 'h2',
 									'view' => 'text',
-									'design' => 'inline',
+									'design' => 'block',
 									'sync' => [
 										'id' => $prefix . 'archive_order_heading_tag',
 									],
@@ -238,74 +242,139 @@ $overridable_card_options = [
 									),
 								],
 
+								'has_link' => [
+									'label' => __('Link To Post', 'blocksy'),
+									'type' => 'ct-switch',
+									'value' => 'yes',
+									'sync' => [
+										'id' => $prefix . 'archive_order_heading_tag',
+									],
+								],
+
+								'spacing' => [
+									'label' => __('Bottom Spacing', 'blocksy'),
+									'type' => 'ct-slider',
+									'min' => 0,
+									'max' => 100,
+									'value' => 20,
+									'responsive' => true,
+									'sync' => [
+										'id' => $prefix . 'archive_order_skip'
+									],
+								],
+
 							],
 						],
 
 						'featured_image' => [
 							'label' => __('Featured Image', 'blocksy'),
 							'options' => [
-								blocksy_rand_md5() => [
-									'type' => 'ct-condition',
-									'condition' => [
-										$prefix . 'card_type' => '!cover',
-									],
-									'values_source' => 'global',
-									'perform_replace' => [
-										'condition' => $has_card_matching_template ? [
-											$prefix . 'structure' => '!__never__'
-										] : [
-											$prefix . 'structure' => 'simple'
+								[
+
+									blocksy_rand_md5() => [
+										'type' => 'ct-condition',
+										'condition' => [
+											$prefix . 'card_type' => '!cover',
 										],
-										'key' => $prefix . 'card_type',
-										'from' => 'cover',
-										'to' => 'boxed'
-									],
-									'options' => [
-										'thumb_ratio' => [
-											'label' => __('Image Ratio', 'blocksy'),
-											'type' => 'ct-ratio',
-											'view' => 'inline',
-											'value' => '4/3',
-											'sync' => [
-												'id' => $prefix . 'archive_order_skip',
+										'values_source' => 'global',
+										'perform_replace' => [
+											'condition' => $has_card_matching_template ? [
+												$prefix . 'structure' => '!__never__'
+											] : [
+												$prefix . 'structure' => 'simple|gutenberg'
+											],
+											'key' => $prefix . 'card_type',
+											'from' => 'cover',
+											'to' => 'boxed'
+										],
+										'options' => [
+											'thumb_ratio' => [
+												'label' => __('Image Ratio', 'blocksy'),
+												'type' => 'ct-ratio',
+												'view' => 'inline',
+												'value' => '4/3',
+												'sync' => [
+													'id' => $prefix . 'archive_order_skip',
+												],
 											],
 										],
 									],
-								],
 
-								'image_hover_effect' => [
-									'label' => __( 'Hover Effect', 'blocksy' ),
-									'type' => 'ct-select',
-									'value' => 'none',
-									'view' => 'text',
-									'design' => 'inline',
-									'setting' => [ 'transport' => 'postMessage' ],
-									'choices' => blocksy_ordered_keys(
-										[
-											'none' => __( 'None', 'blocksy' ),
-											'zoom-in' => __( 'Zoom In', 'blocksy' ),
-											'zoom-out' => __( 'Zoom Out', 'blocksy' ),
-										]
-									),
+									blocksy_rand_md5() => [
+										'type' => 'ct-condition',
+										'condition' => [
+											$prefix . 'structure' => 'simple'
+										],
+										'values_source' => 'global',
+										'options' => [
 
-									'sync' => blocksy_sync_whole_page([
-										'prefix' => 'woo_categories',
-										'loader_selector' => '.products > li'
-									]),
-								],
+											'image_width' => [
+												'label' => __( 'Image Width', 'blocksy' ),
+												'type' => 'ct-slider',
+												'value' => 40,
+												'min' => 10,
+												'max' => 70,
+												'defaultUnit' => '%',
+												'sync' => [
+													'id' => $prefix . 'archive_order_skip',
+												],
+											],
 
-								'image_size' => [
-									'label' => __('Size', 'blocksy'),
-									'type' => 'ct-select',
-									'value' => 'medium_large',
-									'view' => 'text',
-									'design' => 'inline',
-									'sync' => [
-										'id' => $prefix . 'archive_order_image',
+										],
 									],
-									'choices' => blocksy_ordered_keys(
-										blocksy_get_all_image_sizes()
-									),
+
+									'image_size' => [
+										'label' => __('Image Size', 'blocksy'),
+										'type' => 'ct-select',
+										'value' => 'medium_large',
+										'view' => 'text',
+										'design' => 'block',
+										'sync' => [
+											'id' => $prefix . 'archive_order_image',
+										],
+										'choices' => blocksy_ordered_keys(
+											blocksy_get_all_image_sizes()
+										),
+									],
+
+									'image_hover_effect' => [
+										'label' => __( 'Hover Effect', 'blocksy' ),
+										'type' => 'ct-select',
+										'value' => 'none',
+										'view' => 'text',
+										'design' => 'block',
+										'setting' => [ 'transport' => 'postMessage' ],
+										'choices' => blocksy_ordered_keys(
+											[
+												'none' => __( 'None', 'blocksy' ),
+												'zoom-in' => __( 'Zoom In', 'blocksy' ),
+												'zoom-out' => __( 'Zoom Out', 'blocksy' ),
+											]
+										),
+
+										'sync' => blocksy_sync_whole_page([
+											'prefix' => $prefix,
+											'loader_selector' => '.entries > article'
+										]),
+									],
+								],
+
+								[
+									(
+										function_exists('blc_fs')
+										&&
+										blc_fs()->can_use_premium_code()
+									) ? [
+										'has_archive_video_thumbnail' => [
+											'label' => __( 'Video Thumbnail', 'blocksy' ),
+											'type' => 'ct-switch',
+											'value' => 'no',
+											'sync' => blocksy_sync_whole_page([
+												'prefix' => $prefix,
+												'loader_selector' => '.entries > article'
+											]),
+										],
+									] : []
 								],
 
 								blocksy_rand_md5() => [
@@ -346,6 +415,26 @@ $overridable_card_options = [
 									],
 								],
 
+								'has_link' => [
+									'label' => __('Link To Post', 'blocksy'),
+									'type' => 'ct-switch',
+									'value' => 'yes',
+									'sync' => [
+										'id' => $prefix . 'archive_order_image',
+									],
+								],
+
+								'spacing' => [
+									'label' => __('Bottom Spacing', 'blocksy'),
+									'type' => 'ct-slider',
+									'min' => 0,
+									'max' => 100,
+									'value' => 30,
+									'responsive' => true,
+									'sync' => [
+										'id' => $prefix . 'archive_order_skip'
+									],
+								],
 							],
 						],
 
@@ -353,12 +442,12 @@ $overridable_card_options = [
 							'label' => __('Excerpt', 'blocksy'),
 							'options' => [
 								'excerpt_source' => [
-									'label' => false,
+									'label' => __('Excerpt Type', 'blocksy'),
 									'type' => 'ct-radio',
 									'value' => 'excerpt',
 									'view' => 'text',
 									'choices' => [
-										'excerpt' => __('Excerpt', 'blocksy'),
+										'excerpt' => __('Custom', 'blocksy'),
 										'full' => __('Full Post', 'blocksy'),
 									],
 								],
@@ -379,6 +468,18 @@ $overridable_card_options = [
 
 									],
 								],
+
+								'spacing' => [
+									'label' => __('Bottom Spacing', 'blocksy'),
+									'type' => 'ct-slider',
+									'min' => 0,
+									'max' => 100,
+									'value' => 20,
+									'responsive' => true,
+									'sync' => [
+										'id' => $prefix . 'archive_order_skip'
+									],
+								],
 							],
 						],
 
@@ -386,7 +487,7 @@ $overridable_card_options = [
 							'label' => __('Read More Button', 'blocksy'),
 							'options' => [
 								'button_type' => [
-									'label' => false,
+									'label' => __('Button Type', 'blocksy'),
 									'type' => 'ct-radio',
 									'value' => 'background',
 									'view' => 'text',
@@ -419,6 +520,18 @@ $overridable_card_options = [
 										'id' => $prefix . 'archive_order_button',
 									]
 								],
+
+								'spacing' => [
+									'label' => __('Bottom Spacing', 'blocksy'),
+									'type' => 'ct-slider',
+									'min' => 0,
+									'max' => 100,
+									'value' => 20,
+									'responsive' => true,
+									'sync' => [
+										'id' => $prefix . 'archive_order_skip'
+									],
+								],
 							],
 						],
 
@@ -428,31 +541,45 @@ $overridable_card_options = [
 							'sync' => [
 								'id' => $prefix . 'archive_order_meta'
 							],
-							'options' => blocksy_get_options('general/meta', [
-								'is_cpt' => $is_cpt,
-								'computed_cpt' => $is_cpt ? trim(
-									$prefix, '_'
-								) : false,
-								'skip_sync_id' => [
-									'id' => $prefix . 'archive_order_skip'
-								],
-								'meta_elements' => blocksy_post_meta_defaults([
-									[
-										'id' => 'author',
-										'enabled' => true,
+							'options' => [
+								blocksy_get_options('general/meta', [
+									'is_cpt' => $is_cpt,
+									'computed_cpt' => $is_cpt ? trim(
+										$prefix, '_'
+									) : false,
+									'skip_sync_id' => [
+										'id' => $prefix . 'archive_order_skip'
 									],
+									'meta_elements' => blocksy_post_meta_defaults([
+										[
+											'id' => 'author',
+											'enabled' => true,
+										],
 
-									[
-										'id' => 'post_date',
-										'enabled' => true,
-									],
+										[
+											'id' => 'post_date',
+											'enabled' => true,
+										],
 
-									[
-										'id' => 'comments',
-										'enabled' => true,
-									],
+										[
+											'id' => 'comments',
+											'enabled' => true,
+										],
+									]),
 								]),
-							])
+
+								'spacing' => [
+									'label' => __('Bottom Spacing', 'blocksy'),
+									'type' => 'ct-slider',
+									'min' => 0,
+									'max' => 100,
+									'value' => 15,
+									'responsive' => true,
+									'sync' => [
+										'id' => $prefix . 'archive_order_skip'
+									],
+								],
+							]
 						],
 
 						'divider' => [
@@ -461,10 +588,22 @@ $overridable_card_options = [
 							'sync' => [
 								'id' => $prefix . 'archive_order_meta'
 							],
+							'options' => [
+								'spacing' => [
+									'label' => __('Bottom Spacing', 'blocksy'),
+									'type' => 'ct-slider',
+									'min' => 0,
+									'max' => 100,
+									'value' => 20,
+									'responsive' => true,
+									'sync' => [
+										'id' => $prefix . 'archive_order_skip'
+									],
+								],
+							]
 						]
 					],
-				], trim($prefix, '_')),
-
+				], trim($prefix, '_'), $prefix . 'archive_order_skip'),
 			],
 
 			$has_card_matching_template ? [] : [
@@ -525,11 +664,17 @@ $overridable_card_options = [
 				$prefix . 'cardsGap' => [
 					'label' => __( 'Cards Gap', 'blocksy' ),
 					'type' => 'ct-slider',
-					'min' => 0,
-					'max' => 100,
+					'value' => '30px',
+					'units' => [
+						['unit' => 'px', 'min' => 0, 'max' => 100],
+						['unit' => 'em', 'min' => 0, 'max' => 100],
+						['unit' => 'rem', 'min' => 0, 'max' => 100],
+						['unit' => 'vw', 'min' => 0, 'max' => 100],
+						['unit' => 'vh', 'min' => 0, 'max' => 100],
+						['unit' => '', 'type' => 'custom'],
+					],
 					'responsive' => true,
 					'sync' => 'live',
-					'value' => 30,
 				],
 
 				blocksy_rand_md5() => [
@@ -570,12 +715,18 @@ $overridable_card_options = [
 						$prefix . 'card_spacing' => [
 							'label' => __( 'Card Inner Spacing', 'blocksy' ),
 							'type' => 'ct-slider',
-							'min' => 0,
-							'max' => 100,
+							'value' => '30px',
+							'units' => [
+								['unit' => 'px', 'min' => 0, 'max' => 100],
+								['unit' => 'em', 'min' => 0, 'max' => 100],
+								['unit' => 'rem', 'min' => 0, 'max' => 100],
+								['unit' => 'vw', 'min' => 0, 'max' => 100],
+								['unit' => 'vh', 'min' => 0, 'max' => 100],
+								['unit' => '', 'type' => 'custom'],
+							],
 							'responsive' => true,
-							'value' => 30,
-							'divider' => 'top',
 							'sync' => 'live',
+							'divider' => 'top',
 						],
 					],
 				],
@@ -593,9 +744,9 @@ $overridable_card_options = [
 					'setting' => [ 'transport' => 'postMessage' ],
 					'value' => 'CT_CSS_SKIP_RULE',
 					'choices' => [
-						'left' => '',
+						'start' => '',
 						'center' => '',
-						'right' => '',
+						'end' => '',
 					],
 				],
 			],
@@ -703,27 +854,27 @@ $overridable_card_options = [
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
 									'inherit' => [
-										'var(--heading-1-color, var(--headings-color))' => [
+										'var(--theme-heading-1-color, var(--theme-headings-color))' => [
 											$prefix . 'archive_order:array-ids:title:heading_tag' => 'h1'
 										],
 
-										'var(--heading-2-color, var(--headings-color))' => [
+										'var(--theme-heading-2-color, var(--theme-headings-color))' => [
 											$prefix . 'archive_order:array-ids:title:heading_tag' => 'h2'
 										],
 
-										'var(--heading-3-color, var(--headings-color))' => [
+										'var(--theme-heading-3-color, var(--theme-headings-color))' => [
 											$prefix . 'archive_order:array-ids:title:heading_tag' => 'h3'
 										],
 
-										'var(--heading-4-color, var(--headings-color))' => [
+										'var(--theme-heading-4-color, var(--theme-headings-color))' => [
 											$prefix . 'archive_order:array-ids:title:heading_tag' => 'h4'
 										],
 
-										'var(--heading-5-color, var(--headings-color))' => [
+										'var(--theme-heading-5-color, var(--theme-headings-color))' => [
 											$prefix . 'archive_order:array-ids:title:heading_tag' => 'h5'
 										],
 
-										'var(--heading-6-color, var(--headings-color))' => [
+										'var(--theme-heading-6-color, var(--theme-headings-color))' => [
 											$prefix . 'archive_order:array-ids:title:heading_tag' => 'h6'
 										]
 									]
@@ -732,7 +883,7 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--linkHoverColor)'
+									'inherit' => 'var(--theme-link-hover-color)'
 								],
 							],
 						],
@@ -762,7 +913,7 @@ $overridable_card_options = [
 							'label' => __( 'Excerpt Color', 'blocksy' ),
 							'type'  => 'ct-color-picker',
 							'design' => 'inline',
-							'noColor' => [ 'background' => 'var(--color)'],
+							'noColor' => [ 'background' => 'var(--theme-text-color)'],
 							'sync' => 'live',
 							'value' => [
 								'default' => [
@@ -774,7 +925,7 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--color)'
+									'inherit' => 'var(--theme-text-color)'
 								],
 							],
 						],
@@ -805,7 +956,7 @@ $overridable_card_options = [
 					'label' => __( 'Meta Font Color', 'blocksy' ),
 					'type'  => 'ct-color-picker',
 					'design' => 'inline',
-					'noColor' => [ 'background' => 'var(--color)'],
+					'noColor' => [ 'background' => 'var(--theme-text-color)'],
 					'sync' => 'live',
 					'value' => [
 						'default' => [
@@ -821,13 +972,13 @@ $overridable_card_options = [
 						[
 							'title' => __( 'Initial', 'blocksy' ),
 							'id' => 'default',
-							'inherit' => 'var(--color)'
+							'inherit' => 'var(--theme-text-color)'
 						],
 
 						[
 							'title' => __( 'Hover', 'blocksy' ),
 							'id' => 'hover',
-							'inherit' => 'var(--linkHoverColor)'
+							'inherit' => 'var(--theme-link-hover-color)'
 						],
 					],
 				],
@@ -837,11 +988,11 @@ $overridable_card_options = [
 					'optionId' => $prefix . 'archive_order',
 					'options' => [
 						$prefix . 'card_meta_button_type_font_colors' => [
-							'label' => __( 'Meta Button Font', 'blocksy' ),
+							'label' => __( 'Meta Button Font Color', 'blocksy' ),
 							'type'  => 'ct-color-picker',
 							'design' => 'inline',
 							'divider' => 'top',
-							'noColor' => [ 'background' => 'var(--color)'],
+							'noColor' => [ 'background' => 'var(--theme-text-color)'],
 							'sync' => 'live',
 							'value' => [
 								'default' => [
@@ -857,13 +1008,13 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--buttonTextInitialColor)'
+									'inherit' => 'var(--theme-button-text-initial-color)'
 								],
 
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--buttonTextHoverColor)'
+									'inherit' => 'var(--theme-button-text-hover-color)'
 								],
 							],
 						],
@@ -872,7 +1023,7 @@ $overridable_card_options = [
 							'label' => __( 'Meta Button Background', 'blocksy' ),
 							'type'  => 'ct-color-picker',
 							'design' => 'inline',
-							'noColor' => [ 'background' => 'var(--color)'],
+							'noColor' => [ 'background' => 'var(--theme-text-color)'],
 							'sync' => 'live',
 							'value' => [
 								'default' => [
@@ -888,13 +1039,13 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--buttonInitialColor)'
+									'inherit' => 'var(--theme-button-background-initial-color)'
 								],
 
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--buttonHoverColor)'
+									'inherit' => 'var(--theme-button-background-hover-color)'
 								],
 							],
 						],
@@ -933,13 +1084,13 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--linkInitialColor)'
+									'inherit' => 'var(--theme-link-initial-color)'
 								],
 
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--linkHoverColor)'
+									'inherit' => 'var(--theme-link-hover-color)'
 								],
 							],
 						],
@@ -979,13 +1130,13 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--buttonTextInitialColor)'
+									'inherit' => 'var(--theme-button-text-initial-color)'
 								],
 
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--buttonTextHoverColor)'
+									'inherit' => 'var(--theme-button-text-hover-color)'
 								],
 							],
 						],
@@ -1025,13 +1176,13 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--linkInitialColor)'
+									'inherit' => 'var(--theme-button-background-initial-color)'
 								],
 
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--linkHoverColor)'
+									'inherit' => 'var(--theme-button-text-hover-color)'
 								],
 							],
 						],
@@ -1067,13 +1218,13 @@ $overridable_card_options = [
 								[
 									'title' => __( 'Initial', 'blocksy' ),
 									'id' => 'default',
-									'inherit' => 'var(--buttonInitialColor)'
+									'inherit' => 'var(--theme-button-background-initial-color)'
 								],
 
 								[
 									'title' => __( 'Hover', 'blocksy' ),
 									'id' => 'hover',
-									'inherit' => 'var(--buttonHoverColor)'
+									'inherit' => 'var(--theme-button-background-hover-color)'
 								],
 							],
 						],
@@ -1097,14 +1248,42 @@ $overridable_card_options = [
 							'label' => __( 'Featured Image Radius', 'blocksy' ),
 							'type' => 'ct-spacing',
 							'sync' => 'live',
-							'value' => blocksy_spacing_value([
-								'linked' => true,
-							]),
+							'value' => blocksy_spacing_value(),
+							'min' => 0,
 							'responsive' => true
+						],
+					],
+				],
+
+				blocksy_rand_md5() =>  [
+					'type' => 'ct-condition',
+					'condition' => [
+						$prefix . 'structure' => 'simple',
+						$prefix . 'card_type' => 'simple',
+					],
+					'options' => [
+
+						$prefix . 'cardThumbShadow' => [
+							'label' => __( 'Featured Image Shadow', 'blocksy' ),
+							'type' => 'ct-box-shadow',
+							'sync' => 'live',
+							'responsive' => true,
+							'divider' => 'top',
+							'value' => blocksy_box_shadow_value([
+								'enable' => false,
+								'h_offset' => 0,
+								'v_offset' => 12,
+								'blur' => 18,
+								'spread' => -6,
+								'inset' => false,
+								'color' => [
+									'color' => 'rgba(34, 56, 101, 0.04)',
+								],
+							])
 						],
 
 						$prefix . 'cardDivider' => [
-							'label' => __( 'Card bottom divider', 'blocksy' ),
+							'label' => __( 'Card Bottom Divider', 'blocksy' ),
 							'type' => 'ct-border',
 							'sync' => 'live',
 							'design' => 'inline',
@@ -1240,7 +1419,7 @@ $overridable_card_options = [
 						'value' => blocksy_background_default_value([
 							'backgroundColor' => [
 								'default' => [
-									'color' => 'var(--paletteColor8)',
+									'color' => 'var(--theme-palette-color-8)',
 								],
 							],
 						]),
@@ -1286,9 +1465,8 @@ $overridable_card_options = [
 						'sync' => 'live',
 						'type' => 'ct-spacing',
 						'divider' => 'top',
-						'value' => blocksy_spacing_value([
-							'linked' => true,
-						]),
+						'value' => blocksy_spacing_value(),
+						'min' => 0,
 						'responsive' => true
 					],
 
@@ -1300,15 +1478,14 @@ $overridable_card_options = [
 
 
 $options = [
-
 	blocksy_rand_md5() => [
 		'type'  => 'ct-title',
-		'label' => sprintf(
+		'label' => blocksy_safe_sprintf(
 			// translators: placeholder here means the actual structure title.
 			__('%s Structure', 'blocksy'),
 			$title
 		),
-		'desc' => sprintf(
+		'desc' => blocksy_safe_sprintf(
 			// translators: placeholder here means the actual structure title.
 			__('Set the %s entries default structure.', 'blocksy'),
 			$title
@@ -1436,6 +1613,7 @@ $options = [
 						'label' => __( 'Columns & Posts', 'blocksy' ),
 						'attr' => [ 'data-columns' => '2:medium' ],
 						'responsive' => true,
+						'hasGroupRevertButton' => true,
 						'options' => [
 
 							$prefix . 'columns' => [
@@ -1445,12 +1623,12 @@ $options = [
 								'value' => [
 									'desktop' => 3,
 									'tablet' => 2,
-									'mobile' => 1
+									'mobile' => 1,
+									'__changed' => ['tablet', 'mobile']
 								],
 								'min' => 1,
 								'max' => 6,
 								'design' => 'block',
-								'disableRevertButton' => true,
 								'attr' => [ 'data-width' => 'full' ],
 								'sync' => 'live',
 								'responsive' => true,
@@ -1466,14 +1644,12 @@ $options = [
 								'max' => 500,
 								'markAsAutoFor' => ['tablet', 'mobile'],
 								'design' => 'block',
-								'disableRevertButton' => true,
 								'attr' => [ 'data-width' => 'full' ],
 								'sync' => blocksy_sync_whole_page([
 									'prefix' => $prefix,
 									'loader_selector' => '.entries > article'
 								]),
-							],
-
+							]
 						],
 					],
 
@@ -1486,11 +1662,45 @@ $options = [
 			],
 
 			$prefix . 'archive_listing_panel' => [
-				'label' => __('Cards Options', 'blocksy'),
+				'label' => __('Card Options', 'blocksy'),
 				'type' => 'ct-panel',
 				'value' => 'yes',
 				'wrapperAttr' => ['data-panel' => 'only-arrow'],
 				'inner-options' => $overridable_card_options
+			],
+
+			$prefix . 'content_area_spacing' => [
+				'label' => __( 'Content Area Vertical Spacing', 'blocksy' ),
+				'type' => 'ct-radio',
+				'value' => 'both',
+				'view' => 'text',
+				'design' => 'block',
+				'divider' => 'top:full',
+				'attr' => [ 'data-type' => 'content-spacing' ],
+				'choice_attr' => [ 'data-tooltip-reveal' => 'top' ],
+				'sync' => "live",
+				'choices' => [
+					'both'   => '<span></span>
+					<i class="ct-tooltip">' . __( 'Top & Bottom', 'blocksy' ) . '</i>',
+
+					'top'    => '<span></span>
+					<i class="ct-tooltip">' . __( 'Only Top', 'blocksy' ) . '</i>',
+
+					'bottom' => '<span></span>
+					<i class="ct-tooltip">' . __( 'Only Bottom', 'blocksy' ) . '</i>',
+
+					'none'   => '<span></span>
+					<i class="ct-tooltip">' . __( 'Disabled', 'blocksy' ) . '</i>',
+				],
+				'desc' => blocksy_safe_sprintf(
+					// translators: placeholder here means the actual URL.
+					__( 'You can customize the global spacing value in General ➝ Layout ➝ %sContent Area Spacing%s.', 'blocksy' ),
+					blocksy_safe_sprintf(
+						'<a data-trigger-section="general:layout_panel" href="%s">',
+						admin_url('/customize.php?autofocus[section]=general&ct_autofocus=general:layout_panel')
+					),
+					'</a>'
+				),
 			],
 
 		],
@@ -1515,10 +1725,10 @@ $options = [
 						],
 					],
 				]),
-				'desc' => sprintf(
+				'desc' => blocksy_safe_sprintf(
 					// translators: placeholder here means the actual URL.
 					__( 'Please note, by default this option is inherited from Colors ➝ %sSite Background%s.', 'blocksy' ),
-					sprintf(
+					blocksy_safe_sprintf(
 						'<a data-trigger-section="color" href="%s">',
 						admin_url('/customize.php?autofocus[section]=color')
 					),
@@ -1527,5 +1737,6 @@ $options = [
 			],
 
 		],
-	],
+	]
+
 ];

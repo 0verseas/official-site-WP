@@ -48,6 +48,14 @@ add_filter('woocommerce_quantity_input_args', function ($args, $product) {
 	global $blocksy_quantity_args;
 	$blocksy_quantity_args = $args;
 
+	if (! isset($blocksy_quantity_args['min_value'])) {
+		$blocksy_quantity_args['min_value'] = 0;
+	}
+
+	if (! isset($blocksy_quantity_args['max_value'])) {
+		$blocksy_quantity_args['max_value'] = $product->get_max_purchase_quantity();
+	}
+
 	$blocksy_quantity_args['min_value'] = max($blocksy_quantity_args['min_value'], 0);
 	$blocksy_quantity_args['max_value'] = 0 < $blocksy_quantity_args['max_value'] ? $blocksy_quantity_args['max_value'] : '';
 
@@ -61,7 +69,7 @@ add_filter('woocommerce_quantity_input_args', function ($args, $product) {
 add_action(
 	'woocommerce_before_quantity_input_field',
 	function () {
-		if (get_theme_mod('has_custom_quantity', 'yes') !== 'yes') {
+		if (blocksy_get_theme_mod('has_custom_quantity', 'yes') !== 'yes') {
 			return;
 		}
 
@@ -74,6 +82,28 @@ add_action(
 	'woocommerce_before_main_content',
 	function () {
 		$prefix = blocksy_manager()->screen->get_prefix();
+
+		if (
+			function_exists('blc_get_content_block_that_matches')
+			&&
+			blc_get_content_block_that_matches([
+				'template_type' => 'nothing_found',
+				'match_conditions' => false
+			])
+			&&
+			is_search()
+			&&
+			! have_posts()
+		) {
+			echo blc_render_content_block(
+				blc_get_content_block_that_matches([
+					'template_type' => 'nothing_found',
+					'match_conditions' => false
+				])
+			);
+			ob_start();
+			return;
+		}
 
 		if ($prefix === 'woo_categories' || $prefix === 'search') {
 			/**
@@ -109,9 +139,10 @@ add_action(
 			]);
 		}
 
+
 		echo '<div ' . blocksy_attr_to_html($attr) . ' ' . wp_kses(blocksy_sidebar_position_attr(), []) . ' ' . blocksy_get_v_spacing() . '>';
 
-		if (is_product()) {
+		if (blocksy_manager()->screen->is_product()) {
 			echo '<article class="post-' . get_the_ID() . '">';
 		} else {
 			echo '<section>';
@@ -138,7 +169,23 @@ add_action(
 add_action(
 	'woocommerce_after_main_content',
 	function () {
-		if (is_product()) {
+		if (
+			function_exists('blc_get_content_block_that_matches')
+			&&
+			blc_get_content_block_that_matches([
+				'template_type' => 'nothing_found',
+				'match_conditions' => false
+			])
+			&&
+			is_search()
+			&&
+			! have_posts()
+		) {
+			ob_get_clean();
+			return;
+		}
+
+		if (blocksy_manager()->screen->is_product()) {
 			echo '</article>';
 		} else {
 			echo '</section>';
@@ -165,6 +212,14 @@ add_action(
 		if ($template_name === 'single-product/related.php') {
 			ob_start();
 		}
+
+		if (
+			$template_name === 'loop/loop-start.php'
+			&&
+			is_archive()
+		) {
+			ob_start();
+		}
 	},
 	10,
 	4
@@ -187,8 +242,8 @@ add_action(
 			if ($args['max_value'] && $args['min_value'] === $args['max_value']) {
 				$final_quantity_look = 'class="quantity hidden"';
 			} else {
-				if (get_theme_mod('has_custom_quantity', 'yes') === 'yes') {
-					$final_quantity_look .= ' data-type="' . get_theme_mod('quantity_type', 'type-2') . '"';
+				if (blocksy_get_theme_mod('has_custom_quantity', 'yes') === 'yes') {
+					$final_quantity_look .= ' data-type="' . blocksy_get_theme_mod('quantity_type', 'type-2') . '"';
 				}
 			}
 
@@ -199,22 +254,69 @@ add_action(
 			);
 		}
 
+		if (
+			$template_name === 'loop/loop-start.php'
+			&&
+			is_archive()
+		) {
+			$loop_start = ob_get_clean();
+
+			$other_attr = [];
+
+			if ( is_customize_preview() ) {
+				$other_attr['data-shortcut'] = 'border:outside';
+				$other_attr['data-shortcut-location'] = blocksy_first_level_deep_link('woo_categories');
+			}
+
+			echo str_replace(
+				'class="products',
+				blocksy_attr_to_html($other_attr) . 'class="products ',
+				$loop_start
+			);
+		}
+
 		if ($template_name === 'single-product/up-sells.php') {
 			$upsells = ob_get_clean();
 
+			$other_attr = [];
+
+			if ( is_customize_preview() ) {
+				$other_attr['data-shortcut'] = 'border:outside';
+				$other_attr['data-shortcut-location'] = blocksy_first_level_deep_link('woo_categories');
+
+				if ( is_single() ) {
+					$prefix = blocksy_manager()->screen->get_prefix();
+
+					$other_attr['data-shortcut-location'] = blocksy_first_level_deep_link($prefix) . ':woo_has_related_upsells';
+				}
+			}
+
+			$constrained_class = '';
+			$visibility_classes = '';
+
+			if (blocksy_manager()->screen->uses_woo_default_template()) {
+				$constrained_class = 'is-width-constrained';
+
+				$visibility_classes = blocksy_visibility_classes(
+					blocksy_get_theme_mod(
+						'upsell_products_visibility',
+						[
+							'desktop' => true,
+							'tablet' => false,
+							'mobile' => false,
+						]
+					)
+				);
+			}
+
+			$woo_product_related_label_tag = blocksy_get_theme_mod('woo_product_related_label_tag', 'h2');
+
+			$upsells = preg_replace('/<h2>(.*?)<\/h2>/', '<' . $woo_product_related_label_tag . ' class="ct-module-title">$1</' . $woo_product_related_label_tag . '>', $upsells);
+
 			echo str_replace(
 				'class="up-sells upsells products"',
-				'class="up-sells upsells products ' . trim(
-					blocksy_visibility_classes(
-						get_theme_mod(
-							'upsell_products_visibility',
-							[
-								'desktop' => true,
-								'tablet' => false,
-								'mobile' => false,
-							]
-						)
-					)
+				blocksy_attr_to_html($other_attr) . 'class="up-sells upsells products ' . trim(
+					$constrained_class . ' ' . $visibility_classes
 				) . '"',
 				$upsells
 			);
@@ -223,19 +325,45 @@ add_action(
 		if ($template_name === 'single-product/related.php') {
 			$related = ob_get_clean();
 
+			$other_attr = [];
+
+			if ( is_customize_preview() ) {
+				$other_attr['data-shortcut'] = 'border:outside';
+				$other_attr['data-shortcut-location'] = blocksy_first_level_deep_link('woo_categories');
+
+				if ( is_single() ) {
+					$prefix = blocksy_manager()->screen->get_prefix();
+
+					$other_attr['data-shortcut-location'] = blocksy_first_level_deep_link($prefix) . ':woo_has_related_upsells';
+				}
+			}
+
+			$constrained_class = '';
+			$visibility_classes = '';
+
+			if (blocksy_manager()->screen->uses_woo_default_template()) {
+				$constrained_class = 'is-width-constrained';
+
+				$visibility_classes = blocksy_visibility_classes(
+					blocksy_get_theme_mod(
+						'related_products_visibility',
+						[
+							'desktop' => true,
+							'tablet' => false,
+							'mobile' => false,
+						]
+					)
+				);
+			}
+
+			$woo_product_related_label_tag = blocksy_get_theme_mod('woo_product_related_label_tag', 'h2');
+
+			$related = preg_replace('/<h2>(.*?)<\/h2>/', '<' . $woo_product_related_label_tag . ' class="ct-module-title">$1</' . $woo_product_related_label_tag . '>', $related);
+
 			echo str_replace(
 				'class="related products"',
-				'class="related products ' . trim(
-					blocksy_visibility_classes(
-						get_theme_mod(
-							'related_products_visibility',
-							[
-								'desktop' => true,
-								'tablet' => false,
-								'mobile' => false,
-							]
-						)
-					)
+				blocksy_attr_to_html($other_attr) . 'class="related products ' . trim(
+					$constrained_class . ' ' . $visibility_classes
 				) . '"',
 				$related
 			);
@@ -246,11 +374,18 @@ add_action(
 );
 
 if (! function_exists('blocksy_product_get_gallery_images')) {
-	function blocksy_product_get_gallery_images($product) {
+    function blocksy_product_get_gallery_images($product, $args = []) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'enforce_first_image_replace' => false
+			]
+		);
+
 		$root_product = $product;
 
 		if ($product->post_type === 'product_variation') {
-			$root_product = wc_get_product( $product->get_parent_id() );
+			$root_product = wc_get_product($product->get_parent_id());
 		}
 
 		$thumb_id = apply_filters(
@@ -272,23 +407,28 @@ if (! function_exists('blocksy_product_get_gallery_images')) {
 		if ($product->post_type === 'product_variation') {
 			$variation_main_image = $product->get_image_id();
 
-			$variation_values = get_post_meta(
-				$product->get_id(),
-				'blocksy_post_meta_options'
+			$variation_values = blocksy_get_post_options(
+				blocksy_translate_post_id(
+					$product->get_id(),
+					[
+						'use_wpml_default_language_woo' => true
+					]
+				)
 			);
-
-			if (empty($variation_values)) {
-				$variation_values = [[]];
-			}
-
-			$variation_values = $variation_values[0];
 
 			$variation_gallery_images = blocksy_akg('images', $variation_values, []);
 			$gallery_source = blocksy_akg('gallery_source', $variation_values, 'default');
 
 			if ($gallery_source === 'default') {
-				if (! in_array($variation_main_image, $gallery_images)) {
+				if (
+					! in_array($variation_main_image, $gallery_images)
+				) {
 					$gallery_images[0] = $variation_main_image;
+				} else {
+					if ($args['enforce_first_image_replace']) {
+						array_unshift($gallery_images, $variation_main_image);
+						$gallery_images = array_unique($gallery_images);
+					}
 				}
 			} else {
 				$gallery_images = [$variation_main_image];
@@ -303,125 +443,3 @@ if (! function_exists('blocksy_product_get_gallery_images')) {
 	}
 }
 
-add_action('rest_api_init', function () {
-	if (! function_exists('is_shop')) {
-		return;
-	}
-
-	if (
-		!isset($_GET['post_type'])
-		||
-		(
-			!str_contains($_GET['post_type'], 'product')
-			&&
-			$_GET['post_type'] !== 'ct_forced_any'
-		)
-	) {
-		return;
-	}
-
-	register_rest_field('post', 'placeholder_image', array(
-		'get_callback' => function ($post, $field_name, $request) {
-			if ($post['type'] !== 'product') {
-				return null;
-			}
-
-			return wc_placeholder_img_src('thumbnail');
-		}
-	));
-
-	if (
-		isset($_GET['product_price'])
-		&&
-		$_GET['product_price'] === 'true'
-	) {
-		register_rest_field('post', 'product_price', array(
-			'get_callback' => function ($post, $field_name, $request) {
-				if ($post['type'] !== 'product') {
-					return 0;
-				}
-
-				$product = wc_get_product($post['id']);
-				$price = $product->get_regular_price();
-				$sale = $product->get_sale_price();
-
-				if (
-					! $product->is_type('simple')
-					&&
-					! $product->is_type('external')
-				) {
-					return $product->get_price_html();
-				}
-
-				if ($product->is_taxable()) {
-					if (defined('WC_ABSPATH')) {
-						// WC 3.6+ - Cart and other frontend functions are not included for REST requests.
-						include_once WC_ABSPATH . 'includes/wc-cart-functions.php';
-						include_once WC_ABSPATH . 'includes/wc-notice-functions.php';
-						include_once WC_ABSPATH . 'includes/wc-template-hooks.php';
-					}
-
-					if (null === WC()->session) {
-						$session_class = apply_filters(
-							'woocommerce_session_handler',
-							'WC_Session_Handler'
-						);
-
-						WC()->session = new $session_class();
-						WC()->session->init();
-					}
-
-					if (null === WC()->customer) {
-						WC()->customer = new WC_Customer(
-							get_current_user_id(),
-							true
-						);
-					}
-
-					$tax_display_mode = get_option('woocommerce_tax_display_shop');
-
-					if ($tax_display_mode === 'incl') {
-						$price = wc_get_price_including_tax($product, ['price' => $price]);
-						$sale = wc_get_price_including_tax($product, ['price' => $sale]);
-					} else {
-						$price = wc_get_price_excluding_tax($product, ['price' => $price]);
-						$sale = wc_get_price_excluding_tax($product, ['price' => $sale]);
-					}
-				}
-
-				if ( $sale && $product->is_on_sale() ) {
-
-					$sale_html = $sale? blocksy_html_tag(
-						'ins',
-						[
-							'aria-hidden' => 'true'
-						],
-						wc_price($sale)
-					) : '';
-
-					$price_html = blocksy_html_tag(
-						'del',
-						[],
-						wc_price($price)
-					);
-
-					return $price ? blocksy_html_tag(
-						'span',
-						[
-							'class' => 'sale-price'
-						],
-						$price_html . $sale_html
-					) : 0;
-				}
-				
-
-				return $price ? wc_price($price) : 0;
-			},
-			'update_callback' => null,
-			'schema' => [
-				'description' => __('Product Price', 'blocksy'),
-				'type' => 'string'
-			],
-		));
-	}
-});

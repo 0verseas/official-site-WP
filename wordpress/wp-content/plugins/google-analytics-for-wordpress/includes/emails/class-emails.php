@@ -358,13 +358,10 @@ class MonsterInsights_WP_Emails {
 		// Hooks into the email footer.
 		do_action( 'monsterinsights_email_footer', $email_parts['footer'] );
 
-
 		$body    = implode( $email_parts );
 		$message = $this->process_tag( $message, false );
-		$message = nl2br( $message );
+		$message = $message ? nl2br( $message ) : '';
 		$message = str_replace( '{email}', $message, $body );
-
-		//$message = make_clickable( $message );
 
 		return apply_filters( 'monsterinsights_email_message', $message, $this );
 	}
@@ -395,7 +392,7 @@ class MonsterInsights_WP_Emails {
 		}
 
 		// Don't send if email address is invalid.
-		if ( ! is_email( $to ) ) {
+		if ( is_string( $to ) && ! is_email( $to ) ) {
 			return false;
 		}
 
@@ -419,11 +416,13 @@ class MonsterInsights_WP_Emails {
 			$this
 		);
 
+		$build = $this->build_email( $data['message'] );
+
 		// Let's do this.
 		$sent = wp_mail(
 			$data['to'],
 			monsterinsights_decode_string( $this->process_tag( $data['subject'] ) ),
-			$this->build_email( $data['message'] ),
+			$build,
 			$data['headers'],
 			$data['attachments']
 		);
@@ -607,7 +606,7 @@ class MonsterInsights_WP_Emails {
 			}
 		}
 
-		require $located;
+		require $located; // phpcs:ignore
 	}
 
 	/**

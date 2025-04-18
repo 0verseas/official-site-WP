@@ -11,7 +11,6 @@
 namespace RankMath;
 
 use RankMath\Helpers\Api;
-use RankMath\Helpers\Attachment;
 use RankMath\Helpers\Conditional;
 use RankMath\Helpers\Choices;
 use RankMath\Helpers\Post_Type;
@@ -20,8 +19,10 @@ use RankMath\Helpers\Taxonomy;
 use RankMath\Helpers\WordPress;
 use RankMath\Helpers\Schema;
 use RankMath\Helpers\Analytics;
-use RankMath\Helpers\DB;
+use RankMath\Helpers\Content_AI;
+use RankMath\Helpers\HTML;
 use RankMath\Replace_Variables\Replacer;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,7 +31,16 @@ defined( 'ABSPATH' ) || exit;
  */
 class Helper {
 
-	use Api, Attachment, Conditional, Choices, Post_Type, Options, Taxonomy, WordPress, Schema, DB, Analytics;
+	use Api;
+	use Conditional;
+	use Choices;
+	use Post_Type;
+	use Options;
+	use Taxonomy;
+	use WordPress;
+	use Schema;
+	use Analytics;
+	use Content_AI;
 
 	/**
 	 * Replace `%variables%` with context-dependent value.
@@ -83,17 +93,17 @@ class Helper {
 	 * @deprecated 1.0.34 Use rank_math_register_var_replacement()
 	 * @see rank_math_register_var_replacement()
 	 *
-	 * @param  string $var       Variable name, for example %custom%. '%' signs are optional.
+	 * @param  string $variable  Variable name, for example %custom%. '%' signs are optional.
 	 * @param  mixed  $callback  Replacement callback. Should return value, not output it.
 	 * @param  array  $args      Array with additional title, description and example values for the variable.
 	 *
 	 * @return bool Replacement was registered successfully or not.
 	 */
-	public static function register_var_replacement( $var, $callback, $args = [] ) {
+	public static function register_var_replacement( $variable, $callback, $args = [] ) {
 		_deprecated_function( 'RankMath\Helper::register_var_replacement()', '1.0.34', 'rank_math_register_var_replacement()' );
 		$args['description'] = isset( $args['desc'] ) ? $args['desc'] : '';
-		$args['variable']    = $var;
-		return rank_math_register_var_replacement( $var, $args, $callback );
+		$args['variable']    = $variable;
+		return rank_math_register_var_replacement( $variable, $args, $callback );
 	}
 
 	/**
@@ -141,8 +151,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_current_page_url( $ignore_qs = false ) {
-		$link = '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-		$link = ( is_ssl() ? 'https' : 'http' ) . $link;
+		$link = ( is_ssl() ? 'https' : 'http' ) . '://' . Param::server( 'HTTP_HOST' ) . Param::server( 'REQUEST_URI' );
 
 		if ( $ignore_qs ) {
 			$link = explode( '?', $link );
@@ -253,8 +262,14 @@ class Helper {
 		// Clear caches on WPEngine-hosted sites.
 		if ( class_exists( 'WpeCommon' ) ) {
 			\WpeCommon::purge_memcached();
-			\WpeCommon::clear_maxcdn_cache();
 			\WpeCommon::purge_varnish_cache();
+
+			// Clear WPEngine CDN cache. Added this condition to avoid PHP error as we are not sure when the new clear_cdn_cache method was added.
+			if ( method_exists( 'WpeCommon', 'clear_cdn_cache' ) ) {
+				\WpeCommon::clear_cdn_cache();
+			} else {
+				\WpeCommon::clear_maxcdn_cache();
+			}
 		}
 
 		// Clear Varnish caches.
@@ -354,5 +369,47 @@ class Helper {
 	 */
 	public static function is_image_url( $image_url ) {
 		return filter_var( $image_url, FILTER_VALIDATE_URL ) && preg_match( '/\.(jpg|jpeg|png|gif|webp)$/i', $image_url );
+	}
+
+	/**
+	 * Check if plugin auto update is disabled.
+	 *
+	 * @return bool
+	 */
+	public static function is_plugin_update_disabled() {
+		return ! apply_filters_ref_array( 'auto_update_plugin', [ true, (object) [] ] )
+			|| apply_filters_ref_array( 'automatic_updater_disabled', [ false ] )
+			|| ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS )
+			|| ( defined( 'AUTOMATIC_UPDATER_DISABLED' ) && AUTOMATIC_UPDATER_DISABLED );
+	}
+
+	/**
+	 * Enable big selects.
+	 */
+	public static function enable_big_selects_for_queries() {
+		static $rank_math_enable_big_select;
+
+		if ( $rank_math_enable_big_select || ! apply_filters( 'rank_math/enable_big_selects', true ) ) {
+			return;
+		}
+
+		global $wpdb;
+		$rank_math_enable_big_select = $wpdb->query( 'SET SESSION SQL_BIG_SELECTS=1' );
+	}
+
+	/**
+	 * Used for Backward compatibility to prevent site from showing undefined method error. (PRO  v3.0.49-beta)
+	 *
+	 * @param string $name     Method name.
+	 * @param array  $argument Parameters passed to the function.
+	 *
+	 * @return string
+	 */
+	public static function __callStatic( $name, $argument ) {
+		if ( 'extract_attributes' === $name ) {
+			return HTML::extract_attributes( current( $argument ) );
+		}
+
+		return '';
 	}
 }

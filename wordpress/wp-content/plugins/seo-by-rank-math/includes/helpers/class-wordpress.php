@@ -14,10 +14,10 @@ use RankMath\Post;
 use RankMath\Term;
 use RankMath\User;
 use RankMath\Helper;
-use MyThemeShop\Helpers\Str;
-use RankMath\Helpers\Security;
-use MyThemeShop\Helpers\WordPress as WP_Helper;
 use RankMath\Role_Manager\Capability_Manager;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Param;
+use RankMath\Helpers\Security;
 use stdClass;
 use WP_Screen;
 
@@ -59,13 +59,13 @@ trait WordPress {
 	 *
 	 * @codeCoverageIgnore
 	 *
-	 * @param  string  $key     Internal key of the value to get (without prefix).
-	 * @param  integer $post_id Post ID of the post to get the value for.
-	 * @param  string  $default  Default value to use.
+	 * @param  string  $key           Internal key of the value to get (without prefix).
+	 * @param  integer $post_id       Post ID of the post to get the value for.
+	 * @param  string  $default_value Default value to use.
 	 * @return mixed
 	 */
-	public static function get_post_meta( $key, $post_id = 0, $default = '' ) {
-		return Post::get_meta( $key, $post_id, $default );
+	public static function get_post_meta( $key, $post_id = 0, $default_value = '' ) {
+		return Post::get_meta( $key, $post_id, $default_value );
 	}
 
 	/**
@@ -73,14 +73,14 @@ trait WordPress {
 	 *
 	 * @codeCoverageIgnore
 	 *
-	 * @param  string $key      Internal key of the value to get (without prefix).
-	 * @param  mixed  $term     Term to get the meta value for either (string) term name, (int) term ID or (object) term.
-	 * @param  string $taxonomy Name of the taxonomy to which the term is attached.
-	 * @param  string $default  Default value to use.
+	 * @param  string $key           Internal key of the value to get (without prefix).
+	 * @param  mixed  $term          Term to get the meta value for either (string) term name, (int) term ID or (object) term.
+	 * @param  string $taxonomy      Name of the taxonomy to which the term is attached.
+	 * @param  string $default_value Default value to use.
 	 * @return mixed
 	 */
-	public static function get_term_meta( $key, $term = 0, $taxonomy = '', $default = '' ) {
-		return Term::get_meta( $key, $term, $taxonomy, $default );
+	public static function get_term_meta( $key, $term = 0, $taxonomy = '', $default_value = '' ) {
+		return Term::get_meta( $key, $term, $taxonomy, $default_value );
 	}
 
 	/**
@@ -88,13 +88,13 @@ trait WordPress {
 	 *
 	 * @codeCoverageIgnore
 	 *
-	 * @param  string $key  Internal key of the value to get (without prefix).
-	 * @param  mixed  $user User to get the meta value for either (int) user ID or (object) user.
-	 * @param  string $default  Default value to use.
+	 * @param  string $key           Internal key of the value to get (without prefix).
+	 * @param  mixed  $user          User to get the meta value for either (int) user ID or (object) user.
+	 * @param  string $default_value Default value to use.
 	 * @return mixed
 	 */
-	public static function get_user_meta( $key, $user = 0, $default = '' ) {
-		return User::get_meta( $key, $user, $default );
+	public static function get_user_meta( $key, $user = 0, $default_value = '' ) {
+		return User::get_meta( $key, $user, $default_value );
 	}
 
 	/**
@@ -128,7 +128,7 @@ trait WordPress {
 
 		// Makes sure the plugin functions are defined before trying to use them.
 		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
-			require_once ABSPATH . '/wp-admin/includes/plugin.php';
+			require_once ABSPATH . '/wp-admin/includes/plugin.php'; // @phpstan-ignore-line
 		}
 
 		return is_plugin_active_for_network( plugin_basename( RANK_MATH_FILE ) ) ?
@@ -164,7 +164,7 @@ trait WordPress {
 		$data = [];
 		$caps = Capability_Manager::get()->get_capabilities( true );
 
-		foreach ( WP_Helper::get_roles() as $slug => $role ) {
+		foreach ( self::get_roles() as $slug => $role ) {
 			self::get_role_capabilities( $slug, $caps, $data );
 		}
 
@@ -203,7 +203,7 @@ trait WordPress {
 	 */
 	public static function set_capabilities( $roles ) {
 		$caps = Capability_Manager::get()->get_capabilities( true );
-		foreach ( WP_Helper::get_roles() as $slug => $role ) {
+		foreach ( self::get_roles() as $slug => $role ) {
 			self::set_role_capabilities( $slug, $caps, $roles );
 		}
 	}
@@ -277,8 +277,12 @@ trait WordPress {
 			return false;
 		}
 
-		$image            = wp_get_attachment_image_src( $og_image, $size );
-		$image['caption'] = $image ? get_post_meta( $og_image, '_wp_attachment_image_alt', true ) : '';
+		$image = wp_get_attachment_image_src( $og_image, $size );
+		if ( empty( $image ) ) {
+			return false;
+		}
+
+		$image['caption'] = get_post_meta( $og_image, '_wp_attachment_image_alt', true );
 		return self::validate_image_data( $image );
 	}
 
@@ -296,7 +300,7 @@ trait WordPress {
 
 		// Makes sure the plugin is defined before trying to use it.
 		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
-			require_once ABSPATH . '/wp-admin/includes/plugin.php';
+			require_once ABSPATH . '/wp-admin/includes/plugin.php'; // @phpstan-ignore-line
 		}
 
 		if ( ! is_plugin_active_for_network( plugin_basename( RANK_MATH_FILE ) ) ) {
@@ -432,11 +436,6 @@ trait WordPress {
 	 * @return bool
 	 */
 	public static function is_block_editor() {
-		// Check WordPress version.
-		if ( version_compare( get_bloginfo( 'version' ), '5.0.0', '<' ) ) {
-			return false;
-		}
-
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : false;
 
 		if ( ! $screen instanceof WP_Screen ) {
@@ -452,6 +451,17 @@ trait WordPress {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Is site editor enabled.
+	 *
+	 * @return bool
+	 */
+	public static function is_site_editor() {
+		global $pagenow;
+
+		return $pagenow === 'site-editor.php';
 	}
 
 	/**
@@ -516,7 +526,7 @@ trait WordPress {
 
 		$data = array_reduce(
 			$args,
-			function( $carry, $arg ) {
+			function ( $carry, $arg ) {
 				if ( is_array( $arg ) ) {
 					return array_merge( $carry, $arg );
 				}
@@ -575,5 +585,167 @@ trait WordPress {
 		Sitepress::get()->restore_home_url_filter();
 
 		return $home_url;
+	}
+
+	/**
+	 * Get roles.
+	 *
+	 * @codeCoverageIgnore
+	 *
+	 * @param string $output How to return roles.
+	 *
+	 * @return array
+	 */
+	public static function get_roles( $output = 'names' ) {
+		$wp_roles = wp_roles();
+
+		if ( 'names' !== $output ) {
+			return $wp_roles->roles;
+		}
+
+		return $wp_roles->get_names();
+	}
+
+	/**
+	 * Retrieves the sitename.
+	 *
+	 * @return string
+	 */
+	public static function get_site_name() {
+		return wp_strip_all_tags( get_bloginfo( 'name' ), true );
+	}
+
+	/**
+	 * Get action from request.
+	 *
+	 * @return bool|string
+	 */
+	public static function get_request_action() {
+		if ( empty( $_REQUEST['action'] ) ) {
+			return false;
+		}
+
+		if ( '-1' === $_REQUEST['action'] && ! empty( $_REQUEST['action2'] ) ) {
+			$_REQUEST['action'] = sanitize_key( $_REQUEST['action2'] );
+		}
+
+		return sanitize_key( $_REQUEST['action'] );
+	}
+
+	/**
+	 * Instantiates the WordPress filesystem for use.
+	 *
+	 * @return object
+	 */
+	public static function get_filesystem() {
+		global $wp_filesystem;
+
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php'; // @phpstan-ignore-line
+			WP_Filesystem();
+		}
+
+		return $wp_filesystem;
+	}
+
+	/**
+	 * Get current post type.
+	 *
+	 * This function has some fallback strategies to get the current screen post type.
+	 *
+	 * @return string|bool
+	 */
+	public static function get_post_type() {
+		global $pagenow;
+
+		if ( Helper::is_site_editor() ) {
+			return 'page';
+		}
+
+		$post_type = self::post_type_from_globals();
+		if ( false !== $post_type ) {
+			return $post_type;
+		}
+
+		$post_type = self::post_type_from_request();
+		if ( false !== $post_type ) {
+			return $post_type;
+		}
+
+		return 'post-new.php' === $pagenow ? 'post' : false;
+	}
+
+	/**
+	 * Get post type from global variables
+	 *
+	 * @return string|bool
+	 */
+	private static function post_type_from_globals() {
+		global $post, $typenow, $current_screen;
+
+		if ( $post && $post->post_type ) {
+			return $post->post_type;
+		}
+
+		if ( $typenow ) {
+			return $typenow;
+		}
+
+		if ( $current_screen && $current_screen->post_type ) {
+			return $current_screen->post_type;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get post type from request variables
+	 *
+	 * @return string|bool
+	 */
+	private static function post_type_from_request() {
+
+		if ( $post_type = Param::request( 'post_type' ) ) { // phpcs:ignore
+			return sanitize_key( $post_type );
+		}
+
+		if ( $post_id = Param::request( 'post_ID', 0, FILTER_VALIDATE_INT ) ) { // phpcs:ignore
+			return get_post_type( $post_id );
+		}
+
+		// @codeCoverageIgnoreStart
+		if ( $post = Param::get( 'post' ) ) { // phpcs:ignore
+			return get_post_type( $post );
+		}
+		// @codeCoverageIgnoreEnd
+
+		return false;
+	}
+
+	/**
+	 * Strip all shortcodes active or orphan.
+	 *
+	 * @param string $content Content to remove shortcodes from.
+	 *
+	 * @return string
+	 */
+	public static function strip_shortcodes( $content ) {
+		if ( ! Str::contains( '[', $content ) ) {
+			return $content;
+		}
+
+		// Remove Caption shortcode.
+		$content = \preg_replace( '#\s*\[caption[^]]*\].*?\[/caption\]\s*#is', '', $content );
+
+		return preg_replace( '~\[\/?.*?\]~s', '', $content );
+	}
+
+	/**
+	 * Get the current time as a Unix timestamp (seconds since epoch).
+	 *
+	 * @return int The current Unix timestamp.
+	 */
+	public static function get_current_time() {
+		return strtotime( current_time( 'mysql' ) );
 	}
 }

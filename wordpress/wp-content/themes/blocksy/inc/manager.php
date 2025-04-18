@@ -3,6 +3,9 @@
 class Blocksy_Manager {
 	public static $instance = null;
 
+	public $db = null;
+	public $db_versioning = null;
+
 	public $builder = null;
 
 	public $header_builder = null;
@@ -11,10 +14,15 @@ class Blocksy_Manager {
 	public $post_types = null;
 
 	public $screen = null;
-    public $hooks = null;
 
 	public $dynamic_css = null;
 	public $dynamic_styles_descriptor = null;
+	public $woocommerce = null;
+	public $colors = null;
+
+	public $archive = null;
+
+	private $hooks = null;
 
 	private $current_template = null;
 
@@ -41,16 +49,102 @@ class Blocksy_Manager {
 	}
 
 	private function early_init() {
+		$this->register_autoloader();
+
+		$this->db = new \Blocksy\Database();
+		$this->db_versioning = new \Blocksy\DbVersioning();
+
 		$this->builder = new Blocksy_Customizer_Builder();
 
 		$this->header_builder = new Blocksy_Header_Builder();
 		$this->footer_builder = new Blocksy_Footer_Builder();
 
-		$this->post_types = new Blocksy_Custom_Post_Types();
+		$this->post_types = new \Blocksy\CustomPostTypes();
 		$this->screen = new Blocksy_Screen_Manager();
-		$this->hooks = new \Blocksy\WpHooksManager();
+		$this->colors = new \Blocksy\Colors();
 
-		$this->dynamic_css = new Blocksy_Dynamic_Css();
+		$this->archive = new \Blocksy\ArchiveLogic();
+
+		$breadcrumbs = new \Blocksy\BreadcrumbsBuilder();
+		$breadcrumbs->mount_shortcode();
+
+		new \Blocksy\SearchModifications();
+
+		$this->boot_woocommerce_integration();
+
+		$this->dynamic_css = new \Blocksy\ThemeDynamicCss();
+
+		$i18n_manager = new Blocksy_Translations_Manager();
+		$i18n_manager->init();
+
+		new \Blocksy\BlocksFallback();
+
+		add_action('customize_save_after', function () {
+			$i18n_manager = new Blocksy_Translations_Manager();
+			$i18n_manager->register_wpml_translation_keys();
+		});
+
+		if (is_admin()) {
+			add_action(
+				'admin_init',
+				function () {
+					$i18n_manager = new Blocksy_Translations_Manager();
+					$i18n_manager->register_translation_keys();
+				}
+			);
+		}
+
+		add_action('customize_save', function ($obj) {
+			if (! $obj) {
+				return;
+			}
+
+			$header_placements = $obj->get_setting('header_placements');
+
+			if ($header_placements) {
+				$current_value = $header_placements->post_value();
+
+				if ($current_value) {
+					unset($current_value['__forced_static_header__']);
+					unset($current_value['__should_refresh_item__']);
+					unset($current_value['__should_refresh__']);
+
+					foreach ($current_value as $key => $value) {
+						if (floatval($key)) {
+							unset($current_value[$key]);
+						}
+					}
+
+					$header_placements->manager->set_post_value(
+						'header_placements',
+						$current_value
+					);
+				}
+			}
+
+			$footer_placements = $obj->get_setting('footer_placements');
+
+			if ($footer_placements) {
+				$current_value = $footer_placements->post_value();
+
+				if ($current_value) {
+					unset($current_value['__forced_static_footer__']);
+					unset($current_value['__should_refresh__']);
+					unset($current_value['__should_refresh_item__']);
+
+					foreach ($current_value as $key => $value) {
+						if (floatval($key)) {
+							unset($current_value[$key]);
+						}
+					}
+
+					$footer_placements->manager->set_post_value(
+						'footer_placements',
+						$current_value
+					);
+				}
+			}
+		});
 
 		add_action(
 			'init',
@@ -70,7 +164,7 @@ class Blocksy_Manager {
 			return $template;
 		}, 900000000);
 
-		add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts'], 50);
+		add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts'], 10);
 
 		add_action(
 			'wp_head',
@@ -87,6 +181,11 @@ class Blocksy_Manager {
 		);
 	}
 
+	public function register_autoloader() {
+		require get_template_directory() . '/inc/classes/autoload.php';
+		\Blocksy\ThemeAutoloader::run();
+	}
+
 	public function enqueue_scripts() {
 		if ($this->scripts_enqueued) {
 			return;
@@ -96,7 +195,7 @@ class Blocksy_Manager {
 
 		$theme = blocksy_get_wp_parent_theme();
 
-		$m = new Blocksy_Fonts_Manager();
+		$m = new \Blocksy\FontsManager();
 
 		$this->dynamic_styles_descriptor = $this
 			->dynamic_css
@@ -125,7 +224,6 @@ class Blocksy_Manager {
 
 		$data = apply_filters('blocksy:general:ct-scripts-localizations', [
 			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ct-ajax-nonce'),
 			'public_url' => blocksy_cdn_url(
 				get_template_directory_uri() . '/static/bundle/'
 			),
@@ -134,6 +232,7 @@ class Blocksy_Manager {
 			'show_more_text' => __('Show more', 'blocksy'),
 			'more_text' => 'More',
 			'search_live_results' => __('Search results', 'blocksy'),
+			'search_live_no_results' => __('No results', 'blocksy'),
 
 			'search_live_no_result' => __('No results', 'blocksy'),
 			'search_live_one_result' => _n(
@@ -149,22 +248,73 @@ class Blocksy_Manager {
 				'blocksy'
 			),
 
+			'clipboard_copied' => __('Copied!', 'blocksy'),
+			'clipboard_failed' => __('Failed to Copy', 'blocksy'),
+
 			'expand_submenu' => __('Expand dropdown menu', 'blocksy'),
 			'collapse_submenu' => __('Collapse dropdown menu', 'blocksy'),
 
 			'dynamic_js_chunks' => blocksy_manager()->get_dynamic_js_chunks(),
 
 			'dynamic_styles' => [
-				'lazy_load' => blocksy_cdn_url(
-					get_template_directory_uri() . '/static/bundle/non-critical-styles.min.css'
+				'lazy_load' => add_query_arg(
+					'ver',
+					$theme->get('Version'),
+					blocksy_cdn_url(
+						get_template_directory_uri() . '/static/bundle/non-critical-styles.min.css'
+					)
 				),
-				'search_lazy' => blocksy_cdn_url(
-					get_template_directory_uri() . '/static/bundle/non-critical-search-styles.min.css'
+
+
+				'search_lazy' => add_query_arg(
+					'ver',
+					$theme->get('Version'),
+					blocksy_cdn_url(
+						get_template_directory_uri() . '/static/bundle/non-critical-search-styles.min.css'
+					)
+				),
+
+				'back_to_top' => add_query_arg(
+					'ver',
+					$theme->get('Version'),
+					blocksy_cdn_url(
+						get_template_directory_uri() . '/static/bundle/back-to-top.min.css'
+					)
 				)
 			],
 
-			'dynamic_styles_selectors' => []
+			'dynamic_styles_selectors' => [
+				[
+					'selector' => '.ct-header-cart, #woo-cart-panel',
+					'url' => add_query_arg(
+						'ver',
+						$theme->get('Version'),
+						blocksy_cdn_url(
+							get_template_directory_uri() . '/static/bundle/cart-header-element-lazy.min.css'
+						)
+					)
+				],
+
+				[
+					'selector' => '.flexy',
+					'url' => add_query_arg(
+						'ver',
+						$theme->get('Version'),
+						blocksy_cdn_url(
+							get_template_directory_uri() . '/static/bundle/flexy.min.css'
+						)
+					),
+				]
+			]
 		]);
+
+		foreach ($data['dynamic_styles_selectors'] as $dynamic_style_index => $dynamic_style) {
+			$data['dynamic_styles_selectors'][$dynamic_style_index]['url'] = add_query_arg(
+				'ver',
+				$theme->get('Version'),
+				$dynamic_style['url']
+			);
+		}
 
 		$maybe_current_language = blocksy_get_current_language('slug');
 
@@ -203,8 +353,16 @@ class Blocksy_Manager {
 
 		global $wp_scripts;
 
+		$theme = blocksy_get_wp_parent_theme();
+
 		foreach ($all_chunks as $index => $chunk) {
-			if (!isset($chunk['deps'])) {
+			$all_chunks[$index]['url'] = add_query_arg(
+				'ver',
+				$theme->get('Version'),
+				$chunk['url']
+			);
+
+			if (! isset($chunk['deps'])) {
 				continue;
 			}
 
@@ -229,6 +387,51 @@ class Blocksy_Manager {
 		}
 
 		return $all_chunks;
+	}
+
+	public function get_prefix_title_actions($args = []) {
+		$args = wp_parse_args($args, [
+			'prefix' => '',
+			'areas' => []
+		]);
+
+		return apply_filters(
+			'blocksy:options:prefix-global-actions',
+			[],
+			$args
+		);
+	}
+
+	public function get_conditions_overrides() {
+		$shop_cards_type = blocksy_get_theme_mod('shop_cards_type', 'type-1');
+
+		if ($shop_cards_type !== 'type-1' && $shop_cards_type !== 'type-2') {
+			$shop_cards_type = 'type-1';
+		}
+
+		return apply_filters(
+			'blocksy:options:conditions:overrides',
+			[
+				'product_view_type' => 'default-gallery',
+				'shop_cards_type' => $shop_cards_type,
+			]
+		);
+	}
+
+	public function get_hooks() {
+		if (! $this->hooks) {
+			$this->hooks = new \Blocksy\WpHooksManager();
+		}
+
+		return $this->hooks;
+	}
+
+	public function boot_woocommerce_integration() {
+		if (class_exists('WooCommerce')) {
+			$this->woocommerce = new \Blocksy\WooCommerce();
+		}
+
+		new \Blocksy\WooDefaultPages();
 	}
 }
 

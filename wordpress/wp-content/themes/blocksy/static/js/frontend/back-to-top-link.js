@@ -1,5 +1,13 @@
 import ctEvents from 'ct-events'
 import { areWeDealingWithSafari } from '../main'
+import { loadStyle } from '../helpers'
+
+import { isIosDevice } from './helpers/is-ios-device'
+
+// idle | loading | loaded
+let stylesState = 'idle'
+
+let prevScrollY = null
 
 export const mount = (backTop) => {
 	if (backTop.hasListener) {
@@ -8,25 +16,62 @@ export const mount = (backTop) => {
 
 	backTop.hasListener = true
 
+	// Loading styles early for iOS devices
+	if (isIosDevice()) {
+		loadStyle(ct_localizations.dynamic_styles.back_to_top).then(() => {})
+	}
+
 	// browser window scroll (in pixels) after which the "back to top" link is shown
 	// browser window scroll (in pixels) after which the "back to top" link opacity is reduced
-	var scrolling = false
 
 	const compute = () => {
 		var backTop = document.querySelector('.ct-back-to-top')
 
 		if (!backTop) return
 
-		window.scrollY > 500
-			? backTop.classList.add('ct-show')
-			: backTop.classList.remove('ct-show')
+		if (window.scrollY > 300) {
+			if (stylesState === 'loaded') {
+				backTop.classList.add('ct-show')
+			}
+
+			if (stylesState === 'idle') {
+				stylesState = 'loading'
+
+				const cb = () => {
+					backTop.removeAttribute('hidden')
+
+					stylesState = 'loaded'
+					backTop.classList.add('ct-show')
+				}
+
+				// Styles are already loaded for iOS devices
+				if (isIosDevice()) {
+					cb()
+				} else {
+					loadStyle(ct_localizations.dynamic_styles.back_to_top).then(
+						() => {
+							cb()
+						}
+					)
+				}
+			}
+		} else {
+			backTop.classList.remove('ct-show')
+		}
 	}
 
-	compute()
+	const renderFrame = () => {
+		if (prevScrollY === null || window.scrollY !== prevScrollY) {
+			prevScrollY = window.scrollY
+			compute()
+		}
 
-	ctEvents.on('ct:scroll:render-frame', () => {
-		compute()
-	})
+		requestAnimationFrame(renderFrame)
+	}
+
+	requestAnimationFrame(renderFrame)
+
+	compute()
 
 	backTop.addEventListener('click', (event) => {
 		event.preventDefault()

@@ -15,9 +15,8 @@ use RankMath\CMB2;
 use RankMath\Helper;
 use RankMath\Runner;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Arr;
-use MyThemeShop\Helpers\Param;
-use MyThemeShop\Helpers\WordPress;
+use RankMath\Helpers\Arr;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -350,19 +349,35 @@ class Option_Center implements Runner {
 			}
 		}
 
-		$this->update_htaccess();
+		$this->maybe_update_htaccess();
 	}
 
 	/**
 	 * Update .htaccess.
 	 */
-	private function update_htaccess() {
+	private function maybe_update_htaccess() {
 		if ( empty( Param::post( 'htaccess_accept_changes' ) ) ) {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Writing to .htaccess file and escaping for HTML will break functionality.
-		$content = wp_unslash( $_POST['htaccess_content'] );
+		if ( ! is_super_admin() || ! Helper::has_cap( 'general' ) || ! Helper::has_cap( 'edit_htaccess' ) ) {
+			Helper::add_notification(
+				esc_html__( 'You do not have permission to edit the .htaccess file.', 'rank-math' ),
+				[ 'type' => 'error' ]
+			);
+			return;
+		}
+
+		if ( ! Helper::is_edit_allowed() ) {
+			Helper::add_notification(
+				esc_html__( 'You do not have permission to edit the .htaccess file.', 'rank-math' ),
+				[ 'type' => 'error' ]
+			);
+			return;
+		}
+
+		// phpcs:ignore= WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification -- Writing to .htaccess file and escaping for HTML will break functionality & CMB2 package handles the nonce verification
+		$content = isset( $_POST['htaccess_content'] ) ? wp_unslash( $_POST['htaccess_content'] ) : '';
 		if ( empty( $content ) ) {
 			return;
 		}
@@ -395,7 +410,7 @@ class Option_Center implements Runner {
 			return false;
 		}
 
-		$wp_filesystem = WordPress::get_filesystem();
+		$wp_filesystem = Helper::get_filesystem();
 
 		$path = get_home_path();
 		$file = $path . '.htaccess';
@@ -418,7 +433,7 @@ class Option_Center implements Runner {
 			return false;
 		}
 
-		$wp_filesystem = WordPress::get_filesystem();
+		$wp_filesystem = Helper::get_filesystem();
 		$htaccess_file = get_home_path() . '.htaccess';
 
 		return ! $wp_filesystem->is_writable( $htaccess_file ) ? false : $wp_filesystem->put_contents( $htaccess_file, $content );

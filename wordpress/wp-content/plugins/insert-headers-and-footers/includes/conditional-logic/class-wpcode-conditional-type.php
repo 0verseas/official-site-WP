@@ -32,6 +32,13 @@ abstract class WPCode_Conditional_Type {
 	public $name;
 
 	/**
+	 * The category of this type.
+	 *
+	 * @var string
+	 */
+	public $category;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -97,6 +104,15 @@ abstract class WPCode_Conditional_Type {
 	}
 
 	/**
+	 * Get the category.
+	 *
+	 * @return string
+	 */
+	public function get_category() {
+		return $this->category;
+	}
+
+	/**
 	 * Get the type name.
 	 *
 	 * @return string
@@ -108,13 +124,14 @@ abstract class WPCode_Conditional_Type {
 	/**
 	 * Process a rule group specific to the conditions type.
 	 *
-	 * @param array $rule_group An array of rules with keys option,relation and value.
+	 * @param array          $rule_group An array of rules with keys option,relation and value.
+	 * @param WPCode_Snippet $snippet The snippet we are evaluating the rules for.
 	 *
 	 * @return bool
 	 */
-	public function evaluate_rule_row( $rule_group ) {
-		return $this->evaluate_rule( $rule_group['option'], $rule_group['relation'], $rule_group['value'] );
-	}
+    public function evaluate_rule_row( $rule_group, $snippet ) {
+        return $this->evaluate_rule( $rule_group['option'], $rule_group['relation'], $rule_group['value'], $snippet );
+    }
 
 	/**
 	 * This takes an option name from the list of options for the type
@@ -122,13 +139,14 @@ abstract class WPCode_Conditional_Type {
 	 * options and compares that value to the set value using the operator
 	 * set in the settings.
 	 *
-	 * @param string $option The option to evaluate.
-	 * @param string $relation The comparison relation.
-	 * @param string $value The selected value for this condition.
+	 * @param string         $option The option to evaluate.
+	 * @param string         $relation The comparison relation.
+	 * @param string         $value The selected value for this condition.
+	 * @param WPCode_Snippet $snippet The snippet we are evaluating the rules for.
 	 *
 	 * @return bool
 	 */
-	protected function evaluate_rule( $option, $relation, $value ) {
+	protected function evaluate_rule( $option, $relation, $value, $snippet ) {
 		$options = $this->get_type_options();
 		if ( ! isset( $options [ $option ] ) ) {
 			return true;
@@ -143,7 +161,7 @@ abstract class WPCode_Conditional_Type {
 			return false;
 		}
 
-		return $this->get_relation_comparison( $callback(), $value, $relation );
+		return $this->get_relation_comparison( $callback( $snippet ), $value, $relation );
 	}
 
 	/**
@@ -203,7 +221,7 @@ abstract class WPCode_Conditional_Type {
 	}
 
 	/**
-	 * Does an does not equal comparison (not strict), also handles arrays to
+	 * Does a "does not equal" comparison (not strict), also handles arrays to
 	 * make it easier to compare things like user roles.
 	 *
 	 * @param mixed $value1 Value 1.
@@ -220,6 +238,10 @@ abstract class WPCode_Conditional_Type {
 			return ! in_array( $value2, $value1 );
 		}
 
+		if ( is_array( $value2 ) ) {
+			return ! in_array( $value1, $value2 );
+		}
+
 		return $value1 != $value2;
 	}
 
@@ -232,6 +254,9 @@ abstract class WPCode_Conditional_Type {
 	 * @return bool
 	 */
 	private function contains( $value1, $value2 ) {
+		if ( empty( $value2 ) ) {
+			return false;
+		}
 		return false !== strpos( $value1, $value2 );
 	}
 }

@@ -2,10 +2,10 @@
 Tags: widget, widgets
 Requires at least: 5.2
 Requires PHP: 7.0
-Tested up to: 6.2
+Tested up to: 6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 1.8.92
+Stable tag: 2.0.83
 
 == Description ==
 
@@ -22,7 +22,475 @@ It runs and adds its enhancements only if the Blocksy theme is installed and act
 1. Upload `Blocksy-Companion-version_number.zip` to the `/wp-content/plugins/` directory and extract.
 2. Activate the plugin by going to **Plugins** page in WordPress admin and clicking on **Activate** link.
 
+== Frequently Asked Questions ==
+
+= Why do I need this plugin? =
+
+You need this plugin if you are using the Blocksy theme. It gives you the
+ability to install any starter site and also a lot of additional extensions
+and features.
+
+= How do I use the Blocksy Companion? =
+
+After you installed this plugin, just go to the Blocksy dashboard from the top
+level menu in the WordPress admin area. When you are there, you will be able
+to see all the awesome extensions that the plugin brings and also the starter
+sites that are ready to be imported with just a few clicks and get you started
+in no time.
+
+= What do I do if the plugin doesn't work? =
+
+If you are using the free version of the plugin, you can post your issue on
+the support forum of the plugin. In case you have bought the premium version,
+please reach out to the support
+[here](https://creativethemes.com/blocksy/support/).
+
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure
+Program. The Patchstack team help validate, triage and handle any security
+vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/blocksy-companion)
+
 == Changelog ==
+2.0.83: 2024-12-25
+- Improvement: Account modal header element - better integration with MailPoet plugin
+- Improvement: Advanced Taxonomy block - smarter check for layout type
+- Improvement: Dynamic data block - featured image cover type improvements
+- Improvement: Standalone Gutenberg plugin breaks Advanced Posts block grid layout
+
+2.0.82: 2024-12-20
+- Improvement: General fixes and improvements
+
+2.0.81: 2024-12-12
+- Improvement: Advanced Search block - Correctly handle scroll on iOS
+
+2.0.80: 2024-11-29
+- Improvement: Advanced Posts block - make sure inner post template block spacing options is applied on frontend
+- Improvement: Advanced Taxonomies block - make sure the column adjustments option for tablet/mobile devices is applied correctly
+- Improvement: Correctly compute grid styles in Advanced Posts and Advanced taxonomies
+
+2.0.79: 2024-11-28
+- Improvement: Fetch only relevant user fields for the conditions module
+
+2.0.78: 2024-11-21
+- Improvement: Improve handling of global CSS file generation when no direct WP file system is used
+
+2.0.77: 2024-11-14
+- Improvement: Smarter handling of translations in JS files
+
+2.0.76: 2024-11-07
+- Improvement: Account modal - better integration with SecuPress plugin
+- Improvement: Make sure uploaded SVG's receive the correct sizes for ratio calculations
+- Improvement: Newsletter subscribe extension - deprecate JSONP and use the provided API for Mailchimp integration
+- Improvement: Starter sites installation - proper URL mapping
+
+2.0.75: 2024-10-24
+- Improvement: General fixes and improvements
+
+2.0.74: 2024-10-24
+- Improvement: Demo importer - don't import FluentBooking calendar twice
+- Improvement: Demo importer - preselect required builder when importing if demos where filtered by a specific builder
+
+2.0.73: 2024-10-11
+- Improvement: General fixes and improvements
+
+2.0.72: 2024-10-10
+- Improvement: Better error reporting of missing XML extension in starter sites
+
+2.0.71: 2024-10-04
+- Improvement: General fixes and improvements
+
+2.0.70: 2024-10-03
+- Improvement: Dont require updates script from Core when installing or updating theme from companion
+
+2.0.69: 2024-09-26
+- Improvement: General fixes and improvements
+
+2.0.68: 2024-09-19
+- Improvement: Correctly regenerate dynamic CSS after All in One WP Migration import is done
+
+2.0.67: 2024-09-12
+- Improvement: General fixes and improvements
+
+2.0.66: 2024-09-06
+- Improvement: General fixes and improvements
+
+2.0.65: 2024-09-05
+- Improvement: Better integrate demo importer with Fluent Booking plugin
+- Improvement: Include custom palettes in customizer export file
+
+2.0.64: 2024-08-29
+- Improvement: General fixes and improvements
+
+2.0.63: 2024-08-22
+- Improvement: Better integration with FluentBooking plugin in starter sites
+
+2.0.62: 2024-08-15
+- Improvement: Improved check for current theme in the customizer preview
+- Improvement: Starter sites - more reliable content installation
+
+2.0.61: 2024-08-08
+- Improvement: Starter sites installer ensure content type header is passed correctly in all requests
+- Fix: Product reviews extension - issue with short description option
+
+2.0.60: 2024-08-01
+- Improvement: Correctly load JSON translation files for JS files
+- Improvement: Declare text domain correctly so that Loco Translate is able to override translations
+
+2.0.59: 2024-07-25
+- Improvement: Removed old Google Analytics V3 option
+
+2.0.58: 2024-07-17
+- Improvement: Account module - better integration with Admin Enhancements Pro login redirection plugin
+- Improvement: Advanced posts block - add option to change columns number per device
+- Improvement: Trending posts module improvements
+- Fix: Advanced posts and taxonomies blocks - columns issue in WordPress 6.6
+
+2.0.57: 2024-07-04
+- Fix: Multi site crashes with Companion file referenced when Blocksy theme is attempted to be activated
+- Fix: Trending Posts extension gets stuck if a selected post type gets un-registered
+
+2.0.56: 2024-06-27
+- Fix: Fixed an issue when dashboard bulk select was not working properly
+
+2.0.55: 2024-06-21
+- Fix: Account modal drop down - properly stay on the same page after sign out
+
+2.0.54: 2024-06-17
+- Improvement: General fixes and improvements
+
+2.0.53: 2024-06-07
+- Improvement: General fixes and improvements
+
+2.0.52: 2024-06-06
+- New: Taxonomies query block
+- Improvement: Regenerate `global.css` when copying settings from parent or child theme
+
+2.0.51: 2024-05-30
+- Improvement: Correctly load JS translations for the Blocksy Companion
+
+2.0.50: 2024-05-24
+- Improvement: Ensure required theme version is correctly verified within WP CLI
+- Improvement: Login to WP dashboard through cPanel WP Toolkit doesn't work
+
+2.0.49: 2024-05-23
+- Improvement: General fixes and improvements
+
+2.0.48: 2024-05-16
+- Improvement: Sometimes the demo data cannot be persisted in DB due to some restrictions
+- Fix: Account dropdown - correctly link Dokan Dashboard item
+
+2.0.47: 2024-05-10
+- Improvement: General fixes and improvements
+
+2.0.46: 2024-05-09
+- Improvement: Sanitize all SVG images upon upload into media gallery
+
+2.0.45: 2024-05-03
+- Improvement: General fixes and improvements
+
+2.0.44: 2024-05-03
+- Improvement: General fixes and improvements
+
+2.0.43: 2024-05-02
+- Improvement: Account element drop down menu remains open indefinitely if clicked on the element itself
+- Improvement: Dont allow URLs in region portion of the Mailchimp API Key
+- Improvement: Enforce year structure of uploads during starter site install
+- Improvement: Make sure starter sites are correctly installed via WP CLI
+- Improvement: Respect login_redirect filter in the account modal
+- Improvement: Starter Site content install step dont pass XML in the request body
+- Improvement: Starter sites list - better filtering by categories
+
+2.0.42: 2024-04-25
+- Improvement: Account header element profile photo support YITH Customize My Account plugin
+- Improvement: Starter sites installation process improvements
+
+2.0.41: 2024-04-19
+- Improvement: Allow multiple instances of newsletter block in same post
+- Fix: `[blocksy_posts]` shortcode type slider has weird spacing for pills
+
+2.0.40: 2024-04-18
+- Improvement: Newsletter Subscribe - add option to make the "name" field mandatory
+
+2.0.39: 2024-04-11
+- Improvement: General fixes and improvements
+
+2.0.38: 2024-04-04
+- Improvement: Introduce a WP CLI command for installing a starter site in one step
+- Improvement: Make sure Product Reviews extension post contents is searchable
+
+2.0.37: 2024-03-29
+- Improvement: Correctly generate translation files
+
+2.0.36: 2024-03-29
+- Improvement: General fixes and improvements
+
+2.0.35: 2024-03-28
+- Improvement: General fixes and improvements
+
+2.0.34: 2024-03-28
+- Improvement: General fixes and improvements
+
+2.0.33: 2024-03-21
+- Improvement: Add filter functionality to starter sites
+- Fix: Newsletter block and single subscribe form can't get the custom list ID
+
+2.0.32: 2024-03-15
+- Improvement: Correctly escape style attribute in newsletter subscribe block
+
+2.0.31: 2024-03-14
+- Fix: `blocksy_posts` shortcode with slider doesn't wrap images inside links
+
+2.0.30: 2024-03-08
+- Improvement: General fixes and improvements
+
+2.0.29: 2024-03-07
+- Improvement: Ensure all dashboard AJAX actions are protected with nonces
+
+2.0.28: 2024-02-29
+- Improvement: General fixes and improvements
+
+2.0.27: 2024-02-29
+- Improvement: Account header element - overflow issue when email address is very long
+- Improvement: Display proper label for language conditions
+- Improvement: Make sure the header account element is getting the correct user role
+
+2.0.26: 2024-02-22
+- Fix: PHP Warning when using Multi-Vendor Marketplace Lite plugin and account header element
+
+2.0.25: 2024-02-15
+- Improvement: General fixes and improvements
+
+2.0.24: 2024-02-08
+- Improvement: Don't output account modal for logged out users if account is disabled for them
+- Improvement: Harden the check for blc_maybe_is_ssl() function
+- Improvement: Introduce a safe sprintf function to avoid errors on translations
+
+2.0.23: 2024-02-01
+- Improvement: General fixes and improvements
+
+2.0.22: 2024-01-25
+- Improvement: General fixes and improvements
+
+2.0.21: 2024-01-20
+- Improvement: General fixes and improvements
+
+2.0.20: 2024-01-19
+- Improvement: General fixes and improvements
+
+2.0.19: 2024-01-18
+- New: Header account - option to add a menu inside the dropdown
+- Improvement: Header account - user info dropdown options improvements
+
+2.0.18: 2024-01-12
+- Improvement: Correctly load Flexy styles when blocksy_posts shortcode is used in the slider mode
+
+2.0.17: 2024-01-11
+- Improvement: General fixes and improvements
+
+2.0.16: 2024-01-05
+- Improvement: General fixes and improvements
+
+2.0.15: 2024-01-04
+- Improvement: General fixes and improvements
+
+2.0.14: 2023-12-26
+- Improvement: Dont attempt to unslash post meta data upon starter site installation
+
+2.0.13: 2023-12-22
+- Improvement: Demo importer - make sure mega menus are imported correctly
+
+2.0.12: 2023-12-21
+- Improvement: General fixes and improvements
+
+2.0.11: 2023-12-15
+- Improvement: General fixes and improvements
+
+2.0.10: 2023-12-14
+- Improvement: General fixes and improvements
+
+2.0.9: 2023-12-12
+- Improvement: More reliable check for extensions preboot
+
+2.0.8: 2023-12-08
+- Improvement: General fixes and improvements
+
+2.0.7: 2023-12-07
+- Improvement: General fixes and improvements
+
+2.0.6: 2023-12-06
+- Fix: Customizer mode issue if child theme is active
+
+2.0.5: 2023-12-06
+- Improvement: Account drop down on mobile is placed out of bounds
+- Fix: Content Blocks cannot be turned on/off if quick edited
+
+2.0.4: 2023-11-30
+- Improvement: Correctly execute pre boot for extensions in the dashboard
+- Improvement: Introduce Product Taxonomy ID condition rule
+
+2.0.3: 2023-11-29
+- Improvement: Account header element under specific settings makes the Customizer break
+- Fix: Trending posts article font size option doesn't work
+
+2.0.2: 2023-11-27
+- Improvement: Correctly load styles for the newsletter subscribe shortcode
+- Improvement: Ensure extensions pre boot isn't executed on every ajax request
+
+2.0.1: 2023-11-25
+- Improvement: General fixes and improvements related to update
+
+2.0.0: 2023-11-24
+- New: Convert old legacy widgets to block widgets
+- New: Dropdown menu for account widget in header
+- New: Footer builder logo element - add lazy loading attribute to image
+- New: More integrations for newsletter module (Sendinblue, CampaignMonitor, ConvertKit)
+- New: New dashboard extensions screen
+- Improvement: Account modal - integration with Two-Factor plugin
+- Improvement: Account modal - use core registration if WooCommerce registration is disabled
+- Improvement: Automatically load Google analytics on cookies notice approve
+- Improvement: Performance - Faster PHP classes autoloader
+- Improvement: Performance - Smarter load extensions CSS files (only when extensions is activated and present on a page)
+- Improvement: Prefix CSS variables in order to not conflict with other plugins
+- Fix: Prevent errors on SVG's size calculation
+
+2.0.0-beta26: 2023-10-25
+- Improvement: General fixes and improvements
+
+2.0.0-beta25: 2023-10-06
+- Improvement: General fixes and improvements
+
+2.0.0-beta24: 2023-10-06
+- Improvement: General fixes and improvements
+
+2.0.0-beta23: 2023-09-29
+- Improvement: General fixes and improvements
+
+2.0.0-beta22: 2023-09-22
+- Improvement: General fixes and improvements
+
+2.0.0-beta21: 2023-09-15
+- Improvement: General fixes and improvements
+
+2.0.0-beta20: 2023-09-08
+- Improvement: General fixes and improvements
+
+2.0.0-beta19: 2023-09-01
+- Improvement: General fixes and improvements
+
+2.0.0-beta18: 2023-08-28
+- Improvement: General fixes and improvements
+
+2.0.0-beta17: 2023-08-25
+- Improvement: General fixes and improvements
+
+2.0.0-beta16: 2023-08-18
+- Improvement: General fixes and improvements
+
+2.0.0-beta15: 2023-08-11
+- Improvement: General fixes and improvements
+
+2.0.0-beta14: 2023-08-04
+- Improvement: General fixes and improvements
+
+2.0.0-beta13: 2023-07-28
+- Improvement: General fixes and improvements
+
+2.0.0-beta12: 2023-07-21
+- Improvement: General fixes and improvements
+
+2.0.0-beta11: 2023-07-14
+- Improvement: General fixes and improvements
+
+2.0.0-beta10: 2023-07-07
+- Improvement: General fixes and improvements
+
+2.0.0-beta9: 2023-06-30
+- Improvement: General fixes and improvements
+
+2.0.0-beta8: 2023-06-23
+- Improvement: General fixes and improvements
+
+2.0.0-beta7: 2023-06-16
+- Improvement: General fixes and improvements
+
+2.0.0-beta6: 2023-05-26
+- Improvement: General fixes and improvements
+
+2.0.0-beta5: 2023-05-26
+- Improvement: General fixes and improvements
+
+2.0.0-beta4: 2023-05-17
+- Improvement: General fixes and improvements
+
+2.0.0-beta3: 2023-05-12
+- New: Convert old legacy widgets to block widgets
+- New: Dropdown menu for account widget in header
+- New: More integrations for newsletter module (Sendinblue & CampaignMonitor)
+- New: New dashboard extensions screen
+- Improvement: Account modal - use core registration if WooCommerce registration is disabled
+
+1.9.11: 2023-11-09
+- Improvement: Better compatibility with WordPress 6.4
+
+1.9.10: 2023-11-02
+- Fix: Account `blocksy_get_avatar_url()` issue
+
+1.9.9: 2023-11-02
+- Improvement: Comments privacy policy link is not inheriting "Privacy page" option from dashboard
+
+1.9.8: 2023-10-12
+- Improvement: General fixes and improvements
+
+1.9.7: 2023-09-28
+- Fix: Posts widget gets corrupted if we select "no thumbnails"
+
+1.9.6: 2023-09-21
+- Improvement: General fixes and improvements
+
+1.9.5: 2023-09-14
+- Improvement: Conditions module bump limit of 500 users
+- Improvement: Improve rounding logic in sticky shrink logic to better handle fractional header heights
+
+1.9.4: 2023-09-07
+- Improvement: General fixes and improvements
+
+1.9.3: 2023-08-31
+- Improvement: Demo importer better handle WooCommerce imports
+
+1.9.2: 2023-08-24
+- Improvement: Cookies consent button type
+
+1.9.1: 2023-08-17
+- Improvement: Trending posts module - more color and typography options
+- Improvement: Correctly display of loading spinner in account modal
+
+1.9.0: 2023-08-10
+- Improvement: General fixes and improvements
+
+1.8.99: 2023-08-09
+- Improvement: Better scoping of taxonomies in blocksy_posts shortcode while filtering
+- Improvement: Contact element - shortcode support in link field
+- Fix: Import/export options disappear if UI Press Lite plugin is active
+
+1.8.98: 2023-07-27
+- Improvement: General fixes and improvements
+
+1.8.97: 2023-07-19
+- Improvement: General fixes and improvements
+
+1.8.96: 2023-07-13
+- Improvement: General fixes and improvements
+
+1.8.95: 2023-07-05
+- Improvement: General fixes and improvements
+
+1.8.94: 2023-06-29
+- Improvement: Correctly install and activate Blocksy theme from Companion
+
+1.8.93: 2023-06-22
+- Improvement: Ensure account logout action is not broken by WPML
+
 1.8.92: 2023-06-14
 - Improvement: General fixes and improvements
 

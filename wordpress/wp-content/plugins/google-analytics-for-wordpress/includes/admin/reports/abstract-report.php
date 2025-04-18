@@ -23,6 +23,15 @@ class MonsterInsights_Report {
 	public $name;
 	public $version = '1.0.0';
 	public $source = 'reports';
+	public $start_date;
+	public $end_date;
+
+	/**
+	 * We will use this value if we are not using the same value for report store and relay path.
+	 *
+	 * @var string
+	 */
+	protected $api_path;
 
 	/**
 	 * Primary class constructor.
@@ -151,7 +160,6 @@ class MonsterInsights_Report {
 
 	// Get report data
 	public function get_data( $args = array() ) {
-
 		if ( ! empty( $args['default'] ) ) {
 			$args['start'] = $this->default_start_date();
 			$args['end']   = $this->default_end_date();
@@ -159,6 +167,18 @@ class MonsterInsights_Report {
 
 		$start = ! empty( $args['start'] ) && $this->is_valid_date( $args['start'] ) ? $args['start'] : '';
 		$end   = ! empty( $args['end'] ) && $this->is_valid_date( $args['end'] ) ? $args['end'] : '';
+
+		$extra_params = [];
+		if ( ! empty( $args['included_metrics'] ) ) {
+			$extra_params['included_metrics'] = $args['included_metrics'];
+		}
+		$compare_start    = null;
+		$compare_end      = null;
+
+		if ( isset( $args['compare_start'] ) ) {
+			$compare_start = ! empty( $args['compare_start'] ) && $this->is_valid_date( $args['compare_start'] ) ? $args['compare_start'] : '';
+			$compare_end   = ! empty( $args['compare_end'] ) && $this->is_valid_date( $args['compare_end'] ) ? $args['compare_end'] : '';
+		}
 
 		if ( monsterinsights_is_pro_version() && ! MonsterInsights()->license->license_can( $this->level ) ) {
 			return array(
@@ -199,49 +219,89 @@ class MonsterInsights_Report {
 			) );
 		}
 
+		// These values are going to use on child classes.
+		$this->start_date = $start;
+		$this->end_date   = $end;
+
 		$check_cache       = ( $start === $this->default_start_date() && $end === $this->default_end_date() ) || apply_filters( 'monsterinsights_report_use_cache', false, $this->name );
 		$site_auth         = MonsterInsights()->auth->get_viewname();
 		$ms_auth           = is_multisite() && MonsterInsights()->auth->get_network_viewname();
-		$transient         = 'monsterinsights_report_' . $this->name . '_' . $start . '_' . $end;
+
+		if ( $compare_start && $compare_end ) {
+			$transient = 'monsterinsights_report_' . $this->name . '_' . $start . '_' . $end . '_to_' . $compare_start . '_' . $compare_end;
+		} else {
+			$transient = 'monsterinsights_report_' . $this->name . '_' . $start . '_' . $end;
+		}
+
 		$current_timestamp = current_time( 'U' );
 		// Set to same time as MI cache. MI caches same day to 15 and others to 1 day, so there's no point pinging MI before then.
 		$expiration = apply_filters( 'monsterinsights_report_transient_expiration',
-			date( 'Y-m-d' ) === $end ? ( 15 * MINUTE_IN_SECONDS ) : ( strtotime( 'Tomorrow 12:05am', $current_timestamp ) - $current_timestamp ),
-			$this->name );
+			date( 'Y-m-d' ) === $end ? ( 15 * MINUTE_IN_SECONDS ) : ( strtotime( 'Tomorrow 12:05am', $current_timestamp ) - $current_timestamp ), $this->name ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
 
 		// Default date range, check.
 		if ( $site_auth || $ms_auth ) {
 			// Single site or MS with auth at subsite
-			$option_name = $site_auth ? 'monsterinsights_report_data_' . $this->name : 'monsterinsights_network_report_data_' . $this->name;
-			$p           = $site_auth ? MonsterInsights()->auth->get_viewid() : MonsterInsights()->auth->get_network_viewid();
+			if ( $compare_start && $compare_end ) {
+				$option_name = $site_auth ? 'monsterinsights_report_data_compare_' . $this->name : 'monsterinsights_network_report_data_compare_' . $this->name;
+			} else {
+				$option_name = $site_auth ? 'monsterinsights_report_data_' . $this->name : 'monsterinsights_network_report_data_' . $this->name;
+			}
+
+			$p = $site_auth ? MonsterInsights()->auth->get_viewid() : MonsterInsights()->auth->get_network_viewid();
 
 			$data = array();
+			// If default date range then get cache data from option.
 			if ( $check_cache ) {
 				$data = ! $site_auth && $ms_auth ? get_site_option( $option_name, array() ) : get_option( $option_name, array() );
 			} else {
 				$data = ! $site_auth && $ms_auth ? get_site_transient( $transient ) : get_transient( $transient );
 			}
 
-			if ( ! empty( $data ) &&
-				 ! empty( $data['expires'] ) &&
-				 $data['expires'] >= time() &&
-				 ! empty( $data['data'] ) &&
-				 ! empty( $data['p'] ) &&
-				 $data['p'] === $p
-			) {
-				return $this->prepare_report_data( array(
-					'success' => true,
-					'data'    => $data['data'],
-				) );
+			$user_included_metrics = get_user_meta( get_current_user_id(), 'monsterinsights_included_metrics', true );
+			if ( $compare_start && $compare_end ) {
+				$previous_included_metrics = get_user_meta( get_current_user_id(), 'monsterinsights_previous_included_metrics_' . $start . '_' . $end . '_to_' . $compare_start . '_' . $compare_end, true );
+			} else {
+				$previous_included_metrics = get_user_meta( get_current_user_id(), 'monsterinsights_previous_included_metrics_' . $start . '_' . $end, true );
 			}
 
-			// Nothing in cache, either not saved before, expired or mismatch. Let's grab from API
+			if ( $user_included_metrics === $previous_included_metrics ) {
+				if ( ! empty( $data ) &&
+						! empty( $data['expires'] ) &&
+						$data['expires'] >= time() &&
+						! empty( $data['data'] ) &&
+						! empty( $data['p'] ) &&
+						$data['p'] === $p
+				) {
+					return $this->prepare_report_data( array(
+						'success' => true,
+						'data'    => $data['data'],
+					) );
+				}
+			} else {
+				// if the metrics has changed, then lets ignore the cache report and trigger a request.
+				if ( $compare_start && $compare_end ) {
+					update_user_meta( get_current_user_id(), 'monsterinsights_previous_included_metrics_' . $start . '_' . $end . '_to_' . $compare_start . '_' . $compare_end, $user_included_metrics );
+				} else {
+					update_user_meta( get_current_user_id(), 'monsterinsights_previous_included_metrics_' . $start . '_' . $end, $user_included_metrics );
+				}
+			}
+
+			// Nothing in cache, either not saved before, expired or mismatch. Let's grab from API.
 			$api_options = array( 'start' => $start, 'end' => $end );
+
+			if ( $compare_start && $compare_end ) {
+				$api_options['compare_start'] = $compare_start;
+				$api_options['compare_end']   = $compare_end;
+			}
+
 			if ( ! $site_auth && $ms_auth ) {
 				$api_options['network'] = true;
 			}
 
-			$api = new MonsterInsights_API_Request( 'analytics/reports/' . $this->name . '/', $api_options, 'GET' );
+			// Get the path of the relay.
+			$api_path = empty( $this->api_path ) ? $this->name : $this->api_path;
+
+			$api = new MonsterInsights_API_Request( 'analytics/reports/' . $api_path . '/', $api_options, 'GET' );
 
 			// Use a report source indicator for requests.
 			if ( ! empty( $this->source ) ) {
@@ -255,8 +315,7 @@ class MonsterInsights_Report {
 			if ( ! empty( $additional_data ) ) {
 				$api->set_additional_data( $additional_data );
 			}
-
-			$ret = $api->request();
+			$ret = $api->request( $extra_params );
 
 			if ( is_wp_error( $ret ) ) {
 				return array(
@@ -300,19 +359,41 @@ class MonsterInsights_Report {
 
 			return array(
 				'success' => false,
-				'error'   => sprintf( __( 'You must be properly authenticated with MonsterInsights to use our reports. Please use our %1$ssetup wizard%2$s to get started.', 'google-analytics-for-wordpress' ), '<a href=" ' . $url . ' ">', '</a>' ),
-				// Translators: Wizard link tag starts with url, Wizard link tag ends.
+				'error'   => sprintf(
+					/* translators: Placeholders add a link to the Setup Wizard page. */
+					__( 'You must be properly authenticated with MonsterInsights to use our reports. Please use our %1$ssetup wizard%2$s to get started.', 'google-analytics-for-wordpress' ),
+					'<a href=" ' . $url . ' ">',
+					'</a>'
+				),
 				'data'    => array(),
 			);
 		}
 	}
 
 	public function default_start_date() {
-		return date( 'Y-m-d', strtotime( '-30 days' ) );
+		return date( 'Y-m-d', strtotime( '-30 days' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
 	}
 
 	public function default_end_date() {
-		return date( 'Y-m-d', strtotime( '-1 day' ) );
+		return date( 'Y-m-d', strtotime( '-1 day' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+	}
+
+	/**
+	 * Default date for compare start.
+	 *
+	 * @return string
+	 */
+	public function default_compare_start_date() {
+		return date( 'Y-m-d', strtotime( '-60 days' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+	}
+
+	/**
+	 * Default date for compare end.
+	 *
+	 * @return string
+	 */
+	public function default_compare_end_date() {
+		return date( 'Y-m-d', strtotime( '-31 day' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
 	}
 
 	// Checks to see if date range is valid. Should be 30-yesterday always for lite & any valid date range to today for Pro.
@@ -351,27 +432,20 @@ class MonsterInsights_Report {
 		return array();
 	}
 
-	protected function get_ga_report_url( $ua_name, $v4_name, $data, $ua_extra_params = '', $v4_extra_params = '', $v4_endpoint = 'explorer', $is_real_time = false ) {
+	protected function get_ga_report_url( $v4_name, $data, $v4_extra_params = '', $v4_endpoint = 'explorer', $is_real_time = false ) {
 		$auth = MonsterInsights()->auth;
 
 		$params = $this->get_ga_report_range( $data );
 
-		if ( $auth->get_connected_type() === 'v4' ) {
-			$format = 'https://analytics.google.com/analytics/web/#/%1$s/' . ( $is_real_time ? 'realtime' : 'reports' ) . '/%5$s?params=%3$s%4$s&r=%2$s';
+		$format = 'https://analytics.google.com/analytics/web/#/%1$s/' . ( $is_real_time ? 'realtime' : 'reports' ) . '/%5$s?params=%3$s%4$s&r=%2$s';
 
-			if ( empty( $v4_name ) ) {
-				$report_name = '';
-			} else {
-				$report_name = $v4_name;
-			}
-			$extra_params = '&' . $v4_extra_params;
-			$endpoint     = $v4_endpoint;
+		if ( empty( $v4_name ) ) {
+			$report_name = '';
 		} else {
-			$format       = 'https://analytics.google.com/analytics/web/#' . ( $is_real_time ? '/realtime' : 'report' ) . '/%2$s/%1$s%3$s%4$s/';
-			$report_name  = $ua_name;
-			$extra_params = '?' . $ua_extra_params;
-			$endpoint     = '';
+			$report_name = $v4_name;
 		}
+		$extra_params = '&' . $v4_extra_params;
+		$endpoint     = $v4_endpoint;
 
 		return sprintf(
 			$format,
@@ -390,14 +464,14 @@ class MonsterInsights_Report {
 		$message = sprintf( __( 'You currently have a %1$s level license, but this report requires at least a %2$s level license to view the %3$s. Please upgrade to view this report.', 'google-analytics-for-wordpress' ), $has_level, $this->level, $this->title );
 		ob_start(); ?>
 		<div
-			class="monsterinsights-upsell-report-container monsterinsights-upsell-report-<?php echo $this->name; ?>-bg">
+			class="monsterinsights-upsell-report-container monsterinsights-upsell-report-<?php echo esc_attr($this->name); ?>-bg">
 			<div class="monsterinsights-upsell-container">
 				<div class="row justify-content-center">
 					<div class="col-lg-10 col-lg-offset-1 align-self-center">
 						<div class="monsterinsights-upsell-card">
 							<img class="monsterinsights-upgrade-mascot"
-								 src="<?php echo trailingslashit( MONSTERINSIGHTS_PLUGIN_URL ); ?>assets/css/images/mascot.png"
-								 srcset="<?php echo trailingslashit( MONSTERINSIGHTS_PLUGIN_URL ); ?>assets/css/images/mascot@2x.png 2x"
+								 src="<?php echo esc_url(trailingslashit( MONSTERINSIGHTS_PLUGIN_URL )); ?>assets/css/images/mascot.png"
+								 srcset="<?php echo esc_url(trailingslashit( MONSTERINSIGHTS_PLUGIN_URL )); ?>assets/css/images/mascot@2x.png 2x"
 								 alt="">
 							<div class="monsterinsights-upsell-card-card-content">
 								<span
@@ -409,21 +483,21 @@ class MonsterInsights_Report {
 									<p>
 										<?php
 										// Translators: License level and smiley.
-										echo sprintf( esc_html__( 'Hey there! It looks like you\'ve got the %1$s license installed on your site. That\'s awesome! %s', 'google-analytics-for-wordpress' ), $has_level, '<span class="dashicons dashicons-smiley"></span>' );
+										echo sprintf( esc_html__( 'Hey there! It looks like you\'ve got the %1$s license installed on your site. That\'s awesome! %s', 'google-analytics-for-wordpress' ), $has_level, '<span class="dashicons dashicons-smiley"></span>' ); // phpcs:ignore
 										?>
 									</p>
 									&nbsp;
 									<p>
 										<?php
 										// Translators: Placeholders add the report title and license level.
-										echo sprintf( esc_html__( 'Do you want to access to %1$s reporting right now%2$s in your WordPress Dashboard? That comes with the %3$s level%4$s of our paid packages. You\'ll need to upgrade your license to get instant access.', 'google-analytics-for-wordpress' ), '<strong>' . $this->title, '</strong>', '<strong><a href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://monsterinsights.com/my-account/' ) . '">' . $this->level, '</a></strong>' );
+										echo sprintf( esc_html__( 'Do you want to access to %1$s reporting right now%2$s in your WordPress Dashboard? That comes with the %3$s level%4$s of our paid packages. You\'ll need to upgrade your license to get instant access.', 'google-analytics-for-wordpress' ), '<strong>' . $this->title, '</strong>', '<strong><a href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://monsterinsights.com/my-account/' ) . '">' . $this->level, '</a></strong>' ); // phpcs:ignore
 										?>
 									</p>
 									&nbsp;
 									<p>
 										<?php
 										// Translators: Placeholdes add links to the account area and a guide.
-										echo sprintf( esc_html__( 'It\'s easy! To upgrade, navigate to %1$sMy Account%2$s on MonsterInsights.com, go to the licenses tab, and click upgrade. We also have a %3$sstep by step guide%4$s with pictures of this process.', 'google-analytics-for-wordpress' ), '<a href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://monsterinsights.com/my-account/' ) . '"><strong>', '</strong></a>', '<a href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://www.monsterinsights.com/docs/upgrade-monsterinsights-license/' ) . '" style="text-decoration:underline !important">', '</a>' );
+										echo sprintf( esc_html__( 'It\'s easy! To upgrade, navigate to %1$sMy Account%2$s on MonsterInsights.com, go to the licenses tab, and click upgrade. We also have a %3$sstep by step guide%4$s with pictures of this process.', 'google-analytics-for-wordpress' ), '<a href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://monsterinsights.com/my-account/' ) . '"><strong>', '</strong></a>', '<a href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://www.monsterinsights.com/docs/upgrade-monsterinsights-license/' ) . '" style="text-decoration:underline !important">', '</a>' ); // phpcs:ignore
 										?>
 									</p>
 									&nbsp;
@@ -439,14 +513,14 @@ class MonsterInsights_Report {
 									<p>
 										<?php
 										// Translators: Placeholders make the text bold, add the license level and add a link to upgrade.
-										echo sprintf( esc_html__( 'Do you you want to access to %1$s reporting right now%2$s in your WordPress Dashboard? That comes with %3$s level%4$s of our paid packages. To get instant access, you\'ll want to buy a MonsterInsights license, which also gives you access to powerful addons, expanded reporting (including the ability to use custom date ranges), comprehensive tracking features (like UserID tracking) and access to our world-class support team.', 'google-analytics-for-wordpress' ), '<strong>' . $this->title, '</strong>', '<a href="' . monsterinsights_get_upgrade_link( 'reports-page', $this->name . '-report-upsell-license-link' ) . '">' . $this->level, '</a>' );
+										echo sprintf( esc_html__( 'Do you you want to access to %1$s reporting right now%2$s in your WordPress Dashboard? That comes with %3$s level%4$s of our paid packages. To get instant access, you\'ll want to buy a MonsterInsights license, which also gives you access to powerful addons, expanded reporting (including the ability to use custom date ranges), comprehensive tracking features (like UserID tracking) and access to our world-class support team.', 'google-analytics-for-wordpress' ), '<strong>' . $this->title, '</strong>', '<a href="' . monsterinsights_get_upgrade_link( 'reports-page', $this->name . '-report-upsell-license-link' ) . '">' . $this->level, '</a>' ); // phpcs:ignore
 										?>
 									</p>
 									&nbsp;
 									<p>
 										<?php
 										// Translators: Placeholders make the text bold, add the license level and add a link to upgrade.
-										echo sprintf( esc_html__( 'Upgrading is easy! To upgrade, navigate to %1$ssour pricing page%2$s, purchase the required license, and then follow the %3$sinstructions in the email receipt%4$s to upgrade. It only takes a few minutes to unlock the most powerful, yet easy to use analytics tracking system for WordPress.', 'google-analytics-for-wordpress' ), '<a href="' . monsterinsights_get_upgrade_link( 'reports-page', $this->name . '-report-upsell-license-link' ) . '"><strong>', '</strong></a>', '<a style="text-decoration:underline !important" href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-go-lite-pro-link', 'https://www.monsterinsights.com/docs/go-lite-pro/' ) . '">', '</a>' );
+										echo sprintf( esc_html__( 'Upgrading is easy! To upgrade, navigate to %1$ssour pricing page%2$s, purchase the required license, and then follow the %3$sinstructions in the email receipt%4$s to upgrade. It only takes a few minutes to unlock the most powerful, yet easy to use analytics tracking system for WordPress.', 'google-analytics-for-wordpress' ), '<a href="' . monsterinsights_get_upgrade_link( 'reports-page', $this->name . '-report-upsell-license-link' ) . '"><strong>', '</strong></a>', '<a style="text-decoration:underline !important" href="' . monsterinsights_get_url( 'reports-page', $this->name . '-report-go-lite-pro-link', 'https://www.monsterinsights.com/docs/go-lite-pro/' ) . '">', '</a>' ); // phpcs:ignore
 										?>
 									</p>
 									&nbsp;
@@ -455,10 +529,10 @@ class MonsterInsights_Report {
 							</div>
 							<div class="monsterinsights-upsell-card-action">
 								<?php if ( monsterinsights_is_pro_version() ) { ?>
-									<a href="<?php echo monsterinsights_get_upgrade_link( 'reports-page', $this->name . '-report-upsell-license-link' ); ?>"
+									<a href="<?php echo monsterinsights_get_upgrade_link( 'reports-page', $this->name . '-report-upsell-license-link' ); // phpcs:ignore -- Escaped in the function ?>"
 									   class="monsterinsights-upsell-card-button"><?php esc_html_e( 'Upgrade Now', 'google-analytics-for-wordpress' ); ?></a>
 								<?php } else { ?>
-									<a href="<?php echo monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://www.monsterinsights.com/docs/upgrade-monsterinsights-license/' ); ?>"
+									<a href="<?php echo monsterinsights_get_url( 'reports-page', $this->name . '-report-upsell-license-link', 'https://www.monsterinsights.com/docs/upgrade-monsterinsights-license/' ); // phpcs:ignore -- Escaped in the function ?>"
 									   class="monsterinsights-upsell-card-button"><?php esc_html_e( 'Get MonsterInsights Pro', 'google-analytics-for-wordpress' ); ?></a>
 								<?php } ?>
 							</div>
@@ -545,7 +619,7 @@ if ( ! class_exists( 'MonsterInsightsDateTime' ) ) {
 				return parent::createFromFormat( $format, $time, $timezone );
 			}
 
-			return new DateTime( date( $format, strtotime( $time ) ), $timezone );
+			return new DateTime( date( $format, strtotime( $time ) ), $timezone ); // phpcs:ignore
 		}
 	}
 }

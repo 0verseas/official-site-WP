@@ -15,8 +15,8 @@ use RankMath\Helper;
 use RankMath\Traits\Ajax;
 use RankMath\Module\Base;
 use RankMath\Admin\Options;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,14 +29,14 @@ class Admin extends Base {
 
 	/**
 	 * Module ID.
-	 * 
+	 *
 	 * @var string
 	 */
 	public $id = '';
 
 	/**
 	 * Module directory.
-	 * 
+	 *
 	 * @var string
 	 */
 	public $directory = '';
@@ -46,7 +46,7 @@ class Admin extends Base {
 	 */
 	public function __construct() {
 
-		$directory = dirname( __FILE__ );
+		$directory = __DIR__;
 		$this->config(
 			[
 				'id'        => 'sitemap',
@@ -75,7 +75,7 @@ class Admin extends Base {
 	 * Register setting page.
 	 */
 	public function register_setting_page() {
-		$sitemap_url = Router::get_base_url( 'sitemap_index.xml' );
+		$sitemap_url = Router::get_base_url( Sitemap::get_sitemap_index_slug() . '.xml' );
 
 		$tabs = [
 			'general' => [
@@ -209,7 +209,7 @@ class Admin extends Base {
 			$notice_end  = '</p><div class="rank-math-cmb-dependency hidden" data-relation="or"><span class="hidden" data-field="tax_' . $taxonomy->name . '_sitemap" data-comparison="=" data-value="on"></span></div></div>';
 
 			$taxonomy_name = strtolower( $taxonomy->name );
-			$url           = isset( $hash_links[ $taxonomy_name ] ) ? KB::get( 'configure-sitemaps', 'Options Panel Sitemap ' . $taxonomy->labels->name . ' Tab' )  . $hash_links[ $taxonomy_name ] : KB::get( 'configure-sitemaps' );
+			$url           = isset( $hash_links[ $taxonomy_name ] ) ? KB::get( 'configure-sitemaps', 'Options Panel Sitemap ' . $taxonomy->labels->name . ' Tab' ) . $hash_links[ $taxonomy_name ] : KB::get( 'configure-sitemaps' );
 			switch ( $taxonomy->name ) {
 				case 'product_cat':
 				case 'product_tag':
@@ -347,7 +347,7 @@ class Admin extends Base {
 		</p>
  <pre>
  # START Nginx Rewrites for Rank Math Sitemaps
- rewrite ^/' . $sitemap_base . 'sitemap_index.xml$ /index.php?sitemap=1 last;
+ rewrite ^/' . $sitemap_base . Sitemap::get_sitemap_index_slug() . '\\.xml$ /index.php?sitemap=1 last;
  rewrite ^/' . $sitemap_base . '([^/]+?)-sitemap([0-9]+)?.xml$ /index.php?sitemap=$1&sitemap_n=$2 last;
  # END Nginx Rewrites for Rank Math Sitemaps
  </pre>

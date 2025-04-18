@@ -15,6 +15,7 @@ use Elementor\Utils;
 use Elementor\Widget_Base;
 use Essential_Addons_Elementor\Classes\Helper as HelperCLass;
 use Essential_Addons_Elementor\Traits\Login_Registration;
+use WP_Roles;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,6 +34,11 @@ class Login_Register extends Widget_Base {
 	 * @var bool
 	 */
 	protected $user_can_register;
+	/**
+	 * Login custom redirect url
+	 * @var bool
+	 */
+	protected $login_custom_redirect_url;
 	/**
 	 * Are you currently in Elementor Editor Screen?
 	 * @var bool
@@ -114,6 +120,12 @@ class Login_Register extends Widget_Base {
 	 * @var string|false
 	 */
 	protected $recaptcha_sitekey_v3;
+	
+	/**
+	 * Google reCAPTCHA v3 badge hide flag
+	 * @var string|false
+	 */
+	protected $recaptcha_badge_hide;
 
 	/**
 	 * @var mixed|void
@@ -130,9 +142,13 @@ class Login_Register extends Widget_Base {
 		$this->user_can_register = get_option( 'users_can_register' );
 		$this->recaptcha_sitekey = get_option( 'eael_recaptcha_sitekey' );
 		$this->recaptcha_sitekey_v3 = get_option( 'eael_recaptcha_sitekey_v3' );
+		$this->recaptcha_badge_hide = get_option('eael_recaptcha_badge_hide');
 		$this->in_editor         = Plugin::instance()->editor->is_edit_mode();
 		$this->pro_enabled       = apply_filters( 'eael/pro_enabled', false );
 
+		if ( $this->recaptcha_badge_hide ) {
+			add_filter( 'body_class', [ $this, 'add_login_register_body_class' ] );
+		}
 	}
 
 	/**
@@ -192,6 +208,10 @@ class Login_Register extends Widget_Base {
 		];
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! HelperCLass::eael_e_optimized_markup();
+    }
+
 	public function get_custom_help_url() {
 		return 'https://essential-addons.com/elementor/docs/login-register-form/';
 	}
@@ -216,10 +236,13 @@ class Login_Register extends Widget_Base {
 			'first_name'   => __( 'First Name', 'essential-addons-for-elementor-lite' ),
 			'last_name'    => __( 'Last Name', 'essential-addons-for-elementor-lite' ),
 			'website'      => __( 'Website', 'essential-addons-for-elementor-lite' ),
+			'honeypot'     => __( 'Honeypot', 'essential-addons-for-elementor-lite' ),
 		];
 
 		if( 'on' === get_option( 'eael_custom_profile_fields' ) ){
 			$eael_form_field_types['eael_phone_number'] = __( 'Phone', 'essential-addons-for-elementor-lite' );
+			$eael_custom_profile_fields = $this->get_eael_custom_profile_fields( 'all' );
+			$eael_form_field_types = array_merge( $eael_form_field_types, $eael_custom_profile_fields );
 		}
 		
 		return apply_filters( 'eael/registration-form-fields', $eael_form_field_types );
@@ -364,7 +387,7 @@ class Login_Register extends Widget_Base {
 		$this->add_control( 'hide_for_logged_in_user', [
 			'label'   => __( 'Hide all Forms from Logged-in Users', 'essential-addons-for-elementor-lite' ),
 			'type'    => Controls_Manager::SWITCHER,
-			'default' => 'yes',
+			'default' => '',
 		] );
 		$this->add_control( 'redirect_for_logged_in_user', [
 			'label'   => __( 'Redirect for Logged-in Users', 'essential-addons-for-elementor-lite' ),
@@ -400,6 +423,18 @@ class Login_Register extends Widget_Base {
 			'type'    => Controls_Manager::SWITCHER,
 			'default' => 'yes',
 		] );
+		$this->add_control( 'log_out_link_text', [
+			'label'       => __( 'Logout Link Text', 'essential-addons-for-elementor-lite' ),
+			'label_block' => true,
+			'type'        => Controls_Manager::TEXT,
+			'dynamic'     => [
+				'active' => true,
+			],
+			'default'     => __( 'You are already logged in as [username]. ([logout_link])', 'essential-addons-for-elementor-lite' ),
+			'condition'   => [
+				'show_log_out_message' => 'yes',
+			],
+		] );
 		$this->add_control( 'show_lost_password', [
 			'label'   => __( 'Show Lost your password?', 'essential-addons-for-elementor-lite' ),
 			'type'    => Controls_Manager::SWITCHER,
@@ -415,6 +450,9 @@ class Login_Register extends Widget_Base {
 			'default'     => __( 'Forgot Password?', 'essential-addons-for-elementor-lite' ),
 			'condition'   => [
 				'show_lost_password' => 'yes',
+			],
+			'ai' => [
+				'active' => false,
 			],
 		] );
 		$this->add_control( 'lost_password_link_type', [
@@ -469,6 +507,9 @@ class Login_Register extends Widget_Base {
 			'default'     => __( 'Remember Me', 'essential-addons-for-elementor-lite' ),
 			'condition'   => [
 				'login_show_remember_me' => 'yes',
+			],
+			'ai' => [
+				'active' => false,
 			],
 		] );
 		if ( $this->user_can_register ) {
@@ -744,6 +785,30 @@ class Login_Register extends Widget_Base {
 			] );
 		}
 
+		$this->add_control( 'login_register_recaptcha_v3_score_threshold', [
+			'label'       => esc_html__( 'Score Threshold', 'essential-addons-for-elementor-lite' ),
+			'description' => esc_html__( 'By default, you can use a threshold of 0.5.', 'essential-addons-for-elementor-lite' ),
+			'type'       => Controls_Manager::SLIDER,
+			'size_units' => [
+				'%',
+			],
+			'range'      => [
+				'%' => [
+					'min'  => 0,
+					'max'  => 1,
+					'step' => 0.1,
+				],
+			],
+			'default'    => [
+				'unit' => '%',
+				'size' => 0.5,
+			],
+			'condition'       => [
+				'enable_login_register_recaptcha' => 'yes',
+				'login_register_recaptcha_version' => 'v3',
+			],
+		] );
+
 		do_action( 'eael/login-register/after-general-controls', $this );
 
 		if ( !$this->pro_enabled ) {
@@ -793,6 +858,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'login_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'login_password_label', [
@@ -803,6 +871,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'login_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'login_placeholders_heading', [
@@ -820,6 +891,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'login_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'login_password_placeholder', [
@@ -830,6 +904,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'login_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_responsive_control( 'login_field_width', [
@@ -855,7 +932,8 @@ class Login_Register extends Widget_Base {
 				'size' => 100,
 			],
 			'selectors'  => [
-				'{{WRAPPER}} .eael-login-form input:not(.eael-lr-btn)' => 'width: {{SIZE}}{{UNIT}};',
+				'{{WRAPPER}} .eael-login-form .eael-user-login' => 'width: {{SIZE}}{{UNIT}};',
+				'{{WRAPPER}} .eael-login-form .eael-user-password' => 'width: {{SIZE}}{{UNIT}};',
 			],
 			'separator'  => 'before',
 		] );
@@ -902,6 +980,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'default'     => __( 'Log In', 'essential-addons-for-elementor-lite' ),
 			'placeholder' => __( 'Log In', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->end_controls_section();
@@ -964,6 +1045,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'lostpassword_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'lostpassword_placeholders_heading', [
@@ -981,6 +1065,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'lostpassword_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_responsive_control( 'lostpassword_field_width', [
@@ -1006,7 +1093,7 @@ class Login_Register extends Widget_Base {
 				'size' => 100,
 			],
 			'selectors'  => [
-				'{{WRAPPER}} .eael-lostpassword-form input:not(.eael-lr-btn)' => 'width: {{SIZE}}{{UNIT}};',
+				'{{WRAPPER}} .eael-lostpassword-form .eael-lr-form-group' => 'width: {{SIZE}}{{UNIT}};',
 			],
 			'separator'  => 'before',
 		] );
@@ -1024,6 +1111,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'default'     => __( 'Reset Password', 'essential-addons-for-elementor-lite' ),
 			'placeholder' => __( 'Reset Password', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->end_controls_section();
@@ -1085,6 +1175,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'resetpassword_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'resetpassword_confirm_password_label', [
@@ -1095,6 +1188,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'resetpassword_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'resetpassword_placeholders_heading', [
@@ -1112,6 +1208,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'resetpassword_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'resetpassword_confirm_password_placeholder', [
@@ -1122,6 +1221,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'label_block' => true,
 			'condition'   => [ 'resetpassword_label_types' => 'custom', ],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_responsive_control( 'resetpassword_field_width', [
@@ -1147,7 +1249,7 @@ class Login_Register extends Widget_Base {
 				'size' => 100,
 			],
 			'selectors'  => [
-				'{{WRAPPER}} .eael-resetpassword-form input:not(.eael-lr-btn)' => 'width: {{SIZE}}{{UNIT}};',
+				'{{WRAPPER}} .eael-resetpassword-form .eael-lr-form-group ' => 'width: {{SIZE}}{{UNIT}};',
 			],
 			'separator'  => 'before',
 		] );
@@ -1173,6 +1275,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'default'     => __( 'Save Password', 'essential-addons-for-elementor-lite' ),
 			'placeholder' => __( 'Save Password', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->end_controls_section();
@@ -1224,6 +1329,9 @@ class Login_Register extends Widget_Base {
 			],
 			'default' => [
 				'url' => Utils::get_placeholder_image_src(),
+			],
+			'ai' => [
+				'active' => false,
 			],
 		] );
 
@@ -1279,6 +1387,9 @@ class Login_Register extends Widget_Base {
 			'default' => [
 				'url' => Utils::get_placeholder_image_src(),
 			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_group_control( Group_Control_Image_Size::get_type(), [
@@ -1328,6 +1439,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'placeholder' => __( 'Welcome Back!', 'essential-addons-for-elementor-lite' ),
 			'separator'   => 'before',
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'login_form_subtitle', [
 			'label'       => __( 'Login Form Sub Title', 'essential-addons-for-elementor-lite' ),
@@ -1342,6 +1456,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'placeholder' => __( 'Create a New Account', 'essential-addons-for-elementor-lite' ),
 			'separator'   => 'before',
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'register_form_subtitle', [
 			'label'       => __( 'Register Form Sub Title', 'essential-addons-for-elementor-lite' ),
@@ -1356,6 +1473,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'placeholder' => __( 'Get New Password', 'essential-addons-for-elementor-lite' ),
 			'separator'   => 'before',
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'lostpassword_form_subtitle', [
 			'label'       => __( 'Lost Password Form Sub Title', 'essential-addons-for-elementor-lite' ),
@@ -1370,6 +1490,9 @@ class Login_Register extends Widget_Base {
 			'dynamic'     => [ 'active' => true, ],
 			'placeholder' => __( 'Reset Password', 'essential-addons-for-elementor-lite' ),
 			'separator'   => 'before',
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'resetpassword_form_subtitle', [
 			'label'       => __( 'Reset Password Form Sub Title', 'essential-addons-for-elementor-lite' ),
@@ -1398,19 +1521,63 @@ class Login_Register extends Widget_Base {
 			'show_label'    => false,
 			'show_external' => false,
 			'placeholder'   => admin_url(),
-			'description'   => __( 'Please note that only your current domain is allowed here to keep your site secure.', 'essential-addons-for-elementor-lite' ),
 			'condition'     => [
 				'redirect_after_login' => 'yes',
+				'login_redirect_url_prev_page!' => 'yes',
 			],
 			'default'       => [
 				'url'         => admin_url(),
 				'is_external' => false,
 				'nofollow'    => true,
 			],
-			'separator'     => 'after',
+		] );
+
+		$this->add_control( 'redirect_based_on_roles', [
+			'label' => __( 'Redirect Based On User Roles', 'essential-addons-for-elementor-lite' ),
+			'type'  => Controls_Manager::SWITCHER,
+			'condition' => [
+				'redirect_after_login' => 'yes',
+			]
+		] );
+
+		$user_roles = $this->eael_get_role_names();
+
+		if( ! empty( $user_roles ) && is_array( $user_roles ) && count( $user_roles ) ){
+			foreach( $user_roles as $user_role_key => $user_role_value ){
+				$this->add_control( 'redirect_url_' . esc_html( $user_role_key ), [
+					'type'          => Controls_Manager::URL,
+					'label'			=> esc_html( __( $user_role_value, 'essential-addons-for-elementor-lite' ) ),
+					'show_external' => false,
+					'placeholder'   => admin_url(),
+					'condition'     => [
+						'redirect_after_login' 		=> 'yes',
+						'redirect_based_on_roles' 	=> 'yes',
+					],
+				] );
+			}
+		}
+
+		$this->add_control( 'login_redirect_url_prev_page', [
+			'label'   => __( 'Redirect to Previous Page', 'essential-addons-for-elementor-lite' ),
+			'description'   => __( 'Redirect to the last visited page before login.', 'essential-addons-for-elementor-lite' ),
+			'type'    => Controls_Manager::SWITCHER,
+			'default' => '',
+			'condition'     => [
+				'redirect_after_login' => 'yes',
+			],
 		] );
 
 		$this->end_controls_section();
+	}
+
+	public function eael_get_role_names() {
+
+		global $wp_roles;
+
+		if ( ! isset( $wp_roles ) )
+			$wp_roles = new WP_Roles();
+
+		return $wp_roles->get_names();
 	}
 
 	protected function social_login_promo() {
@@ -1448,6 +1615,19 @@ class Login_Register extends Widget_Base {
 			'label_off'    => __( 'No', 'essential-addons-for-elementor-lite' ),
 			'default'      => 'no',
 			'return_value' => 'yes',
+		] );
+
+		$this->add_control( 'eael_terms_conditions_field_type', [
+			'label'       => __( 'Field Type', 'essential-addons-for-elementor-lite' ),
+			'type'        => Controls_Manager::SELECT,
+			'default'     => 'toggle',
+			'options'     => [
+				'toggle' => __( 'Toggle', 'essential-addons-for-elementor-lite' ),
+				'checkbox'  => __( 'Checkbox', 'essential-addons-for-elementor-lite' ),
+			],
+			'condition'   => [
+				'show_terms_conditions' => 'yes',
+			],
 		] );
 
 		$this->add_control( 'acceptance_label', [
@@ -1488,6 +1668,7 @@ class Login_Register extends Widget_Base {
 			],
 		] );
 
+		$terms_conditions_url = get_the_permalink( get_option( 'wp_page_for_privacy_policy' ) );
 
 		$this->add_control( 'acceptance_text_url', [
 			'label'       => __( 'Terms & Conditions URL', 'essential-addons-for-elementor-lite' ),
@@ -1497,7 +1678,7 @@ class Login_Register extends Widget_Base {
 				'active' => true,
 			],
 			'default'     => [
-				'url'         => get_the_permalink( get_option( 'wp_page_for_privacy_policy' ) ),
+				'url'         => ! empty( $terms_conditions_url ) && 'false' !== $terms_conditions_url ? $terms_conditions_url : '',
 				'is_external' => true,
 				'nofollow'    => true,
 			],
@@ -1526,6 +1707,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Your email is invalid.', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "You have used an invalid email", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'err_email_missing', [
 			'label'       => __( 'Email is missing', 'essential-addons-for-elementor-lite' ),
@@ -1533,6 +1717,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Email is missing or Invalid', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'Email is missing or Invalid', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'err_email_used', [
 			'label'       => __( 'Already Used Email', 'essential-addons-for-elementor-lite' ),
@@ -1540,6 +1727,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Your email is already in use..', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'The provided email is already registered with other account. Please login or reset password or use another email.', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'err_username', [
 			'label'       => __( 'Invalid Username', 'essential-addons-for-elementor-lite' ),
@@ -1547,6 +1737,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Your username is invalid.', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "You have used an invalid username", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'err_username_used', [
 			'label'       => __( 'Username already in use', 'essential-addons-for-elementor-lite' ),
@@ -1554,6 +1747,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Your username is already registered.', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'Invalid username provided or the username already registered.', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'err_pass', [
 			'label'       => __( 'Invalid Password', 'essential-addons-for-elementor-lite' ),
@@ -1561,6 +1757,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Your password is invalid', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "Your password is invalid.", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_conf_pass', [
@@ -1569,6 +1768,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Password did not matched', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "Your confirmed password did not match", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_loggedin', [
@@ -1577,6 +1779,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. You are already logged in', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "You are already logged in", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_recaptcha', [
@@ -1585,6 +1790,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. reCAPTCHA Validation Failed', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "You did not pass reCAPTCHA challenge.", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_reset_password_key_expired', [
@@ -1593,6 +1801,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Your password reset link appears to be invalid. Please request a new link.', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'Your password reset link appears to be invalid. Please request a new link.', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		
 		$this->add_control( 'err_tc', [
@@ -1601,6 +1812,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. You must accept the Terms & Conditions', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'You did not accept the Terms and Conditions. Please accept it and try again.', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_unknown', [
@@ -1609,6 +1823,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. Something went wrong', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "Something went wrong!", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_phone_number_missing', [
@@ -1617,6 +1834,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Phone number is missing', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'Phone number is missing', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'err_phone_number_invalid', [
@@ -1625,6 +1845,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Invalid phone number provided', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( 'Invalid phone number provided', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'success_message_heading', [
@@ -1639,6 +1862,9 @@ class Login_Register extends Widget_Base {
 			'label_block' => true,
 			'placeholder' => __( 'Eg. You have logged in successfully', 'essential-addons-for-elementor-lite' ),
 			'default'     => __( "You have logged in successfully", 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( 'success_register', [
 			'label'       => __( 'Successful Registration', 'essential-addons-for-elementor-lite' ),
@@ -1692,6 +1918,7 @@ class Login_Register extends Widget_Base {
 	}
 
 	protected function init_content_register_fields_controls() {
+		$custom_fields_image = array_keys( $this->get_eael_custom_profile_fields( 'image' ) );
 
 		$this->start_controls_section( 'section_content_register_fields', [
 			'label'      => __( 'Register Form Fields', 'essential-addons-for-elementor-lite' ),
@@ -1699,7 +1926,7 @@ class Login_Register extends Widget_Base {
 		] );
 		$this->add_control( 'register_form_field_note', [
 			'type'            => Controls_Manager::RAW_HTML,
-			'raw'             => __( sprintf( 'Select the type of fields you want to show in the registration form. You can enable custom fields from EA Dashboard » Elements » <a href="%s" target="_blank">Login Register Form Settings</a>.', esc_attr( site_url('/wp-admin/admin.php?page=eael-settings') ) ), 'essential-addons-for-elementor-lite' ),
+			'raw'             => __( sprintf( 'Select the type of fields you want to show in the registration form. You can enable custom fields from EA Dashboard » Elements » <a href="%s" target="_blank">Login Register Form Settings</a>.', esc_url( site_url('/wp-admin/admin.php?page=eael-settings') ) ), 'essential-addons-for-elementor-lite' ),
 			'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 		] );
 		$repeater = new Repeater();
@@ -1711,6 +1938,15 @@ class Login_Register extends Widget_Base {
 			'default' => 'first_name',
 		] );
 
+		$repeater->add_control( 'field_type_custom_image_note', [
+			'type'            	=> Controls_Manager::RAW_HTML,
+			'raw'             	=> __( 'File upload will not work if AJAX submission is enabled.', 'essential-addons-for-elementor-lite' ),
+			'condition'       	=> [
+				'field_type' 	=> array_keys( $this->get_eael_custom_profile_fields( 'image' ) ),
+			],
+			'content_classes' => 'eael-warning',
+		] );
+
 		$repeater->add_control( 'field_label', [
 			'label'   => __( 'Label', 'essential-addons-for-elementor-lite' ),
 			'type'    => Controls_Manager::TEXT,
@@ -1718,7 +1954,60 @@ class Login_Register extends Widget_Base {
 			'dynamic' => [
 				'active' => true,
 			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
+
+		$repeater->add_control( 'field_type_custom_image_extensions', [
+			'label'   		=> __( 'File Extensions', 'essential-addons-for-elementor-lite' ),
+			'description'	=> __('Only extensions that is permitted on WordPress.', 'essential-addons-for-elementor-lite'),
+			'type'    		=> Controls_Manager::TEXT,
+			'default'		=> '',
+			'placeholder' 	=> '.png, .jpg, .jpeg',
+			'dynamic' => [
+				'active' => true,
+			],
+			'condition' => [
+				'field_type' => $custom_fields_image,
+			],
+		] );
+
+		$repeater->add_control(
+            'field_type_custom_image_filename_length',
+            [
+                'label' 		=> __('Max Filename Length', 'essential-addons-for-elementor-lite'),
+                'type' 			=> Controls_Manager::NUMBER,
+                'placeholder'	=> '128',
+                'default' 		=> '128',
+				'min' 			=> '1',
+				'max' 			=> '128',
+                'condition' => [
+					'field_type' => $custom_fields_image,
+				],
+            ]
+        );
+
+		$max_file_size = wp_max_upload_size();
+		if( $max_file_size ){
+			$max_file_size = $max_file_size / 1048576; //(1024x1024=1048576)
+		}
+
+		$repeater->add_control(
+            'field_type_custom_image_filesize',
+            [
+                'label' 		=> __('Max File Size (MB)', 'essential-addons-for-elementor-lite'),
+                'description'	=> sprintf( __('Set max file size up to %s MB.', 'essential-addons-for-elementor-lite'), $max_file_size ),
+                'type' 			=> Controls_Manager::NUMBER,
+                'placeholder' 	=> '5',
+                'default' 		=> '5',
+				'Min'			=> '1',
+				'Max'			=> $max_file_size,
+                'condition' 	=> [
+					'field_type' => $custom_fields_image,
+				],
+            ]
+        );
 
 		$repeater->add_control( 'placeholder', [
 			'label'   => __( 'Placeholder', 'essential-addons-for-elementor-lite' ),
@@ -1726,6 +2015,12 @@ class Login_Register extends Widget_Base {
 			'default' => '',
 			'dynamic' => [
 				'active' => true,
+			],
+			'condition' => [
+				'field_type!' => array_merge( $custom_fields_image, ['honeypot'] ),
+			],
+			'ai' => [
+				'active' => false,
 			],
 		] );
 
@@ -1737,6 +2032,7 @@ class Login_Register extends Widget_Base {
 					'email',
 					'password',
 					'confirm_pass',
+					'honeypot'
 				],
 			],
 		] );
@@ -1756,21 +2052,31 @@ class Login_Register extends Widget_Base {
 
 		$repeater->add_responsive_control( 'width', [
 			'label'   => __( 'Field Width', 'essential-addons-for-elementor-lite' ),
-			'type'    => Controls_Manager::SELECT,
-			'options' => [
-				''    => __( 'Default', 'essential-addons-for-elementor-lite' ),
-				'100' => '100%',
-				'80'  => '80%',
-				'75'  => '75%',
-				'66'  => '66%',
-				'60'  => '60%',
-				'50'  => '50%',
-				'40'  => '40%',
-				'33'  => '33%',
-				'25'  => '25%',
-				'20'  => '20%',
+			'type'    => Controls_Manager::SLIDER,
+			'size_units' => [ 'px', '%' ],
+			'range' => [
+				'px' => [
+					'min' => 0,
+					'max' => 1000,
+					'step' => 5,
+				],
+				'%' => [
+					'min' => 0,
+					'max' => 100,
+				],
 			],
-			'default' => '100',
+			'default' => [
+				'unit' => '%',
+				'size' => 100,
+			],
+			'selectors' => [
+				'{{WRAPPER}} {{CURRENT_ITEM}}' => 'width: {{SIZE}}{{UNIT}};',
+			],
+			'condition'       => [
+				'field_type!' => [
+					'honeypot'
+				],
+			],
 		] );
 		apply_filters( 'eael/login-register/register-repeater', $repeater );
 		$rf = [
@@ -1782,21 +2088,18 @@ class Login_Register extends Widget_Base {
 					'field_type'  => 'user_name',
 					'field_label' => __( 'Username', 'essential-addons-for-elementor-lite' ),
 					'placeholder' => __( 'Username', 'essential-addons-for-elementor-lite' ),
-					'width'       => '100',
 				],
 				[
 					'field_type'  => 'email',
 					'field_label' => __( 'Email', 'essential-addons-for-elementor-lite' ),
 					'placeholder' => __( 'Email', 'essential-addons-for-elementor-lite' ),
 					'required'    => 'yes',
-					'width'       => '100',
 				],
 				[
 					'field_type'  => 'password',
 					'field_label' => __( 'Password', 'essential-addons-for-elementor-lite' ),
 					'placeholder' => __( 'Password', 'essential-addons-for-elementor-lite' ),
 					'required'    => 'yes',
-					'width'       => '100',
 				],
 			] ),
 			'title_field' => '{{ field_label }}',
@@ -1842,6 +2145,9 @@ class Login_Register extends Widget_Base {
 			'type'    => Controls_Manager::TEXT,
 			'dynamic' => [ 'active' => true, ],
 			'default' => __( 'Register', 'essential-addons-for-elementor-lite' ),
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 
@@ -1882,14 +2188,25 @@ class Login_Register extends Widget_Base {
 			],
 			'condition'     => [
 				'register_action' => 'redirect',
+				'register_redirect_url_prev_page!' => 'yes'
 			],
 		] );
 
-		if(current_user_can('create_users')){
+		$this->add_control( 'register_redirect_url_prev_page', [
+			'label'   => __( 'Redirect to Previous Page', 'essential-addons-for-elementor-lite' ),
+			'description'   => __( 'Redirect to the last visited page before registration.', 'essential-addons-for-elementor-lite' ),
+			'type'    => Controls_Manager::SWITCHER,
+			'default' => '',
+			'condition'     => [
+				'register_action' => 'redirect',
+			],
+		] );
+
+		if ( current_user_can( 'administrator' ) ) {
 			$user_role = $this->get_user_roles();
-		}else{
+		} else {
 			$user_role = [
-				get_option( 'default_role' ) =>  ucfirst(get_option( 'default_role' ))
+				'' => __( 'Default', 'essential-addons-for-elementor-lite' ),
 			];
 		}
 
@@ -1971,6 +2288,9 @@ class Login_Register extends Widget_Base {
 			'condition'   => [
 				'reg_email_template_type' => 'custom',
 			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'reg_email_message', [
@@ -1987,7 +2307,7 @@ class Login_Register extends Widget_Base {
 
 		$this->add_control( 'reg_email_content_note', [
 			'type'            => Controls_Manager::RAW_HTML,
-			'raw'             => __( '<strong>Note:</strong> You can use dynamic content in the email body like [fieldname]. For example [username] will be replaced by user-typed username. Available tags are: [password], [username], [email], [firstname],[lastname], [website], [loginurl], [password_reset_link] and [sitetitle] ', 'essential-addons-for-elementor-lite' ),
+			'raw'             => __( '<strong>Note:</strong> You can use dynamic content in the email body like [fieldname]. For example [username] will be replaced by user-typed username. Available tags are: [password], [username], [email], [firstname],[lastname], [website], [loginurl], [password_reset_link], [eael_phone_number] and [sitetitle]. <br>For custom profile fields use slug of the field name e.x. [my_custom_field_1]', 'essential-addons-for-elementor-lite' ),
 			'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 			'condition'       => [
 				'reg_email_template_type' => 'custom',
@@ -2077,6 +2397,9 @@ class Login_Register extends Widget_Base {
 			'condition'   => [
 				'reg_admin_email_template_type' => 'custom',
 			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'reg_admin_email_message', [
@@ -2093,7 +2416,7 @@ class Login_Register extends Widget_Base {
 
 		$this->add_control( 'reg_admin_email_content_note', [
 			'type'            => Controls_Manager::RAW_HTML,
-			'raw'             => __( '<strong>Note:</strong> You can use dynamic content in the email body like [fieldname]. For example [username] will be replaced by user-typed username. Available tags are: [username], [email], [firstname],[lastname], [website], [loginurl] and [sitetitle] ', 'essential-addons-for-elementor-lite' ),
+			'raw'             => __( '<strong>Note:</strong> You can use dynamic content in the email body like [fieldname]. For example [username] will be replaced by user-typed username. Available tags are: [username], [email], [firstname],[lastname], [website], [loginurl], [eael_phone_number] and [sitetitle]. <br>For custom profile fields use slug of the field name e.x. [my_custom_field_1]', 'essential-addons-for-elementor-lite' ),
 			'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 			'condition'       => [
 				'reg_admin_email_template_type' => 'custom',
@@ -2143,6 +2466,9 @@ class Login_Register extends Widget_Base {
 			'default'     => $default_subject,
 			'label_block' => true,
 			'render_type' => 'none',
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'lostpassword_email_message', [
@@ -2168,6 +2494,9 @@ class Login_Register extends Widget_Base {
 			'default'     => __( 'Click here to reset your password', 'essential-addons-for-elementor-lite'),
 			'label_block' => false,
 			'render_type' => 'none',
+			'ai' => [
+				'active' => false,
+			],
 		] );
 
 		$this->add_control( 'lostpassword_email_message_reset_link_in_popup', [
@@ -2192,6 +2521,9 @@ class Login_Register extends Widget_Base {
 			'description' => __( 'Specify the class for the popup button that can be automatically triggered upon the page\'s loading.', 'essential-addons-for-elementor-lite' ),
 			'condition'       => [
 				'lostpassword_email_message_reset_link_in_popup' => 'yes',
+			],
+			'ai' => [
+				'active' => false,
 			],
 		] );
 
@@ -3619,6 +3951,9 @@ class Login_Register extends Widget_Base {
 			'condition'   => [
 				'rmark_po_toggle' => 'yes',
 			],
+			'ai' => [
+				'active' => false,
+			],
 		] );
 		$this->add_control( "rmark_size", [
 			'label'      => esc_html__( 'Size', 'essential-addons-for-elementor-lite' ),
@@ -4122,8 +4457,8 @@ class Login_Register extends Widget_Base {
 			'label'     => __( 'Checkbox | Toggle Color', 'essential-addons-for-elementor-lite' ),
 			'type'      => Controls_Manager::COLOR,
 			'selectors' => [
-				"{{WRAPPER}} .lr-form-wrapper .forget-menot  input[type=checkbox]:checked" => 'border-color: {{VALUE}};background: {{VALUE}};',
-				"{{WRAPPER}} .lr-form-wrapper input[type=checkbox]:hover:not(:checked):not(:disabled)" => 'border-color: {{VALUE}};',
+				"{{WRAPPER}} .lr-form-wrapper .eael-forever-forget .forget-menot  input[type=checkbox]:checked" => 'border-color: {{VALUE}} !important;background: {{VALUE}} !important;',
+				"{{WRAPPER}} .lr-form-wrapper .eael-forever-forget input[type=checkbox]:hover:not(:checked):not(:disabled)" => 'border-color: {{VALUE}} !important;',
 			],
 			'condition' => [
 				'remember_me_style_pot' => 'yes',
@@ -4264,6 +4599,155 @@ class Login_Register extends Widget_Base {
 			'name'     => "eael_forget_pass_label_typography",
 			'selector' => "{{WRAPPER}} .lr-form-wrapper .forget-pass a",
 		] );
+
+		//Terms & Conditions Style
+		$this->add_control( 'eael_form_terms_fields_heading', [
+			'type'      => Controls_Manager::HEADING,
+			'label'     => __( 'Terms & Conditions', 'essential-addons-for-elementor-lite' ),
+			'separator' => 'before',
+		] );
+		$this->add_control( 'terms_conditions_style_pot', [
+			'label'        => __( 'Style', 'essential-addons-for-elementor-lite' ),
+			'type'         => Controls_Manager::POPOVER_TOGGLE,
+			'label_off'    => __( 'Default', 'essential-addons-for-elementor-lite' ),
+			'label_on'     => __( 'Custom', 'essential-addons-for-elementor-lite' ),
+			'return_value' => 'yes',
+			'condition'    => [
+				'show_terms_conditions' => 'yes',
+			],
+		] );
+
+		$this->start_popover();
+		$this->add_responsive_control( "eael_form_terms_field_margin", [
+			'label'      => __( 'Container Margin', 'essential-addons-for-elementor-lite' ),
+			'type'       => Controls_Manager::DIMENSIONS,
+			'size_units' => [
+				'px',
+				'em',
+				'%',
+			],
+			'selectors'  => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap" => $this->apply_dim( 'margin' ),
+			],
+			'condition'  => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+		$this->add_responsive_control( "eael_form_terms_field_padding", [
+			'label'      => __( 'Container Padding', 'essential-addons-for-elementor-lite' ),
+			'type'       => Controls_Manager::DIMENSIONS,
+			'size_units' => [
+				'px',
+				'em',
+				'%',
+			],
+			'selectors'  => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap" => $this->apply_dim( 'padding' ),
+			],
+			'condition'  => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+		$this->add_responsive_control( "eael_form_terms_lbl_margin", [
+			'label'      => __( 'Label Margin', 'essential-addons-for-elementor-lite' ),
+			'type'       => Controls_Manager::DIMENSIONS,
+			'size_units' => [
+				'px',
+				'em',
+				'%',
+			],
+			'selectors'  => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap label" => $this->apply_dim( 'margin' ),
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap a" => $this->apply_dim( 'margin' ),
+			],
+			'condition'  => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+		$this->add_responsive_control( "eael_form_terms_lbl_padding", [
+			'label'      => __( 'Label Padding', 'essential-addons-for-elementor-lite' ),
+			'type'       => Controls_Manager::DIMENSIONS,
+			'size_units' => [
+				'px',
+				'em',
+				'%',
+			],
+			'selectors'  => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap label" => $this->apply_dim( 'padding' ),
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap a" => $this->apply_dim( 'padding' ),
+			],
+			'condition'  => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+
+		$this->add_responsive_control( "eael_form_terms_checkbox_margin", [
+			'label'      => __( 'Checkbox Margin', 'essential-addons-for-elementor-lite' ),
+			'type'       => Controls_Manager::DIMENSIONS,
+			'size_units' => [
+				'px',
+				'em',
+				'%',
+			],
+			'selectors'  => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap input" => $this->apply_dim( 'margin' ),
+			],
+			'condition'  => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+
+		$this->add_control( 'eael_terms_label_color', [
+			'label'     => __( 'Color', 'essential-addons-for-elementor-lite' ),
+			'type'      => Controls_Manager::COLOR,
+			'selectors' => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap" => 'color: {{VALUE}};',
+			],
+			'condition' => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+
+		$this->add_control( 'eael_terms_label_link_color', [
+			'label'     => __( 'Link Color', 'essential-addons-for-elementor-lite' ),
+			'type'      => Controls_Manager::COLOR,
+			'selectors' => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap a" => 'color: {{VALUE}};',
+			],
+			'condition' => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+
+		$this->add_control( 'eael_terms_label_bg_color', [
+			'label'     => __( 'Background Color', 'essential-addons-for-elementor-lite' ),
+			'type'      => Controls_Manager::COLOR,
+			'default'   => '#ffffff',
+			'selectors' => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap" => 'background-color: {{VALUE}};',
+			],
+			'condition' => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+		$this->add_control( 'eael_terms_checkbox_color', [
+			'label'     => __( 'Checkbox | Toggle Color', 'essential-addons-for-elementor-lite' ),
+			'type'      => Controls_Manager::COLOR,
+			'selectors' => [
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap  input[type=checkbox]:checked" => 'border-color: {{VALUE}} !important; background: {{VALUE}} !important;',
+				"{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap input[type=checkbox]:hover:not(:checked):not(:disabled)" => 'border-color: {{VALUE}} !important;',
+			],
+			'condition' => [
+				'terms_conditions_style_pot' => 'yes',
+			],
+		] );
+		$this->end_popover();
+		$this->add_group_control( Group_Control_Typography::get_type(), [
+			'label'    => __( 'Typography', 'essential-addons-for-elementor-lite' ),
+			'name'     => "eael_terms_label_typography",
+			'selector' => "{{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap, {{WRAPPER}} .lr-form-wrapper .eael_accept_tnc_wrap label",
+		] );
+
 		$this->end_controls_section();
 	}
 
@@ -5039,6 +5523,12 @@ class Login_Register extends Widget_Base {
 		return $terms_relation_conditions;
 	}
 
+	public function add_login_register_body_class( $classes ) {
+		$classes[] = 'eael-login-register-page-body';
+
+		return $classes;
+	}
+
 	protected function render() {
 
 		if ( ! current_user_can( 'manage_options' ) && 'yes' === $this->get_settings_for_display( 'redirect_for_logged_in_user' ) && is_user_logged_in() ) {
@@ -5083,6 +5573,8 @@ class Login_Register extends Widget_Base {
 			$login_redirect_url = !empty( $this->ds[ 'redirect_url' ][ 'url' ] ) ? esc_url( $this->ds[ 'redirect_url' ][ 'url' ] ) : '';
 		}
 		
+		$this->login_custom_redirect_url = apply_filters( 'eael/login-register/login-redirect-url', $login_redirect_url, $this );
+
 		if ( ! empty( $this->ds['redirect_after_resetpassword'] ) && 'yes' === $this->ds['redirect_after_resetpassword'] ) {
 			$resetpassword_redirect_url = !empty( $this->ds[ 'redirect_url_resetpassword' ][ 'url' ] ) ? esc_url( $this->ds[ 'redirect_url_resetpassword' ][ 'url' ] ) : '';
 		}
@@ -5104,11 +5596,10 @@ class Login_Register extends Widget_Base {
             
 	        $recaptcha_api_args1 = apply_filters( 'eael_lr_recaptcha_api_args_v3', $recaptcha_api_args1 );
 	        $recaptcha_api_args1 = http_build_query( $recaptcha_api_args1 );
-            wp_register_script('eael-recaptcha-v3', "https://www.google.com/recaptcha/api.js?{$recaptcha_api_args1}", false, EAEL_PLUGIN_VERSION, false);
+            wp_register_script('eael-recaptcha-v3', "https://www.recaptcha.net/recaptcha/api.js?{$recaptcha_api_args1}", false, EAEL_PLUGIN_VERSION, false);
 			wp_enqueue_script('eael-recaptcha-v3');
 			wp_dequeue_script('eael-recaptcha');
         }
-
 		?>
         <div class="eael-login-registration-wrapper <?php echo empty( $form_image_id ) ? '' : esc_attr( 'has-illustration' ); ?>"
              data-is-ajax="<?php echo esc_attr( $this->get_settings_for_display( 'enable_ajax' ) ); ?>"
@@ -5117,7 +5608,7 @@ class Login_Register extends Widget_Base {
 			 data-recaptcha-sitekey-v3="<?php echo esc_attr( get_option( 'eael_recaptcha_sitekey_v3' ) ); ?>"
 			 data-login-recaptcha-version="<?php echo esc_attr( $login_recaptcha_version ); ?>"
 			 data-register-recaptcha-version="<?php echo esc_attr( $register_recaptcha_version ); ?>"
-             data-redirect-to="<?php echo esc_attr( $login_redirect_url ); ?>"
+             data-redirect-to="<?php echo esc_attr( $this->login_custom_redirect_url ); ?>"
              data-resetpassword-redirect-to="<?php echo esc_attr( $resetpassword_redirect_url ); ?>"
         >
 			<?php
@@ -5125,6 +5616,18 @@ class Login_Register extends Widget_Base {
 			$this->print_login_form();
 			$this->print_register_form();
 			$this->print_lostpassword_form(); //request for a new password.
+			
+			if ( $this->recaptcha_badge_hide ) {
+			?>
+				<div class="eael-recaptcha-no-branding-wrapper">
+					<small>
+					This site is protected by reCAPTCHA and the Google
+					<a href="https://policies.google.com/privacy">Privacy Policy</a> and
+					<a href="https://policies.google.com/terms">Terms of Service</a> apply.
+					</small>
+				</div>
+			<?php
+			}
 			?>
         </div>
 
@@ -5157,7 +5660,7 @@ class Login_Register extends Widget_Base {
 					break;
 			}
 
-			$reg_link = sprintf( $reg_link_placeholder, $reg_message, esc_attr( $reg_url ), esc_attr( $reg_link_action ), $reg_link_text, $reg_atts );
+			$reg_link = sprintf( $reg_link_placeholder, $reg_message, esc_url( $reg_url ), esc_attr( $reg_link_action ), $reg_link_text, $reg_atts );
 
 
 			// login form fields related
@@ -5177,7 +5680,7 @@ class Login_Register extends Widget_Base {
 			}
 
 
-			$btn_text         = ! empty( $this->ds['login_button_text'] ) ? $this->ds['login_button_text'] : '';
+			$btn_text         = ! empty( $this->ds['login_button_text'] ) ? sanitize_text_field( $this->ds['login_button_text'] ) : '';
 			$show_logout_link = ( ! empty( $this->ds['show_log_out_message'] ) && 'yes' === $this->ds['show_log_out_message'] );
 			$show_rememberme  = ( ! empty( $this->ds['login_show_remember_me'] ) && 'yes' === $this->ds['login_show_remember_me'] );
 			$remember_text    = isset( $this->ds['remember_text'] ) ? $this->ds['remember_text'] : esc_html__( 'Remember Me', 'essential-addons-for-elementor-lite');
@@ -5188,14 +5691,14 @@ class Login_Register extends Widget_Base {
 			//Loss password
 			$show_lp = ( ! empty( $this->ds['show_lost_password'] ) && 'yes' === $this->ds['show_lost_password'] );
 			$lp_text = ! empty( $this->ds['lost_password_text'] ) ? HelperCLass::eael_wp_kses($this->ds['lost_password_text']) : __( 'Forgot Password?', 'essential-addons-for-elementor-lite' );
-			$lp_link = sprintf( '<a href="%s">%s</a>', esc_attr( wp_lostpassword_url() ), $lp_text );
+			$lp_link = sprintf( '<a href="%s">%s</a>', esc_url( wp_lostpassword_url() ), $lp_text );
 			if ( ! empty( $this->ds['lost_password_link_type'] ) && 'custom' === $this->ds['lost_password_link_type'] ) {
 				$lp_url  = ! empty( $this->ds['lost_password_url']['url'] ) ? $this->ds['lost_password_url']['url'] : wp_lostpassword_url();
 				$lp_atts = ! empty( $this->ds['lost_password_url']['is_external'] ) ? ' target="_blank"' : '';
 				$lp_atts .= ! empty( $this->ds['lost_password_url']['nofollow'] ) ? ' rel="nofollow"' : '';
-				$lp_link = sprintf( '<a href="%s" %s >%s</a>', esc_attr( $lp_url ), $lp_atts, $lp_text );
+				$lp_link = sprintf( '<a href="%s" %s >%s</a>', esc_url( $lp_url ), $lp_atts, $lp_text );
 			} else if ( ! empty( $this->ds['lost_password_link_type'] ) && 'form' === $this->ds['lost_password_link_type'] ){
-				$lp_link = sprintf( '<a id="eael-lr-lostpassword-toggle" href="" data-action="%s">%s</a>', esc_attr('form'), $lp_text );
+				$lp_link = sprintf( '<a id="eael-lr-lostpassword-toggle" href="" data-action="form">%s</a>', $lp_text );
 			}
 			// btn alignment
 			$btn_align = isset( $this->ds['login_btn_align'] ) ? $this->ds['login_btn_align'] : '';
@@ -5219,8 +5722,9 @@ class Login_Register extends Widget_Base {
 					<?php
 					if ( $show_logout_link && is_user_logged_in() && ! $this->in_editor ) {
 						/* translators: %s user display name */
-						$logged_in_msg = sprintf( __( 'You are already logged in as %s. ', 'essential-addons-for-elementor-lite' ), wp_get_current_user()->display_name );
-						printf( '%1$s   (<a href="%2$s">%3$s</a>)', esc_html( $logged_in_msg ), esc_url( wp_logout_url() ), __( 'Logout', 'essential-addons-for-elementor-lite' ) );
+						$logout_link_text = ! empty( $this->ds['log_out_link_text'] ) ? $this->ds['log_out_link_text'] : 'You are already logged in as [username]. ([logout_link])';
+						$logout_link_text = $this->replace_placeholders_logout_link_text($logout_link_text);
+						echo wp_kses( __( $logout_link_text, 'essential-addons-for-elementor-lite' ), HelperCLass::eael_allowed_tags() );
 					} else {
 						if ( 'left' === $this->form_illustration_pos ) {
 							$this->print_form_illustration();
@@ -5233,15 +5737,14 @@ class Login_Register extends Widget_Base {
                                   id="eael-login-form"
                                   method="post">
 								<?php do_action( 'eael/login-register/after-login-form-open', $this ); ?>
-                                <div class="eael-lr-form-group">
+                                <div class="eael-lr-form-group eael-user-login">
 									<?php if ( $display_label && $u_label ) {
-										printf( '<label for="eael-user-login" class="eael-field-label">%s</label>', HelperCLass::eael_wp_kses( $u_label ) );
+										echo '<label for="eael-user-login" class="eael-field-label">' . wp_kses( $u_label, HelperCLass::eael_allowed_tags() ) . '</label>';
 									} ?>
                                     <input type="text"
                                            name="eael-user-login"
                                            id="eael-user-login"
                                            class="eael-lr-form-control"
-                                           aria-describedby="emailHelp"
                                            placeholder="<?php if ( $display_label && $u_ph ) {
 										       echo esc_attr( $u_ph );
 									       } ?>"
@@ -5251,9 +5754,9 @@ class Login_Register extends Widget_Base {
 										echo '<i class="fas fa-user"></i>';
 									} ?>
                                 </div>
-                                <div class="eael-lr-form-group">
+                                <div class="eael-lr-form-group eael-user-password">
 									<?php if ( $display_label && $p_label ) {
-										printf( '<label for="eael-user-password" class="eael-field-label">%s</label>', $p_label );
+										echo '<label for="eael-user-password" class="eael-field-label">' . wp_kses( $p_label, HelperCLass::eael_allowed_tags() ) . '</label>';
 									} ?>
                                     <div class="eael-lr-password-wrapper">
                                         <input type="password"
@@ -5295,7 +5798,7 @@ class Login_Register extends Widget_Base {
                                         </p>
 									<?php }
 									if ( $show_lp ) {
-										echo '<p class="forget-pass">' . $lp_link . '</p>';//XSS ok. already escaped
+										echo '<p class="forget-pass">' . wp_kses( $lp_link, HelperCLass::eael_allowed_tags( [ 'a' => [ 'data-action' => [] ] ] ) ) . '</p>';
 									} ?>
 
                                 </div>
@@ -5317,15 +5820,15 @@ class Login_Register extends Widget_Base {
                                            value="<?php echo esc_attr( $btn_text ); ?>"/>
 										
 										<?php if( !empty( $show_login_spinner ) && 'true' === $show_login_spinner ): ?>
-										<span class="eael-lr-form-loader eael-lr-login-form-loader d-none<?php esc_attr_e($this->in_editor ? '-editor' : '') ?>">
-											<i class="eicon-spinner eicon-animation-spin"></i>
+										<span class="eael-lr-form-loader eael-lr-login-form-loader d-none<?php echo esc_attr($this->in_editor ? '-editor' : '') ?>">
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"/></svg>
 										</span>
 										<?php endif; ?>
 
 									</div>
 									<?php if ( $show_reg_link ) { ?>
                                         <div class="eael-sign-wrapper <?php echo esc_attr( $link_align ); ?>">
-											<?php echo $reg_link; // XSS ok. already escaped ?>
+											<?php echo wp_kses( $reg_link, HelperCLass::eael_allowed_tags( [ 'a' => [ 'data-action' => [] ] ] ) ); ?>
                                         </div>
 									<?php } ?>
 
@@ -5337,8 +5840,6 @@ class Login_Register extends Widget_Base {
                                 </div>
 								<?php
 								$this->print_necessary_hidden_fields( 'login' );
-
-								$this->print_login_validation_errors();
 
 								do_action( 'eael/login-register/before-login-form-close', $this );
 								?>
@@ -5354,6 +5855,24 @@ class Login_Register extends Widget_Base {
                 </div>
 
             </section>
+
+			<script>
+				jQuery(document).ready(function($){
+					var eael_get_login_status = localStorage.getItem( 'eael-is-login-form' );
+					if( eael_get_login_status === 'true' ) {
+						setTimeout(function() {
+							var button = jQuery('[eael-login="yes"]');
+							if( ! button.hasClass('eael-clicked') ) {
+								button.trigger('click').addClass('eael-clicked');
+							}
+						}, 100);
+
+						setTimeout(function() {
+							jQuery('[eael-login="yes"]').removeClass('eael-clicked')
+						}, 500);
+					}
+				});
+			</script>
 			<?php
 		}
 	}
@@ -5372,25 +5891,38 @@ class Login_Register extends Widget_Base {
 			$last_name_exists    = 0;
 			$website_exists      = 0;
 			$eael_phone_number_exists = 0;
+			$honeypot_exists = 0;
 			
 			$f_labels            = [
-				'email'            => __( 'Email', 'essential-addons-for-elementor-lite' ),
-				'password'         => __( 'Password', 'essential-addons-for-elementor-lite' ),
-				'confirm_password' => __( 'Confirm Password', 'essential-addons-for-elementor-lite' ),
-				'user_name'        => __( 'Username', 'essential-addons-for-elementor-lite' ),
-				'first_name'       => __( 'First Name', 'essential-addons-for-elementor-lite' ),
-				'last_name'        => __( 'Last Name', 'essential-addons-for-elementor-lite' ),
-				'website'          => __( 'Website', 'essential-addons-for-elementor-lite' ),
-				'eael_phone_number'          => __( 'Phone', 'essential-addons-for-elementor-lite' ),
+				'email'            	=> __( 'Email', 'essential-addons-for-elementor-lite' ),
+				'password'         	=> __( 'Password', 'essential-addons-for-elementor-lite' ),
+				'confirm_password' 	=> __( 'Confirm Password', 'essential-addons-for-elementor-lite' ),
+				'user_name'        	=> __( 'Username', 'essential-addons-for-elementor-lite' ),
+				'first_name'       	=> __( 'First Name', 'essential-addons-for-elementor-lite' ),
+				'last_name'        	=> __( 'Last Name', 'essential-addons-for-elementor-lite' ),
+				'website'          	=> __( 'Website', 'essential-addons-for-elementor-lite' ),
+				'eael_phone_number'	=> __( 'Phone', 'essential-addons-for-elementor-lite' ),
+				'honeypot'			=> __( 'Honeypot', 'essential-addons-for-elementor-lite' ),
 			];
+
+			$eael_custom_profile_fields_text = $this->get_eael_custom_profile_fields( 'text' );
+			$eael_custom_profile_fields_image = $this->get_eael_custom_profile_fields( 'image' );
+			$eael_custom_profile_fields = array_merge( $eael_custom_profile_fields_text, $eael_custom_profile_fields_image );
+
+			$f_labels = array_merge($f_labels, $eael_custom_profile_fields);
+
+			foreach( $eael_custom_profile_fields as $eael_custom_profile_field_key => $eael_custom_profile_field_value ) {
+				$eael_custom_profile_field_key_exists = $eael_custom_profile_field_key . '_exists';
+				$$eael_custom_profile_field_key_exists = 0; // dynamic variable
+			}
+
 			$repeated_f_labels   = [];
 
-
 			//Login link related
-			$lgn_link_action = ! empty( $this->ds['login_link_action'] ) ? $this->ds['login_link_action'] : 'form';
+			$lgn_link_action = ! empty( $this->ds['login_link_action'] ) ? sanitize_text_field( $this->ds['login_link_action'] ) : 'form';
 			$show_lgn_link   = 'yes' === $this->get_settings( 'show_login_link' );
 			$lgn_link_text   = ! empty( $this->get_settings( 'login_link_text' ) ) ? HelperCLass::eael_wp_kses($this->get_settings( 'login_link_text' )) : __( 'Login', 'essential-addons-for-elementor-lite' );
-			$btn_text        = ! empty( $this->ds['reg_button_text'] ) ? $this->ds['reg_button_text'] : '';
+			$btn_text        = ! empty( $this->ds['reg_button_text'] ) ? sanitize_text_field( $this->ds['reg_button_text'] ) : '';
 
 			$parts                = explode( "\n", $lgn_link_text );
 			$lgn_link_text        = array_pop( $parts );
@@ -5403,7 +5935,7 @@ class Login_Register extends Widget_Base {
 
 			switch ( $lgn_link_action ) {
 				case 'custom':
-					$lgn_url  = ! empty( $this->ds['custom_login_url']['url'] ) ? $this->ds['custom_login_url']['url'] : '';
+					$lgn_url  = ! empty( $this->ds['custom_login_url']['url'] ) ? sanitize_url( $this->ds['custom_login_url']['url'] ) : '';
 					$lgn_atts = ! empty( $this->ds['custom_login_url']['is_external'] ) ? ' target="_blank"' : '';
 					$lgn_atts .= ! empty( $this->ds['custom_login_url']['nofollow'] ) ? ' rel="nofollow"' : '';
 					break;
@@ -5411,7 +5943,7 @@ class Login_Register extends Widget_Base {
 					$lgn_url = wp_login_url();
 					break;
 			}
-			$lgn_link = sprintf( $lgn_link_placeholder, $lgn_message, esc_attr( $lgn_url ), esc_attr( $lgn_link_action ), $lgn_link_text, $lgn_atts );
+			$lgn_link = sprintf( $lgn_link_placeholder, $lgn_message, esc_url( $lgn_url ), esc_attr( $lgn_link_action ), $lgn_link_text, $lgn_atts );
 
 			// btn alignment
 			$btn_align  = isset( $this->ds['register_btn_align'] ) ? esc_html( $this->ds['register_btn_align'] ) : '';
@@ -5456,10 +5988,24 @@ class Login_Register extends Widget_Base {
 						<?php
 						$this->print_form_header( 'register' );
 						do_action( 'eael/login-register/before-register-form', $this );
+
+						$has_file_input = 0;
+						foreach ( $this->ds['register_fields'] as $single_field ) {
+							$single_field_type = $single_field['field_type'];
+
+							if( ! empty( $eael_custom_profile_fields_image[ $single_field_type ] ) ){
+								$has_file_input = 1;
+								break;
+							}
+						}
 						?>
                         <form class="eael-register-form eael-lr-form"
                               id="eael-register-form"
-                              method="post">
+                              method="post"
+							  <?php if ( $has_file_input ) : ?>
+								enctype="multipart/form-data"
+							  <?php endif; ?>
+							  >
 							<?php do_action( 'eael/login-register/after-register-form-open', $this ); ?>
 							<?php // Print all dynamic fields
 							foreach ( $this->ds['register_fields'] as $f_index => $field ) :
@@ -5467,9 +6013,12 @@ class Login_Register extends Widget_Base {
 								$dynamic_field_name = "{$field_type}_exists";
 								$$dynamic_field_name ++; //NOTE, double $$ intentional. Dynamically update the var check eg. $username_exists++ to prevent user from using the same field twice
 								// is same field repeated?
-								if ( $$dynamic_field_name > 1 ) {
-									$repeated_f_labels[] = $f_labels[ $field_type ];
+								if( isset( $$dynamic_field_name ) ){
+									if ( $$dynamic_field_name > 1 ) {
+										$repeated_f_labels[] = $f_labels[ $field_type ];
+									}
 								}
+
 								if ( 'password' === $field_type ) {
 									$is_pass_valid = true;
 								}
@@ -5491,6 +6040,7 @@ class Login_Register extends Widget_Base {
 									case 'user_name':
 									case 'first_name':
 									case 'last_name':
+									case 'honeypot':
 										$field_input_type = 'text';
 										break;
 									case 'confirm_pass':
@@ -5502,6 +6052,17 @@ class Login_Register extends Widget_Base {
 									default:
 										$field_input_type = $field_type;
 								}
+
+								if( ! empty( $eael_custom_profile_fields_text[ $field_type ] ) ){
+									$field_input_type = 'text';
+								}
+
+								if( ! empty( $eael_custom_profile_fields_image[ $field_type ] ) ){
+									$field_input_type = 'file';
+								}
+
+								$field_type_honeypot = 'eaelhoneyp' . esc_attr( $this->get_id() );
+								$field_type = 'honeypot' === $field_type ? $field_type_honeypot : $field_type;
 
 								$this->add_render_attribute( [
 									$input_key => [
@@ -5536,34 +6097,33 @@ class Login_Register extends Widget_Base {
 
 
 								// add css classes to the main input field wrapper.
-								$this->add_render_attribute( [
-									$field_group_key => [
-										'class' => [
-											'eael-lr-form-group',
-											'eael-field-type-' . $field_type,
-											'eael-w-' . $field['width'],
-										],
+								$field_group_key_array = [
+									'class' => [
+										'eael-lr-form-group',
+										'elementor-repeater-item-'.$field['_id'],
+										'eael-field-type-' . $field_type,
 									],
+								];
+
+								if ( $field_type_honeypot === $field_type ){
+									$field_group_key_array['style'] = 'display:none;';
+									$field['field_label'] = '';
+								}
+
+								$this->add_render_attribute( [
+									$field_group_key => $field_group_key_array,
 								] );
-
-								if ( ! empty( $field['width_tablet'] ) ) {
-									$this->add_render_attribute( $field_group_key, 'class', 'elementor-md-' . $field['width_tablet'] );
-								}
-
-								if ( ! empty( $field['width_mobile'] ) ) {
-									$this->add_render_attribute( $field_group_key, 'class', 'elementor-sm-' . $field['width_mobile'] );
-								}
 
 								?>
                                 <div <?php $this->print_render_attribute_string( $field_group_key ) ?>>
 									<?php
 									if ( 'yes' === $this->ds['show_labels'] && ! empty( $field['field_label'] ) ) {
-										echo '<label ' . $this->get_render_attribute_string( $label_key ) . '>' . HelperCLass::eael_wp_kses( $field['field_label'] ) . '</label>';
+										echo '<label '; $this->print_render_attribute_string( $label_key ); echo '>' . wp_kses( $field['field_label'], HelperCLass::eael_allowed_tags() ) . '</label>';
 									}
 									if( 'password' === $field['field_type'] ){
 										echo '<div class="eael-lr-password-wrapper-register">';
-											echo '<input ' . $this->get_render_attribute_string( $input_key ) . '>';
-											
+											echo '<input '; $this->print_render_attribute_string( $input_key ); echo '>';
+
 											if ( $show_pv_icon ) { ?>
 												<button type="button"
 														id="wp-hide-pw-register"
@@ -5579,19 +6139,24 @@ class Login_Register extends Widget_Base {
 											}
 										echo '</div>';
 									} else {
-										echo '<input ' . $this->get_render_attribute_string( $input_key ) . '>';
+										echo '<input '; $this->print_render_attribute_string( $input_key ); echo '>';
 
 										if ( $show_icon && ! empty( $field['icon'] ) ) {
 											Icons_Manager::render_icon( $field['icon'], [ 'aria-hidden' => 'true' ] );
 										}
 									}
 									?>
-                                </div>
 
 								<?php
 								if ( 'password' === $field['field_type'] ) {
 									do_action( 'eael/login-register/after-password-field', $this );
 								}
+								
+								if ( 'email' === $field['field_type'] ) {
+									do_action( 'eael/login-register/after-email-field' );
+								}
+								
+                                echo "</div>";
 							endforeach;
 							$this->print_necessary_hidden_fields( 'register' );
 							$this->print_terms_condition_notice();
@@ -5607,15 +6172,15 @@ class Login_Register extends Widget_Base {
                                        value="<?php echo esc_attr( $btn_text ); ?>"/>
 										
 									<?php if( !empty( $show_register_spinner ) && 'true' === $show_register_spinner ): ?>
-									<span class="eael-lr-form-loader eael-lr-register-form-loader d-none<?php esc_attr_e($this->in_editor ? '-editor' : '') ?>">
-										<i class="eicon-spinner eicon-animation-spin"></i>
+									<span class="eael-lr-form-loader eael-lr-register-form-loader d-none<?php echo esc_attr($this->in_editor ? '-editor' : ''); ?>">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"/></svg>
 									</span>
 									<?php endif; ?>
 
 								</div>
 								<?php if ( $show_lgn_link ) { ?>
-                                    <div class="eael-sign-wrapper  <?php echo esc_attr( $link_align ); ?>">
-										<?php echo $lgn_link; ?>
+                                    <div class="eael-sign-wrapper <?php echo esc_attr( $link_align ); ?>">
+										<?php echo wp_kses( $lgn_link, HelperCLass::eael_allowed_tags( [ 'a' => [ 'data-action' => [] ] ] ) ); ?>
                                     </div>
 								<?php } ?>
                             </div>
@@ -5647,8 +6212,10 @@ class Login_Register extends Widget_Base {
 				if ( $repeated || $email_field_missing || $pass_missing ) {
 					return false; // error found, exit, dont show form.
 				}
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $form_markup; //XSS OK, data sanitized already.
 			} else {
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $form_markup; //XSS OK, data sanitized already.
 			}
 		}
@@ -5656,6 +6223,13 @@ class Login_Register extends Widget_Base {
 
 	protected function print_lostpassword_form(){
 		if ( $this->should_print_lostpassword_form ) {
+			$form_not_enabled = ! ( 'lostpassword' === $this->default_form || ( 'yes' === $this->get_settings_for_display( 'show_lost_password' ) && 'form' === $this->get_settings_for_display( 'lost_password_link_type' ) ) );
+
+			if( $form_not_enabled && isset( $_GET['eael-lostpassword'] ) ){
+				wp_safe_redirect( remove_query_arg( array( 'eael-lostpassword' ) ) );
+				exit;
+			}
+
 			// prepare all lostpassword form related vars
 			$default_hide_class = ( 'register' === $this->default_form || 'login' === $this->default_form || $this->should_print_resetpassword_form_editor || isset($_GET['eael-register']) || isset($_GET['eael-resetpassword']) ) && !isset($_GET['eael-lostpassword']) ? 'eael-lr-d-none' : '';
 
@@ -5685,7 +6259,7 @@ class Login_Register extends Widget_Base {
 					break;
 			}
 
-			$login_link_lostpassword = sprintf( $login_link_placeholder_lostpassword, $login_message_lostpassword, esc_attr( $login_url_lostpassword ), esc_attr( $login_link_action_lostpassword ), $login_link_text_lostpassword, $login_atts_lostpassword, $this->get_render_attribute_string( 'login_button_lostpassword' ) );
+			$login_link_lostpassword = sprintf( $login_link_placeholder_lostpassword, $login_message_lostpassword, esc_url( $login_url_lostpassword ), esc_attr( $login_link_action_lostpassword ), $login_link_text_lostpassword, $login_atts_lostpassword, $this->get_render_attribute_string( 'login_button_lostpassword' ) );
 
 			// lost password form fields related
 			$label_type      = ! empty( $this->ds['lostpassword_label_types'] ) ? esc_html( $this->ds['lostpassword_label_types'] ) : 'default';
@@ -5700,7 +6274,7 @@ class Login_Register extends Widget_Base {
 				$u_label = isset( $this->ds['lostpassword_user_label'] ) ? esc_html__( wp_strip_all_tags( $this->ds['lostpassword_user_label'] ), 'essential-addons-for-elementor-lite' ) : '';
 				$u_ph    = isset( $this->ds['lostpassword_user_placeholder'] ) ? esc_html__( wp_strip_all_tags( $this->ds['lostpassword_user_placeholder'] ), 'essential-addons-for-elementor-lite' ) : '';
 			}
-			$btn_text         = ! empty( $this->ds['lostpassword_button_text'] ) ? $this->ds['lostpassword_button_text'] : '';
+			$btn_text         = ! empty( $this->ds['lostpassword_button_text'] ) ? sanitize_text_field( $this->ds['lostpassword_button_text'] ) : '';
 
 			// btn alignment
 			$btn_align = isset( $this->ds['lostpassword_btn_align'] ) ? esc_html( $this->ds['lostpassword_btn_align'] ) : '';
@@ -5735,7 +6309,6 @@ class Login_Register extends Widget_Base {
 									   name="eael-user-lostpassword"
 									   id="eael-user-lostpassword"
 									   class="eael-lr-form-control"
-									   aria-describedby="emailHelp"
 									   placeholder="<?php if ( $display_label && $u_ph ) {
 										   echo esc_attr( $u_ph );
 									   } ?>"
@@ -5755,10 +6328,10 @@ class Login_Register extends Widget_Base {
 									   name="eael-lostpassword-submit"
 									   id="eael-lostpassword-submit"
 									   class="eael-lr-btn eael-lr-btn-block <?php echo esc_attr( $btn_align ); ?>  <?php echo esc_attr( $hide_class_after_submission ); ?>"
-									   value="<?php echo wp_strip_all_tags( $btn_text ); ?>"/>
+									   value="<?php echo esc_attr( $btn_text ); ?>"/>
 								<?php if ( $show_login_link_lostpassword ) { ?>
 									<div class="eael-sign-wrapper <?php echo esc_attr( $link_align ); ?>">
-										<?php echo $login_link_lostpassword; // XSS ok. already escaped ?>
+										<?php echo wp_kses( $login_link_lostpassword, HelperCLass::eael_allowed_tags( [ 'a' => [ 'data-action' => [] ] ] ) ); ?>
 									</div>
 								<?php } ?>
 
@@ -5796,23 +6369,17 @@ class Login_Register extends Widget_Base {
 		$rp_page_url = ! empty( $this->page_id_for_popup ) ? get_permalink( $this->page_id_for_popup ) : get_permalink( $this->page_id ); 
 
 		if ( $this->should_print_resetpassword_form_editor || ( ! empty( $_GET['eael-resetpassword'] ) ) ) {
-			$rp_data = $_COOKIE;
 			$show_resetpassword_on_form_submit = get_option('eael_show_reset_password_on_form_submit_' . $this->get_id());
-			
+
 			$validation_required = true;
-			if( $this->should_print_resetpassword_form_editor || $show_resetpassword_on_form_submit ){
+			if ( $this->should_print_resetpassword_form_editor || $show_resetpassword_on_form_submit ) {
 				$validation_required = false;
 			}
 
-			$rp_cookie = 'wp-resetpass-' . COOKIEHASH;
-			if ( ! empty( $rp_data[ $rp_cookie ] ) ) {
-				list( $rp_data['rp_login'], $rp_data['rp_key'] ) = explode( ':', sanitize_text_field( $rp_data[ $rp_cookie ] ) );
-			}
+			$rp_data['rp_login'] = $_GET['eael_login'] ?? '';
+			$rp_data['rp_key']   = $_GET['eael_key'] ?? '';
 			
 			if( $validation_required ){
-				$rp_data['rp_key'] = ! empty( $rp_data['rp_key'] ) ? $rp_data['rp_key'] : '';
-				$rp_data['rp_login'] = ! empty( $rp_data['rp_login'] ) ? $rp_data['rp_login'] : '';
-
 				$user = check_password_reset_key( $rp_data['rp_key'], $rp_data['rp_login'] );
 
 				if ( empty( $rp_data['rp_key'] ) || ! $user || is_wp_error( $user ) ) {
@@ -5830,7 +6397,7 @@ class Login_Register extends Widget_Base {
 					</script>
 					<?php
 					exit;
-				}				
+				}
 			}
 			
 			delete_option('eael_show_reset_password_on_form_submit_' . $this->get_id());
@@ -5860,7 +6427,7 @@ class Login_Register extends Widget_Base {
 				$confirm_password_placeholder = isset( $this->ds['resetpassword_confirm_password_placeholder'] ) ? __( $this->ds['resetpassword_confirm_password_placeholder'], 'essential-addons-for-elementor-lite' ) : '';
 			}
 
-			$btn_text         = ! empty( $this->ds['resetpassword_button_text'] ) ? __( $this->ds['resetpassword_button_text'], 'essential-addons-for-elementor-lite' ) : '';
+			$btn_text         = ! empty( $this->ds['resetpassword_button_text'] ) ? __( sanitize_text_field( $this->ds['resetpassword_button_text'] ), 'essential-addons-for-elementor-lite' ) : '';
 
 			// btn alignment
 			$btn_align = isset( $this->ds['resetpassword_btn_align'] ) ? esc_html( $this->ds['resetpassword_btn_align'] ) : '';
@@ -5957,7 +6524,7 @@ class Login_Register extends Widget_Base {
 									   name="eael-resetpassword-submit"
 									   id="eael-resetpassword-submit"
 									   class="eael-lr-btn eael-lr-btn-block <?php echo esc_attr( $btn_align ); ?> <?php echo esc_attr( $hide_class_after_submission ); ?>"
-									   value="<?php echo esc_html( wp_strip_all_tags( $btn_text ) ); ?>"/>
+									   value="<?php echo esc_attr( $btn_text ); ?>"/>
 							</div>
 							<?php do_action( 'eael/login-register/after-resetpassword-footer', $this );
 							?>
@@ -6002,8 +6569,8 @@ class Login_Register extends Widget_Base {
 	 * @param string $form_type the type of form. Available values: login and register
 	 */
 	protected function print_form_header( $form_type = 'login' ) {
-		$title    = ! empty( $this->ds["{$form_type}_form_title"] ) ?  esc_html__( wp_strip_all_tags( $this->ds["{$form_type}_form_title"] ), 'essential-addons-for-elementor-lite' )  : '';
-		$subtitle = ! empty( $this->ds["{$form_type}_form_subtitle"] ) ? HelperCLass::eael_wp_kses( $this->ds["{$form_type}_form_subtitle"] ) : '';
+		$title    = ! empty( $this->ds["{$form_type}_form_title"] ) ?  wp_strip_all_tags( $this->ds["{$form_type}_form_title"] )  : '';
+		$subtitle = ! empty( $this->ds["{$form_type}_form_subtitle"] ) ? $this->ds["{$form_type}_form_subtitle"] : '';
 		
 		$show_form_logo_class = '';
 		if( 'lostpassword' === $form_type || 'resetpassword' === $form_type ){
@@ -6018,7 +6585,7 @@ class Login_Register extends Widget_Base {
         <div class="lr-form-header header-<?php echo esc_attr( $this->form_logo_pos ); ?>">
 			<?php if ( ! empty( $this->form_logo ) ) { ?>
                 <div class="form-logo <?php echo esc_attr( $show_form_logo_class ); ?>">
-                    <img src="<?php echo esc_attr( esc_url( $this->form_logo ) ); ?>"
+                    <img src="<?php echo esc_url( $this->form_logo ); ?>"
                          alt="<?php esc_attr_e( 'Form Logo Image', 'essential-addons-for-elementor-lite' ); ?>">
                 </div>
 			<?php } ?>
@@ -6027,11 +6594,11 @@ class Login_Register extends Widget_Base {
                 <div class="form-dsc">
 					<?php
 					if ( ! empty( $title ) ) {
-						echo "<h4>{$title}</h4>"; // data escaped already.
+						echo "<h4>" . esc_html( $title ) . "</h4>"; // data escaped already.
 					}
 
 					if ( ! empty( $subtitle ) ) {
-						echo "<p>{$subtitle}</p>"; // data escaped already.
+						echo "<p>" . wp_kses( $subtitle, HelperCLass::eael_allowed_tags() ) . "</p>"; // data escaped already.
 					} ?>
                 </div>
 			<?php } ?>
@@ -6042,11 +6609,43 @@ class Login_Register extends Widget_Base {
 	protected function print_necessary_hidden_fields( $form_type = 'login' ) {
 		if ( 'login' === $form_type ) {
 			if ( ! empty( $this->ds['redirect_after_login'] ) && 'yes' === $this->ds['redirect_after_login'] ) {
-				$login_redirect_url = ! empty( $this->ds['redirect_url']['url'] ) ? esc_url( $this->ds['redirect_url']['url'] ) : '';
 				?>
                 <input type="hidden"
                        name="redirect_to"
-                       value="<?php echo esc_attr( $login_redirect_url ); ?>">
+                       value="<?php echo esc_attr( $this->login_custom_redirect_url ); ?>">
+			<?php }
+
+			if ( ! empty( $this->ds['redirect_based_on_roles'] ) && 'yes' === $this->ds['redirect_based_on_roles'] ) {
+				$user_roles = $this->eael_get_role_names();
+
+				if( ! empty( $user_roles ) && is_array( $user_roles ) && count( $user_roles ) ){
+					foreach( $user_roles as $user_role_key => $user_role_value ){
+						$login_redirect_url = ! empty( $this->ds['redirect_url_' . esc_html( $user_role_key ) ]['url'] ) ? esc_url( $this->ds['redirect_url_' . esc_html( $user_role_key )]['url'] ) : '';
+						?>
+						<input type="hidden"
+							name="redirect_to_<?php echo esc_html( $user_role_key ); ?>"
+							value="<?php echo esc_attr( $login_redirect_url ); ?>">
+						<?php
+					}
+				}
+			}
+
+			if ( ! empty( $this->ds['login_redirect_url_prev_page'] ) && 'yes' === $this->ds['login_redirect_url_prev_page'] ) {
+				$login_redirect_url_prev_page = ! empty( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( $_SERVER['HTTP_REFERER'] ) : '';
+				?>
+				<input type="hidden"
+					name="redirect_to_prev_page_login"
+					value="<?php echo esc_attr( $login_redirect_url_prev_page ); ?>">
+			<?php }
+		}
+
+		if ( 'register' === $form_type ) {
+			if ( ! empty( $this->ds['register_redirect_url_prev_page'] ) && 'yes' === $this->ds['register_redirect_url_prev_page'] ) {
+				$register_redirect_url_prev_page = ! empty( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( $_SERVER['HTTP_REFERER'] ) : '';
+				?>
+                <input type="hidden"
+                       name="redirect_to_prev_page"
+                       value="<?php echo esc_attr( $register_redirect_url_prev_page ); ?>">
 			<?php }
 		}
 
@@ -6093,9 +6692,9 @@ class Login_Register extends Widget_Base {
 			$tc_url  = ! empty( $this->ds['acceptance_text_url']['url'] ) ? esc_url( $this->ds['acceptance_text_url']['url'] ) : esc_url( get_the_permalink( get_option( 'wp_page_for_privacy_policy' ) ) );
 			$tc_atts = ! empty( $this->ds['acceptance_text_url']['is_external'] ) ? ' target="_blank"' : '';
 			$tc_atts .= ! empty( $this->ds['acceptance_text_url']['nofollow'] ) ? ' rel="nofollow"' : '';
-			$tc_link = sprintf( '<a href="%1$s" id="eael-lr-tnc-link" class="eael-lr-tnc-link" %2$s>%3$s</a>', esc_attr( $tc_url ), $tc_atts, $link_text );
+			$tc_link = sprintf( '<a href="%1$s" id="eael-lr-tnc-link" class="eael-lr-tnc-link" %2$s>%3$s</a>', esc_url( $tc_url ), $tc_atts, $link_text );
 		}
-
+		$lrtoggle = ! empty( $this->ds['eael_terms_conditions_field_type'] ) && 'toggle' === $this->ds['eael_terms_conditions_field_type'] ? 'lr-toggle' : '';
 		?>
         <div class="eael_accept_tnc_wrap">
             <input type="hidden"
@@ -6103,7 +6702,7 @@ class Login_Register extends Widget_Base {
                    value="1">
             <input type="checkbox"
                    name="eael_accept_tnc"
-                   class="eael_accept_tnc lr-toggle"
+                   class="eael_accept_tnc <?php echo esc_attr($lrtoggle); ?>"
                    value="1"
                    id="eael_accept_tnc">
             <label for="eael_accept_tnc"
@@ -6113,7 +6712,7 @@ class Login_Register extends Widget_Base {
 				?>
             </label>
 			<?php
-			echo $tc_link; // XSS ok. already sanitized.
+			echo wp_kses( $tc_link, HelperCLass::eael_allowed_tags( [ 'a' => [ 'data-action' => [] ] ] ) );
 			?>
         </div>
 
@@ -6121,27 +6720,16 @@ class Login_Register extends Widget_Base {
 		$tc = '<div class="eael-lr-tnc-wrap">';
 		$tc .= $this->parse_text_editor( $tc_text );
 		$tc .= '</div>';
-		echo $tc;
+		echo wp_kses( $tc, HelperCLass::eael_allowed_tags() );
 
 
 	}
 
 	protected function print_login_validation_errors() {
-		$error_key = 'eael_login_error_' . $this->get_id();
 		$resetpassword_success_key = 'eael_resetpassword_success_' . $this->get_id();
-		$resetpassword_success = apply_filters( 'eael/login-register/resetpassword-success-message', get_option( $resetpassword_success_key ) );
+		$resetpassword_success     = apply_filters( 'eael/login-register/resetpassword-success-message', get_option( $resetpassword_success_key ) );
 
-		if ( $login_error = apply_filters( 'eael/login-register/login-error-message', get_option( $error_key ) ) ) {
-			do_action( 'eael/login-register/before-showing-login-error', $login_error, $this );
-			?>
-            <p class="eael-form-msg invalid">
-				<?php echo HelperCLass::eael_wp_kses( $login_error ); ?>
-            </p>
-			<?php
-			do_action( 'eael/login-register/after-showing-login-error', $login_error, $this );
-
-			delete_option( $error_key );
-		} else if( ! empty( $resetpassword_success ) && 'register' !== $this->ds['default_form_type'] ){
+		if ( ! empty( $resetpassword_success ) && 'register' !== $this->ds['default_form_type'] ) {
 			$this->print_resetpassword_success_message( $resetpassword_success );
 		}
 	}
@@ -6166,7 +6754,7 @@ class Login_Register extends Widget_Base {
 			do_action( 'eael/login-register/before-showing-lostpassword-error', $lostpassword_error, $this );
 			?>
             <p class="eael-form-msg invalid">
-				<?php echo esc_html( $lostpassword_error ); ?>
+				<?php echo wp_kses( $lostpassword_error, HelperCLass::eael_allowed_tags() ); ?>
             </p>
 			<?php
 			do_action( 'eael/login-register/after-showing-login-error', $lostpassword_error, $this );
@@ -6190,7 +6778,7 @@ class Login_Register extends Widget_Base {
 	protected function print_resetpassword_validation_errors() {
 		$error_key = 'eael_resetpassword_error_' . $this->get_id();
 		
-		if ( $resetpassword_error = apply_filters( 'eael/login-register/resetpassword-error-message', maybe_unserialize( get_option( $error_key ) ) ) ) {
+		if ( $resetpassword_error = apply_filters( 'eael/login-register/resetpassword-error-message', json_decode( get_option( $error_key ), true ) ) ) {
 			do_action( 'eael/login-register/before-showing-resetpassword-error', $resetpassword_error, $this );
 			?>
             <div class="eael-form-msg invalid">
@@ -6216,9 +6804,13 @@ class Login_Register extends Widget_Base {
 	}
 
 	protected function print_recaptcha_node( $form_type = 'login' ) {
-		if ( 'yes' === $this->get_settings_for_display( "enable_{$form_type}_recaptcha" ) && 'v3' !== $this->ds["login_register_recaptcha_version"] ) {
-			$id = "{$form_type}-recaptcha-node-" . $this->get_id();
-			echo "<input type='hidden' name='g-recaptcha-enabled' value='1'/><div id='{$id}' class='eael-recaptcha-wrapper'></div>";
+		if ( 'yes' === $this->get_settings_for_display( "enable_{$form_type}_recaptcha" ) || 'v3' === $this->ds["login_register_recaptcha_version"] ) {
+			$id = "{$form_type}-recaptcha-node-" . esc_attr( $this->get_id() );
+			echo "<input type='hidden' name='g-recaptcha-enabled' value='1'/><div id='" . esc_attr( $id ) . "' class='eael-recaptcha-wrapper'></div>";
+
+			if( 'v3' === $this->ds["login_register_recaptcha_version"] && ( ! $this->ds[ 'enable_ajax' ] ) ){
+				echo "<input type='hidden' name='action' value='eael_login_register_form'/>";
+			}
 		}
 	}
 
@@ -6229,7 +6821,8 @@ class Login_Register extends Widget_Base {
             <p class='eael-register-form-error elementor-alert elementor-alert-warning'>
 				<?php
 				/* translators: %s: Error fields */
-				printf( __( 'Error! you seem to have added %s field in the form more than once.', 'essential-addons-for-elementor-lite' ), $error_fields );
+				$error_msg = sprintf( __( 'Error! you seem to have added %s field in the form more than once.', 'essential-addons-for-elementor-lite' ), $error_fields );
+				echo wp_kses( $error_msg, HelperCLass::eael_allowed_tags() );
 				?>
             </p>
 			<?php
@@ -6245,6 +6838,7 @@ class Login_Register extends Widget_Base {
             <p class='eael-register-form-error elementor-alert elementor-alert-warning'>
 				<?php
 				/* translators: %s: Error String */
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				printf( __( 'Error! It is required to use %s field.', 'essential-addons-for-elementor-lite' ), '<strong>Email</strong>' );
 				?>
             </p>
@@ -6269,6 +6863,7 @@ class Login_Register extends Widget_Base {
             <p class='eael-register-form-error elementor-alert elementor-alert-warning'>
 				<?php
 				/* translators: %s: Error String */
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				printf( __( 'Error! It is required to use %s field with %s Field.', 'essential-addons-for-elementor-lite' ), '<strong>Password</strong>', '<strong>Password Confirmation</strong>' );
 				?>
             </p>
@@ -6321,6 +6916,7 @@ class Login_Register extends Widget_Base {
 
 		if ( $success ) {
 			$message = '<p class="eael-form-msg valid">' . esc_html( $this->get_settings_for_display( 'success_register' ) ) . '</p>';
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo apply_filters( 'eael/login-register/registration-success-msg', $message, $success );
 
 			delete_option( 'eael_register_success_' . $this->get_id() );

@@ -14,7 +14,7 @@ use Embera\Url;
  * @package     EmbedPress
  * @subpackage  EmbedPress/Providers
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @copyright   Copyright (C) 2023 WPDeveloper. All rights reserved.
  * @license     GPLv3 or later
  * @since       1.0.0
  */
@@ -108,11 +108,11 @@ class GoogleDocs extends ProviderAdapter implements ProviderInterface
 	    $width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: 600;
 	    $height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 450;
         if ($type !== 'drawings') {
-            $html = '<iframe src="' . $iframeSrc . '" frameborder="0" width="'.$width.'" height="'.$height.'" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
+            $html = '<iframe src="' . esc_url($iframeSrc) . '" frameborder="0" width="'.$width.'" height="'.$height.'" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
         } else {
 	        $width = isset( $this->config['maxwidth']) ? $this->config['maxwidth']: 960;
 	        $height = isset( $this->config['maxheight']) ? $this->config['maxheight']: 720;
-            $html = '<img src="' . $iframeSrc . '" width="'.$width.'" height="'.$height.'" />';
+            $html = '<img src="' . esc_url($iframeSrc) . '" width="'.esc_attr($width).'" height="'.esc_attr($height).'" />';
         }
 
         return [

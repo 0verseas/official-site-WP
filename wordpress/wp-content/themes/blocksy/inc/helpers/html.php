@@ -1,19 +1,34 @@
 <?php
 
 function blocksy_safe_antispambot($string_with_email) {
-	$has_mail_to_prefix = strpos($string_with_email, 'mailto:') !== false;
+	$mail_parts = wp_parse_url($string_with_email);
 
-	$result = antispambot(str_replace(
-		'mailto:',
-		'',
-		$string_with_email
-	));
-
-	if ($has_mail_to_prefix) {
-		$result = 'mailto:' . $result;
+	// No reason in trying to obfuscate if there is no email passed in the
+	// mailto: link.
+	//
+	// This is a valid mailto: link without email. Sometimes, the user wants
+	// to only prefill the subject or body of the email via the link.
+	//
+	// Example: mailto:?subject=Hello%20world
+	if (! isset($mail_parts['path'])) {
+		return $string_with_email;
 	}
 
-	return $result;
+	$mail_parts['path'] = antispambot($mail_parts['path']);
+
+	$result = [];
+
+	if (! empty($mail_parts['scheme'])) {
+		$result[] = $mail_parts['scheme'] . ':';
+	}
+
+	$result[] = $mail_parts['path'];
+
+	if (! empty($mail_parts['query'])) {
+		$result[] = '?' . $mail_parts['query'];
+	}
+
+	return implode('', $result);
 }
 
 /**
@@ -32,10 +47,10 @@ if (! function_exists('blocksy_attr_to_html')) {
 				continue;
 			}
 
-			$html_attr .= $attr_name . '="' . $attr_val . '" ';
+			$html_attr .= $attr_name . '="' . esc_attr($attr_val) . '" ';
 		}
 
-		return $html_attr;
+		return trim($html_attr);
 	}
 }
 
@@ -50,14 +65,26 @@ if (! function_exists('blocksy_attr_to_html')) {
  */
 if (! function_exists('blocksy_html_tag')) {
 	function blocksy_html_tag($tag, $attr = [], $end = false) {
-		$html = '<' . $tag . ' ' . blocksy_attr_to_html($attr);
+		if (! is_string($attr)) {
+			$attr = blocksy_attr_to_html($attr);
+		}
+
+		if (strpos($tag, ' ') !== false) {
+			$tag = explode(' ', $tag)[0];
+		}
+
+		$html = '<' . $tag;
+
+		if (! empty($attr)) {
+			$html .= ' ' . $attr;
+		}
 
 		if (true === $end) {
 			// <script></script>
 			$html .= '></' . $tag . '>';
 		} elseif (false === $end) {
-			// <br/>
-			$html .= '/>';
+			// <br>
+			$html .= '>';
 		} else {
 			// <div>content</div>
 			$html .= '>' . $end . '</' . $tag . '>';

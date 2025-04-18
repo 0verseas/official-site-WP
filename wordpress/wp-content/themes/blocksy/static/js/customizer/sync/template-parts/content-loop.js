@@ -37,11 +37,14 @@ watchOptionsWithPrefix({
 			allItemsToOutput.map((component, index) => {
 				;[...document.querySelectorAll('.entries > article')].map(
 					(article) => {
-						let image = article.querySelector('.ct-image-container')
+						let image = article.querySelector('.ct-media-container')
 						let button = article.querySelector('.entry-button')
 
 						if (component.id === 'featured_image' && image) {
-							setRatioFor(component.thumb_ratio, image)
+							setRatioFor({
+								ratio: component.thumb_ratio,
+								el: image,
+							})
 
 							image.classList.remove('boundless-image')
 
@@ -59,13 +62,23 @@ watchOptionsWithPrefix({
 							button.dataset.type =
 								component.button_type || 'simple'
 
-							button.classList.remove('ct-button')
+							button.classList.remove(
+								'ct-button',
+								'ct-button-ghost'
+							)
 
 							if (
 								(component.button_type || 'simple') ===
 								'background'
 							) {
 								button.classList.add('ct-button')
+							}
+
+							if (
+								(component.button_type || 'simple') ===
+								'outline'
+							) {
+								button.classList.add('ct-button-ghost')
 							}
 
 							replaceFirstTextNode(
@@ -132,6 +145,10 @@ watchOptionsWithPrefix({
 								}
 							}
 
+							if (el.length === 1) {
+								el = el[0]
+							}
+
 							renderSingleEntryMeta({
 								el,
 								...moreDefaults,
@@ -146,6 +163,90 @@ watchOptionsWithPrefix({
 		}
 	},
 })
+
+const imageBorderVariables = [
+	{
+		selector: applyPrefixFor('.entry-card', prefix),
+		type: 'spacing',
+		variable: 'theme-image-border-radius',
+		responsive: true,
+
+		extractValue: () => getOptionFor('cardRadius', prefix),
+
+		transformSpacingValue: (value, valueAsArray, device) => {
+			const card_type = getOptionFor('card_type', prefix)
+			const card_spacing = maybePromoteScalarValueIntoResponsive(
+				getOptionFor('card_spacing', prefix)
+			)
+			const cardBorder = maybePromoteScalarValueIntoResponsive(
+				getOptionFor('cardBorder', prefix)
+			)
+
+			const archive_order = getOptionFor('archive_order', prefix)
+
+			let didChange = false
+
+			const featured_image_settings = getOptionFor(
+				'archive_order',
+				prefix
+			).find(({ id }) => id === 'featured_image')
+
+			const is_boundles = featured_image_settings.is_boundless || 'yes'
+
+			let maybeWidth = 0
+
+			if (card_type === 'boxed' || card_type === 'cover') {
+				if (
+					cardBorder[device] &&
+					cardBorder[device]['style'] !== 'none' &&
+					cardBorder[device]['width'] > 0
+				) {
+					maybeWidth = `${cardBorder[device].width}px`
+				}
+
+				if (card_type === 'boxed' && is_boundles !== 'yes') {
+					maybeWidth = card_spacing[device]
+				}
+			}
+
+			if (maybeWidth !== 0) {
+				return valueAsArray
+					.map((value) => `calc(${value} - ${maybeWidth})`)
+					.join(' ')
+			}
+
+			return value
+		},
+	},
+
+	{
+		selector: applyPrefixFor('[data-cards] .entry-card', prefix),
+		variable: 'card-inner-spacing',
+		responsive: true,
+		unit: '',
+		extractValue: () => getOptionFor('card_spacing', prefix),
+	},
+
+	{
+		selector: applyPrefixFor('.entry-card', prefix),
+		type: 'spacing',
+		variable: 'theme-border-radius',
+		responsive: true,
+		extractValue: () => {
+			const cardRadius = getOptionFor('cardRadius', prefix)
+
+			return cardRadius
+		},
+	},
+	{
+		selector: applyPrefixFor('.entry-card', prefix),
+		variable: 'card-border',
+		type: 'border',
+		responsive: true,
+		skip_none: true,
+		extractValue: () => getOptionFor('cardBorder', prefix),
+	},
+]
 
 export const getPostListingVariables = () => ({
 	...typographyOption({
@@ -163,7 +264,9 @@ export const getPostListingVariables = () => ({
 					...typographyOption({
 						id: 'test',
 						selector: applyPrefixFor(
-							`[data-field*="${layer.__id.substring(0, 6)}"]`,
+							`[data-field*="${(
+								layer.__id || 'default'
+							).substring(0, 6)}"]`,
 							prefix
 						),
 						extractValue: (value) => {
@@ -179,10 +282,12 @@ export const getPostListingVariables = () => ({
 
 					{
 						selector: applyPrefixFor(
-							`[data-field*="${layer.__id.substring(0, 6)}"]`,
+							`[data-field*="${(
+								layer.__id || 'default'
+							).substring(0, 6)}"]`,
 							prefix
 						),
-						variable: 'color',
+						variable: 'theme-text-color',
 						type: 'color:default',
 						extractValue: () => {
 							return layer.color
@@ -191,10 +296,12 @@ export const getPostListingVariables = () => ({
 
 					{
 						selector: applyPrefixFor(
-							`[data-field*="${layer.__id.substring(0, 6)}"]`,
+							`[data-field*="${(
+								layer.__id || 'default'
+							).substring(0, 6)}"]`,
 							prefix
 						),
-						variable: 'linkHoverColor',
+						variable: 'theme-link-hover-color',
 						type: 'color:hover',
 						extractValue: () => {
 							return layer.color
@@ -202,9 +309,150 @@ export const getPostListingVariables = () => ({
 					},
 				]
 			}
+
+			if (layer.id === 'featured_image') {
+				variables = [
+					...variables,
+
+					{
+						selector: applyPrefixFor('.entry-card', prefix),
+						variable: 'card-media-max-width',
+						unit: '%',
+						extractValue: () => {
+							return layer.image_width || 40
+						},
+					},
+				]
+			}
+
+			// bottom spacing
+			let selectorsMap = {
+				title: '[data-archive="default"] .card-content .entry-title',
+				featured_image:
+					'[data-archive="default"] .card-content .ct-media-container',
+				excerpt:
+					'[data-archive="default"] .card-content .entry-excerpt',
+				read_more:
+					'[data-archive="default"] .card-content .entry-button',
+				overall_score:
+					'[data-archive="default"] .card-content .ct-overall-score-layer',
+			}
+
+			if (selectorsMap[layer.id]) {
+				variables = [
+					...variables,
+					{
+						selector: applyPrefixFor(
+							selectorsMap[layer.id],
+							prefix
+						),
+						variable: 'card-element-spacing',
+						responsive: true,
+						unit: 'px',
+						extractValue: () => {
+							let defaultValue = 20
+
+							if (layer.id === 'featured_image') {
+								defaultValue = 30
+							}
+
+							return layer.spacing || defaultValue
+						},
+					},
+				]
+			}
+
+			if (layer.id === 'divider') {
+				variables = [
+					...variables,
+					{
+						selector: applyPrefixFor(
+							`[data-archive="default"] .card-content .entry-divider[data-id="${(
+								layer?.__id || 'default'
+							).slice(0, 6)}"]`,
+							prefix
+						),
+						variable: 'card-element-spacing',
+						responsive: true,
+						unit: 'px',
+						extractValue: () => {
+							return layer.spacing || 20
+						},
+					},
+				]
+			}
+
+			if (layer.id === 'post_meta') {
+				variables = [
+					...variables,
+					{
+						selector: applyPrefixFor(
+							`[data-archive="default"] .card-content .entry-meta[data-id="${(
+								layer?.__id || 'default'
+							).slice(0, 6)}"]`,
+							prefix
+						),
+						variable: 'card-element-spacing',
+						responsive: true,
+						unit: 'px',
+						extractValue: () => {
+							return layer.spacing || 15
+						},
+					},
+				]
+			}
+
+			if (layer.id === 'content-block') {
+				variables = [
+					...variables,
+					{
+						selector: applyPrefixFor(
+							`[data-archive="default"] .card-content .ct-entry-content-block[data-id="${
+								layer?.__id || 'default'
+							}"]`,
+							prefix
+						),
+						variable: 'card-element-spacing',
+						responsive: true,
+						unit: 'px',
+						extractValue: () => {
+							return layer.spacing || 20
+						},
+					},
+				]
+			}
+
+			if (
+				[
+					'acf_field',
+					'metabox_field',
+					'toolset_field',
+					'jetengine_field',
+					'custom_field',
+					'pods_field',
+				].includes(layer.id)
+			) {
+				variables = [
+					...variables,
+					{
+						selector: applyPrefixFor(
+							`[data-archive="default"] .card-content .ct-dynamic-data-layer[data-field*=":${(
+								layer?.__id || 'default'
+							).slice(0, 6)}"]`,
+							prefix
+						),
+						variable: 'card-element-spacing',
+						responsive: true,
+						unit: 'px',
+						extractValue: () => {
+							return layer.spacing || 20
+						},
+					},
+				]
+			}
 		})
 
-		return variables
+		return [...variables, ...imageBorderVariables]
 	},
 
 	[`${prefix}_columns`]: [
@@ -227,13 +475,13 @@ export const getPostListingVariables = () => ({
 	[`${prefix}_cardTitleColor`]: [
 		{
 			selector: applyPrefixFor('.entry-card .entry-title', prefix),
-			variable: 'heading-color',
+			variable: 'theme-heading-color',
 			type: 'color:default',
 		},
 
 		{
 			selector: applyPrefixFor('.entry-card .entry-title', prefix),
-			variable: 'linkHoverColor',
+			variable: 'theme-link-hover-color',
 			type: 'color:hover',
 		},
 	],
@@ -245,7 +493,7 @@ export const getPostListingVariables = () => ({
 
 	[`${prefix}_cardExcerptColor`]: {
 		selector: applyPrefixFor('.entry-excerpt', prefix),
-		variable: 'color',
+		variable: 'theme-text-color',
 		type: 'color',
 	},
 
@@ -257,13 +505,13 @@ export const getPostListingVariables = () => ({
 	[`${prefix}_cardMetaColor`]: [
 		{
 			selector: applyPrefixFor('.entry-card .entry-meta', prefix),
-			variable: 'color',
+			variable: 'theme-text-color',
 			type: 'color:default',
 		},
 
 		{
 			selector: applyPrefixFor('.entry-card .entry-meta', prefix),
-			variable: 'linkHoverColor',
+			variable: 'theme-link-hover-color',
 			type: 'color:hover',
 		},
 	],
@@ -271,13 +519,13 @@ export const getPostListingVariables = () => ({
 	[`${prefix}_card_meta_button_type_font_colors`]: [
 		{
 			selector: applyPrefixFor('.entry-card [data-type="pill"]', prefix),
-			variable: 'buttonTextInitialColor',
+			variable: 'theme-button-text-initial-color',
 			type: 'color:default',
 		},
 
 		{
 			selector: applyPrefixFor('.entry-card [data-type="pill"]', prefix),
-			variable: 'buttonTextHoverColor',
+			variable: 'theme-button-text-hover-color',
 			type: 'color:hover',
 		},
 	],
@@ -285,73 +533,55 @@ export const getPostListingVariables = () => ({
 	[`${prefix}_card_meta_button_type_background_colors`]: [
 		{
 			selector: applyPrefixFor('.entry-card [data-type="pill"]', prefix),
-			variable: 'buttonInitialColor',
+			variable: 'theme-button-background-initial-color',
 			type: 'color:default',
 		},
 
 		{
 			selector: applyPrefixFor('.entry-card [data-type="pill"]', prefix),
-			variable: 'buttonHoverColor',
+			variable: 'theme-button-background-hover-color',
 			type: 'color:hover',
 		},
 	],
 
 	[`${prefix}_cardButtonSimpleTextColor`]: [
 		{
-			selector: applyPrefixFor(
-				'.entry-button[data-type="simple"]',
-				prefix
-			),
-			variable: 'linkInitialColor',
+			selector: applyPrefixFor('.entry-button', prefix),
+			variable: 'theme-link-initial-color',
 			type: 'color:default',
 		},
 
 		{
-			selector: applyPrefixFor(
-				'.entry-button[data-type="simple"]',
-				prefix
-			),
-			variable: 'linkHoverColor',
+			selector: applyPrefixFor('.entry-button', prefix),
+			variable: 'theme-link-hover-color',
 			type: 'color:hover',
 		},
 	],
 
 	[`${prefix}_cardButtonBackgroundTextColor`]: [
 		{
-			selector: applyPrefixFor(
-				'.entry-button[data-type="background"]',
-				prefix
-			),
-			variable: 'buttonTextInitialColor',
+			selector: applyPrefixFor('.entry-button.ct-button', prefix),
+			variable: 'theme-button-text-initial-color',
 			type: 'color:default',
 		},
 
 		{
-			selector: applyPrefixFor(
-				'.entry-button[data-type="background"]',
-				prefix
-			),
-			variable: 'buttonTextHoverColor',
+			selector: applyPrefixFor('.entry-button.ct-button', prefix),
+			variable: 'theme-button-text-hover-color',
 			type: 'color:hover',
 		},
 	],
 
 	[`${prefix}_cardButtonOutlineTextColor`]: [
 		{
-			selector: applyPrefixFor(
-				'.entry-button[data-type="outline"]',
-				prefix
-			),
-			variable: 'linkInitialColor',
+			selector: applyPrefixFor('.entry-button.ct-button-ghost', prefix),
+			variable: 'theme-button-text-initial-color',
 			type: 'color:default',
 		},
 
 		{
-			selector: applyPrefixFor(
-				'.entry-button[data-type="outline"]',
-				prefix
-			),
-			variable: 'linkHoverColor',
+			selector: applyPrefixFor('.entry-button.ct-button-ghost', prefix),
+			variable: 'theme-button-text-hover-color',
 			type: 'color:hover',
 		},
 	],
@@ -359,13 +589,13 @@ export const getPostListingVariables = () => ({
 	[`${prefix}_cardButtonColor`]: [
 		{
 			selector: applyPrefixFor('.entry-button', prefix),
-			variable: 'buttonInitialColor',
+			variable: 'theme-button-background-initial-color',
 			type: 'color:default',
 		},
 
 		{
 			selector: applyPrefixFor('.entry-button', prefix),
-			variable: 'buttonHoverColor',
+			variable: 'theme-button-background-hover-color',
 			type: 'color:hover',
 		},
 	],
@@ -379,19 +609,11 @@ export const getPostListingVariables = () => ({
 	...handleBackgroundOptionFor({
 		id: `${prefix}_card_overlay_background`,
 		selector: applyPrefixFor(
-			'.entry-card .ct-image-container:after',
+			'.entry-card .ct-media-container:after',
 			prefix
 		),
 		responsive: true,
 	}),
-
-	[`${prefix}_cardBorder`]: {
-		selector: applyPrefixFor('.entry-card', prefix),
-		variable: 'card-border',
-		type: 'border',
-		responsive: true,
-		skip_none: true,
-	},
 
 	[`${prefix}_cardDivider`]: {
 		selector: applyPrefixFor('[data-cards="simple"] .entry-card', prefix),
@@ -411,11 +633,11 @@ export const getPostListingVariables = () => ({
 		[
 			{
 				selector: applyPrefixFor(
-					'.entry-card .ct-image-container',
+					'.entry-card .ct-media-container',
 					prefix
 				),
 				type: 'spacing',
-				variable: 'borderRadius',
+				variable: 'theme-border-radius',
 				responsive: true,
 				extractValue: () => {
 					return getOptionFor('cardThumbRadius', prefix)
@@ -432,31 +654,33 @@ export const getPostListingVariables = () => ({
 		]
 	),
 
+	[`${prefix}_cardThumbShadow`]: {
+		selector: applyPrefixFor('.entry-card .ct-media-container', prefix),
+		type: 'box-shadow',
+		variable: 'theme-image-shadow',
+		responsive: true,
+	},
+
 	[`${prefix}_cardsGap`]: {
 		selector: applyPrefixFor('.entries', prefix),
 		variable: 'grid-columns-gap',
 		responsive: true,
-		unit: 'px',
+		unit: '',
 	},
 
-	[`${prefix}_card_spacing`]: {
-		selector: applyPrefixFor('[data-cards] .entry-card', prefix),
-		variable: 'card-inner-spacing',
-		responsive: true,
-		unit: 'px',
-	},
-
-	[`${prefix}_cardRadius`]: {
-		selector: applyPrefixFor('.entry-card', prefix),
-		type: 'spacing',
-		variable: 'borderRadius',
-		responsive: true,
-	},
+	...withKeys(
+		[
+			`${prefix}_card_spacing`,
+			`${prefix}_cardRadius`,
+			`${prefix}_cardBorder`,
+		],
+		imageBorderVariables
+	),
 
 	[`${prefix}_cardShadow`]: {
 		selector: applyPrefixFor('.entry-card', prefix),
 		type: 'box-shadow',
-		variable: 'box-shadow',
+		variable: 'theme-box-shadow',
 		responsive: true,
 	},
 
@@ -518,7 +742,7 @@ export const getPostListingVariables = () => ({
 		? {
 				...handleBackgroundOptionFor({
 					id: `${prefix}_background`,
-					selector: `[data-prefix="${prefix}"]`,
+					selector: `body[data-prefix="${prefix}"]`,
 					responsive: true,
 				}),
 		  }

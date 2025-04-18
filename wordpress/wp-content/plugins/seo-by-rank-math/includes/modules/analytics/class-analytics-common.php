@@ -11,13 +11,13 @@
 namespace RankMath\Analytics;
 
 use RankMath\Helper;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\DB as DB_Helper;
 use RankMath\Traits\Hooker;
 use RankMath\Google\Console;
 use RankMath\Google\Authentication;
 use RankMath\Analytics\Workflow\Jobs;
 use RankMath\Analytics\Workflow\Workflow;
-use MyThemeShop\Helpers\Conditional;
-use MyThemeShop\Helpers\Str;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,7 +32,7 @@ class Analytics_Common {
 	 * The Constructor
 	 */
 	public function __construct() {
-		if ( Conditional::is_heartbeat() ) {
+		if ( Helper::is_heartbeat() ) {
 			return;
 		}
 
@@ -47,7 +47,7 @@ class Analytics_Common {
 
 		new GTag();
 		new Analytics_Stats();
-		$this->action( 'plugins_loaded', 'maybe_init_email_reports', 15 );
+		$this->action( 'init', 'maybe_init_email_reports' );
 		$this->action( 'init', 'maybe_enable_email_reports', 20 );
 		$this->action( 'cmb2_save_options-page_fields_rank-math-options-general_options', 'maybe_update_report_schedule', 20, 3 );
 
@@ -192,10 +192,10 @@ class Analytics_Common {
 			'rank_math_analytics_inspections',
 		];
 
-		$objects_coll = Helper::get_table_collation( 'rank_math_analytics_objects' );
+		$objects_coll = DB_Helper::get_table_collation( 'rank_math_analytics_objects' );
 		$changed      = 0;
 		foreach ( $tables as $table ) {
-			$changed += (int) Helper::check_collation( $table, 'all', $objects_coll );
+			$changed += (int) DB_Helper::check_collation( $table, 'all', $objects_coll );
 		}
 
 		return $changed ? sprintf(
@@ -227,7 +227,7 @@ class Analytics_Common {
 			return;
 		}
 
-		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'enable_email_reports' ) ) {
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_GET['_wpnonce'] ), 'enable_email_reports' ) ) {
 			return;
 		}
 
@@ -274,13 +274,11 @@ class Analytics_Common {
 	/**
 	 * Replace link inside notice dynamically to avoid issues with the nonce.
 	 *
-	 * @param string $output  Notice output.
-	 * @param string $message Notice message.
-	 * @param array  $options Notice options.
+	 * @param string $output Notice output.
 	 *
 	 * @return string
 	 */
-	public function replace_notice_link( $output, $message, $options ) {
+	public function replace_notice_link( $output ) {
 		$url    = wp_nonce_url( Helper::get_admin_url( 'options-general&enable_email_reports=1#setting-panel-analytics' ), 'enable_email_reports' );
 		$output = str_replace( '###ENABLE_EMAIL_REPORTS###', $url, $output );
 		return $output;
@@ -298,7 +296,7 @@ class Analytics_Common {
 		return [
 			'search-traffic'    => [
 				'label' => __( 'Search Traffic', 'rank-math' ),
-				'desc'  => __( 'This is the number of pageviews carried out by visitors from Google.', 'rank-math' ),
+				'desc'  => __( 'This is the number of pageviews carried out by visitors from Search Engines.', 'rank-math' ),
 				'value' => $is_connected && defined( 'RANK_MATH_PRO_FILE' ),
 				'data'  => isset( $data->pageviews ) ? $data->pageviews : '',
 			],
@@ -316,13 +314,13 @@ class Analytics_Common {
 			],
 			'total-keywords'    => [
 				'label' => __( 'Total Keywords', 'rank-math' ),
-				'desc'  => __( 'Total number of keywords your site ranking below 100 position.', 'rank-math' ),
+				'desc'  => __( 'Total number of keywords your site ranks for within top 100 positions.', 'rank-math' ),
 				'value' => true,
 				'data'  => $data->keywords,
 			],
 			'average-position'  => [
 				'label'  => __( 'Average Position', 'rank-math' ),
-				'desc'   => __( 'Average position of all the ranking keywords below 100 position.', 'rank-math' ),
+				'desc'   => __( 'Average position of all the keywords ranking within top 100 positions.', 'rank-math' ),
 				'value'  => true,
 				'revert' => true,
 				'data'   => $data->position,

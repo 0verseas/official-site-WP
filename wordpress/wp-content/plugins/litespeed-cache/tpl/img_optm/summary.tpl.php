@@ -35,7 +35,7 @@ if (!empty($img_count['img.' . Img_Optm::STATUS_ERR_FETCH])) {
 
 ?>
 <div class="litespeed-flex-container litespeed-column-with-boxes">
-	<div class="litespeed-width-7-10 litespeed-image-optim-summary-wrapper">
+	<div class="litespeed-width-7-10 litespeed-column-left litespeed-image-optim-summary-wrapper">
 		<div class="litespeed-image-optim-summary">
 
 			<h3>
@@ -136,7 +136,7 @@ if (!empty($img_count['img.' . Img_Optm::STATUS_ERR_FETCH])) {
 					<?php endif; ?>
 
 					<p><?php echo sprintf(
-							'<a href="%1$s" class="button button-secondary" data-balloon-pos="right" aria-label="%2$s" %3$s><span class="dashicons dashicons-editor-removeformatting"></span>&nbsp;%4$s</a>',
+							'<a href="%1$s" class="button button-secondary litespeed-btn-warning" data-balloon-pos="right" aria-label="%2$s" %3$s><span class="dashicons dashicons-editor-removeformatting"></span>&nbsp;%4$s</a>',
 							($unfinished_num ? Utility::build_url(Router::ACTION_IMG_OPTM, Img_Optm::TYPE_CLEAN) : 'javascript:;'),
 							__('Remove all previous unfinished image optimization requests.', 'litespeed-cache'),
 							($unfinished_num ? '' : ' disabled'),
@@ -219,7 +219,7 @@ if (!empty($img_count['img.' . Img_Optm::STATUS_ERR_FETCH])) {
 		</div>
 	</div>
 
-	<div class="litespeed-width-3-10">
+	<div class="litespeed-width-3-10 litespeed-column-right">
 		<div class="postbox litespeed-postbox litespeed-postbox-imgopt-info">
 			<div class="inside">
 
@@ -238,7 +238,7 @@ if (!empty($img_count['img.' . Img_Optm::STATUS_ERR_FETCH])) {
 							<?php if ($img_count['groups_new']) : ?>
 								<code><?php echo Admin_Display::print_plural($img_count['groups_new'], 'group'); ?></code>
 							<?php else : ?>
-								<font class="litespeed-congratulate"><?php echo __('Congratulations, all requested!', 'litespeed-cache'); ?></font>
+								<font class="litespeed-congratulate"><?php echo __('Congratulations, all gathered!', 'litespeed-cache'); ?></font>
 							<?php endif; ?>
 
 							<a href="https://docs.litespeedtech.com/lscache/lscwp/imageopt/#what-is-an-image-group" target="_blank" class="litespeed-desc litespeed-help-btn-icon" data-balloon-pos="up" aria-label="<?php echo __('What is a group?', 'litespeed-cache'); ?>">
@@ -274,6 +274,10 @@ if (!empty($img_count['img.' . Img_Optm::STATUS_ERR_FETCH])) {
 				<p>
 					<?php echo __('Last Request', 'litespeed-cache'); ?>: <code><?php echo isset($optm_summary['last_requested']) ? Utility::readable_time($optm_summary['last_requested']) : '-'; ?></code>
 				</p>
+				<p>
+					<?php echo __('Last Pulled', 'litespeed-cache'); ?>: <code><?php echo isset($optm_summary['last_pulled']) ? Utility::readable_time($optm_summary['last_pulled']) : '-'; ?></code>
+					<?php if (isset($optm_summary['last_pulled_by_cron']) && $optm_summary['last_pulled_by_cron']) echo '(Cron)'; ?>
+				</p>
 			</div>
 			<div class="inside litespeed-postbox-footer litespeed-postbox-footer--compact litespeed-desc">
 				<?php echo sprintf(__('Results can be checked in <a %s>Media Library</a>.', 'litespeed-cache'), 'href="upload.php?mode=list"'); ?>
@@ -302,7 +306,15 @@ if (!empty($img_count['img.' . Img_Optm::STATUS_ERR_FETCH])) {
 
 			</div>
 			<div class="inside litespeed-postbox-footer litespeed-postbox-footer--compact">
+				<p><a href="<?php echo Utility::build_url(Router::ACTION_IMG_OPTM, Img_Optm::TYPE_RESET_COUNTER); ?>" class="litespeed-link-with-icon litespeed-warning">
+						<span class="dashicons dashicons-dismiss"></span><?php echo __('Soft Reset Optimization Counter', 'litespeed-cache'); ?>
+					</a></p>
 
+				<div class="litespeed-desc">
+					<?php echo sprintf(__('This will reset the %1$s. If you changed WebP/AVIF settings and want to generate %2$s for the previously optimized images, use this action.', 'litespeed-cache'), '<code>' . __('Current image post id position', 'litespeed-cache') . '</code>', 'WebP/AVIF'); ?>
+				</div>
+			</div>
+			<div class="inside litespeed-postbox-footer litespeed-postbox-footer--compact">
 				<p><a href="<?php echo Utility::build_url(Router::ACTION_IMG_OPTM, Img_Optm::TYPE_DESTROY); ?>" class="litespeed-link-with-icon litespeed-danger" data-litespeed-cfm="<?php echo __('Are you sure to destroy all optimized images?', 'litespeed-cache'); ?>">
 						<span class="dashicons dashicons-dismiss"></span><?php echo __('Destroy All Optimization Data', 'litespeed-cache'); ?>
 					</a></p>

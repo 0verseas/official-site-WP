@@ -33,7 +33,8 @@ class ElementsKit_Menu_Walker extends \Walker_Nav_Menu {
 	}
 
 	public function is_megamenu( $menu_slug ) {
-		$menu_slug = ( ( ( gettype( $menu_slug ) == 'object' ) && ( isset( $menu_slug->slug ) ) ) ? $menu_slug->slug : $menu_slug );
+		$menu_obj = wp_get_nav_menu_object($menu_slug);
+		$menu_slug = ( ( ( gettype( $menu_obj ) == 'object' ) && ( isset( $menu_obj->slug ) ) ) ? $menu_obj->slug : $menu_slug );
 
 		$cache_key = 'elementskit_megamenu_data_' . $menu_slug;
 		$cached    = wp_cache_get( $cache_key );
@@ -202,7 +203,12 @@ class ElementsKit_Menu_Walker extends \Walker_Nav_Menu {
 			$atts['class'] .= ' ekit-menu-dropdown-toggle';
 		}
 		if ( in_array( 'menu-item-has-children', $classes ) || $is_megamenu_item == true ) {
-			$submenu_indicator .= '<i class="icon icon-down-arrow1 elementskit-submenu-indicator"></i>';
+			// Use an if statement to conditionally display the submenu indicator icon
+			if(!empty($args->submenu_indicator_icon)) {
+				$submenu_indicator .= $args->submenu_indicator_icon;
+			} else {
+				$submenu_indicator .= '<i class="icon icon-down-arrow1 elementskit-submenu-indicator"></i>';
+			}
 		}
 		if ( $depth > 0 ) {
 			$manual_class   = array_values( $classes )[0] . ' ' . 'dropdown-item';

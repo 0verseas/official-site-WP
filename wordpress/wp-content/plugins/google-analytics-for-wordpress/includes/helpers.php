@@ -8,6 +8,7 @@
  * @package MonsterInsights
  * @subpackage Helper
  * @author  Chris Christoff
+ * TODO Go through this file and remove UA and dual tracking references/usages
  */
 
 // Exit if accessed directly
@@ -17,30 +18,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function monsterinsights_get_url($medium = '', $campaign = '', $url = '', $escape = true)
 {
-    // Setup Campaign variables
-    $source      = monsterinsights_is_pro_version() ? 'proplugin' : 'liteplugin';
-    $medium      = !empty($medium) ? $medium : 'defaultmedium';
-    $campaign    = !empty($campaign) ? $campaign : 'defaultcampaign';
-    $content     = MONSTERINSIGHTS_VERSION;
-    $default_url = monsterinsights_is_pro_version() ? '' : 'lite/';
-    $url         = !empty($url) ? $url : 'https://www.monsterinsights.com/' . $default_url;
+	// Setup Campaign variables
+	$source      = monsterinsights_is_pro_version() ? 'proplugin' : 'liteplugin';
+	$medium      = !empty($medium) ? $medium : 'defaultmedium';
+	$campaign    = !empty($campaign) ? $campaign : 'defaultcampaign';
+	$content     = MONSTERINSIGHTS_VERSION;
+	$default_url = monsterinsights_is_pro_version() ? '' : 'lite/';
+	$url         = !empty($url) ? $url : 'https://www.monsterinsights.com/' . $default_url;
 
-    // Put together redirect URL
-    $url = add_query_arg(
-        array(
-            'utm_source'   => $source,   // Pro/Lite Plugin
-            'utm_medium'   => sanitize_key($medium),   // Area of MonsterInsights (example Reports)
-            'utm_campaign' => sanitize_key($campaign), // Which link (example eCommerce Report)
-            'utm_content'  => $content,  // Version number of MI
-        ),
-        trailingslashit($url)
-    );
+	// Put together redirect URL
+	$url = add_query_arg(
+		array(
+			'utm_source'   => $source,   // Pro/Lite Plugin
+			'utm_medium'   => sanitize_key($medium),   // Area of MonsterInsights (example Reports)
+			'utm_campaign' => sanitize_key($campaign), // Which link (example eCommerce Report)
+			'utm_content'  => $content,  // Version number of MI
+		),
+		trailingslashit($url)
+	);
 
-    if ($escape) {
-        return esc_url($url);
-    } else {
-        return $url;
-    }
+	if ($escape) {
+		return esc_url($url);
+	} else {
+		return $url;
+	}
 }
 
 function monsterinsights_is_page_reload() {
@@ -81,8 +82,8 @@ function monsterinsights_track_user( $user_id = - 1 ) {
 	}
 
 	// or if tracking code is not entered
-	$tracking_ids = monsterinsights_get_tracking_ids();
-	if ( empty( $tracking_ids ) ) {
+	$tracking_id = monsterinsights_get_v4_id();
+	if ( empty( $tracking_id ) ) {
 		$track_user = false;
 	}
 
@@ -137,7 +138,7 @@ function monsterinsights_get_uuid() {
 	 * if the first page visited is AMP, the cookie may be in the format amp-XXXXXXXXXXXXX-XXXXXXXX
 	 */
 
-	$ga_cookie    = sanitize_text_field($_COOKIE['_ga']);
+	$ga_cookie    = sanitize_text_field($_COOKIE['_ga']); // phpcs:ignore WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___COOKIE
 	$cookie_parts = explode( '.', $ga_cookie );
 	if ( is_array( $cookie_parts ) && ! empty( $cookie_parts[2] ) ) {
 		$cookie_parts = array_slice( $cookie_parts, 2 );
@@ -160,20 +161,32 @@ function monsterinsights_get_uuid() {
  * @var string $measurement_id
  *   GA4 Measurement Id (Property Id). E.g., 'G-1YS1VWHG3V'.
  *
- * @return int
+ * @return string|null
  *   Returns GA4 Session Id or NULL if cookie wasn't found.
  */
 function monsterinsights_get_browser_session_id( $measurement_id ) {
-	// Cookie name example: '_ga_1YS1VWHG3V'.
-	$cookie_name = '_ga_' . str_replace( 'G-', '', $measurement_id );
-	if ( isset( $_COOKIE[ $cookie_name ] ) ) {
-		// Cookie value example: 'GS1.1.1659710029.4.1.1659710504.0'.
-		// Session Id:                  ^^^^^^^^^^.
-		$parts = explode( '.', sanitize_text_field($_COOKIE[ $cookie_name ]) );
-		return $parts[2];
+
+	if ( ! is_string( $measurement_id ) ) {
+		return null;
 	}
 
-	return null;
+	// Cookie name example: '_ga_1YS1VWHG3V'.
+	$cookie_name = '_ga_' . str_replace( 'G-', '', $measurement_id );
+
+	if ( ! isset( $_COOKIE[ $cookie_name ] ) ) {
+		return null;
+	}
+
+	// Cookie value example: 'GS1.1.1659710029.4.1.1659710504.0'.
+	// Session Id:                  ^^^^^^^^^^.
+	$cookie = sanitize_text_field( $_COOKIE[ $cookie_name ] ); // phpcs:ignore WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___COOKIE
+	$parts = explode( '.', $cookie );
+
+	if ( ! isset( $parts[2] ) ){
+		return null;
+	}
+
+	return $parts[2];
 }
 
 /**
@@ -218,7 +231,7 @@ function monsterinsights_get_cookie( $debug = false ) {
 		return ( $debug ) ? 'FCE' : false;
 	}
 
-	$ga_cookie    = sanitize_text_field( $_COOKIE['_ga'] );
+	$ga_cookie    = sanitize_text_field( $_COOKIE['_ga'] ); // phpcs:ignore WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___COOKIE
 	$cookie_parts = explode( '.', $ga_cookie );
 	if ( is_array( $cookie_parts ) && ! empty( $cookie_parts[2] ) ) {
 		$cookie_parts = array_slice( $cookie_parts, 2 );
@@ -429,7 +442,7 @@ function monsterinsights_is_dev_url( $url = '' ) {
 
 // Set cookie to expire in 2 years
 function monsterinsights_get_cookie_expiration_date( $time ) {
-	return date( 'D, j F Y H:i:s', time() + $time );
+	return date( 'D, j F Y H:i:s', time() + $time ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 }
 
 function monsterinsights_string_ends_with( $string, $ending ) {
@@ -975,7 +988,52 @@ function monsterinsights_get_api_url() {
 }
 
 function monsterinsights_get_licensing_url() {
-	return apply_filters( 'monsterinsights_get_licensing_url', 'https://www.monsterinsights.com' );
+	$licensing_website = apply_filters( 'monsterinsights_get_licensing_url', 'https://www.monsterinsights.com' );
+	return $licensing_website . '/license-api';
+}
+
+/**
+ * Queries the remote URL via wp_remote_post and returns a json decoded response.
+ *
+ * @param string $action The name of the $_POST action var.
+ * @param array  $body The content to retrieve from the remote URL.
+ * @param array  $headers The headers to send to the remote URL.
+ * @param string $return_format The format for returning content from the remote URL.
+ *
+ * @return string|bool          Json decoded response on success, false on failure.
+ * @since 6.0.0
+ */
+function monsterinsights_perform_remote_request( $action, $body = array(), $headers = array(), $return_format = 'json' ) {
+
+	$key = is_network_admin() ? MonsterInsights()->license->get_network_license_key() : MonsterInsights()->license->get_site_license_key();
+
+	// Build the body of the request.
+	$query_params = wp_parse_args(
+		$body,
+		array(
+			'tgm-updater-action'     => $action,
+			'tgm-updater-key'        => $key,
+			'tgm-updater-wp-version' => get_bloginfo( 'version' ),
+			'tgm-updater-referer'    => site_url(),
+			'tgm-updater-mi-version' => MONSTERINSIGHTS_VERSION,
+			'tgm-updater-is-pro'     => monsterinsights_is_pro_version(),
+		)
+	);
+	$args = [
+		'headers' => $headers,
+	];
+	// Perform the query and retrieve the response.
+	$response      = wp_remote_get( add_query_arg( $query_params, monsterinsights_get_licensing_url() ), $args );
+	$response_code = wp_remote_retrieve_response_code( $response );
+	$response_body = wp_remote_retrieve_body( $response );
+
+	// Bail out early if there are any errors.
+	if ( 200 != $response_code || is_wp_error( $response_body ) ) {
+		return false;
+	}
+
+	// Return the json decoded content.
+	return json_decode( $response_body );
 }
 
 function monsterinsights_is_wp_seo_active() {
@@ -1177,6 +1235,75 @@ if ( ! function_exists( 'wp_get_jed_locale_data' ) ) {
 	}
 }
 
+/**
+ * Get JED array of translatable text.
+ *
+ * @param $domain string Text domain.
+ *
+ * @return array
+ */
+function monsterinsights_get_jed_locale_data( $domain ) {
+	$translations = get_translations_for_domain( $domain );
+
+	$translations_entries = $translations->entries;
+
+	if ( empty( $translations_entries ) ) {
+		return;
+	}
+
+	$messages = array(
+		'' => array(
+			'domain'       => 'messages',
+			'lang'         => is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale(),
+			'plural-forms' => 'nplurals=2; plural=(n != 1);',
+		)
+	);
+
+	foreach ( $translations_entries as $entry ) {
+		$messages[ $entry->singular ] = $entry->translations;
+	}
+
+	return array(
+		'domain'      => 'messages',
+		'locale_data' => array(
+			'messages' => $messages,
+		),
+	);
+}
+
+/**
+ * Get JED array of translatable text.
+ *
+ * @param $domain string Text domain.
+ *
+ * @return string
+ */
+function monsterinsights_get_printable_translations( $domain ) {
+	$locale = determine_locale();
+
+	if ( 'en_US' == $locale ) {
+		return '';
+	}
+
+	$locale_data = monsterinsights_get_jed_locale_data( $domain );
+
+	if ( ! $locale_data ) {
+		return '';
+	}
+
+	$json_translations = wp_json_encode( $locale_data );
+
+	$output = <<<JS
+( function( domain, translations ) {
+	var localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+	localeData[""].domain = domain;
+	wp.i18n.setLocaleData( localeData, domain );
+} )( "{$domain}", {$json_translations} );
+JS;
+
+	return $output;
+}
+
 function monsterinsights_get_inline_menu_icon() {
 	$scheme          = get_user_option( 'admin_color', get_current_user_id() );
 	$use_dark_scheme = $scheme === 'light';
@@ -1187,6 +1314,14 @@ function monsterinsights_get_inline_menu_icon() {
 		return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTciIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0iI0ZGRiIgZmlsbC1ydWxlPSJub256ZXJvIj48cGF0aCBkPSJNOC4zNyA3LjE5OWMuMDI4LS4wMS4wNTQtLjAyLjA4My0uMDI5YTEuNDcgMS40NyAwIDAgMSAuMTExLS4wMzJjLjAzLS4wMDYuMDU1LS4wMTMuMDg0LS4wMTYuMDg2LS4wMTYuMTcyLS4wMjUuMjU5LS4wMzIuMDI4IDAgLjA1Ny0uMDAzLjA5LS4wMDNsLjAwMi4wMDNoLjAwNGMuMDMyIDAgLjA2NCAwIC4wOTYuMDAzLjAxNiAwIC4wMzUuMDA0LjA1LjAwNGwuMDQyLjAwMy4wNjcuMDEuMDIzLjAwM2MuMDI1LjAwMy4wNTEuMDEuMDc3LjAxMmwuMDEyLjAwNGMuMDMuMDA2LjA1NS4wMTIuMDguMDE5aC4wMWMuMDI2LjAwNi4wNTQuMDE2LjA4LjAyMmguMDA2YS43NzIuNzcyIDAgMCAxIC4wOC4wMjZsLjAwNy4wMDMuMDc2LjAzMi4wMDcuMDAzLjAyOS4wMTMuMDA2LjAwM2MuMjUuMTEyLjQ3LjI3OC42NS40OS4xNjUtLjI2LjM2Ny0uNDkuNi0uNjkxYTMuMjg0IDMuMjg0IDAgMCAwLTIuMDQzLTEuODM2Yy0uMDM1LS4wMS0uMDc0LS4wMjMtLjExMi0uMDMybC0uMDMyLS4wMWEzLjk0MyAzLjk0MyAwIDAgMC0uMzg3LS4wNzcgMS43NjIgMS43NjIgMCAwIDAtLjE4Mi0uMDE5IDEuNjI4IDEuNjI4IDAgMCAwLS4xMjUtLjAwNmMtLjA0MiAwLS4wODMtLjAwMy0uMTI4LS4wMDMtLjExNSAwLS4yMy4wMDYtLjM0Mi4wMTlsLS4wODcuMDEtLjA2NC4wMWMtLjA2My4wMDktLjEyNC4wMTgtLjE4OC4wMzRoLS4wMDNjLS4wMjMuMDA0LS4wNDIuMDEtLjA2NC4wMTNhLjUyNS41MjUgMCAwIDAtLjAzNi4wMWMtLjAwNiAwLS4wMTIuMDAzLS4wMTYuMDAzbC0uMDEuMDAzLS4wNTcuMDE2aC0uMDAzbC0uMDE2LjAwMy0uMDI5LjAxLS4wNi4wMTZoLS4wMDRhMy4yODYgMy4yODYgMCAwIDAtMi4xOTcgMi4zMDljMCAuMDAzIDAgLjAwMy0uMDAzLjAwNi0uMDA2LjAyNi0uMDEzLjA1MS0uMDE2LjA3N2EzLjI4IDMuMjggMCAwIDAgMi43MTggMy45ODJjLjAzMi4wMDMuMDYxLjAxLjA5My4wMTJsLjA5My4wMWMuMDk2LjAwNi4xOTIuMDEzLjI4OC4wMTNoLjAwM2MuMDUxIDAgLjEwNiAwIC4xNTctLjAwMy4wNS0uMDA0LjEwMi0uMDA3LjE1My0uMDEzYTQuNjMgNC42MyAwIDAgMCAuMzA0LS4wNDJjLjExMi0uMDIyLjIyNC0uMDQ4LjMzMy0uMDhsLjA4Ni0uMDI4YTMuMzM1IDMuMzM1IDAgMCAwIDEuMTYtLjY3NSAyLjkyNiAyLjkyNiAwIDAgMS0uMTI3LS4zM2gtLjAwM2ExLjgyIDEuODIgMCAwIDEtLjk4NS4zMzNoLS4wNzdjLS4wNDUgMC0uMDg2IDAtLjEyOC0uMDAzLS4wMjItLjAwMy0uMDQxLS4wMDMtLjA2LS4wMDdhMS44NTMgMS44NTMgMCAwIDEtMS40MjctLjk0NmgtLjAwM2ExLjg0NCAxLjg0NCAwIDAgMS0uMjMtLjg5M2MwLS4wMzIgMC0uMDY0LjAwMy0uMDk2YS43NDQuNzQ0IDAgMCAwIC42NTYuMjE3Ljc1Mi43NTIgMCAwIDAgLjYyLS44NjkuNzUzLjc1MyAwIDAgMC0uNjU2LS42MjdoLS4wMDNjLjE3LS4xNS4zNjUtLjI2OC41NzYtLjM0OGwuMDI4LS4wMTNaTTIuODk0IDE0LjEyYy0uNDYtLjAzOS0uNTc5LS4yMTgtLjU5MS0uMzIzLS4wNDItLjQxLS4wODctLjgyMi0uMTI1LTEuMjM1bC0uMDQ4LS41MDItLjIwMi0yLjE1MmMtLjAxMi0uMTI1LS4wMjItLjI1LS4wMzUtLjM3NWE0LjMgNC4zIDAgMCAwLS41MzQuNTE5Yy0uNjMuNzI2LS45OTQgMS42MDgtMS4xODMgMi41NzQtLjEwNi41NS0uMTYzIDEuMTA3LS4xNzYgMS42NjZsLjAwMy4wMDNIMGMuMDIuNDQ4LjExOC44LjMxNyAxLjAxNy4yMDEtLjAxNi4zOC0uMTY2LjUxNS0uMzUxYTEuNyAxLjcgMCAwIDAgLjI4LjY5Yy40NC0uMDkyLjc4NC0uMzMyLjk0MS0uNzEuMDc3LjAwNC4xNTcuMDA0LjIzNC4wMDQuMTEyLjQwMy41MDUuNTk4LjcxLjU4OC4wOTktLjE2Ni4xOTUtLjM4NC4xOTgtLjY0NnYtLjc1MWwtLjEzOC0uMDFjLS4wNiAwLS4xMTItLjAwMy0uMTYzLS4wMDZaTS4zNzcgMTUuMTVhMS4zMzQgMS4zMzQgMCAwIDEtLjIyLS43M2guMDE5Yy4wOTYuMDYuMTk1LjExNS4yOTQuMTYzbC0uMDkzLjU2NlptLjguMzMyYTEuNzY0IDEuNzY0IDAgMCAxLS4yMy0uNzEzYy4xNDQuMDQxLjI5LjA3Ni40MzguMTAybC0uMjA4LjYxWm0xLjc0LS4xLS4xMjgtLjQ1M2MuMDkyLS4wMDcuMTg1LS4wMTYuMjc4LS4wMjZhMS4wNjEgMS4wNjEgMCAwIDEtLjE1LjQ4Wk00LjYyNCAxNC4xOTNsLS4zMjktLjAxNmMtLjIzLjM0NS0uMzkuNzItLjQ0OCAxLjAzMy4xNjcuMjA4LjM2NS4zODcuNTg5LjUzMWEuODcuODcgMCAwIDAtLjE0MS4yNTZoMy4zNjh2LTEuNzI0Yy0uMTEgMC0uMjE4IDAtLjMyMy0uMDAzYTYzLjUxOCA2My41MTggMCAwIDEtMi43MTYtLjA3N1pNMTEuMjY0IDE0LjE5M2E2OS4yMyA2OS4yMyAwIDAgMS0yLjcxMi4wOGMtLjExIDAtLjIxOCAwLS4zMjcuMDAzVjE2aDMuMzY4YS44MjYuODI2IDAgMCAwLS4xNDQtLjI1OWMuMjItLjE0Ny40Mi0uMzI2LjU4NS0uNTMtLjA1Ny0uMzE0LS4yMTctLjY4OS0uNDQ3LTEuMDM0bC0uMzIzLjAxNloiLz48cGF0aCBkPSJNMTUuODE4IDExLjM4OGMtLjA0Mi0uMDQ0LS4wOS0uMDgzLS4xMzUtLjEyNC0uMDU0LjA3Ni0uMTEyLjE1LS4xNy4yMjRhMy4xNTMgMy4xNTMgMCAwIDEtMi4yNTUgMS4xMzVoLS4wMjhhMy41MjcgMy41MjcgMCAwIDEtLjM2Ny0uMDAzbC0uMDc3LS4wMDdhMy4xODYgMy4xODYgMCAwIDEtMi40MTEtMS40OTQgMy42NjEgMy42NjEgMCAwIDEtNS45NTItMy42bC4wMDYtLjAyM2MuMDA0LS4wMjIuMDEtLjA0MS4wMTYtLjA2NHYtLjAwNmEzLjY2OCAzLjY2OCAwIDAgMSAyLjc5LTIuNjY3IDMuNjYyIDMuNjYyIDAgMCAxIDQuMDggMi4wNDcgMy4xNzcgMy4xNzcgMCAwIDEgMi40ODgtLjQ0OGMuMDctLjgyOS4xMzctMS42Ny4yMDUtMi41NTJsLTEuMTIzLS4zMWMuMTIyLS44MDMtLjAxMy0xLjIxOS0uMTc2LTEuOTQ4LS41MDguNDIyLS44MzUuNzI5LTEuNDUyIDEuMDRBNi4yNzQgNi4yNzQgMCAwIDAgMTAuNDYxLjRsLS4yNC0uNGMtLjkwOC42ODQtMS42NzkgMS4yMzQtMi4yOCAyLjE0QzcuMzQ2IDEuMjM0IDYuNTY5LjY4NCA1LjY2NCAwbC0uMjM3LjQwM2E2LjMxMyA2LjMxMyAwIDAgMC0uNzk2IDIuMTljLS42Mi0uMzEzLS45NDQtLjYxNy0xLjQ1Mi0xLjAzOS0uMTY2LjczLS4zIDEuMTQ1LS4xNzYgMS45NDhoLS4wMDZsLTEuMTIzLjMxYTM2OS40MTEgMzY5LjQxMSAwIDAgMCAuNDg2IDUuNjdjLjA2Ny43Mi4xMzEgMS40MzYuMjAyIDIuMTUzbC4wNDguNTAyLjEyNCAxLjIzMWMuMDEzLjEwNi4xMjguMjg1LjU5Mi4zMjMuMDUxLjAwMy4xMDYuMDA2LjE2My4wMDZsLjEzOC4wMWMuMjIzLjAxNi40NDcuMDI5LjY3NC4wMzhhNjkuMjMgNjkuMjMgMCAwIDAgMy4wNDEuMDk2aDEuMjEzYTYzLjM1IDYzLjM1IDAgMCAwIDIuNzEyLS4wOGMuMTA5LS4wMDYuMjE3LS4wMTIuMzI2LS4wMTZsLjgwNi0uMDQ4Yy4xMTUgMCAuMjMtLjAxLjM0Mi0uMDMyLjM0Ni42MTEuOTkyLjk5MiAxLjY5NS45OTJoLjA1MWwuMTQ3LjQzOGMuMDguMjM3Ljk2My0uMDU4Ljg4My0uMjk0bC0uMDctLjIxOGExLjExIDEuMTEgMCAwIDEtLjMwNC0uMDU3IDEuMjE0IDEuMjE0IDAgMCAxLS4zNTItLjE5MiAxLjcxNiAxLjcxNiAwIDAgMS0uMjY5LS4yNmMuMTEyLS4yMTQuMjctLjQwMi40NTgtLjU1YTEuMTUgMS4xNSAwIDAgMS0uNDQ4LS4xODVjLjAzNS4zMTQtLjAzMi42MDUtLjIwOC44MjJhMS4wNjYgMS4wNjYgMCAwIDEtLjEzNC4xMzRjLS40NjctLjA0MS0uNjU5LS40NDQtLjYzLS45MjdsLS4wMDMtLjAwM2MuMTUzLS4wNDIuMzEzLS4wNy40NzMtLjA4My4xNjYtLjAxMy4zMzYuMDA2LjQ5Ni4wNTRhMS42NyAxLjY3IDAgMCAxLS4zMzMtLjMwN2MuMTI4LS4yNDMuMzEtLjQ1LjUzNC0uNjEuMDk2LS4wNzEuMTk1LS4xMzUuMy0uMjAyLjI1LjIxNy40MTcuNDcuNDUyLjcyOWEuNzI1LjcyNSAwIDAgMS0uMDUxLjM3N2MuMTMuMTE5LjIzNi4yNjIuMzEzLjQyMmEuODM2LjgzNiAwIDAgMSAuMDc3LjM0MyAxLjkxMiAxLjkxMiAwIDAgMCAwLTIuN1pNNi40MTIgMy42NWExLjkzOSAxLjkzOSAwIDAgMSAxLjUzMi0uMzhjLjQ1Ny4wODYuODg2LjM2IDEuMTguODY2di4wMDNDNy42NjYgMy45MTQgNi4zOCA0LjI3IDUuNzEgNS4zNzZhMS44MTUgMS44MTUgMCAwIDEgLjcwNC0xLjcyN1oiLz48cGF0aCBkPSJNMTMuMzY4IDYuNjg3YTIuNzg0IDIuNzg0IDAgMCAwLTIuNjc0IDQuMjA5bC41MDItLjY5NGEuNTcyLjU3MiAwIDEgMSAxLjAwMS0uMjgybC44NDUuMzUyYy4wMTMtLjAxNi4wMjUtLjAzNS4wNDEtLjA1LjEtLjExLjI0LS4xNzQuMzg0LS4xODNoLjAwN2EuNDQuNDQgMCAwIDEgLjE0My4wMTNsLjYwMi0xLjI0NGEuNTcuNTcgMCAwIDEtLjA3LS44MDYuNTcuNTcgMCAwIDEgLjgwNS0uMDdjLjEyMi4xMDIuMTk1LjI0OS4yMDUuNDA1di4wMDRsLjUwMi4wOTZoLjAwM2EyLjc4NiAyLjc4NiAwIDAgMC0xLjg5Ni0xLjY3MyAyLjQ1IDIuNDUgMCAwIDAtLjQtLjA3N1oiLz48cGF0aCBkPSJtMTQuNDY4IDguOTI5LS42MDEgMS4yNGEuNTc3LjU3NyAwIDAgMSAuMTUuNjg1LjU3NC41NzQgMCAwIDEtLjY0OS4zMS41NzQuNTc0IDAgMCAxLS40MzItLjY0M2wtLjg0NC0uMzUxYS41NzQuNTc0IDAgMCAxLS42NzIuMTg1bC0uNTYuNzc4YTIuNzcgMi43NyAwIDAgMCAyIDEuMDljLjAxMiAwIC4wMjUuMDAzLjAzOC4wMDMuMTEyLjAwNy4yMjQuMDEuMzM2LjAwMy4wMSAwIC4wMTktLjAwMy4wMzItLjAwMy4wNTctLjAwMy4xMTUtLjAxLjE3Mi0uMDE2YTIuNzkgMi43OSAwIDAgMCAyLjMzMi0zLjQ3NmgtLjAwM2wtLjY1Ni0uMTI4YS41OC41OCAwIDAgMS0uNjQzLjMyM1oiLz48L2c+PC9zdmc+';
 		// return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4AoEBjcfBsDvpwAABQBJREFUWMO1mGmollUQgJ9z79Vc01LLH0GLWRqlUhYV5o+LbRIVbVQSUSn9qJTKsqDCoqCINKUbtBEUFbbeDGyz1SIiaCHIINu18KZ1bbkuV+/Tj+arw8v7fvdVcuDjvGdmzsycM3Nm5nywE6BOVSfW4JukTmF3gtqifqJuVmc34ZunblFX7W6DzvYf2BDjPWpLRm9T7y/wzPw/DRhZmH+sfq/urb4YCp8JQwaqLwXuBXW0+pP6XjOZO+ueb9X2mE8OZTdl9MWBu199NL4XN05NvT1wh8R8prpGTbti0BEhbLt6t7ow5kdkPEl9zP/gkYKMowN/o7pU3RHzg3fFoHNj8epM4aY8ZoJvuPpj7HxwgTYgLoAFWac1091WgR8a4xxgH2Ah0JdS6gtlY4DZwAnADmAjMA14vSEgpdSrfg9sBm4BeoCVmex6gayepS6P3ZyT0SZksbDJcnikcPMmZN+zgud59Qx1RB2D3o9FW9R31ZMK9IPUP20O11XInqmuUrcG3xt1XNYVvwNSSptL+K/IjvxDoDPGteG6kcDgMkUppRXACnUIsA7YUNegERXGAEwNQZellJbHzodFfPXUjIwtwHDglzJiS4lBe4SSMugCjgfWqo+rvwF/AH+pXWqnOqOfXDMSaK06oaKf54Z/D6igj1bvzXLK5+rTYchHGf5ZdXiFjPHBc2Udg84P5qMqsvdzQf9APbaEZ2JWVj5u5KbIV7PURZmM+XUMag/mk0to1wWtUx3YT9lZErwPq9er3dkt/E3tzU54Rp2SMauA3zMErS1zhTpWvURdEKe8V7jQrOBOUwcF/97qbPWrcPP8KoP2DQFzC/gLAj+vZM1Vak8hF61V31L7msWKOjROvE89q4yhNSy+rYBfGorGV8RcFSyqESZ7hOu+UQeUMfyidhRwy0LB0AJ+TRNj/qjb/0QpUT2jpYS+ERhTkswA9sqEjALGNdGzMqXUXTNZrogi3F5sJ64GDgXGFhasjvGYDDe4HyXf1i3qKaVe4DtgbF6ZzwHuiZq0b2HN8hjzAF3Xj9IhO9mGDQX68gy8PpqoB9XuEj93hp/nZLjzmsTQZzvR9uwXaxY0EHdEuzo5EpklHeB+0bhvV69RWwN/beDKYHpNg+6I2z2hce261M4gXlRVz9RD1S+zlnRh3JBropVtQHfIXB3B38yYadEjvdZAzMjLhXpizI+tEDA4Gv+yrnFH1LJxIbdX/aKsNma9+++RIrapxyT1TmAeMDKltFU9HPgcODOl9GKTnQ0EpgMHBaobWJVS+jnjOQV4ItLFO8CbwDZgBHAqMAXoBSYBHcBm1JfzZ28EuOrl/9ODc5R6Vzwyq6BDvVTtbgHGA2sKiXFbydXfJUgpbUwpLQAateqwQj4DuDjSTWuKru+BlNIN2a6+ACYCv0dH2PhtCtfYjx0t4ZYR0a7uGeNw4GpgLnBgxt8HfAJsSOpWYD1wH7AqvocAz0Q2bgNGB62RoQfF95FhZAswLIQSZaBRbqYDPwHLogqcEhvdp7CJPqC9vwL5VtyUjor42B69zqvqXxU8S+IFOyq6iYcqdD3VONqngV8jbhol4e0sntqAnuIzumZAt8bnIOC4lNKOlNKceL3cCvyQsd/87/WNRuk29T51/5ifHu/zJ2MH69WvCz+zE+oroXdlL9pUkYdeUi/89xLU6VWAZn88fQoMjNtTBS+klF6pc6p/A2ye4OCYzm1lAAAAAElFTkSuQmCC';
 	}
+}
+
+function monsterinsights_get_ai_menu_icon() {
+	return '
+        <span class="monsterinsights-sidebar-icon">
+            <svg width="17" height="18" viewBox="0 0 17 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.9301 1.27472C12.1523 0.259572 13.5986 0.253501 13.8305 1.26743L13.8402 1.31479L13.8621 1.4095C14.1292 2.54364 15.0472 3.40943 16.1959 3.60979C17.2548 3.79436 17.2548 5.31464 16.1959 5.49922C15.6311 5.59753 15.1078 5.86056 14.6919 6.25526C14.2761 6.64996 13.9861 7.15875 13.8584 7.71771L13.8293 7.84157C13.5986 8.8555 12.1536 8.84943 11.9301 7.83429L11.9071 7.72743C11.7845 7.16626 11.4975 6.65435 11.0826 6.25704C10.6678 5.85974 10.144 5.59505 9.57806 5.49679C8.52163 5.31343 8.52163 3.79557 9.57806 3.61221C10.142 3.51435 10.6641 3.25127 11.0783 2.85631C11.4925 2.46136 11.7801 1.95232 11.9046 1.39372L11.9216 1.31357L11.9301 1.27472ZM12.8129 9.918C12.2343 9.90674 11.6813 9.6773 11.2647 9.27564C11.1731 9.33603 11.0933 9.41256 11.0291 9.5015C10.4827 10.2252 9.84278 10.9647 9.11906 11.6872C8.57021 12.2361 8.01406 12.7351 7.4652 13.1808C6.91635 12.7351 6.3602 12.2361 5.81135 11.6872C5.28543 11.1624 4.78691 10.6107 4.31778 10.0346C4.76342 9.4845 5.2637 8.92957 5.81135 8.38071C6.49514 7.69453 7.22544 7.05633 7.99706 6.47064C8.07764 6.41292 8.1482 6.34236 8.20592 6.26179C7.97508 6.05132 7.79016 5.79548 7.66271 5.51028C7.53525 5.22508 7.46802 4.91666 7.4652 4.60429C6.27399 3.77007 5.09613 3.152 4.04456 2.83021C2.90556 2.48172 1.56985 2.38822 0.694348 3.2625C0.127276 3.83079 -0.026938 4.60307 0.0167763 5.33771C0.0604906 6.07357 0.306991 6.88229 0.679776 7.70314C1.06006 8.51991 1.51406 9.30029 2.03613 10.0346C1.51419 10.7681 1.06019 11.5476 0.679776 12.3636C0.306991 13.1844 0.0604906 13.9931 0.0167763 14.729C-0.026938 15.4636 0.126062 16.2359 0.694348 16.8042C1.26263 17.3713 2.03492 17.5255 2.76956 17.4818C3.5042 17.4369 4.31413 17.1916 5.13499 16.8188C5.87571 16.4824 6.66378 16.0234 7.46642 15.4624C8.26785 16.0234 9.0547 16.4824 9.79663 16.8188C10.6163 17.1916 11.4262 17.4381 12.1621 17.4818C12.8967 17.5255 13.6678 17.3713 14.2361 16.803C15.1116 15.9287 15.0181 14.593 14.6696 13.454C14.3368 12.3684 13.6896 11.1481 12.8129 9.918ZM3.51149 4.5715C4.21092 4.78521 5.04513 5.19079 5.94856 5.7785C4.9622 6.61536 4.046 7.53157 3.20913 8.51793C2.88027 8.01716 2.58886 7.49278 2.33728 6.94907C2.01792 6.24479 1.86128 5.66193 1.83456 5.22843C1.80906 4.7925 1.91592 4.61764 1.9827 4.55086C2.09199 4.44157 2.49513 4.26186 3.51149 4.5715ZM2.33728 13.1189C2.5607 12.6271 2.85335 12.0989 3.20913 11.55C4.0464 12.5364 4.96301 13.4526 5.94978 14.2894C5.44943 14.6186 4.92546 14.9105 4.38213 15.1625C3.67785 15.4819 3.09499 15.6385 2.66149 15.6652C2.22435 15.6907 2.0507 15.5839 1.98392 15.5171C1.91713 15.4503 1.81028 15.2742 1.83578 14.8395C1.86249 14.406 2.01792 13.8231 2.33849 13.1189H2.33728ZM10.5495 15.1625C10.0064 14.9108 9.48279 14.619 8.98306 14.2894C9.96858 13.4525 10.884 12.5363 11.7201 11.55C12.3066 12.4546 12.7121 13.2889 12.9258 13.9883C13.2367 15.0034 13.057 15.4078 12.9477 15.5171C12.8797 15.5839 12.7048 15.6907 12.2701 15.664C11.8354 15.6397 11.2538 15.4819 10.5495 15.1625ZM6.25092 10.0346C6.25092 9.71252 6.37885 9.40366 6.60658 9.17594C6.8343 8.94822 7.14316 8.82029 7.4652 8.82029C7.78725 8.82029 8.09611 8.94822 8.32383 9.17594C8.55156 9.40366 8.67949 9.71252 8.67949 10.0346C8.67949 10.3566 8.55156 10.6655 8.32383 10.8932C8.09611 11.1209 7.78725 11.2489 7.4652 11.2489C7.14316 11.2489 6.8343 11.1209 6.60658 10.8932C6.37885 10.6655 6.25092 10.3566 6.25092 10.0346Z" fill="currentColor"/></svg>
+        </span>
+    ';
 }
 
 
@@ -1295,44 +1430,11 @@ function monsterinsights_get_page_title() {
  * Count the number of occurrences of UA tags inserted by third-party plugins.
  *
  * @param string $body
- * @param string $type
  *
  * @return int
  */
-function monsterinsights_count_third_party_ua_codes( $body, $type = 'ua' ) {
+function monsterinsights_count_third_party_v4_codes($body) {
 	$count = 0;
-
-	// Count all potential google site verification tags
-	if ( $type === 'ua' ) {
-		$pattern = '/content="UA-[0-9-]+"/';
-
-		if ( preg_match_all( $pattern, $body, $matches ) ) {
-			$count += count( $matches[0] );
-		}
-	}
-
-	// Advanced Ads plugin (https://wpadvancedads.com)
-	// When `Ad blocker counter` setting is populated with an UA ID
-	if ( class_exists( 'Advanced_Ads' ) ) {
-		$options = Advanced_Ads::get_instance()->options();
-
-		$pattern = '/UA-[0-9-]+/';
-		if ( $type === 'ua' && isset( $options['ga-UID'] ) && preg_match( $pattern, $options['ga-UID'] ) ) {
-			++ $count;
-		}
-	}
-
-	// WP Popups plugin (https://wppopups.com/)
-	// When `Google UA Code` setting is populated with an UA Id
-	if ( function_exists( 'wppopups_setting' ) ) {
-		$code = wppopups_setting( 'ua-code' );
-
-		$pattern = '/UA-[0-9-]+/';
-		if ( $type === 'ua' && ! empty( $code ) && preg_match( $pattern, $code ) ) {
-			++ $count;
-		}
-	}
-
 	return $count;
 }
 
@@ -1355,15 +1457,6 @@ function monsterinsights_count_addon_codes( $current_code ) {
 		}
 	}
 
-	// If the performance addon is installed and its Google Optimize ID is the same as the current code, then increase the count
-	if ( class_exists( 'MonsterInsights_Performance' ) ) {
-		$container_id = monsterinsights_get_option( 'goptimize_container', '' );
-
-		if ( $container_id === $current_code ) {
-			$count ++;
-		}
-	}
-
 	return $count;
 }
 
@@ -1371,16 +1464,13 @@ function monsterinsights_count_addon_codes( $current_code ) {
  * Detect tracking code error depending on the type of tracking code
  *
  * @param string $body
- * @param string $type
  *
  * @return array
  */
-function monsterinsights_detect_tracking_code_error( $body, $type = 'ua' ) {
+function monsterinsights_detect_tracking_code_error( $body ) {
 	$errors = array();
 
-	$current_code = $type === 'ua'
-		? monsterinsights_get_ua_to_output()
-		: monsterinsights_get_v4_id_to_output();
+	$current_code = monsterinsights_get_v4_id_to_output();
 
 	$url = monsterinsights_get_url( 'notice', 'using-cache', 'https://www.wpbeginner.com/beginners-guide/how-to-clear-your-cache-in-wordpress/' );
 	// Translators: The placeholders are for making the "We noticed you're using a caching plugin" text bold.
@@ -1404,8 +1494,10 @@ function monsterinsights_detect_tracking_code_error( $body, $type = 'ua' ) {
 		return $errors;
 	}
 
-	if ( $type === 'v4' && false === strpos( $body, '__gtagTracker' ) ) {
-		$errors[] = $cache_error;
+	if ( false === strpos( $body, '__gtagTracker' ) ) {
+		if ( ! isset ( $errors ) ) {
+			$errors[] = $cache_error;
+		}
 
 		return $errors;
 	}
@@ -1415,7 +1507,7 @@ function monsterinsights_detect_tracking_code_error( $body, $type = 'ua' ) {
 	$limit += monsterinsights_count_addon_codes( $current_code );
 
 	// TODO: Need to re-evaluate this regularly when third party plugins start supporting v4
-	$limit += monsterinsights_count_third_party_ua_codes( $body, $type );
+	$limit += monsterinsights_count_third_party_v4_codes( $body );
 
 	// Count all the codes from the page.
 	$total_count = substr_count( $body, $current_code );
@@ -1427,10 +1519,21 @@ function monsterinsights_detect_tracking_code_error( $body, $type = 'ua' ) {
 	}
 
 	// Main property always has a ?id=(UA|G|GT)-XXXXXXXX script
-	$connected_type = MonsterInsights()->auth->get_connected_type();
-	if ( $type === $connected_type && strpos( $body, 'googletagmanager.com/gtag/js?id=' . $current_code ) !== false ) {
+	if ( strpos( $body, 'googletagmanager.com/gtag/js?id=' . $current_code ) !== false ) {
 		// In that case, we can safely deduct one from the total count
 		-- $total_count;
+	}
+
+	// Test for Advanced Ads plugin tracking code.
+	$pattern = '/advanced_ads_ga_UID.*?"' . $current_code . '"/m';
+	if ( preg_match_all( $pattern, $body, $matches ) ) {
+		$total_count -= count( $matches[0] );
+	}
+
+	// Test for WP Popups tracking code.
+	$pattern = '/wppopups_pro_vars.*?"' . $current_code . '"/m';
+	if ( preg_match_all( $pattern, $body, $matches ) ) {
+		$total_count -= count( $matches[0] );
 	}
 
 	if ( $total_count > $limit ) {
@@ -1477,10 +1580,7 @@ function monsterinsights_is_code_installed_frontend() {
 	if ( in_array( $response_code, $accepted_http_codes, true ) ) {
 		$body = wp_remote_retrieve_body( $request );
 
-		$errors = array_merge(
-			monsterinsights_detect_tracking_code_error( $body ),
-			monsterinsights_detect_tracking_code_error( $body, 'v4' )
-		);
+		$errors = monsterinsights_detect_tracking_code_error( $body );
 	}
 
 	return $errors;
@@ -1506,7 +1606,7 @@ function monsterinsights_menu_highlight_color() {
  * @param string $url The url to which users get redirected.
  */
 function monsterinsights_custom_track_pretty_links_redirect( $url ) {
-	if ( ! function_exists( 'monsterinsights_mp_track_event_call' ) && ! function_exists( 'monsterinsights_mp_collect_v4' ) ) {
+	if ( ! function_exists( 'monsterinsights_mp_collect_v4' ) ) {
 		return;
 	}
 
@@ -1525,7 +1625,6 @@ function monsterinsights_custom_track_pretty_links_redirect( $url ) {
 		}
 	}
 	// Check if this is an affiliate link and use the appropriate category.
-	$ec            = 'outbound-link';
 	$inbound_paths = monsterinsights_get_option( 'affiliate_links', array() );
 	$path          = empty( $_SERVER['REQUEST_URI'] ) ? '' : $_SERVER['REQUEST_URI']; // phpcs:ignore
 	if ( ! empty( $inbound_paths ) && is_array( $inbound_paths ) && ! empty( $path ) ) {
@@ -1536,7 +1635,6 @@ function monsterinsights_custom_track_pretty_links_redirect( $url ) {
 			}
 			if ( 0 === strpos( $path, trim( $inbound_path['path'] ) ) ) {
 				$label = ! empty( $inbound_path['label'] ) ? trim( $inbound_path['label'] ) : 'aff';
-				$ec   .= '-' . $label;
 				$found = true;
 				break;
 			}
@@ -1549,35 +1647,39 @@ function monsterinsights_custom_track_pretty_links_redirect( $url ) {
 		return;
 	}
 
-	if ( monsterinsights_get_ua_to_output() ) {
-		$track_args = array(
-			't'  => 'event',
-			'ec' => $ec,
-			'ea' => $url,
-			'el' => 'external-redirect',
-		);
-		monsterinsights_mp_track_event_call( $track_args );
-	}
-
 	if ( monsterinsights_get_v4_id_to_output() ) {
+		// Get Pretty Links settings.
+		$pretty_track = monsterinsights_get_option( 'pretty_links_backend_track', '' );
+
+		if ( 'pretty_link' == $pretty_track ) {
+			global $prli_link;
+			$pretty_link = $prli_link->get_one_by( 'url', $url );
+			$link_url    = PrliUtils::get_pretty_link_url( $pretty_link->slug );
+		} else {
+			$link_url = $url;
+		}
+
 		$url_components = parse_url( $url );
-		$args           = array(
-			'events' => array(
-				array(
-					'link_text'   => 'external-redirect',
-					'link_url'    => $url,
-					'link_domain' => $url_components['host'],
-					'outbound'    => true,
-				),
-			),
+		$params_args    = array(
+			'link_text'   => 'external-redirect',
+			'link_url'    => $link_url,
+			'link_domain' => $url_components['host'],
+			'outbound'    => 'true',
 		);
 
 		if ( ! empty( $label ) ) {
-			$args['events'][0]['affiliate_label']   = $label;
-			$args['events'][0]['is_affiliate_link'] = true;
+			$params_args['affiliate_label']   = $label;
+			$params_args['is_affiliate_link'] = 'true';
 		}
 
-		monsterinsights_mp_collect_v4( $args );
+		monsterinsights_mp_collect_v4( array(
+			'events' => array(
+				array(
+					'name'   => 'click',
+					'params' => $params_args,
+				)
+			),
+		) );
 	}
 }
 
@@ -1748,43 +1850,43 @@ let targetTitleField = document.querySelector("input[name='post_title']");
 let targetUrlField = document.querySelector("textarea[name='prli_url']");
 let MonsterInsightsUrl = JSON.parse(localStorage.getItem('MonsterInsightsURL'));
 if ('undefined' !== typeof targetUrlField && 'undefined' !== typeof MonsterInsightsUrl) {
-    let url = MonsterInsightsUrl.value;
-    let postTitle = '';
-    let pathArray = url.split('?');
-    if (pathArray.length <= 1) {
-        pathArray = url.split('#');
-    }
-    let urlParams = new URLSearchParams(pathArray[1]);
-    if (urlParams.has('utm_campaign')) {
-        let campaign_name = urlParams.get('utm_campaign');
-        postTitle += campaign_name;
-    }
-    if (urlParams.has('utm_medium')) {
-        let campaign_medium = urlParams.get('utm_medium');
-        postTitle += ` ${campaign_medium}`;
-    }
-    if (urlParams.has('utm_source')) {
-        let campaign_source = urlParams.get('utm_source');
-        postTitle += ` on ${campaign_source}`;
-    }
-    if (urlParams.has('utm_term')) {
-        let campaign_term = urlParams.get('utm_term');
-        postTitle += ` for ${campaign_term}`;
-    }
-    if (urlParams.has('utm_content')) {
-        let campaign_content = urlParams.get('utm_content');
-        postTitle += ` - ${campaign_content}`;
-    }
-    if ('undefined' !== typeof targetTitleField && postTitle) {
-        targetTitleField.value = postTitle;
-    }
-    if (url) {
-        targetUrlField.value = url;
-    }
+	let url = MonsterInsightsUrl.value;
+	let postTitle = '';
+	let pathArray = url.split('?');
+	if (pathArray.length <= 1) {
+		pathArray = url.split('#');
+	}
+	let urlParams = new URLSearchParams(pathArray[1]);
+	if (urlParams.has('utm_campaign')) {
+		let campaign_name = urlParams.get('utm_campaign');
+		postTitle += campaign_name;
+	}
+	if (urlParams.has('utm_medium')) {
+		let campaign_medium = urlParams.get('utm_medium');
+		postTitle += ` ${campaign_medium}`;
+	}
+	if (urlParams.has('utm_source')) {
+		let campaign_source = urlParams.get('utm_source');
+		postTitle += ` on ${campaign_source}`;
+	}
+	if (urlParams.has('utm_term')) {
+		let campaign_term = urlParams.get('utm_term');
+		postTitle += ` for ${campaign_term}`;
+	}
+	if (urlParams.has('utm_content')) {
+		let campaign_content = urlParams.get('utm_content');
+		postTitle += ` - ${campaign_content}`;
+	}
+	if ('undefined' !== typeof targetTitleField && postTitle) {
+		targetTitleField.value = postTitle;
+	}
+	if (url) {
+		targetUrlField.value = url;
+	}
 }
 let form = document.getElementById('post');
 form.addEventListener('submit', function() {
-    localStorage.removeItem('MonsterInsightsURL');
+	localStorage.removeItem('MonsterInsightsURL');
 });
 </script>
 <?php
@@ -2049,8 +2151,8 @@ function monsterinsights_date_is_between( $start_date, $end_date ) {
 
 	$current_date = current_time( 'Y-m-d' );
 
-	$start_date = date( 'Y-m-d', strtotime( $start_date ) );
-	$end_date   = date( 'Y-m-d', strtotime( $end_date ) );
+	$start_date = date( 'Y-m-d', strtotime( $start_date ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+	$end_date   = date( 'Y-m-d', strtotime( $end_date ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 	if ( ( $current_date >= $start_date ) && ( $current_date <= $end_date ) ) {
 		return true;
@@ -2073,6 +2175,22 @@ function monsterinsights_is_aioseo_active() {
 
 	return false;
 }
+
+// /**
+//  * Return FunnelKit Stripe Woo Gateway Settings URL if plugin is active.
+//  *
+//  * @return string
+//  * @since 8.24.0
+//  */
+// function monsterinsights_funnelkit_stripe_woo_gateway_dashboard_url() {
+// 	$url = '';
+
+// 	if ( class_exists( 'FKWCS_Gateway_Stripe' ) ) {
+// 		$url = is_multisite() ? network_admin_url( 'admin.php?page=wc-settings&tab=fkwcs_api_settings' ) : admin_url( 'admin.php?page=wc-settings&tab=fkwcs_api_settings' );
+// 	}
+
+// 	return $url;
+// }
 
 /**
  * Return AIOSEO Dashboard URL if plugin is active.
@@ -2293,3 +2411,13 @@ if ( ! function_exists( 'current_datetime' ) ) {
 		return new DateTimeImmutable( 'now', wp_timezone() );
 	}
 }
+
+
+if ( ! function_exists( 'monsterinsights_is_authed' ) ) {
+	function monsterinsights_is_authed() {
+		$site_profile = get_option('monsterinsights_site_profile');
+		return isset($site_profile['key']);
+	}
+}
+// Prevents being redirected to Duplicator once plugin is installed through the onboarding wizard.
+add_filter( 'duplicator_disable_onboarding_redirect', '__return_true' );

@@ -106,7 +106,6 @@ class Blocksy_Customizer_Builder {
 			}
 		}
 
-
 		foreach ($all_items as $item) {
 			if ($item) {
 				if (
@@ -117,7 +116,6 @@ class Blocksy_Customizer_Builder {
 					continue;
 				}
 
-
 				if (! file_exists($item['path'] . '/dynamic-styles.php')) {
 					continue;
 				}
@@ -126,6 +124,8 @@ class Blocksy_Customizer_Builder {
 				$css_args['item'] = $item;
 
 				$row_id = null;
+
+				$row_ids = [];
 
 				if (isset($item['is_primary']) && $item['is_primary']) {
 					$row_id = $item['id'];
@@ -136,6 +136,7 @@ class Blocksy_Customizer_Builder {
 							foreach ($row['placements'] as $single_placement) {
 								if (in_array($item['id'], $single_placement['items'])) {
 									$row_id = $row['id'];
+									$row_ids[] = $row['id'];
 								}
 							}
 						}
@@ -146,6 +147,7 @@ class Blocksy_Customizer_Builder {
 							foreach ($row['placements'] as $single_placement) {
 								if (in_array($item['id'], $single_placement['items'])) {
 									$row_id = $row['id'];
+									$row_ids[] = $row['id'];
 								}
 							}
 						}
@@ -157,6 +159,8 @@ class Blocksy_Customizer_Builder {
 					array_merge([
 						'section_id' => $args['section_id'],
 						'row_id' => $row_id,
+						'row_ids' => $row_ids,
+						'panel_type' => $args['panel_type'],
 						'path' => $item['path'] . '/dynamic-styles.php',
 						'root_selector' => $render->get_root_selector($item),
 						'root_selector_header' => $render->get_root_selector(),
@@ -300,16 +304,17 @@ class Blocksy_Customizer_Builder {
 
 			$future_data = [
 				'id' => $id,
-
-				'config' => apply_filters(
-					'blocksy:' . $panel_type . ':items-config',
-					$this->read_config_for($single_item),
-					$id
-				),
-
 				'path' => $single_item,
 				'is_primary' => in_array($id, $primary_items)
 			];
+
+			if (is_customize_preview() || is_admin()) {
+				$future_data['config'] = apply_filters(
+					'blocksy:' . $panel_type . ':items-config',
+					$this->read_config_for($single_item),
+					$id
+				);
+			}
 
 			if ($args['require_options']) {
 				$future_data['options'] = $this->get_options_for(

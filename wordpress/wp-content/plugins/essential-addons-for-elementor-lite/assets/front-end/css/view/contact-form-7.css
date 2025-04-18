@@ -1,3 +1,8 @@
+.eael-contact-form-align-default {
+  display: block;
+  text-align: left;
+}
+
 .eael-contact-form-7.eael-contact-form-btn-align-center input.wpcf7-submit {
   margin-left: auto !important;
   margin-right: auto !important;
@@ -13,6 +18,10 @@
 .eael-contact-form-7.eael-contact-form-btn-align-right input.wpcf7-submit {
   float: right;
   width: auto;
+}
+
+.eael-contact-form-7 label {
+  display: block;
 }
 
 .eael-contact-form-7 textarea,
@@ -34,9 +43,9 @@
   -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
   -webkit-transition: border linear 0.2s, -webkit-box-shadow linear 0.2s;
   transition: border linear 0.2s, -webkit-box-shadow linear 0.2s;
-  -o-transition: border linear 0.2s, box-shadow linear 0.2s;
   transition: border linear 0.2s, box-shadow linear 0.2s;
   transition: border linear 0.2s, box-shadow linear 0.2s, -webkit-box-shadow linear 0.2s;
+  max-width: 100%;
 }
 
 .eael-contact-form-7 .wpcf7-form::before,

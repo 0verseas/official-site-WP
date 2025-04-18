@@ -7,9 +7,9 @@
 
 namespace Essential_Addons_Elementor\Traits;
 
+use Essential_Addons_Elementor\Classes\AllTraits;
+use Essential_Addons_Elementor\Classes\Elements_Manager;
 use Essential_Addons_Elementor\Classes\Helper as HelperClass;
-use Essential_Addons_Elementor\Template\Woocommerce\Checkout\Woo_Checkout_Helper;
-use Essential_Addons_Elementor\Traits\Template_Query;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -53,10 +53,7 @@ trait Ajax_Handler {
 		add_action( 'wp_ajax_eael_product_gallery', [ $this, 'ajax_eael_product_gallery' ] );
 
 		add_action( 'wp_ajax_eael_select2_search_post', [ $this, 'select2_ajax_posts_filter_autocomplete' ] );
-		add_action( 'wp_ajax_nopriv_eael_select2_search_post', [ $this, 'select2_ajax_posts_filter_autocomplete' ] );
-
 		add_action( 'wp_ajax_eael_select2_get_title', [ $this, 'select2_ajax_get_posts_value_titles' ] );
-		add_action( 'wp_ajax_nopriv_eael_select2_get_title', [ $this, 'select2_ajax_get_posts_value_titles' ] );
 
 		if ( is_admin() ) {
 			add_action( 'wp_ajax_save_settings_with_ajax', array( $this, 'save_settings' ) );
@@ -87,6 +84,7 @@ trait Ajax_Handler {
 		do_action( 'eael_before_ajax_load_more', $_REQUEST );
 
 		wp_parse_str( $_POST['args'], $args );
+		$args['post_status'] = 'publish';
 
 		if ( isset( $args['date_query']['relation'] ) ) {
 			$args['date_query']['relation'] = HelperClass::eael_sanitize_relation( $args['date_query']['relation'] );
@@ -149,7 +147,8 @@ trait Ajax_Handler {
 				$this->sanitize_taxonomy_data( $_REQUEST['taxonomy'] ),
 			];
 
-			$args['tax_query'] = $this->eael_terms_query_multiple( $args['tax_query'] );
+			$relation = isset( $settings['relation_cats_tags'] ) ? $settings['relation_cats_tags'] : 'OR';
+			$args['tax_query'] = $this->eael_terms_query_multiple( $args['tax_query'], $relation );
 		}
 
 		if ( $class == '\Essential_Addons_Elementor\Elements\Post_Grid' ) {
@@ -161,7 +160,9 @@ trait Ajax_Handler {
 				unset( $args['offset'] );
 			}
 		}
-
+		if ( $class === '\Essential_Addons_Elementor\Elements\Product_Grid' ) {
+			do_action( 'eael_woo_before_product_loop', $settings['eael_product_grid_style_preset'] );
+		}
 		// ensure control name compatibility to old code if it is post block
 		if ( $class === '\Essential_Addons_Elementor\Pro\Elements\Post_Block' ) {
 			$settings ['post_block_hover_animation']    = $settings['eael_post_block_hover_animation'];
@@ -182,10 +183,10 @@ trait Ajax_Handler {
 			$args['post__not_in'] = ( !empty( $_POST['exclude_ids'] ) ) ? array_map( 'intval', array_unique($exclude_ids) ) : array();
 			$active_term_id = ( !empty( $_POST['active_term_id'] ) ) ? intval( $_POST['active_term_id'] ) : 0;
 			$active_taxonomy = ( !empty( $_POST['active_taxonomy'] ) ) ? sanitize_text_field( $_POST['active_taxonomy'] ) : '';
-			
-			if( 0 < $active_term_id && 
-				!empty( $active_taxonomy ) && 
-				!empty($args['tax_query']) 
+
+			if( 0 < $active_term_id &&
+				!empty( $active_taxonomy ) &&
+				!empty($args['tax_query'])
 			) {
 				foreach ($args['tax_query'] as $key => $taxonomy) {
 					if (isset($taxonomy['taxonomy']) && $taxonomy['taxonomy'] === $active_taxonomy) {
@@ -265,7 +266,9 @@ trait Ajax_Handler {
 			}
 		}
 
-
+		if ( $class === '\Essential_Addons_Elementor\Elements\Product_Grid' ) {
+			do_action( 'eael_woo_after_product_loop', $settings['eael_product_grid_style_preset'] );
+		}
 		while ( ob_get_status() ) {
 			ob_end_clean();
 		}
@@ -318,6 +321,7 @@ trait Ajax_Handler {
 		$settings['eael_page_id']   = $page_id;
 		$settings['eael_widget_id'] = $widget_id;
 		wp_parse_str( $_REQUEST['args'], $args );
+		$args['post_status'] = array_intersect( (array) $settings['eael_product_grid_products_status'], [ 'publish', 'draft', 'pending', 'future' ] );
 
 		if ( isset( $args['date_query']['relation'] ) ) {
 			$args['date_query']['relation'] = HelperClass::eael_sanitize_relation( $args['date_query']['relation'] );
@@ -344,6 +348,17 @@ trait Ajax_Handler {
 		ob_start();
 		$query = new \WP_Query( $args );
 		if ( $query->have_posts() ) {
+			if ( isset( $template_info['name'] ) && $template_info['name'] === 'eicon-woocommerce' && boolval( $settings['show_add_to_cart_custom_text'] ) ){
+				$add_to_cart_text = [
+					'add_to_cart_simple_product_button_text'   => $settings['add_to_cart_simple_product_button_text'],
+					'add_to_cart_variable_product_button_text' => $settings['add_to_cart_variable_product_button_text'],
+					'add_to_cart_grouped_product_button_text'  => $settings['add_to_cart_grouped_product_button_text'],
+					'add_to_cart_external_product_button_text' => $settings['add_to_cart_external_product_button_text'],
+					'add_to_cart_default_product_button_text'  => $settings['add_to_cart_default_product_button_text'],
+				];
+				$this->change_add_woo_checkout_update_order_reviewto_cart_text( $add_to_cart_text );
+			}
+
 			while ( $query->have_posts() ) {
 				$query->the_post();
 				include( $template );
@@ -392,7 +407,7 @@ trait Ajax_Handler {
 		if ( isset( $args['date_query']['relation'] ) ) {
 			$args['date_query']['relation'] = HelperClass::eael_sanitize_relation( $args['date_query']['relation'] );
 		}
-		
+
 		$paginationNumber          = absint( $_POST['number'] );
 		$paginationLimit           = absint( $_POST['limit'] );
 		$pagination_Count          = intval( $args['total_post'] );
@@ -529,7 +544,7 @@ trait Ajax_Handler {
 	public function woo_checkout_update_order_review() {
 		$setting = $_POST['orderReviewData'];
 		ob_start();
-		Woo_Checkout_Helper::checkout_order_review_default( $setting );
+		AllTraits::checkout_order_review_default( $setting );
 		$woo_checkout_update_order_review = ob_get_clean();
 
 		wp_send_json(
@@ -585,6 +600,8 @@ trait Ajax_Handler {
 		$ajax = wp_doing_ajax();
 
 		wp_parse_str( $_POST['args'], $args );
+		$args['post_status'] = 'publish';
+		$args['offset']      = $args['offset'] ?? 0;
 
 		if ( isset( $args['date_query']['relation'] ) ) {
 			$args['date_query']['relation'] = HelperClass::eael_sanitize_relation( $args['date_query']['relation'] );
@@ -648,9 +665,48 @@ trait Ajax_Handler {
 				$this->sanitize_taxonomy_data( $_REQUEST['taxonomy'] ),
 			];
 
-			$args['tax_query'] = $this->eael_terms_query_multiple( $args['tax_query'] );
+			$relation = isset( $settings['relation_cats_tags'] ) ? $settings['relation_cats_tags'] : 'OR';
+			if ( 'and' === strtolower( $relation ) ) {
+				if ( 'product_cat' === $_REQUEST['taxonomy']['taxonomy'] && ! empty( $settings['eael_product_gallery_tags'] ) ) {
+					$args['tax_query'][] = [
+						'taxonomy' => 'product_tag',
+						'field'    => 'term_id',
+						'terms'    => $settings['eael_product_gallery_tags'],
+						'operator' => 'IN',
+					];
+				}
+				if ( 'product_tag' === $_REQUEST['taxonomy']['taxonomy'] && ! empty( $settings['eael_product_gallery_categories'] ) ) {
+					$args['tax_query'][] = [
+						'taxonomy' => 'product_cat',
+						'field'    => 'term_id',
+						'terms'    => $settings['eael_product_gallery_categories'],
+						'operator' => 'IN',
+					];
+				}
+			}
+
+			$args['tax_query'] = $this->eael_terms_query_multiple( $args['tax_query'], $relation );
+
+			if ( $settings[ 'eael_product_gallery_product_filter' ] == 'featured-products' ) {
+				$args[ 'tax_query' ][] = [
+					'relation' => 'AND',
+					[
+						'taxonomy' => 'product_visibility',
+						'field'    => 'name',
+						'terms'    => 'featured',
+					],
+					[
+						'taxonomy' => 'product_visibility',
+						'field'    => 'name',
+						'terms'    => [ 'exclude-from-search', 'exclude-from-catalog' ],
+						'operator' => 'NOT IN',
+					],
+				];
+			}
+
+
 		}
-		
+
 		$template_info = $this->eael_sanitize_template_param( $_REQUEST['template_info'] );
 
 		if ( $template_info ) {
@@ -680,10 +736,15 @@ trait Ajax_Handler {
 
 				if ( $query->have_posts() ) {
 
+					do_action( 'eael_woo_before_product_loop' );
+
 					while ( $query->have_posts() ) {
 						$query->the_post();
 						$html .= HelperClass::include_with_variable( $file_path, [ 'settings' => $settings ] );
 					}
+					
+					do_action( 'eael_woo_after_product_loop' );
+
 					$html .= '<div class="eael-max-page" style="display:none;">'. ceil($query->found_posts / absint( $args['posts_per_page'] ) ) . '</div>';
 					printf( '%1$s', $html );
 					wp_reset_postdata();
@@ -693,10 +754,10 @@ trait Ajax_Handler {
 		wp_die();
 	}
 
-	public function eael_terms_query_multiple( $args_tax_query = [] ){
+	public function eael_terms_query_multiple( $args_tax_query = [], $relation = 'OR' ){
 		if ( strpos($args_tax_query[0]['taxonomy'], '|') !== false ) {
 			$args_tax_query_item = $args_tax_query[0];
-			
+
 			//Query for category and tag
 			$args_multiple['tax_query'] = [];
 
@@ -707,7 +768,7 @@ trait Ajax_Handler {
 					'terms' => $args_tax_query_item['terms'],
 				];
 			}
-			
+
 			if( isset( $args_tax_query_item['terms_tag'] ) ){
 				$args_multiple['tax_query'][] = [
 					'taxonomy' => 'product_tag',
@@ -715,15 +776,15 @@ trait Ajax_Handler {
 					'terms' => $args_tax_query_item['terms_tag'],
 				];
 			}
-			
+
 
 			if ( count( $args_multiple['tax_query'] ) ) {
-				$args_multiple['tax_query']['relation'] = 'OR';
+				$args_multiple['tax_query']['relation'] = $relation;
 			}
 
 			$args_tax_query = $args_multiple['tax_query'];
 		}
-		
+
 		if( isset( $args_tax_query[0]['terms_tag'] ) ){
 			if( 'product_tag' === $args_tax_query[0]['taxonomy'] ){
 				$args_tax_query[0]['terms'] = $args_tax_query[0]['terms_tag'];
@@ -746,15 +807,15 @@ trait Ajax_Handler {
 		$post_type   = 'post';
 		$source_name = 'post_type';
 
-		if ( ! empty( $_GET['post_type'] ) ) {
-			$post_type = sanitize_text_field( $_GET['post_type'] );
+		if ( ! empty( $_POST['post_type'] ) ) {
+			$post_type = sanitize_text_field( $_POST['post_type'] );
 		}
 
-		if ( ! empty( $_GET['source_name'] ) ) {
-			$source_name = sanitize_text_field( $_GET['source_name'] );
+		if ( ! empty( $_POST['source_name'] ) ) {
+			$source_name = sanitize_text_field( $_POST['source_name'] );
 		}
 
-		$search  = ! empty( $_GET['term'] ) ? sanitize_text_field( $_GET['term'] ) : '';
+		$search  = ! empty( $_POST['term'] ) ? sanitize_text_field( $_POST['term'] ) : '';
 		$results = $post_list = [];
 		switch ( $source_name ) {
 			case 'taxonomy':
@@ -762,8 +823,7 @@ trait Ajax_Handler {
 					'hide_empty' => false,
 					'orderby'    => 'name',
 					'order'      => 'ASC',
-					'search'     => $search,
-					'number'     => '5',
+					'search'     => $search
 				];
 
 				if ( $post_type !== 'all' ) {
@@ -773,6 +833,11 @@ trait Ajax_Handler {
 				$post_list = wp_list_pluck( get_terms( $args ), 'name', 'term_id' );
 				break;
 			case 'user':
+				if ( ! current_user_can( 'list_users' ) ) {
+					$post_list = [];
+					break;
+				}
+
 				$users = [];
 
 				foreach ( get_users( [ 'search' => "*{$search}*" ] ) as $user ) {
@@ -792,6 +857,7 @@ trait Ajax_Handler {
 				$results[] = [ 'text' => $item, 'id' => $key ];
 			}
 		}
+
 		wp_send_json( [ 'results' => $results ] );
 	}
 
@@ -871,11 +937,11 @@ trait Ajax_Handler {
 			wp_send_json_error( __( 'you are not allowed to do this action', 'essential-addons-for-elementor-lite' ) );
 		}
 
-		if ( ! isset( $_POST['fields'] ) ) {
-			return;
-		}
-
-		wp_parse_str( $_POST['fields'], $settings );
+		$settings = array_map( 'sanitize_text_field', $_POST );
+		unset( $settings['action'], $settings['security'] );
+		$settings['embedpress']     = true;
+		$settings['career-page']    = true;
+		$settings['better-payment'] = true;
 
 		if ( ! empty( $_POST['is_login_register'] ) ) {
 			// Saving Login | Register Related Data
@@ -935,10 +1001,24 @@ trait Ajax_Handler {
 			update_option( 'eael_recaptcha_language_v3', sanitize_text_field( $settings['lr_recaptcha_language_v3'] ) );
 		}
 
+		if ( isset( $settings['lr_recaptcha_badge_hide'] ) ) {
+			update_option( 'eael_recaptcha_badge_hide', sanitize_text_field( $settings['lr_recaptcha_badge_hide'] ) );
+		}
+
 		if ( isset( $settings['lr_custom_profile_fields'] ) ) {
 			update_option( 'eael_custom_profile_fields', sanitize_text_field( $settings['lr_custom_profile_fields'] ) );
+		}
+
+		if ( isset( $settings['lr_custom_profile_fields_text'] ) ) {
+			update_option( 'eael_custom_profile_fields_text', sanitize_text_field( $settings['lr_custom_profile_fields_text'] ) );
 		} else {
-			update_option( 'eael_custom_profile_fields', '' );
+			update_option( 'eael_custom_profile_fields_text', '' );
+		}
+
+		if ( isset( $settings['lr_custom_profile_fields_img'] ) ) {
+			update_option( 'eael_custom_profile_fields_img', sanitize_text_field( $settings['lr_custom_profile_fields_img'] ) );
+		} else {
+			update_option( 'eael_custom_profile_fields_img', '' );
 		}
 
 		//pro settings
@@ -966,7 +1046,7 @@ trait Ajax_Handler {
 		if ( isset( $settings['mailchimp-api'] ) ) {
 			update_option( 'eael_save_mailchimp_api', sanitize_text_field( $settings['mailchimp-api'] ) );
 		}
-		
+
 		// Saving Mailchimp Api Key for EA Login | Register Form
 		if ( isset( $settings['lr_mailchimp_api_key'] ) ) {
 			update_option( 'eael_lr_mailchimp_api_key', sanitize_text_field( $settings['lr_mailchimp_api_key'] ) );
@@ -982,22 +1062,48 @@ trait Ajax_Handler {
 			update_option( 'eael_save_post_duplicator_post_type', sanitize_text_field( $settings['post-duplicator-post-type'] ) );
 		}
 
+		// Saving Woo Acount Dashboard Settings
+		if ( isset( $settings['woo-account-dashboard-custom-tabs'] ) ) {
+			update_option( 'eael_woo_ac_dashboard_custom_tabs', sanitize_text_field( $settings['woo-account-dashboard-custom-tabs'] ) );
+		}
+
 		// save js print method
 		if ( isset( $settings['eael-js-print-method'] ) ) {
 			update_option( 'eael_js_print_method', sanitize_text_field( $settings['eael-js-print-method'] ) );
 		}
 
-		$settings = array_map( 'sanitize_text_field', $settings );
-		$defaults = array_fill_keys( array_keys( array_merge( $this->registered_elements, $this->registered_extensions ) ), false );
-		$elements = array_merge( $defaults, array_fill_keys( array_keys( array_intersect_key( $settings, $defaults ) ), true ) );
+		// save allowed post types
+		if ( isset( $settings['allowedPostTypes'] ) ) {
+			$post_types = json_decode( stripslashes( $settings['allowedPostTypes'] ), true );
+			update_option( 'eael_allowed_post_types', $post_types );
+		}
 
-		// update new settings
-		$updated = update_option( 'eael_save_settings', $elements );
+		if ( ! empty( $settings['elements'] ) ) {
+			$defaults    = array_fill_keys( array_keys( array_merge( $this->registered_elements, $this->registered_extensions ) ), false );
+			$elements    = array_merge( $defaults, array_fill_keys( array_keys( array_intersect_key( $settings, $defaults ) ), true ) );
+			$el_disable  = get_option( 'elementor_disabled_elements', [] );
+			$new_disable = [];
 
-		// clear assets files
-		$this->empty_dir( EAEL_ASSET_PATH );
+			foreach ( $el_disable as $element ) {
+				$el_new_name = Elements_Manager::replace_widget_name();
+				$el_new_name = $el_new_name[ $element ] ?? $element;
+				$el_new_name = substr( $el_new_name, 5 );
+				if ( in_array( $el_new_name, $elements ) && $elements[ $el_new_name ] === true ) {
+					continue;
+				}
 
-		wp_send_json( $updated );
+				$new_disable[] = $element;
+			}
+
+			// update new settings
+			$updated = update_option( 'eael_save_settings', $elements );
+			update_option( 'elementor_disabled_elements', $new_disable );
+
+			// clear assets files
+			$this->empty_dir( EAEL_ASSET_PATH );
+		}
+
+		wp_send_json_success( true );
 	}
 
 	/**
@@ -1067,4 +1173,5 @@ trait Ajax_Handler {
 			return 'no';
 		} );
 	}
+
 }

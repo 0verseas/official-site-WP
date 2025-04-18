@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the Plugins - Enable Media Replace - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-04-24 17:17:29+0000\n"
+"PO-Revision-Date: 2023-10-23 04:48:42+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: GlotPress/4.0.0-alpha.4\n"
+"X-Generator: GlotPress/4.0.0-alpha.11\n"
 "Language: zh_TW\n"
 "Project-Id-Version: Plugins - Enable Media Replace - Stable (latest release)\n"
 
@@ -151,7 +151,7 @@ msgstr "新圖片"
 msgid "Your S3-Offload plugin version doesn't seem to be compatible. Please upgrade the S3-Offload plugin"
 msgstr "這個網站的 S3 移轉外掛版本似乎不相容，請更新 S3 移轉外掛。"
 
-#: classes/api.php:73
+#: classes/api.php:75
 msgid "No permission for user"
 msgstr "目前的使用者沒有權限。"
 
@@ -235,11 +235,11 @@ msgstr "用於更換的檔案的檔案類型不相符。這會造成發生未預
 msgid "Select Replacement Media"
 msgstr "選取要更換的媒體"
 
-#: views/do-replace-background.php:54
+#: views/do-replace-background.php:56
 msgid "Temp file does not exist"
 msgstr "暫存檔案不存在"
 
-#: views/do-replace-background.php:15
+#: views/do-replace-background.php:16
 msgid "Error while sending form (no key). Please try again."
 msgstr "傳送表單時發生錯誤 (沒有金鑰)。請再試一次。"
 
@@ -251,7 +251,7 @@ msgstr "%s全新測試版功能！%s%sEnable Media Replace 現在可以讓網站
 msgid "Removing background..."
 msgstr "正在移除背景..."
 
-#: classes/replacer.php:345 classes/ViewController.php:117
+#: classes/ViewController.php:117
 msgid "Specificed directory is outside the upload directory. This is not allowed for security reasons"
 msgstr "指定的目錄位於 uploads 目錄之外。基於安全性考量，不接受這樣的設定。"
 
@@ -272,23 +272,23 @@ msgstr "如需移除背景，請點擊上方 [移除背景] 按鈕，並選取�
 msgid "Remove background"
 msgstr "移除背景"
 
-#: classes/api.php:226
+#: classes/api.php:228
 msgid "Download failed"
 msgstr "下載時發生錯誤"
 
-#: classes/api.php:215
+#: classes/api.php:217
 msgid "This file seems not available anymore. Please try again"
 msgstr "這個檔案似乎無法再提供使用。請再試一次。"
 
-#: classes/api.php:191
+#: classes/api.php:193
 msgid "The background could not be removed in a reasonable amount of time. The file might be too big, or the API could be busy. Please try again later!"
 msgstr "無法在合理的時間內移除圖片背景，可能的原因為檔案太大或 API 處於忙碌的狀態，請稍後再試。"
 
-#: classes/api.php:66
+#: classes/api.php:68
 msgid "No attachment ID given"
 msgstr "找不到對應的附件 ID"
 
-#: build/shortpixel/notices/src/NoticeModel.php:283
+#: build/shortpixel/notices/src/NoticeModel.php:290
 msgid "Dismiss this notice"
 msgstr "關閉這項通知"
 
@@ -352,7 +352,7 @@ msgstr "網站變慢了嗎？"
 msgid "ShortPixel Image Optimizer"
 msgstr "ShortPixel Image Optimizer"
 
-#: views/do-replace-background.php:20
+#: views/do-replace-background.php:21
 msgid "Error in request. Please try again"
 msgstr "要求時發生錯誤。請再試一次。"
 
@@ -369,7 +369,7 @@ msgid "If you replace the file with a different filetype, this file might become
 msgstr "如果要將檔案更換為不同檔案類型，更換過後的檔案可能無法讀取或會造成未預期的問題。"
 
 #: classes/ViewController/ReplaceViewController.php:38
-#: views/do-replace-background.php:26
+#: views/do-replace-background.php:27
 msgid "You do not have permission to upload files for this author."
 msgstr "目前的登入身分沒有為這個作者上傳檔案的權限。"
 
@@ -385,11 +385,11 @@ msgstr "正在安裝..."
 msgid "Note: If you enable this option, the name and type of the file you are uploading will replace the old file. All links pointing to the current file (%s) will be updated to point to the new file name. (If other websites link directly to the file, those links will no longer work. Be careful!)"
 msgstr "注意事項: 啟用這項設定後，之後上傳的檔案的檔案名稱及檔案類型會更換舊版檔案。指向目前檔案 %s 的全部檔案都會重新指向新的檔案名稱。任何外部網站如果直接連結至舊版檔案，這些連結都會失效，請審慎使用。"
 
-#: build/shortpixel/notices/src/NoticeModel.php:274
+#: build/shortpixel/notices/src/NoticeModel.php:281
 msgid "Hide Details"
 msgstr "隱藏詳細資料"
 
-#: build/shortpixel/notices/src/NoticeModel.php:270
+#: build/shortpixel/notices/src/NoticeModel.php:277
 msgid "See Details"
 msgstr "查看詳細資料"
 
@@ -397,15 +397,7 @@ msgstr "查看詳細資料"
 msgid "Replaced By"
 msgstr "更換媒體檔案上傳者:"
 
-#: classes/replacer.php:404
-msgid "EMR could not establish a proper destination for replacement"
-msgstr "Enable Media Replace 無法為更換項目建立適當的目的地。"
-
-#: classes/replacer.php:374
-msgid "In specificied directory there is already a file with the same name. Can't replace."
-msgstr "指定目錄中已有相同檔名的檔案。無法更換檔案。"
-
-#: classes/replacer.php:351 classes/ViewController.php:127
+#: classes/ViewController.php:127
 msgid "Specificed new directory does not exist. Path must be a relative path from the upload directory and exist"
 msgstr "指定目錄不存在。路徑必須是上傳目錄中已存在的相對路徑"
 
@@ -441,7 +433,7 @@ msgstr "%s f %s 超過這個網站的上傳檔案大小上限。"
 msgid "Maximum file size: <strong>%s</strong>"
 msgstr "檔案大小上限: <strong>%s</strong>"
 
-#: views/do-replace-background.php:72
+#: views/do-replace-background.php:85
 msgid "File successfully replaced"
 msgstr "媒體檔案已成功更換。"
 
@@ -514,21 +506,17 @@ msgstr "已更換圖片的縮圖預覽"
 msgid "Replace Media"
 msgstr "更換媒體檔案"
 
-#: build/shortpixel/replacer/src/Replacer.php:174 classes/replacer.php:612
+#: build/shortpixel/replacer/src/Replacer.php:174
 msgid "There was an issue with updating your image URLS: Search and replace have different amount of values. Aborting updating thumbnails"
 msgstr "更新圖片網址時發生問題: 搜尋及取代的值數量不同。中止更新縮圖。"
 
-#: build/shortpixel/replacer/src/Replacer.php:97 classes/replacer.php:519
+#: build/shortpixel/replacer/src/Replacer.php:97
 msgid "Fail Safe :: Source Location returned empty string. Not replacing content"
-msgstr "安全模式 :: 來源位置傳回空字串。沒有更換任何內容。"
+msgstr "安全模式 :: 來源位置傳回空白字串。沒有更換任何內容。"
 
-#: build/shortpixel/replacer/src/Replacer.php:90 classes/replacer.php:512
+#: build/shortpixel/replacer/src/Replacer.php:90
 msgid "Fail Safe :: Source Location seems to be a directory."
 msgstr "安全模式 :: 來源位置為目錄。"
-
-#: classes/replacer.php:148
-msgid "The uploaded file could not be moved to %1$s. This is most likely an issue with permissions, or upload failed."
-msgstr "無法將上傳的媒體檔案移動至 %1$s。可能的原因為權限問題或上傳失敗。"
 
 #: views/screen.php:28
 msgid "You do not have permission to upload files."

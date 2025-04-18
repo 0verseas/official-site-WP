@@ -14,7 +14,7 @@ use \Elementor\Group_Control_Box_Shadow;
 use \Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Modules\DynamicTags\Module as TagsModule;
-use \Elementor\Core\Schemes\Typography;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use \Elementor\Widget_Base;
 use Essential_Addons_Elementor\Classes\Helper;
 
@@ -57,6 +57,14 @@ class Creative_Button extends Widget_Base
         ];
     }
 
+    protected function is_dynamic_content():bool {
+        return false;
+    }
+
+    public function has_widget_inner_wrapper(): bool {
+        return ! Helper::eael_e_optimized_markup();
+    }
+
     public function get_custom_help_url()
     {
         return 'https://essential-addons.com/elementor/docs/creative-buttons/';
@@ -86,6 +94,9 @@ class Creative_Button extends Widget_Base
                     'default'     => 'Click Me!',
                     'placeholder' => __('Enter button text', 'essential-addons-for-elementor-lite'),
                     'title'       => __('Enter button text here', 'essential-addons-for-elementor-lite'),
+                    'ai' => [
+                        'active' => false,
+                    ],
                 ]
             );
 
@@ -101,6 +112,9 @@ class Creative_Button extends Widget_Base
                     'default'     => 'Go!',
                     'placeholder' => __('Enter button secondary text', 'essential-addons-for-elementor-lite'),
                     'title'       => __('Enter button secondary text here', 'essential-addons-for-elementor-lite'),
+                    'ai' => [
+                        'active' => false,
+                    ],
                 ]
             );
 
@@ -134,6 +148,41 @@ class Creative_Button extends Widget_Base
                     'condition'        => [
                         'creative_button_effect!' => ['eael-creative-button--tamaya'],
                     ],
+                ]
+            );
+
+            $this->add_control(
+                'eael_creative_button_icon_rotate',
+                [
+                    'label' => esc_html__('Rotation', 'essential-addons-for-elementor-lite'),
+                    'type'  => Controls_Manager::SLIDER,
+                    'range' => [
+                        'deg' => [
+                            'min'  => -360,
+                            'max'  => 360,
+                            'step' => 1,
+                        ],
+                    ],
+                    'default' => [
+                        'unit' => 'deg',
+                        'size' => 0,
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} .eael-creative-button-icon-left svg, 
+                        {{WRAPPER}} .eael-creative-button-icon-right svg' => 'rotate: {{SIZE}}deg;',
+                        '{{WRAPPER}} .eael-creative-button-icon-left i,
+                        {{WRAPPER}} .eael-creative-button-icon-right i' => 'rotate: {{SIZE}}deg;',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'eael_creative_button_remove_svg_color_dummy',
+                [
+                    'label'        => esc_html__( 'Remove Default SVG Color', 'essential-addons-for-elementor-lite' ),
+                    'type'         => Controls_Manager::SWITCHER,
+                    'description'  => esc_html__( 'If you are using a custom SVG and want to apply colors from the controller, enable this option. Note that it will override the default color of your SVG.', 'essential-addons-for-elementor-lite' ),
+                    'return_value' => 'yes',
                 ]
             );
 
@@ -271,20 +320,19 @@ class Creative_Button extends Widget_Base
                 ]
             );
 
-            $this->add_control(
-                'eael_creative_button_text_color',
-                [
-                    'label'     => esc_html__('Text Color', 'essential-addons-for-elementor-lite'),
-                    'type'      => Controls_Manager::COLOR,
-                    'default'   => '#ffffff',
-                    'selectors' => [
-                        '{{WRAPPER}} .eael-creative-button'                                      => 'color: {{VALUE}};',
-                        '{{WRAPPER}} .eael-creative-button svg'                             => 'fill: {{VALUE}};',
-                        '{{WRAPPER}} .eael-creative-button.eael-creative-button--tamaya::before' => 'color: {{VALUE}};',
-                        '{{WRAPPER}} .eael-creative-button.eael-creative-button--tamaya::after'  => 'color: {{VALUE}};',
-                    ],
-                ]
-            );
+	        $this->add_control(
+		        'eael_creative_button_text_color',
+		        [
+			        'label'     => esc_html__( 'Text Color', 'essential-addons-for-elementor-lite' ),
+			        'type'      => Controls_Manager::COLOR,
+			        'default'   => '#ffffff',
+			        'selectors' => [
+				        '{{WRAPPER}} .eael-creative-button'                                         => 'color: {{VALUE}};',
+				        '{{WRAPPER}} .eael-creative-button svg'                                     => 'fill: {{VALUE}};',
+				        '{{WRAPPER}} .eael-creative-button .eael-creative-button--tamaya-secondary' => 'color: {{VALUE}};',
+			        ],
+		        ]
+	        );
             $this->add_control(
                 'eael_creative_button_background_color',
                 [
@@ -491,7 +539,9 @@ class Creative_Button extends Widget_Base
                 Group_Control_Typography::get_type(),
                 [
                     'name'     => 'eael_creative_button_typography',
-                    'scheme'   => Typography::TYPOGRAPHY_1,
+                    'global' => [
+	                    'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
+                    ],
                     'selector' => '{{WRAPPER}} .eael-creative-button .cretive-button-text, {{WRAPPER}} .eael-creative-button--winona::after, {{WRAPPER}} .eael-creative-button--rayen::before, {{WRAPPER}} .eael-creative-button--tamaya::after, {{WRAPPER}} .eael-creative-button--tamaya::before',
                 ]
             );
@@ -571,21 +621,25 @@ class Creative_Button extends Widget_Base
         }
 
         if ($settings['creative_button_link_url']['is_external']) {
-            $this->add_render_attribute('eael_creative_button', 'target', '_blank');
+            $this->add_render_attribute('eael_creative_button', 'target');
         }
 
-        if ($settings['creative_button_link_url']['nofollow']) {
+        if ( $settings['creative_button_link_url']['nofollow'] ) {
             $this->add_render_attribute('eael_creative_button', 'rel', 'nofollow');
         }
 
+        if ( isset( $settings['eael_creative_button_remove_svg_color'] ) && 'yes' === $settings['eael_creative_button_remove_svg_color'] ) {
+            $this->add_render_attribute('eael_creative_button', 'class', 'csvg-use-color');
+        }
+
         $this->add_render_attribute('eael_creative_button', 'data-text', esc_attr($settings['creative_button_secondary_text']));
-?>
+        ?>
         <div class="eael-creative-button-wrapper">
 
-            <a <?php echo $this->get_render_attribute_string('eael_creative_button'); ?>>
+            <a <?php $this->print_render_attribute_string('eael_creative_button'); ?>>
 
 	    <?php if ($settings['creative_button_effect'] === 'eael-creative-button--tamaya' ) : ?>
-            <div class="eael-creative-button--tamaya-secondary eael-creative-button--tamaya-before"><span><?php echo Helper::eael_wp_kses($settings['creative_button_secondary_text']); ?></span></div>
+            <div class="eael-creative-button--tamaya-secondary eael-creative-button--tamaya-before"><span><?php echo wp_kses( $settings['creative_button_secondary_text'], Helper::eael_allowed_tags() ); ?></span></div>
         <?php endif; ?>
 
                 <div class="creative-button-inner">
@@ -600,7 +654,7 @@ class Creative_Button extends Widget_Base
                         <?php } ?>
                     <?php endif; ?>
 
-                    <span class="cretive-button-text"><?php echo Helper::eael_wp_kses($settings['creative_button_text']); ?></span>
+                    <span class="cretive-button-text"><?php echo wp_kses( $settings['creative_button_text'], Helper::eael_allowed_tags() ); ?></span>
 
                     <?php if ($settings['creative_button_effect'] !== 'eael-creative-button--tamaya' && $settings['eael_creative_button_icon_alignment'] == 'right') : ?>
                         <?php if ($icon_migrated || $icon_is_new) {
@@ -613,11 +667,11 @@ class Creative_Button extends Widget_Base
                     <?php endif; ?>
                 </div>
 	            <?php if ($settings['creative_button_effect'] === 'eael-creative-button--tamaya' ) : ?>
-                    <div class="eael-creative-button--tamaya-secondary eael-creative-button--tamaya-after"><span><?php echo Helper::eael_wp_kses($settings['creative_button_secondary_text']); ?></span></div>
+                    <div class="eael-creative-button--tamaya-secondary eael-creative-button--tamaya-after"><span><?php echo wp_kses( $settings['creative_button_secondary_text'], Helper::eael_allowed_tags() ); ?></span></div>
 	            <?php endif; ?>
             </a>
         </div>
-<?php
+        <?php
 
     }
 }

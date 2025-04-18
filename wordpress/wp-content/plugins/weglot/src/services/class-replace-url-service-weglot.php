@@ -29,7 +29,18 @@ class Replace_Url_Service_Weglot {
 	 * @var Multisite_Service_Weglot
 	 */
 	private $multisite_service;
+	/**
+	 * @var null|array<string,mixed>
+	 */
 	private $multisite_other_paths;
+	/**
+	 * @var Language_Service_Weglot
+	 */
+	private $language_services;
+	/**
+	 * @var Option_Service_Weglot
+	 */
+	private $option_services;
 
 	/**
 	 * @since 2.0
@@ -38,6 +49,8 @@ class Replace_Url_Service_Weglot {
 		$this->request_url_services  = weglot_get_service( 'Request_Url_Service_Weglot' );
 		$this->replace_link_service  = weglot_get_service( 'Replace_Link_Service_Weglot' );
 		$this->multisite_service     = weglot_get_service( 'Multisite_Service_Weglot' );
+		$this->language_services   = weglot_get_service( 'Language_Service_Weglot' );
+		$this->option_services   = weglot_get_service( 'Option_Service_Weglot' );
 		$this->multisite_other_paths = null;
 		if ( is_multisite() ) {
 			$this->multisite_other_paths = array_filter(
@@ -98,6 +111,13 @@ class Replace_Url_Service_Weglot {
 		return apply_filters( 'weglot_replace_link', $dom );
 	}
 
+	/**
+	 * @param array<string,mixed> $json
+	 *
+	 * @return array<string,mixed>
+	 * @since 2.3.0
+	 *
+	 */
 	public function replace_link_in_json( $json ) {
 		$replace_urls = apply_filters( 'weglot_ajax_replace_urls', [ 'redirecturl', 'url', 'link' ] );
 		foreach ( $json as $key => $val ) {
@@ -115,6 +135,53 @@ class Replace_Url_Service_Weglot {
 		}
 
 		return $json;
+	}
+
+	/**
+	 * @param string $dom
+	 *
+	 * @return string
+	 * @since 2.3.0
+	 *
+	 */
+	public function replace_link_in_xml( $dom ) {
+		$data = Helper_Replace_Url_Weglot::get_replace_modify_link_in_xml();
+
+		foreach ( $data as $key => $value ) {
+			$dom = $this->modify_link_sitemap( $value, $dom, $key );
+		}
+
+		return apply_filters( 'weglot_replace_link', $dom );
+	}
+
+	/**
+	 * @param string $dom
+	 *
+	 * @return string
+	 * @since 2.3.0
+	 *
+	 */
+	public function proxify_url( $dom ) {
+		$proxify_urls = apply_filters( 'weglot_proxify_urls', [] );
+		$original_language = $this->language_services->get_original_language()->getInternalCode();
+		$current_language = $this->request_url_services->get_current_language()->getInternalCode();
+		if( $original_language === $current_language){
+			return $dom;
+		}
+		$api_key = $this->option_services->get_api_key( true );
+		$api_key = preg_replace('/wg_/', '', $api_key);
+		if( !empty($proxify_urls)){
+			foreach ($proxify_urls as $url){
+				$parsed_url = wp_parse_url($url);
+				if( ! empty($parsed_url['path'] ) ){
+					$new_proxify_url = 'https://proxy.weglot.com/' . $api_key . '/' . $original_language . '/' . $current_language . '/' . $parsed_url['host'] . $parsed_url['path'];
+				}else{
+					$new_proxify_url = 'https://proxy.weglot.com/' . $api_key . '/' . $original_language . '/' . $current_language . '/' . $parsed_url['host'];
+				}
+				$dom = str_replace( $url, $new_proxify_url, $dom);
+			}
+		}
+		return $dom;
 	}
 
 	/**
@@ -167,11 +234,49 @@ class Replace_Url_Service_Weglot {
 	}
 
 	/**
+	 * Replace link for sitemap xml
+	 *
+	 * @param string $pattern
+	 * @param string $translated_page
+	 * @param string $type
+	 *
+	 * @return string
+	 */
+	public function modify_link_sitemap( $pattern, $translated_page, $type ) {
+		preg_match_all( $pattern, $translated_page, $out, PREG_PATTERN_ORDER );
+		$count_out_0 = count( $out[0] );
+		for ( $i = 0; $i < $count_out_0; $i ++ ) {
+
+			$current_url = ( isset( $out[1] ) ) ? $out[1][ $i ] : null;
+			$length_link = apply_filters( 'weglot_length_replace_a', 1500 ); // Prevent error on long URL (preg_match_all Compilation failed: regular expression is too large at offset).
+			if ( strlen( $current_url ) >= $length_link ) {
+				continue;
+			}
+
+			if ( ! $this->check_link( $current_url ) ) {
+				continue;
+			}
+
+			$function_name = apply_filters( 'weglot_modify_link_sitemap_replace_function', 'replace_' . $type, $type );
+
+			if ( method_exists( $this->replace_link_service, $function_name ) ) {
+				$translated_page = $this->replace_link_service->$function_name( $translated_page, $current_url );
+			} else {
+				if ( function_exists( $function_name ) ) {
+					$translated_page = $function_name( $translated_page, $current_url );
+				}
+			}
+		}
+
+		return $translated_page;
+	}
+
+	/**
 	 * @param string $current_url
 	 * @param string $sometags
 	 * @param string $sometags2
 	 *
-	 * @return string
+	 * @return bool
 	 * @since 2.0
 	 */
 	public function check_link( $current_url, $sometags = '', $sometags2 = '' ) {
@@ -186,7 +291,9 @@ class Replace_Url_Service_Weglot {
 		$parsed_url['host'] = ! empty( $parsed_url['host'] ) ? $parsed_url['host'] : '';
 
 		$not_other_site = true;
-		if ( $this->multisite_other_paths ) {
+
+		$check_multisite_other_paths = apply_filters( 'weglot_check_multisite_other_paths', true );
+		if ( $this->multisite_other_paths && $check_multisite_other_paths) {
 			if ( isset( $parsed_url['path'] ) ) {
 				$paths = explode( '/', $parsed_url['path'] );
 				if ( isset( $paths[1] ) ) {
@@ -239,6 +346,7 @@ class Replace_Url_Service_Weglot {
 			'xlsx',
 			'txt',
 			'eps',
+			'vcf',
 		];
 
 		foreach ( $files as $file ) {

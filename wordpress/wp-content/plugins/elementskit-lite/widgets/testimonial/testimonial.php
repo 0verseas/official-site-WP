@@ -13,7 +13,6 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
     
     public function __construct( $data = [], $args = null ) {
 		parent::__construct( $data, $args );
-		// $this->add_script_depends('ekit-slick'); // deprecated
 	}
 
     public function get_name() {
@@ -38,6 +37,14 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 
     public function get_help_url() {
         return 'https://wpmet.com/doc/how-to-create-testimonials-in-wordpress/';
+    }
+
+	public function get_style_depends() {
+		return ['swiper'];
+	}
+
+    protected function is_dynamic_content(): bool {
+        return false;
     }
 
     protected function register_controls() {
@@ -156,7 +163,14 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'condition' => [
 					'ekit_testimonial_wartermark_enable' => 'yes',
 					'ekit_testimonial_style' => ['style5']
-				]
+				],
+				'selectors_dictionary' => [
+					'top' => 'position: unset;',
+					'bottom' => 'bottom: 30px; right: 30px;',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .ekit_testimonial_style_5 .elementskit-watermark-icon' => '{{VALUE}}',
+				],
 			]
 		);
 
@@ -397,6 +411,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
         $repeater->add_control(
             'use_hover_logo', [
 				'label' => esc_html__( 'Display different logo on hover?', 'elementskit-lite' ),
+				'description' => esc_html__( 'This option only work for style 1 & 2', 'elementskit-lite' ),
 				'type' => Controls_Manager::SWITCHER,
 				'label_on' => esc_html__( 'Yes', 'elementskit-lite' ),
 				'label_off' => esc_html__( 'No', 'elementskit-lite' ),
@@ -502,7 +517,6 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				],
 				'render_type' => 'template',
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-slide' => 'margin-right: {{SIZE}}{{UNIT}};margin-left: {{SIZE}}{{UNIT}};',
 					'{{WRAPPER}} .elementskit-testimonial-slider' => '--ekit_testimonial_left_right_spacing: {{SIZE}}{{UNIT}};',
 				],
 			]
@@ -515,7 +529,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-list' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -661,17 +675,20 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			    'tab'	 => Controls_Manager::TAB_STYLE,
 		    ]
 	    );
-			$this->add_responsive_control(
-				'ekit_testimonial_layout_margin',
-				[
-					'label'         => esc_html__('Column Gap', 'elementskit-lite'),
-					'type'          => Controls_Manager::SLIDER,
-					'size_units'    => ['px', 'em'],
-					'selectors' => [
-						'{{WRAPPER}} .elementskit-tootltip-testimonial .elementskit-commentor-content, {{WRAPPER}} .elementskit-single-testimonial-slider, {{WRAPPER}}  .elementskit-testimonial_card' => 'margin-left: {{SIZE}}{{UNIT}}; margin-right: {{SIZE}}{{UNIT}};',
-					],
-				]
-			);
+
+		$this->add_responsive_control(
+			'ekit_testimonial_layout_margin',
+			[
+				'label'         => esc_html__('Column Gap', 'elementskit-lite'),
+				'type'          => Controls_Manager::SLIDER,
+				'size_units'    => ['px', 'em'],
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-tootltip-testimonial .elementskit-commentor-content,
+					{{WRAPPER}} .ekit-main-swiper .elementskit-single-testimonial-slider,
+					{{WRAPPER}} .elementskit-testimonial_card' => 'margin-left: {{SIZE}}{{UNIT}}; margin-right: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
 
 
 			$this->add_responsive_control(
@@ -859,6 +876,9 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
                     '{{WRAPPER}} .elementkit-testimonial-col' => 'align-self: {{VALUE}};'
                 ],
 				'default' => 'center',
+				'condition' => [
+					'ekit_testimonial_style' => 'style1',
+				],
 			]
 		);
 
@@ -885,6 +905,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
                     '{{WRAPPER}} .elementskit-commentor-content' => 'text-align: {{VALUE}};',
                     '{{WRAPPER}} .elementskit-testimonial_card' => 'text-align: {{VALUE}};',
                     '{{WRAPPER}} .elementskit-profile-info' => 'text-align: {{VALUE}};',
+                    '{{WRAPPER}} .elementskit-commentor-bio' => 'text-align: {{VALUE}}; justify-content: {{VALUE}}',
                     '{{WRAPPER}} .ekit_testimonial_style_5 .elementskit-commentor-header' => 'text-align: {{VALUE}};',
                 ]
 			]
@@ -1023,7 +1044,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'type'		 => Controls_Manager::COLOR,
 				'default'	 => '#fec42d',
 			    'selectors'	 => [
-				    '{{WRAPPER}} .elementskit-stars > li > a, {{WRAPPER}} .elementskit-stars > li > span' => 'color: {{VALUE}};'
+				    '{{WRAPPER}} .elementskit-stars > li > a, {{WRAPPER}} .elementskit-stars > li > span' => 'color: {{VALUE}}; fill: {{VALUE}};',
 			    ],
 		    ]
 	    );
@@ -1033,9 +1054,11 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'label'		=> esc_html__( 'Hover & Active Color', 'elementskit-lite' ),
 				'type'		=> Controls_Manager::COLOR,
-				'selectors'	=> [
-					'{{WRAPPER}} .elementskit-single-testimonial-slider:hover .elementskit-stars > li > a, {{WRAPPER}} .elementskit-single-testimonial-slider:hover .elementskit-stars > li > span' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .elementskit-single-testimonial-slider.testimonial-active .elementskit-stars > li > a, {{WRAPPER}} .elementskit-single-testimonial-slider.testimonial-active .elementskit-stars > li > span' => 'color: {{VALUE}};',
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-single-testimonial-slider:hover .elementskit-stars > li > a, 
+					{{WRAPPER}} .elementskit-single-testimonial-slider:hover .elementskit-stars > li > span, 
+					{{WRAPPER}} .elementskit-single-testimonial-slider.testimonial-active .elementskit-stars > li > a, 
+					{{WRAPPER}} .elementskit-single-testimonial-slider.testimonial-active .elementskit-stars > li > span' => 'color: {{VALUE}}; fill: {{VALUE}};',
 				],
 			]
 		);
@@ -1815,6 +1838,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 						'unit' => 'px',
 						'size' => -98,
 					],
+					'render_type' => 'template',
 					'selectors' => [
 						'{{WRAPPER}} .elementskit-commentor-bio' => 'bottom: {{SIZE}}{{UNIT}};',
 					],
@@ -1870,7 +1894,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => -50,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots' => 'bottom: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination' => 'bottom: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1893,7 +1917,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 8,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li button' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span' => 'width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1916,7 +1940,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 8,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li button' => 'height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span' => 'height: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1926,7 +1950,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'name' => 'ekit_testimonial_client_dot_border',
 				'label' => esc_html__( 'Border', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li button',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span',
 			]
 		);
 
@@ -1937,7 +1961,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -1960,7 +1984,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 12,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li:not(:last-child)' => 'margin-right: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span:not(:last-child)' => 'margin-right: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1971,7 +1995,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'name' => 'ekit_testimonial_client_dot_background',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li button',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span',
 			]
 		);
 
@@ -1990,7 +2014,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'name' => 'ekit_testimonial_client_dot_active_background',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li.slick-active button',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span.swiper-pagination-bullet-active',
 			]
 		);
 
@@ -2012,7 +2036,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 8,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li.slick-active button' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span.swiper-pagination-bullet-active' => 'width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -2035,7 +2059,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 8,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li.slick-active button' => 'height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span.swiper-pagination-bullet-active' => 'height: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -2045,7 +2069,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'name' => 'ekit_testimonial_client_dot_active_border',
 				'label' => esc_html__( 'Border', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li.slick-active button',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span.swiper-pagination-bullet-active',
 			]
 		);
 
@@ -2067,7 +2091,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 1.2,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-dots li.slick-active button' => 'transform: scale({{SIZE}});',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-pagination span.swiper-pagination-bullet-active' => 'transform: scale({{SIZE}});',
 				],
 			]
 		);
@@ -2104,8 +2128,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 36,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev' => 'font-size: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next' => 'font-size: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-navigation-button' => 'font-size: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -2127,7 +2150,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 0,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev' => 'left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev' => 'left: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -2149,20 +2172,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 0,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next' => 'right: {{SIZE}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'ekit_testimonial_nav_border_radius',
-			[
-				'label' => esc_html__( 'Border Radius', 'elementskit-lite' ),
-				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', '%', 'em' ],
-				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next' => 'right: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -2185,8 +2195,8 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 50,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev' => 'width: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next' => 'width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -2209,15 +2219,16 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 					'size' => 50,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev' => 'height: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next' => 'height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev' => 'height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next' => 'height: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
+
         $this->add_responsive_control(
             'ekit_testimonial_nav_vertical_align',
             [
-                'label' => esc_html__( 'vertical_align', 'elementskit-lite' ),
+                'label' => esc_html__( 'Vertical Align', 'elementskit-lite' ),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => [ 'px','%' ],
                 'range' => [
@@ -2231,11 +2242,10 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-testimonial-slider .slick-arrow' => ' -webkit-transform: translateY({{SIZE}}{{UNIT}}); -ms-transform: translateY({{SIZE}}{{UNIT}}); transform: translateY({{SIZE}}{{UNIT}});',
+                    '{{WRAPPER}} .elementskit-testimonial-slider .swiper-navigation-button' => ' -webkit-transform: translateY({{SIZE}}{{UNIT}}); -ms-transform: translateY({{SIZE}}{{UNIT}}); transform: translateY({{SIZE}}{{UNIT}});',
                 ],
             ]
         );
-
 
         $this->start_controls_tabs(
             'ekit_testimonial_nav_hover_normal_tabs'
@@ -2255,8 +2265,8 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '#000000',
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev' => 'color: {{VALUE}}',
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -2267,7 +2277,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'name' => 'ekit_testimonial_nav_background_normal',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-prev, {{WRAPPER}} .elementskit-testimonial-slider .slick-next',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev, {{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next',
 			]
 		);
 
@@ -2276,7 +2286,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'name' => 'ekit_testimonial_nav_box_shadow_normal',
 				'label' => esc_html__( 'Box Shadow', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-prev, {{WRAPPER}} .elementskit-testimonial-slider .slick-next',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev, {{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next',
 			]
 		);
 
@@ -2285,7 +2295,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'name' => 'ekit_testimonial_nav_border_normal',
 				'label' => esc_html__( 'Border', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-prev, {{WRAPPER}} .elementskit-testimonial-slider .slick-next',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev, {{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next',
 			]
 		);
 
@@ -2305,8 +2315,8 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '#000000',
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-prev:hover' => 'color: {{VALUE}}',
-					'{{WRAPPER}} .elementskit-testimonial-slider .slick-next:hover' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev:hover' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next:hover' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -2317,7 +2327,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 				'name' => 'ekit_testimonial_nav_background_hover',
 				'label' => esc_html__( 'Background', 'elementskit-lite' ),
 				'types' => [ 'classic', 'gradient' ],
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-prev:hover, {{WRAPPER}} .elementskit-testimonial-slider .slick-next:hover',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev:hover, {{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next:hover',
 			]
 		);
 
@@ -2326,7 +2336,7 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'name' => 'ekit_testimonial_nav_box_shadow_hover',
 				'label' => esc_html__( 'Box Shadow', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-prev:hover, {{WRAPPER}} .elementskit-testimonial-slider .slick-next:hover',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev:hover, {{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next:hover',
 			]
 		);
 
@@ -2335,13 +2345,39 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			[
 				'name' => 'ekit_testimonial_nav_border_hover',
 				'label' => esc_html__( 'Border', 'elementskit-lite' ),
-				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .slick-prev:hover, {{WRAPPER}} .elementskit-testimonial-slider .slick-next:hover',
+				'selector' => '{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev:hover, {{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next:hover',
 			]
 		);
 
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
+
+		$this->add_responsive_control(
+			'ekit_testimonial_nav_border_radius',
+			[
+				'label' => esc_html__( 'Border Radius', 'elementskit-lite' ),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', '%', 'em' ],
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-prev' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-button-next' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+				'separator' => 'before'
+			]
+		);
+
+		$this->add_responsive_control(
+			'ekit_price_menu_arrow_padding',
+			[
+				'label' => esc_html__( 'Padding', 'elementskit-lite' ),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em' ],
+				'selectors' => [
+					'{{WRAPPER}} .elementskit-testimonial-slider .swiper-navigation-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
 
 		$this->end_controls_section();
 
@@ -2354,25 +2390,18 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
         echo '</div>';
     }
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
     protected function render_raw( ) {
 
 		$testimonials = [];
 		$settings = $this->get_settings_for_display();
 		extract($settings);
 
-		// Left Arrow Icon
-		$migrated = isset( $settings['__fa4_migrated']['ekit_testimonial_left_arrows'] );
-		// - Check if its a new widget without previously selected icon using the old Icon control
-		$is_new = empty( $settings['ekit_testimonial_left_arrow'] );
-
-		$prevArrowIcon = ($is_new || $migrated) ? (!empty($ekit_testimonial_left_arrows) && $settings['ekit_testimonial_left_arrows']['library'] != 'svg' ? $settings['ekit_testimonial_left_arrows']['value'] : '') : $settings['ekit_testimonial_left_arrow'];
-
-		// Right Arrow Icon
-		$migrated = isset( $settings['__fa4_migrated']['ekit_testimonial_right_arrows'] );
-		// - Check if its a new widget without previously selected icon using the old Icon control
-		$is_new = empty( $settings['ekit_testimonial_right_arrow'] );
-
-		$nextArrowIcon = ($is_new || $migrated) ? !empty($ekit_testimonial_right_arrows) && $settings['ekit_testimonial_right_arrows']['library'] != 'svg' ? $settings['ekit_testimonial_right_arrows']['value'] : '' : $settings['ekit_testimonial_right_arrow'];
+		// Set default client image size
+		$ekit_testimonial_client_image_size = isset($ekit_testimonial_client_image_size) ? $ekit_testimonial_client_image_size : ['size' => 70];
 
 		$slides_to_show_count = $ekit_testimonial_slidetoshow ? $ekit_testimonial_slidetoshow : 1;
 		$slides_to_scroll_count = $ekit_testimonial_slidesToScroll ? $ekit_testimonial_slidesToScroll : 1;
@@ -2388,20 +2417,25 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			'slidesPerGroup'	=> (int) $slides_to_scroll_count,
 			'slidesPerView'		=> (int) $slides_to_show_count,
 			'loop'				=> ( !empty($ekit_testimonial_loop) && $ekit_testimonial_loop == 'yes' ) ? true : false,
-			'breakpoints'		=> [
-                320 => [
-                    'slidesPerView'      => !empty( $ekit_testimonial_slidetoshow_mobile ) ? $ekit_testimonial_slidetoshow_mobile : 1,
-                    'slidesPerGroup'     => !empty( $ekit_testimonial_slidesToScroll_mobile ) ? $ekit_testimonial_slidesToScroll_mobile : 1
-                ],
-                768 => [
-                    'slidesPerView'      => !empty( $ekit_testimonial_slidetoshow_tablet ) ? $ekit_testimonial_slidetoshow_tablet : 2,
-                    'slidesPerGroup'     => !empty( $ekit_testimonial_slidesToScroll_tablet ) ? $ekit_testimonial_slidesToScroll_tablet : 1,
-                ],
-                1024 => [
-                    'slidesPerView'      =>  $slides_to_show_count,
-                    'slidesPerGroup'     =>  $slides_to_scroll_count,
-                ]
-            ],
+			'spaceBetween' => isset($ekit_testimonial_left_right_spacing['size']) ? ($ekit_testimonial_left_right_spacing['size'] !== 0 ? $ekit_testimonial_left_right_spacing['size'] : 0) : 15,
+			'breakpoints'  => [
+				320 => [
+					'slidesPerView'      => !empty( $ekit_testimonial_slidetoshow_mobile ) ? $ekit_testimonial_slidetoshow_mobile : 1,
+					'slidesPerGroup'     => !empty( $ekit_testimonial_slidesToScroll_mobile ) ? $ekit_testimonial_slidesToScroll_mobile : 1,
+					'spaceBetween'       => !empty( $ekit_testimonial_left_right_spacing_mobile['size'] ) ? $ekit_testimonial_left_right_spacing_mobile['size'] : 10,
+				],
+				768 => [
+					'slidesPerView'      => !empty( $ekit_testimonial_slidetoshow_tablet ) ? $ekit_testimonial_slidetoshow_tablet : 2,
+					'slidesPerGroup'     => !empty( $ekit_testimonial_slidesToScroll_tablet ) ? $ekit_testimonial_slidesToScroll_tablet : 1,
+					'spaceBetween'       => !empty( $ekit_testimonial_left_right_spacing_tablet['size'] ) ? $ekit_testimonial_left_right_spacing_tablet['size'] : 10,
+				],
+				1024 => [
+					'slidesPerView'      =>  $slides_to_show_count,
+					'slidesPerGroup'     =>  $slides_to_scroll_count,
+					'spaceBetween'		=> !empty( $ekit_testimonial_left_right_spacing['size'] ) ? $ekit_testimonial_left_right_spacing['size'] : 15,
+				]
+			],
+			
 		];
 
 		// HTML Attribute
@@ -2420,13 +2454,21 @@ class ElementsKit_Widget_Testimonial extends Widget_Base {
 			]
 		);
 		
-		$dir_common = Handler::get_dir() .'common/';
+		$dir_common = Handler::get_dir() . 'common/';
 
-        $testimonials = isset($ekit_testimonial_data) ? $ekit_testimonial_data : [];
-		$style = isset($ekit_testimonial_style) ? $ekit_testimonial_style : 'default';
+		$testimonials = isset($ekit_testimonial_data) ? $ekit_testimonial_data : [];
+		$style = isset($ekit_testimonial_style) ? sanitize_text_field($ekit_testimonial_style) : 'default';
+		$styles = [
+			'style1',
+			'style2',
+			'style3',
+			'style4',
+			'style5',
+			'style6',
+		];
 
-		if (is_array($testimonials) && !empty($testimonials)):
-			require Handler::get_dir() . 'style/'.$style.'.php';
-	 	endif; // end if check testimonila array
-    }
+		if (in_array($style, $styles) && is_array($testimonials) && !empty($testimonials)) {
+			require Handler::get_dir() . 'style/' . $style . '.php';
+		}
+	}
 }

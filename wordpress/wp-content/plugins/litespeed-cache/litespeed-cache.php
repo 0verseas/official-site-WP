@@ -4,7 +4,7 @@
  * Plugin Name:       LiteSpeed Cache
  * Plugin URI:        https://www.litespeedtech.com/products/cache-plugins/wordpress-acceleration
  * Description:       High-performance page caching and site optimization from LiteSpeed
- * Version:           5.5
+ * Version:           7.0.0.1
  * Author:            LiteSpeed Technologies
  * Author URI:        https://www.litespeedtech.com
  * License:           GPLv3
@@ -12,7 +12,7 @@
  * Text Domain:       litespeed-cache
  * Domain Path:       /lang
  *
- * Copyright (C) 2015-2017 LiteSpeed Technologies, Inc.
+ * Copyright (C) 2015-2024 LiteSpeed Technologies, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-defined('WPINC') || exit;
+defined('WPINC') || exit();
 
 if (defined('LSCWP_V')) {
 	return;
 }
 
-!defined('LSCWP_V') && define('LSCWP_V', '5.5');
+!defined('LSCWP_V') && define('LSCWP_V', '7.0.0.1');
 
 !defined('LSCWP_CONTENT_DIR') && define('LSCWP_CONTENT_DIR', WP_CONTENT_DIR);
 !defined('LSCWP_DIR') && define('LSCWP_DIR', __DIR__ . '/'); // Full absolute path '/var/www/html/***/wp-content/plugins/litespeed-cache/' or MU
@@ -46,17 +46,20 @@ if (defined('LSCWP_V')) {
  * @since  5.2 Auto correct protocol for CONTENT URL
  */
 $WP_CONTENT_URL = WP_CONTENT_URL;
-$home_url = home_url('/');
-if (substr($WP_CONTENT_URL, 0, 5) == 'http:' && substr($home_url, 0, 5) == 'https') $WP_CONTENT_URL = str_replace('http://', 'https://', $WP_CONTENT_URL);
-!defined('LSCWP_CONTENT_FOLDER') && define('LSCWP_CONTENT_FOLDER', str_replace($home_url, '', $WP_CONTENT_URL)); // `wp-content`
+$site_url = site_url('/');
+if (substr($WP_CONTENT_URL, 0, 5) == 'http:' && substr($site_url, 0, 5) == 'https') {
+	$WP_CONTENT_URL = str_replace('http://', 'https://', $WP_CONTENT_URL);
+}
+!defined('LSCWP_CONTENT_FOLDER') && define('LSCWP_CONTENT_FOLDER', str_replace($site_url, '', $WP_CONTENT_URL)); // `wp-content`
 !defined('LSWCP_PLUGIN_URL') && define('LSWCP_PLUGIN_URL', plugin_dir_url(__FILE__)); // Full URL path '//example.com/wp-content/plugins/litespeed-cache/'
 
 /**
  * Static cache files consts
  * @since  3.0
  */
-!defined('LITESPEED_STATIC_URL') && define('LITESPEED_STATIC_URL', $WP_CONTENT_URL . '/litespeed'); // Full static cache folder URL '//example.com/wp-content/litespeed'
-!defined('LITESPEED_STATIC_DIR') && define('LITESPEED_STATIC_DIR', LSCWP_CONTENT_DIR . '/litespeed'); // Full static cache folder path '/var/www/html/***/wp-content/litespeed'
+!defined('LITESPEED_DATA_FOLDER') && define('LITESPEED_DATA_FOLDER', 'litespeed');
+!defined('LITESPEED_STATIC_URL') && define('LITESPEED_STATIC_URL', $WP_CONTENT_URL . '/' . LITESPEED_DATA_FOLDER); // Full static cache folder URL '//example.com/wp-content/litespeed'
+!defined('LITESPEED_STATIC_DIR') && define('LITESPEED_STATIC_DIR', LSCWP_CONTENT_DIR . '/' . LITESPEED_DATA_FOLDER); // Full static cache folder path '/var/www/html/***/wp-content/litespeed'
 
 !defined('LITESPEED_TIME_OFFSET') && define('LITESPEED_TIME_OFFSET', get_option('gmt_offset') * 60 * 60);
 
@@ -68,7 +71,7 @@ require_once LSCWP_DIR . 'autoload.php';
 
 // Define CLI
 if ((defined('WP_CLI') && WP_CLI) || PHP_SAPI == 'cli') {
-	!defined('LITESPEED_CLI') &&  define('LITESPEED_CLI', true);
+	!defined('LITESPEED_CLI') && define('LITESPEED_CLI', true);
 
 	// Register CLI cmd
 	if (method_exists('WP_CLI', 'add_command')) {
@@ -78,6 +81,7 @@ if ((defined('WP_CLI') && WP_CLI) || PHP_SAPI == 'cli') {
 		WP_CLI::add_command('litespeed-image', 'LiteSpeed\CLI\Image');
 		WP_CLI::add_command('litespeed-debug', 'LiteSpeed\CLI\Debug');
 		WP_CLI::add_command('litespeed-presets', 'LiteSpeed\CLI\Presets');
+		WP_CLI::add_command('litespeed-crawler', 'LiteSpeed\CLI\Crawler');
 	}
 }
 
@@ -95,11 +99,11 @@ if (!defined('LITESPEED_SERVER_TYPE')) {
 }
 
 // Checks if caching is allowed via server variable
-if (!empty($_SERVER['X-LSCACHE']) ||  LITESPEED_SERVER_TYPE === 'LITESPEED_SERVER_ADC' || defined('LITESPEED_CLI')) {
-	!defined('LITESPEED_ALLOWED') &&  define('LITESPEED_ALLOWED', true);
+if (!empty($_SERVER['X-LSCACHE']) || LITESPEED_SERVER_TYPE === 'LITESPEED_SERVER_ADC' || defined('LITESPEED_CLI')) {
+	!defined('LITESPEED_ALLOWED') && define('LITESPEED_ALLOWED', true);
 }
 
-// ESI const defination
+// ESI const definition
 if (!defined('LSWCP_ESI_SUPPORT')) {
 	define('LSWCP_ESI_SUPPORT', LITESPEED_SERVER_TYPE !== 'LITESPEED_SERVER_OLS' ? true : false);
 }
@@ -119,7 +123,7 @@ if (!function_exists('litespeed_exception_handler')) {
 }
 
 /**
- * Overwride the WP nonce funcs outside of LiteSpeed namespace
+ * Overwrite the WP nonce funcs outside of LiteSpeed namespace
  * @since  3.0
  */
 if (!function_exists('litespeed_define_nonce_func')) {
@@ -130,11 +134,11 @@ if (!function_exists('litespeed_define_nonce_func')) {
 		 */
 		function wp_create_nonce($action = -1)
 		{
-			if (!defined('LITESPEED_DISABLE_ALL')) {
+			if (!defined('LITESPEED_DISABLE_ALL') || !LITESPEED_DISABLE_ALL) {
 				$control = \LiteSpeed\ESI::cls()->is_nonce_action($action);
 				if ($control !== null) {
 					$params = array(
-						'action'	=> $action,
+						'action' => $action,
 					);
 					return \LiteSpeed\ESI::cls()->sub_esi_block('nonce', 'wp_create_nonce ' . $action, $params, $control, true, true, true);
 				}
@@ -148,14 +152,14 @@ if (!function_exists('litespeed_define_nonce_func')) {
 		 */
 		function wp_create_nonce_litespeed_esi($action = -1)
 		{
-			$uid  = get_current_user_id();
+			$uid = get_current_user_id();
 			if (!$uid) {
 				/** This filter is documented in wp-includes/pluggable.php */
 				$uid = apply_filters('nonce_user_logged_out', $uid, $action);
 			}
 
 			$token = wp_get_session_token();
-			$i     = wp_nonce_tick();
+			$i = wp_nonce_tick();
 
 			return substr(wp_hash($i . '|' . $action . '|' . $uid . '|' . $token, 'nonce'), -12, 10);
 		}
@@ -170,13 +174,13 @@ if (!function_exists('litespeed_define_nonce_func')) {
 if (!function_exists('run_litespeed_cache')) {
 	function run_litespeed_cache()
 	{
-		//Check minimum PHP requirements, which is 5.3 at the moment.
-		if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+		//Check minimum PHP requirements, which is 7.2 at the moment.
+		if (version_compare(PHP_VERSION, '7.2.0', '<')) {
 			return;
 		}
 
-		//Check minimum WP requirements, which is 4.0 at the moment.
-		if (version_compare($GLOBALS['wp_version'], '4.0', '<')) {
+		//Check minimum WP requirements, which is 5.3 at the moment.
+		if (version_compare($GLOBALS['wp_version'], '5.3', '<')) {
 			return;
 		}
 

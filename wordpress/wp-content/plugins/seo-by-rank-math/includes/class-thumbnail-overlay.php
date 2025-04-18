@@ -11,7 +11,8 @@
 namespace RankMath;
 
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
+use RankMath\Helpers\Attachment;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,12 +51,12 @@ class Thumbnail_Overlay {
 			$secret = Param::request( 'secret', '' );
 		}
 
-		$choices      = Helper::choices_overlay_images();
+		$choices = Helper::choices_overlay_images();
 		if ( ! isset( $choices[ $type ] ) ) {
 			die();
 		}
 		$overlay_image = $choices[ $type ]['path'];
-		$image         = Helper::get_scaled_image_path( $thumbnail_id, 'large' );
+		$image         = Attachment::get_scaled_image_path( $thumbnail_id, 'large' );
 
 		if ( ! $this->is_secret_valid( $thumbnail_id, $type, $secret ) ) {
 			die();
@@ -63,7 +64,7 @@ class Thumbnail_Overlay {
 
 		// If 'large' thumbnail is not found, fall back to full size.
 		if ( empty( $image ) ) {
-			$image = Helper::get_scaled_image_path( $thumbnail_id, 'full' );
+			$image = Attachment::get_scaled_image_path( $thumbnail_id, 'full' );
 		}
 
 		$position = $choices[ $type ]['position'];
@@ -194,7 +195,7 @@ class Thumbnail_Overlay {
 		$stamp_width  = imagesx( $stamp );
 		$stamp_height = imagesy( $stamp );
 
-		$img_width  = imagesx( $image );
+		$img_width = imagesx( $image );
 
 		if ( $stamp_width > $img_width ) {
 			$stamp = imagescale( $stamp, $img_width );
@@ -241,12 +242,10 @@ class Thumbnail_Overlay {
 		}
 
 		$stamp_width = $stamp->getImageWidth();
-
-		$img_width  = $image->getImageWidth();
-		$img_height = $image->getImageHeight();
+		$img_width   = $image->getImageWidth();
 
 		if ( $stamp_width > $img_width ) {
-			$stamp->scaleImage( $img_width, $img_height );
+			$stamp->resizeImage( $img_width, 0, \Imagick::FILTER_LANCZOS, 1 );
 		}
 
 		$margins = $this->get_position_margins_imagick( $position, $image, $stamp );

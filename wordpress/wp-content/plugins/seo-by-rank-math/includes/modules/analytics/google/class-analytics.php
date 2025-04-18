@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use WP_Error;
 use RankMath\Google\Api;
-use MyThemeShop\Helpers\Str;
+use RankMath\Helpers\Str;
 use RankMath\Analytics\Workflow\Base;
 
 /**
@@ -76,7 +76,7 @@ class Analytics extends Request {
 	public function add_ga4_accounts( $accounts ) {
 
 		$v4_response = $this->http_get( 'https://analyticsadmin.googleapis.com/v1alpha/accountSummaries?pageSize=200' );
-		if ( ! $this->is_success() || isset( $v4_response->error ) ) {
+		if ( ! $v4_response || ! $this->is_success() || isset( $v4_response->error ) ) {
 			return $accounts;
 		}
 		foreach ( $v4_response['accountSummaries'] as $account ) {
@@ -118,10 +118,10 @@ class Analytics extends Request {
 	/**
 	 * Query analytics data from google client api.
 	 *
-	 * @param string $start_date Start date.
-	 * @param string $end_date   End date.
+	 * @param array   $options Analytics options.
+	 * @param boolean $days    Whether to include dates.
 	 *
-	 * @return array
+	 * @return array|false|WP_Error
 	 */
 	public static function get_analytics( $options = [], $days = false ) {
 		// Check view ID.
@@ -153,7 +153,7 @@ class Analytics extends Request {
 		}
 
 		// Check dates.
-		$dates 		= Base::get_dates();
+		$dates      = Base::get_dates();
 		$start_date = isset( $options['start_date'] ) ? $options['start_date'] : $dates['start_date'];
 		$end_date   = isset( $options['end_date'] ) ? $options['end_date'] : $dates['end_date'];
 		if ( ! $start_date || ! $end_date ) {
@@ -167,91 +167,6 @@ class Analytics extends Request {
 			$country = $stored['country'];
 		}
 
-		// Check the property for old Google Analytics.
-		if ( Str::starts_with( 'UA-', $property_id ) ) {
-			$args = [
-				'viewId'                 => $view_id,
-				'pageSize'               => $row_limit,
-				'dateRanges'             => [
-					[
-						'startDate' => $start_date,
-						'endDate'   => $end_date,
-					],
-				],
-				'dimensionFilterClauses' => [
-					[
-						'filters' => [
-							[
-								'dimensionName' => 'ga:medium',
-								'operator'      => 'EXACT',
-								'expressions'   => 'organic',
-							],
-						],
-					],
-				],
-			];
-
-			// Include only dates.
-			if ( true === $days ) {
-				$args = wp_parse_args(
-					[
-						'dimensions' => [
-							[ 'name' => 'ga:date' ],
-						],
-					],
-					$args
-				);
-			} else {
-				$args = wp_parse_args(
-					[
-						'metrics'    => [
-							[ 'expression' => 'ga:pageviews' ],
-							[ 'expression' => 'ga:users' ],
-						],
-						'dimensions' => [
-							[ 'name' => 'ga:date' ],
-							[ 'name' => 'ga:pagePath' ],
-						],
-						'orderBys'   => [
-							[
-								'fieldName' => 'ga:pageviews',
-								'sortOrder' => 'DESCENDING',
-							],
-						],
-					],
-					$args
-				);
-
-				// Add country.
-				if ( ! $country ) {
-					$args['dimensionFilterClauses'][0]['filters'][] = [
-						'dimensionName' => 'ga:countryIsoCode',
-						'operator'      => 'EXACT',
-						'expressions'   => $country,
-					];
-				}
-			}
-
-			$response = Api::get()->http_post(
-				'https://analyticsreporting.googleapis.com/v4/reports:batchGet',
-				[
-					'reportRequests' => [ $args ],
-				]
-			);
-
-			Api::get()->log_failed_request( $response, 'analytics', $start_date, func_get_args() );
-
-			if ( ! Api::get()->is_success() ) {
-				return new WP_Error( 'request_failed', __( 'The Google Analytics request failed.', 'rank-math' ) );
-			}
-
-			if ( ! isset( $response['reports'], $response['reports'][0]['data']['rows'] ) ) {
-				return false;
-			}
-
-			return $response['reports'][0]['data']['rows'];
-		}
-
 		// Request for GA4 API.
 		$args = [
 			'dateRanges'      => [
@@ -261,11 +176,26 @@ class Analytics extends Request {
 				],
 			],
 			'dimensionFilter' => [
-				'filter' => [
-					'fieldName'    => 'streamId',
-					'stringFilter' => [
-						'matchType' => 'EXACT',
-						'value'     => $view_id,
+				'andGroup' => [
+					'expressions' => [
+						[
+							'filter' => [
+								'fieldName'    => 'streamId',
+								'stringFilter' => [
+									'matchType' => 'EXACT',
+									'value'     => $view_id,
+								],
+							],
+						],
+						[
+							'filter' => [
+								'fieldName'    => 'sessionMedium',
+								'stringFilter' => [
+									'matchType' => 'EXACT',
+									'value'     => 'organic',
+								],
+							],
+						],
 					],
 				],
 			],
@@ -285,8 +215,10 @@ class Analytics extends Request {
 			$args = wp_parse_args(
 				[
 					'dimensions' => [
-						[ 'name' => 'pagePathPlusQueryString' ],
+						[ 'name' => 'hostname' ],
+						[ 'name' => 'pagePath' ],
 						[ 'name' => 'countryId' ],
+						[ 'name' => 'sessionMedium' ],
 					],
 					'metrics'    => [
 						[ 'name' => 'screenPageViews' ],
@@ -298,11 +230,13 @@ class Analytics extends Request {
 
 			// Include country.
 			if ( $country ) {
-				$args['dimensionFilter']['filter'] = [
-					'fieldName'    => 'countryId',
-					'stringFilter' => [
-						'matchType' => 'EXACT',
-						'value'     => $country,
+				$args['dimensionFilter']['andGroup']['expressions'][] = [
+					'filter' => [
+						'fieldName'    => 'countryId',
+						'stringFilter' => [
+							'matchType' => 'EXACT',
+							'value'     => $country,
+						],
 					],
 				];
 			}

@@ -5,10 +5,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-/**
- * Compatibility WP < 4.7.0
- */
+
 if ( ! function_exists( 'wp_doing_ajax' ) ) {
+	/**
+	 * Compatibility WP < 4.7.0
+	 * @return bool
+	 */
 	function wp_doing_ajax() {
 		/**
 		 * Filters whether the current request is a WordPress Ajax request.
@@ -32,7 +34,7 @@ if ( ! function_exists( 'is_rest' ) ) {
 	 * Case #3: URL Path begins with wp-json/ (your REST prefix)
 	 * Also supports WP installations in subfolders
 	 *
-	 * @returns boolean
+	 * @return boolean
 	 * @author matzeeable
 	 */
 	function is_rest() {
@@ -55,15 +57,21 @@ if ( ! function_exists( 'is_rest' ) ) {
 	}
 }
 
-/**
- * Compatibility for library weglot-php PHP 5.4
- */
 if ( ! function_exists( 'array_column' ) ) {
+	/**
+	 * Compatibility for library weglot-php PHP 5.4
+	 *
+	 * @param array<string,mixed> $input
+	 * @param int|string $column_key
+	 * @param int|string $index_key
+	 *
+	 * @return bool|array<string,mixed>
+	 */
 	function array_column( array $input, $column_key, $index_key = null ) {
 		$array = array();
 		foreach ( $input as $value ) {
 			if ( ! array_key_exists( $column_key, $value ) ) {
-				trigger_error( "Key \"$column_key\" does not exist in array" );
+				trigger_error( esc_html("Key \"$column_key\" does not exist in array" ));
 
 				return false;
 			}
@@ -71,12 +79,12 @@ if ( ! function_exists( 'array_column' ) ) {
 				$array[] = $value[ $column_key ];
 			} else {
 				if ( ! array_key_exists( $index_key, $value ) ) {
-					trigger_error( "Key \"$index_key\" does not exist in array" );
+					trigger_error( esc_html("Key \"$index_key\" does not exist in array" ));
 
 					return false;
 				}
 				if ( ! is_scalar( $value[ $index_key ] ) ) {
-					trigger_error( "Key \"$index_key\" does not contain scalar value" );
+					trigger_error( esc_html("Key \"$index_key\" does not contain scalar value" ) );
 
 					return false;
 				}

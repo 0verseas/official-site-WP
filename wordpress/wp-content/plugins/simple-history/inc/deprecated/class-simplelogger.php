@@ -1,22 +1,24 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound
 use Simple_History\Loggers\Logger;
 
 /**
  * Un-namespaced class for old loggers that extend \SimpleLogger.
  *
  * New loggers must extend Simple_History\Loggers\Logger.
+ *
+ * @method null warningMessage(string $message, array $context)
  */
-// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound
 class SimpleLogger extends Logger {
 	/**
 	 * Methods that used to exist and needs to be remapped.
 	 *
 	 * @var string[] Array of key/value pairs where keys represent old method name and value is name of new method
 	 */
-	private $methods_mapping = array(
+	private array $methods_mapping = array(
 		'getInfoValueByKey' => 'get_info_value_by_key',
 		'getCapability' => 'get_capability',
-		'interpolate' => null, // moved to helper
+		'interpolate' => null, // moved to helper.
 		'getLogRowHeaderInitiatorOutput' => 'get_log_row_header_initiator_output',
 		'getLogRowHeaderDateOutput' => 'get_log_row_header_date_output',
 		'getLogRowHeaderUsingPluginOutput' => 'get_log_row_header_using_plugin_output',
@@ -59,8 +61,8 @@ class SimpleLogger extends Logger {
 	 * Call new method when calling old/deprecated method names.
 	 *
 	 * @since 4.0
-	 * @param string $name
-	 * @param array $arguments
+	 * @param string $name Method name.
+	 * @param array  $arguments Arguments.
 	 * @return mixed
 	 */
 	public function __call( $name, $arguments ) {

@@ -14,10 +14,10 @@ $options = [
 		'setting' => [ 'transport' => 'postMessage' ],
 		'placeholder' => __('Select menu...', 'blocksy'),
 		'choices' => blocksy_ordered_keys(blocksy_get_menus_items($location)),
-		'desc' => sprintf(
+		'desc' => blocksy_safe_sprintf(
 			// translators: placeholder here means the actual URL.
 			__( 'Manage your menus in the %sMenus screen%s.', 'blocksy' ),
-			sprintf(
+			blocksy_safe_sprintf(
 				'<a href="%s" target="_blank">',
 				admin_url('/nav-menus.php')
 			),
@@ -125,14 +125,12 @@ $options = [
 				'type' => 'ct-visibility',
 				'design' => 'block',
 				'divider' => 'top',
-				// 'allow_empty' => true,
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'desktop' => true,
 					'tablet' => true,
 					'mobile' => true,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'desktop' => __( 'Desktop', 'blocksy' ),
 					'tablet' => __( 'Tablet', 'blocksy' ),
@@ -168,7 +166,7 @@ $options = [
 
 				'value' => [
 					'default' => [
-						'color' => 'var(--color)',
+						'color' => 'var(--theme-text-color)',
 					],
 
 					'hover' => [
@@ -189,7 +187,7 @@ $options = [
 					[
 						'title' => __( 'Hover', 'blocksy' ),
 						'id' => 'hover',
-						'inherit' => 'var(--linkHoverColor)',
+						'inherit' => 'var(--theme-link-hover-color)',
 					],
 
 					[
@@ -205,9 +203,7 @@ $options = [
 				'type' => 'ct-spacing',
 				'divider' => 'top',
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => blocksy_spacing_value([
-					'linked' => true,
-				]),
+				'value' => blocksy_spacing_value(),
 				'responsive' => true
 			],
 

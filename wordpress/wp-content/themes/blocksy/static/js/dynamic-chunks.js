@@ -1,11 +1,95 @@
 import $script from 'scriptjs'
-import { fastOverlayHandleClick } from './frontend/fast-overlay'
+
+import { handleTrigger } from './frontend/dynamic-chunks/triggers'
 
 let loadedChunks = {}
 let intersectionObserver = null
 
+export const loadDynamicChunk = (chunkId) => {
+	return new Promise((resolve, reject) => {
+		let chunk = ct_localizations.dynamic_js_chunks.find(
+			(chunk) => chunk.id === chunkId
+		)
+
+		if (!chunk) {
+			reject()
+		}
+
+		if (loadedChunks[chunk.id]) {
+			resolve({ chunk: loadedChunks[chunk.id], isInitial: false })
+		} else {
+			loadedChunks[chunk.id] = {
+				state: 'loading',
+			}
+
+			if (chunk.global_data) {
+				chunk.global_data.map((data) => {
+					if (!data.var || !data.data) {
+						return
+					}
+
+					window[data.var] = data.data
+				})
+			}
+
+			if (chunk.raw_html) {
+				if (!document.querySelector(chunk.raw_html.selector)) {
+					document.body.insertAdjacentHTML(
+						'beforeend',
+						chunk.raw_html.html
+					)
+				}
+			}
+
+			if (chunk.deps) {
+				const depsThatAreNotLoadedIds = chunk.deps.filter(
+					(id) =>
+						!document.querySelector(
+							`script[src*="${chunk.deps_data[id]}"]`
+						)
+				)
+				const depsThatAreNotLoaded = depsThatAreNotLoadedIds.map(
+					(id) => chunk.deps_data[id]
+				)
+
+				;[...depsThatAreNotLoadedIds, 'root']
+					.map((x) => () => {
+						return new Promise((depsResolve) => {
+							if (x === 'root') {
+								$script([chunk.url], () => {
+									depsResolve()
+									resolve({
+										chunk: loadedChunks[chunk.id],
+										isInitial: true,
+									})
+								})
+								return
+							}
+
+							$script([chunk.deps_data[x]], () => {
+								depsResolve()
+							})
+						})
+					})
+					.reduce(
+						(before, after) => before.then((_) => after()),
+						Promise.resolve()
+					)
+			} else {
+				$script(chunk.url, () => {
+					resolve({ chunk: loadedChunks[chunk.id], isInitial: true })
+				})
+			}
+		}
+	})
+}
+
 const loadChunkWithPayload = (chunk, payload = {}, el = null) => {
 	const immediateMount = () => {
+		if (!loadedChunks[chunk.id].mount) {
+			return
+		}
+
 		if (el) {
 			loadedChunks[chunk.id].mount(el, payload)
 		} else {
@@ -15,54 +99,20 @@ const loadChunkWithPayload = (chunk, payload = {}, el = null) => {
 		}
 	}
 
-	if (loadedChunks[chunk.id]) {
-		immediateMount()
-	} else {
-		if (chunk.global_data) {
-			chunk.global_data.map((data) => {
-				if (!data.var || !data.data) {
-					return
-				}
+	loadDynamicChunk(chunk.id)
+		.then(({ isInitial }) => {
+			if (isInitial) {
+				immediateMount()
+			}
 
-				window[data.var] = data.data
-			})
-		}
-
-		if (chunk.deps) {
-			const depsThatAreNotLoadedIds = chunk.deps.filter(
-				(id) =>
-					!document.querySelector(
-						`script[src*="${chunk.deps_data[id]}"]`
-					)
-			)
-			const depsThatAreNotLoaded = depsThatAreNotLoadedIds.map(
-				(id) => chunk.deps_data[id]
-			)
-
-			;[...depsThatAreNotLoadedIds, 'root']
-				.map((x) => () => {
-					return new Promise((resolve) => {
-						if (x === 'root') {
-							$script([chunk.url], () => {
-								resolve()
-								immediateMount()
-							})
-							return
-						}
-
-						$script([chunk.deps_data[x]], () => {
-							resolve()
-						})
-					})
-				})
-				.reduce(
-					(before, after) => before.then((_) => after()),
-					Promise.resolve()
-				)
-		} else {
-			$script(chunk.url, immediateMount)
-		}
-	}
+			// This is special case when re-triggered & payload present.
+			if (!isInitial && payload) {
+				immediateMount()
+			}
+		})
+		.catch((e) => {
+			console.error('Cannot load chunk', chunk.id, e)
+		})
 }
 
 const addChunkToIntersectionObserver = (chunk) => {
@@ -117,207 +167,48 @@ const addChunkToIntersectionObserver = (chunk) => {
 }
 
 export const mountDynamicChunks = () => {
-	const requestIdleCallback =
-		window.requestIdleCallback ||
-		function (cb) {
-			var start = Date.now()
-			return setTimeout(function () {
-				cb({
-					didTimeout: false,
-					timeRemaining: function () {
-						return Math.max(0, 50 - (Date.now() - start))
-					},
-				})
-			}, 1)
-		}
-
 	ct_localizations.dynamic_js_chunks.map((chunk) => {
 		if (!chunk.id) {
 			return
 		}
 
+		// This is a potential problem for cases when we have multiple triggers
 		if (!document.querySelector(chunk.selector)) {
 			return
 		}
 
-		if (chunk.trigger) {
-			if (chunk.trigger === 'click') {
-				;[...document.querySelectorAll(chunk.selector)].map((el) => {
-					if (el.hasLazyLoadClickListener) {
-						return
-					}
-
-					el.hasLazyLoadClickListener = true
-
-					const cb = (event) => {
-						if (
-							chunk.ignore_click &&
-							event.target.matches(chunk.ignore_click)
-						) {
-							return
-						}
-
-						event.preventDefault()
-
-						if (
-							el.closest('.ct-panel.active') &&
-							el.matches(
-								'.ct-header-account[href*="account-modal"]'
-							)
-						) {
-							return
-						}
-
-						if (chunk.has_modal_loader) {
-							const actuallyLoadChunk = () => {
-								let hasLoader = true
-
-								if (
-									chunk.has_modal_loader &&
-									chunk.has_modal_loader
-										.skip_if_no_template &&
-									!document.querySelector(
-										`#${chunk.has_modal_loader.id}`
-									) &&
-									!loadedChunks[chunk.id]
-								) {
-									hasLoader = false
-								}
-
-								if (hasLoader) {
-									const loadingHtml = `
-                                <div data-behaviour="modal" class="ct-panel ${
-									chunk.has_modal_loader.class
-										? chunk.has_modal_loader.class
-										: ''
-								}" ${
-										chunk.has_modal_loader.id
-											? `id="${chunk.has_modal_loader.id}"`
-											: ''
-									}>
-                                    <span data-loader="circles">
-                                        <span></span>
-                                        <span></span>
-                                        <span></span>
-                                    </span>
-                                </div>
-                            `
-
-									const div = document.createElement('div')
-
-									div.innerHTML = loadingHtml
-
-									let divRef = div.firstElementChild
-
-									document
-										.querySelector('.ct-drawer-canvas')
-										.appendChild(div.firstElementChild)
-
-									fastOverlayHandleClick(event, {
-										openStrategy: 'fast',
-										container: divRef,
-									})
-								}
-
-								loadChunkWithPayload(chunk, { event }, el)
-							}
-
-							if (document.body.dataset.panel) {
-								let currentPanel =
-									document.querySelector('.ct-panel.active')
-
-								if (currentPanel) {
-									let maybeButton =
-										document.querySelector(
-											`[data-toggle-panel="#${currentPanel.id}"]`
-										) ||
-										document.querySelector(
-											`[href="#${currentPanel.id}"]`
-										)
-
-									if (maybeButton) {
-										maybeButton.click()
-
-										setTimeout(() => {
-											actuallyLoadChunk()
-										}, 500)
-
-										return
-									}
-								}
-							} else {
-								actuallyLoadChunk()
-							}
-						} else {
-							loadChunkWithPayload(chunk, { event }, el)
-						}
-					}
-
-					el.dynamicJsChunkStop = () => {
-						el.removeEventListener('click', cb)
-					}
-
-					el.addEventListener('click', cb)
-				})
-			}
-
-			if (chunk.trigger === 'submit') {
-				;[...document.querySelectorAll(chunk.selector)].map((el) => {
-					if (el.hasLazyLoadSubmitListener) {
-						return
-					}
-
-					el.hasLazyLoadSubmitListener = true
-
-					el.addEventListener('submit', (event) => {
-						event.preventDefault()
-						loadChunkWithPayload(chunk, { event }, el)
-					})
-				})
-			}
-
-			if (chunk.trigger === 'hover') {
-				;[...document.querySelectorAll(chunk.selector)].map((el) => {
-					if (el.hasLazyLoadHoverListener) {
-						return
-					}
-
-					el.hasLazyLoadHoverListener = true
-
-					el.addEventListener('mouseover', (event) => {
-						event.preventDefault()
-						loadChunkWithPayload(chunk, { event }, el)
-					})
-				})
-			}
-
-			if (chunk.trigger === 'intersection-observer') {
-				addChunkToIntersectionObserver(chunk)
-			}
-
-			if (chunk.trigger === 'scroll') {
-				setTimeout(() => {
-					let prevScroll = scrollY
-
-					let cb = (e) => {
-						if (Math.abs(scrollY - prevScroll) > 30) {
-							document.removeEventListener('scroll', cb)
-							loadChunkWithPayload(chunk)
-							return
-						}
-					}
-
-					document.addEventListener('scroll', cb, { passive: true })
-				}, 500)
-			}
-		} else {
-			loadChunkWithPayload(chunk)
+		if (!chunk.trigger) {
+			loadChunkWithPayload(chunk, null)
+			return
 		}
+
+		;(Array.isArray(chunk.trigger) ? chunk.trigger : [chunk.trigger]).map(
+			(trigger) => {
+				trigger = trigger.trigger
+					? trigger
+					: {
+							trigger,
+							selector: chunk.selector,
+					  }
+
+				if (trigger.trigger === 'intersection-observer') {
+					addChunkToIntersectionObserver(chunk)
+					return
+				}
+
+				handleTrigger(
+					trigger,
+					chunk,
+					loadChunkWithPayload,
+					loadedChunks
+				)
+			}
+		)
 	})
 }
 
 export const registerDynamicChunk = (id, implementation) => {
-	if (loadedChunks[id]) {
+	if (loadedChunks[id] && loadedChunks[id].state !== 'loading') {
 		return
 	}
 

@@ -56,14 +56,14 @@ add_action(
 		);
 
 		$deps = apply_filters('blocksy-options-scripts-dependencies', [
-			'underscore',
+			// 'underscore',
 			'react',
 			'react-dom',
 			'wp-element',
 			'wp-date',
 			'wp-i18n',
 			'ct-events',
-			'wp-media-utils'
+			'wp-media-utils',
 			// 'wp-polyfill'
 		]);
 
@@ -77,12 +77,23 @@ add_action(
 			if (
 				$current_screen->base === 'nav-menus'
 				||
+				$current_screen->base === 'edit-tags'
+				||
+				$current_screen->base === 'term'
+				||
 				(
 					$current_screen->base === 'post'
 					&&
 					$current_screen->is_block_editor
 				)
+				||
+				(
+					$current_screen->base === 'widgets'
+					&&
+					$current_screen->is_block_editor
+				)
 			) {
+				$deps[] = 'underscore';
 				wp_enqueue_editor();
 			}
 
@@ -90,6 +101,27 @@ add_action(
 				'ct-options-scripts',
 				get_template_directory_uri() . '/static/bundle/options.js',
 				$deps,
+				$theme->get('Version')
+			);
+
+			$styles_deps = [];
+
+			if (
+				$current_screen->base === 'nav-menus'
+				||
+				(
+					$current_screen->base === 'post'
+					&&
+					$current_screen->is_block_editor
+				)
+			) {
+				$styles_deps[] = 'wp-components';
+			}
+
+			wp_enqueue_style(
+				'ct-options-styles',
+				get_template_directory_uri() . '/static/bundle/options.min.css',
+				$styles_deps,
 				$theme->get('Version')
 			);
 		}
@@ -101,12 +133,6 @@ add_action(
 			'wp.i18n.setLocaleData( ' . wp_json_encode($locale_data_ct) . ', "blocksy" );'
 		);
 
-		wp_enqueue_style(
-			'ct-options-styles',
-			get_template_directory_uri() . '/static/bundle/options.min.css',
-			['wp-components'],
-			$theme->get('Version')
-		);
 
 		if (is_rtl()) {
 			wp_enqueue_style(
@@ -117,17 +143,39 @@ add_action(
 			);
 		}
 
+		$gradients = [];
+
+		if (
+			get_theme_support('editor-gradient-presets')
+			&&
+			isset(get_theme_support('editor-gradient-presets')[0])
+		) {
+			$gradients = get_theme_support('editor-gradient-presets')[0];
+		}
+
+		if (function_exists('wp_get_global_settings')) {
+			if (isset(wp_get_global_settings()['color']['gradients']['theme'])) {
+				$gradients = wp_get_global_settings()['color']['gradients']['theme'];
+			}
+		}
+
 		wp_localize_script(
 			'ct-options-scripts',
 			'ct_localizations',
 			[
-				'gradients' => get_theme_support('editor-gradient-presets')[0],
+				'conditions_override' => blocksy_manager()->get_conditions_overrides(),
+				'theme_version' => $theme->get('Version'),
+				'current_palette' => array_keys(
+					blocksy_manager()->colors->get_color_palette()
+				),
+				'gradients' => $gradients,
 				'is_dev_mode' => !! (
 					defined('BLOCKSY_DEVELOPMENT_MODE')
 					&&
 					BLOCKSY_DEVELOPMENT_MODE
 				),
 				'nonce' => wp_create_nonce('ct-ajax-nonce'),
+				'dashboard_actions_nonce' => wp_create_nonce('ct-dashboard'),
 				'public_url' => get_template_directory_uri() . '/static/bundle/',
 				'static_public_url' => get_template_directory_uri() . '/static/',
 				'dismissed_google_fonts_notice' => get_option(
@@ -140,7 +188,16 @@ add_action(
 				'product_name' => blocksy_get_wp_theme()->get('Name'),
 				'customizer_sync' => [
 					'svg_patterns' => blocksy_get_patterns_svgs_list()
-				]
+				],
+				'gutenberg_blocks_data' => apply_filters(
+					'blocksy:gutenberg-blocks-data',
+					[]
+				),
+				'gutenberg_metaboxes_data' => apply_filters(
+					'blocksy:gutenberg-metaboxes-data',
+					[]
+				),
+				'backend_dynamic_styles_urls' => blocksy_backend_dynamic_styles_urls()
 			]
 		);
 	},

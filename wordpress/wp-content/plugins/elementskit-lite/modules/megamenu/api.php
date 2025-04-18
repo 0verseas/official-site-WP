@@ -17,7 +17,7 @@ class Megamenu_Api extends Core\Handler_Api {
 			return;
 		}
 		$menu_item_id       = $this->request['settings']['menu_id'];
-		$menu_item_settings = json_encode( $this->request['settings'], JSON_UNESCAPED_UNICODE );
+		$menu_item_settings = wp_json_encode( $this->request['settings'], JSON_UNESCAPED_UNICODE );
 		update_post_meta( $menu_item_id, Init::$menuitem_settings_key, $menu_item_settings );
 
 		return array(
@@ -39,7 +39,7 @@ class Megamenu_Api extends Core\Handler_Api {
 	public function get_megamenu_content() {
 		$menu_item_id = intval($this->request['id']);
 
-		if (!get_post_status ($menu_item_id) || post_password_required($menu_item_id)) {
+		if ('publish' !== get_post_status ($menu_item_id) || post_password_required($menu_item_id)) {
 			return;
 		}
 

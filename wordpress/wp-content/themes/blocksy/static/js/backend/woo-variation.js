@@ -5,19 +5,27 @@ import $ from 'jquery'
 import { __ } from 'ct-i18n'
 
 export const initWooVariation = (variationWrapper) => {
-	const uploadImage = variationWrapper.querySelector('.upload_image')
+	let uploadImage = variationWrapper.querySelector('.upload_image')
 
 	if (!uploadImage) {
 		return
 	}
 
-	const div = document.createElement('p')
+	if (uploadImage.closest('.form-flex-box')) {
+		uploadImage = uploadImage.closest('.form-flex-box')
+	} else {
+		uploadImage = uploadImage.nextElementSibling
+	}
+
+	const div = document.createElement('div')
 
 	div.classList.add('form-row')
 	div.classList.add('form-row-full')
 	div.classList.add('ct-variation-image-gallery')
 
-	uploadImage.nextElementSibling.insertAdjacentElement('afterend', div)
+	uploadImage.insertAdjacentElement('afterend', div)
+
+	const maybeWpmlLocked = document.querySelector('.wcml_lock_img')
 
 	const input = variationWrapper.querySelector(
 		'[name*="blocksy_post_meta_options"]'
@@ -29,8 +37,8 @@ export const initWooVariation = (variationWrapper) => {
 
 	const options = {
 		gallery_source: {
-			label: __('Variation Gallery Source', 'blocksy'),
-			type: 'ct-radio',
+			label: __('Variation Gallery', 'blocksy'),
+			type: maybeWpmlLocked ? 'hidden' : 'ct-radio',
 			value: 'default',
 			design: 'inline',
 			divider: 'bottom',
@@ -40,21 +48,38 @@ export const initWooVariation = (variationWrapper) => {
 			},
 		},
 
-		condition: {
-			type: 'ct-condition',
-			condition: {
-				gallery_source: 'custom',
-			},
-			options: {
-				images: {
-					label: __('Variation Image Gallery', 'blocksy'),
-					type: 'ct-multi-image-uploader',
-					design: ({ value }) =>
-						value.length === 0 ? 'inline' : 'block',
-					value: [],
-				},
-			},
-		},
+		...(maybeWpmlLocked
+			? {
+					inheritance: {
+						label: __('Variation Gallery', 'blocksy'),
+						type: 'ct-notification',
+						design: 'inline',
+						text: maybeWpmlLocked.outerHTML
+							.replace('wcml_lock_img', '')
+							.replace('display: none;', ''),
+					},
+			  }
+			: {}),
+
+		condition: maybeWpmlLocked
+			? {
+					type: 'hidden',
+			  }
+			: {
+					type: 'ct-condition',
+					condition: {
+						gallery_source: 'custom',
+					},
+					options: {
+						images: {
+							label: __('Custom Image Gallery', 'blocksy'),
+							type: 'ct-multi-image-uploader',
+							design: ({ value }) =>
+								value.length === 0 ? 'inline' : 'block',
+							value: [],
+						},
+					},
+			  },
 	}
 
 	render(

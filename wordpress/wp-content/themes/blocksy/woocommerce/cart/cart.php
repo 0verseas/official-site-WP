@@ -12,14 +12,24 @@
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates
- * @version 7.8.0
+ * @version 7.9.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-do_action( 'woocommerce_before_cart' ); ?>
+do_action( 'woocommerce_before_cart' );
 
-<div class="ct-cart-form">
+$wrapper_class = apply_filters(
+	'blocksy:woocommerce:cart:wrapper-class',
+	'ct-woocommerce-cart-form'
+);
+
+$image_size = blocksy_get_theme_mod('cart_page_image_size', 'woocommerce_thumbnail');
+$image_ratio = blocksy_get_theme_mod('cart_page_image_ratio', '1/1');
+
+?>
+
+<div class="<?php echo $wrapper_class ?>">
 
 <form class="woocommerce-cart-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
 	<?php do_action( 'woocommerce_before_cart_table' ); ?>
@@ -43,8 +53,10 @@ do_action( 'woocommerce_before_cart' ); ?>
 				/**
 				 * Filter the product name.
 				 *
-				 * @since 7.8.0
+				 * @since 2.1.0
 				 * @param string $product_name Name of the product in the cart.
+				 * @param array $cart_item The product in the cart.
+				 * @param string $cart_item_key Key for the product in the cart.
 				 */
 				$product_name = apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key );
 
@@ -54,37 +66,37 @@ do_action( 'woocommerce_before_cart' ); ?>
 					<tr class="woocommerce-cart-form__cart-item <?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>">
 
 						<td class="product-thumbnail">
-							<?php
-								$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image(), $cart_item, $cart_item_key );
-
-								if ( ! $product_permalink ) {
-									echo $thumbnail; // PHPCS: XSS ok.
-								} else {
-									printf( '<a href="%s">%s</a>', esc_url( $product_permalink ), $thumbnail ); // PHPCS: XSS ok.
-								}
+							<?php 
+								echo apply_filters(
+									'woocommerce_cart_item_thumbnail',
+									blocksy_media([
+										'no_image_type' => 'woo',
+										'attachment_id' => $_product->get_image_id(),
+										'post_id' => $_product->get_id(),
+										'size' => $image_size,
+										'ratio' => $image_ratio,
+										'tag_name' => 'a',
+										'html_atts' => [
+											'href' => esc_url( $_product->get_permalink() )
+										],
+									]),
+									$cart_item,
+									$cart_item_key
+								);
 							?>
 						</td>
 
 						<td class="product-name" data-title="<?php esc_attr_e( 'Product', 'blocksy' ); ?>">
 							<?php
 								if ( ! $product_permalink ) {
-									/**
-									 * Filter the product name.
-									 *
-									 * @since 7.8.0
-									 * @param string $product_name Name of the product in the cart.
-									 * @param array $cart_item The product in the cart.
-									 * @param string $cart_item_key Key for the product in the cart.
-									 */
-									echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', $product_name, $cart_item, $cart_item_key ) . '&nbsp;' );
+									echo wp_kses_post( $product_name . '&nbsp;' );
 								} else {
 									/**
-									 * Filter the product name.
+									 * This filter is documented above.
 									 *
-									 * @since 7.8.0
-									 * @param string $product_url URL the product in the cart.
+									 * @since 2.1.0
 									 */
-									echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', sprintf( '<a href="%s">%s</a>', esc_url( $product_permalink ), $product_name ), $cart_item, $cart_item_key ) );
+									echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', blocksy_safe_sprintf( '<a href="%s">%s</a>', esc_url( $product_permalink ), $_product->get_name() ), $cart_item, $cart_item_key ) );
 								}
 
 								do_action( 'woocommerce_after_cart_item_name', $cart_item, $cart_item_key );
@@ -106,7 +118,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 							<div class="product-mobile-actions ct-hidden-lg product-remove">
 								<?php
 									if ( $_product->is_sold_individually() ) {
-										$product_quantity = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1">', $cart_item_key );
+										$product_quantity = blocksy_safe_sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1">', $cart_item_key );
 									} else {
 										$product_quantity = woocommerce_quantity_input(
 											array(
@@ -140,18 +152,30 @@ do_action( 'woocommerce_before_cart' ); ?>
 									}
 
 									echo apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key ); // PHPCS: XSS ok.
+
+									if (class_exists('WCS_ATT_Display_Cart')) {
+										add_filter(
+											'woocommerce_cart_item_price',
+											array(
+												'WCS_ATT_Display_Cart',
+												'show_cart_item_subscription_options'
+											),
+											1000,
+											3
+										);
+									}
 								?>
 
 								<?php
 									echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										'woocommerce_cart_item_remove_link',
-										sprintf(
+										blocksy_safe_sprintf(
 											'<a href="%s" class="remove" aria-label="%s" data-product_id="%s" data-product_sku="%s">
 												<svg class="ct-icon" width="10px" height="10px" viewBox="0 0 24 24"><path d="M9.6,0l0,1.2H1.2v2.4h21.6V1.2h-8.4l0-1.2H9.6z M2.8,6l1.8,15.9C4.8,23.1,5.9,24,7.1,24h9.9c1.2,0,2.2-0.9,2.4-2.1L21.2,6H2.8z"></path></svg>
 											</a>',
 											esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
 											/* translators: %s is the product name */
-											esc_attr( sprintf( __( 'Remove %s from cart', 'blocksy' ), $product_name ) ),
+											esc_attr( blocksy_safe_sprintf( __( 'Remove %s from cart', 'blocksy' ), wp_strip_all_tags($product_name) ) ),
 											esc_attr( $product_id ),
 											esc_attr( $_product->get_sku() )
 										),
@@ -164,7 +188,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 						<td class="product-quantity" data-title="<?php esc_attr_e( 'Quantity', 'blocksy' ); ?>">
 							<?php
 								if ( $_product->is_sold_individually() ) {
-									$product_quantity = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1">', $cart_item_key );
+									$product_quantity = blocksy_safe_sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1">', $cart_item_key );
 								} else {
 									$product_quantity = woocommerce_quantity_input(
 										array(
@@ -193,13 +217,13 @@ do_action( 'woocommerce_before_cart' ); ?>
 							<?php
 								echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									'woocommerce_cart_item_remove_link',
-									sprintf(
+									blocksy_safe_sprintf(
 										'<a href="%s" class="remove" aria-label="%s" data-product_id="%s" data-product_sku="%s">
 											<svg class="ct-icon" width="10px" height="10px" viewBox="0 0 24 24"><path d="M9.6,0l0,1.2H1.2v2.4h21.6V1.2h-8.4l0-1.2H9.6z M2.8,6l1.8,15.9C4.8,23.1,5.9,24,7.1,24h9.9c1.2,0,2.2-0.9,2.4-2.1L21.2,6H2.8z"></path></svg>
 										</a>',
 										esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
 										/* translators: %s is the product name */
-										esc_attr( sprintf( __( 'Remove %s from cart', 'blocksy' ), $product_name ) ),
+										esc_attr( blocksy_safe_sprintf( __( 'Remove %s from cart', 'blocksy' ), $product_name ) ),
 										esc_attr( $product_id ),
 										esc_attr( $_product->get_sku() )
 									),
@@ -220,7 +244,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 
 					<?php if ( wc_coupons_enabled() ) { ?>
 						<div class="coupon">
-							<label for="coupon_code" class="screen-reader-text"><?php esc_html_e( 'Coupon:', 'blocksy' ); ?></label> <input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'blocksy' ); ?>"> <button type="submit" class="button" name="apply_coupon" value="<?php esc_html_e( 'Apply coupon', 'blocksy' ); ?>"><?php esc_html_e( 'Apply coupon', 'blocksy' ); ?></button>
+							<label for="coupon_code" class="screen-reader-text"><?php esc_html_e( 'Coupon:', 'blocksy' ); ?></label> <input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'blocksy' ); ?>" /> <button type="submit" class="button" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'blocksy' ); ?>"><?php esc_html_e( 'Apply coupon', 'blocksy' ); ?></button>
 							<?php do_action( 'woocommerce_cart_coupon' ); ?>
 						</div>
 					<?php } ?>

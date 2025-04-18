@@ -1,8 +1,9 @@
 import ctEvents from 'ct-events'
 import { getItemsDistribution } from './get-items-distribution'
+import { getCurrentScreen } from '../helpers/current-screen'
 
 const isEligibleForSubmenu = (el) =>
-	el.classList.contains('animated-submenu') &&
+	el.className.includes('animated-submenu') &&
 	(!el.parentNode.classList.contains('menu') ||
 		(el.className.indexOf('ct-mega-menu') === -1 &&
 			el.parentNode.classList.contains('menu')))
@@ -12,12 +13,14 @@ let cacheInfo = {}
 export const getCacheFor = (id) => cacheInfo[id]
 
 const getNavRootEl = (nav) => {
-	return Array.from(nav.children).filter((t) => !t.matches('link'))[0]
+	return Array.from(nav.children).filter(
+		(t) => !t.matches('link') && !t.matches('style')
+	)[0]
 }
 
 const maybeCreateMoreItemsFor = (nav, onDone) => {
 	if (nav.querySelector('.more-items-container')) {
-		onDone()
+		onDone(nav.querySelector('.more-items-container'))
 		return
 	}
 
@@ -25,7 +28,7 @@ const maybeCreateMoreItemsFor = (nav, onDone) => {
 
 	moreContainer.classList.add('menu-item-has-children')
 	moreContainer.classList.add('more-items-container')
-	moreContainer.classList.add('animated-submenu')
+	moreContainer.classList.add('animated-submenu-block')
 	moreContainer.classList.add('menu-item')
 
 	moreContainer.insertAdjacentHTML(
@@ -43,7 +46,60 @@ const maybeCreateMoreItemsFor = (nav, onDone) => {
 	)
 
 	getNavRootEl(nav).appendChild(moreContainer)
-	onDone && onDone()
+	onDone && onDone(moreContainer)
+}
+
+const countElWidth = (el) => {
+	if (el.firstElementChild.matches('a') && !el.querySelector('svg')) {
+		const a = el.firstElementChild
+		a.innerHTML = `<span>${a.innerHTML}</span>`
+
+		const props = window.getComputedStyle(a, null)
+
+		let extraWidth = 0
+
+		let parentComputedStyle = window.getComputedStyle(el.parentNode, null)
+
+		if (parentComputedStyle.gap !== 'normal') {
+			extraWidth = parseFloat(parentComputedStyle.gap)
+
+			if (
+				el.parentNode.firstElementChild === el ||
+				el === el.parentNode.lastElementChild
+			) {
+				extraWidth = extraWidth / 2
+			}
+		}
+
+		let actualWidth =
+			a.firstElementChild.getBoundingClientRect().width +
+			parseInt(props.getPropertyValue('padding-left'), 10) +
+			parseInt(props.getPropertyValue('padding-right'), 10) +
+			(a.querySelector('.ct-toggle-dropdown-desktop') ? 13 : 0) +
+			extraWidth
+
+		a.innerHTML = a.firstElementChild.innerHTML
+
+		return actualWidth
+	}
+
+	return el.firstElementChild.getBoundingClientRect().width
+}
+
+const computeMoreItemWidth = (nav) => {
+	let data = null
+
+	let hadMoreItems = !!nav.querySelector('.more-items-container')
+
+	maybeCreateMoreItemsFor(nav, (el) => {
+		data = countElWidth(el)
+
+		if (!hadMoreItems) {
+			el.remove()
+		}
+	})
+
+	return data
 }
 
 const computeItemsWidth = (nav) => {
@@ -53,26 +109,7 @@ const computeItemsWidth = (nav) => {
 				!el.classList.contains('.more-items-container') &&
 				el.firstElementChild
 		)
-		.map((el, index) => {
-			if (el.firstElementChild.matches('a') && !el.querySelector('svg')) {
-				const a = el.firstElementChild
-				a.innerHTML = `<span>${a.innerHTML}</span>`
-
-				const props = window.getComputedStyle(a, null)
-
-				let actualWidth =
-					a.firstElementChild.getBoundingClientRect().width +
-					parseInt(props.getPropertyValue('padding-left'), 10) +
-					parseInt(props.getPropertyValue('padding-right'), 10) +
-					(a.querySelector('.ct-toggle-dropdown-desktop') ? 13 : 0)
-
-				a.innerHTML = a.firstElementChild.innerHTML
-
-				return actualWidth
-			}
-
-			return el.firstElementChild.getBoundingClientRect().width
-		})
+		.map((el) => countElWidth(el))
 }
 
 const maybeMakeCacheForAllNavs = (nav) => {
@@ -110,11 +147,22 @@ const maybeMakeCacheForAllNavs = (nav) => {
 					: []),
 			],
 			itemsWidth: computeItemsWidth(nav),
+			moreItemWidth: computeMoreItemWidth(nav),
 		}
 
 		nav.dataset.responsive = 'yes'
 	})
 }
+
+new ResizeObserver(() => {
+	const els = [
+		...document.querySelectorAll(
+			'header [data-device="desktop"] [data-id^="menu"][data-responsive]'
+		),
+	]
+
+	els.map((nav) => mount(nav))
+}).observe(document.body)
 
 export const mount = (nav) => {
 	if (!getNavRootEl(nav)) {
@@ -132,6 +180,10 @@ export const mount = (nav) => {
 
 	cacheInfo[nav.__id].previousRenderedWidth = window.innerWidth
 
+	if (getCurrentScreen() !== 'desktop') {
+		return
+	}
+
 	let { fit, notFit } = getItemsDistribution(nav)
 
 	if (notFit.length === 0) {
@@ -142,20 +194,34 @@ export const mount = (nav) => {
 					nav.querySelector('.more-items-container')
 				)
 
+				if (
+					el.matches(
+						'.menu-item-has-children, .page_item_has_children'
+					)
+				) {
+					el.classList.remove('animated-submenu-inline')
+					el.classList.add('animated-submenu-block')
+				}
+
 				Array.from(
 					el.querySelectorAll(
 						'.menu-item-has-children, .page_item_has_children'
 					)
 				)
 					.filter((el) => !!el.closest('[class*="ct-mega-menu"]'))
-					.map((el) => el.classList.remove('animated-submenu'))
+					.map((el) => {
+						el.classList.remove(
+							'animated-submenu-block',
+							'animated-submenu-inline'
+						)
+					})
 			})
 
 			nav.querySelector('.more-items-container').remove()
 		}
 
 		resetSubmenus()
-		ctEvents.trigger('ct:header:init-popper')
+		ctEvents.trigger('ct:header:refresh-menu-submenus')
 
 		return
 	}
@@ -168,13 +234,12 @@ export const mount = (nav) => {
 		notFit.map((el) => {
 			nav.querySelector('.more-items-container .sub-menu').appendChild(el)
 
-			el.classList.add('animated-submenu')
-
-			Array.from(
-				el.querySelectorAll(
-					'.menu-item-has-children, .page_item_has_children'
-				)
-			).map((el) => el.classList.add('animated-submenu'))
+			if (
+				el.matches('.menu-item-has-children, .page_item_has_children')
+			) {
+				el.classList.add('animated-submenu-inline')
+				el.classList.remove('animated-submenu-block')
+			}
 		})
 
 		fit.map((el) => {
@@ -183,17 +248,29 @@ export const mount = (nav) => {
 				nav.querySelector('.more-items-container')
 			)
 
+			if (
+				el.matches('.menu-item-has-children, .page_item_has_children')
+			) {
+				el.classList.remove('animated-submenu-inline')
+				el.classList.add('animated-submenu-block')
+			}
+
 			Array.from(
 				el.querySelectorAll(
 					'.menu-item-has-children, .page_item_has_children'
 				)
 			)
 				.filter((el) => !!el.closest('[class*="ct-mega-menu"]'))
-				.map((el) => el.classList.remove('animated-submenu'))
+				.map((el) => {
+					el.classList.remove(
+						'animated-submenu-block',
+						'animated-submenu-inline'
+					)
+				})
 		})
 
 		resetSubmenus()
-		ctEvents.trigger('ct:header:init-popper')
+		ctEvents.trigger('ct:header:refresh-menu-submenus')
 	})
 }
 

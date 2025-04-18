@@ -3,28 +3,28 @@
 namespace Blocksy;
 
 class DemoInstallFinalActions {
-	protected $has_streaming = true;
+	protected $is_ajax_request = true;
 
 	public function __construct($args = []) {
 		$args = wp_parse_args($args, [
-			'has_streaming' => true
+			'is_ajax_request' => true,
 		]);
 
-		$this->has_streaming = $args['has_streaming'];
+		$this->is_ajax_request = $args['is_ajax_request'];
 	}
 
 	public function import() {
-		if ($this->has_streaming) {
-			Plugin::instance()->demo->start_streaming();
-
-			if (! current_user_can('edit_theme_options')) {
-				Plugin::instance()->demo->emit_sse_message([
-					'action' => 'complete',
-					'error' => false,
-				]);
-				exit;
-			}
+		if (
+			! current_user_can('edit_theme_options')
+			&&
+			$this->is_ajax_request
+		) {
+			wp_send_json_error([
+				'message' => __("Sorry, you don't have permission to finish the installation.", 'blocksy-companion')
+			]);
 		}
+
+		delete_option('blocksy_ext_demos_currently_installing_demo');
 
 		$wpforms_settings = get_option('wpforms_settings', []);
 		$wpforms_settings['disable-css'] = '2';
@@ -32,9 +32,14 @@ class DemoInstallFinalActions {
 
 		$this->replace_urls();
 
+		if (class_exists('\FluentForm\App\Hooks\Handlers\ActivationHandler')) {
+			$fluentFormActivation = new \FluentForm\App\Hooks\Handlers\ActivationHandler();
+			$fluentFormActivation->migrate();
+		}
+
 		do_action('customize_save_after');
 		do_action('blocksy:dynamic-css:refresh-caches');
-		Plugin::instance()->cache_manager->run_cache_purge();
+		do_action('blocksy:cache-manager:purge-all');
 
 		if (class_exists('WC_REST_System_Status_Tools_V2_Controller')) {
 			if (! defined('WP_CLI')) {
@@ -79,12 +84,12 @@ class DemoInstallFinalActions {
 
 		$this->maybe_activate_elementor_experimental_container();
 
-		if ($this->has_streaming) {
-			Plugin::instance()->demo->emit_sse_message([
-				'action' => 'complete',
-				'error' => false,
-			]);
-			exit;
+		$this->update_counts_for_all_terms();
+
+		$this->patch_attachment_ids_in_mods();
+
+		if ($this->is_ajax_request) {
+			wp_send_json_success();
 		}
 	}
 
@@ -278,6 +283,209 @@ class DemoInstallFinalActions {
 		}
 
 		update_option('elementor_experiment-container', 'active');
+	}
+
+	public function update_counts_for_all_terms() {
+		if (! function_exists('blocksy_manager')) {
+			return;
+		}
+
+		$taxonomies = array_reduce(
+			blocksy_manager()->post_types->get_supported_post_types(),
+			function ($result, $item) {
+				return array_unique(array_merge(
+					$result,
+					array_values(array_diff(
+						get_object_taxonomies($item),
+						['post_format']
+					))
+				));
+			},
+			[]
+		);
+
+		foreach ($taxonomies as $taxonomy) {
+			if (! taxonomy_exists($taxonomy)) {
+				continue;
+			}
+
+			$terms = get_terms($taxonomy, ['hide_empty' => false]);
+			$term_taxonomy_ids = wp_list_pluck($terms, 'term_taxonomy_id');
+
+			wp_update_term_count($term_taxonomy_ids, $taxonomy);
+		}
+	}
+
+	public function patch_attachment_ids_in_mods() {
+		$body = json_decode(file_get_contents('php://input'), true);
+
+		if (! $body) {
+			return;
+		}
+
+		$requestsPayload = [];
+
+		if (isset($body['requestsPayload'])) {
+			$requestsPayload = $body['requestsPayload'];
+		}
+
+		if (! isset($requestsPayload['processed_posts'])) {
+			return;
+		}
+
+		$all_mods = get_theme_mods();
+
+		foreach ($all_mods as $key => $val) {
+			if ($key === 'header_placements') {
+				$new_val = $val;
+
+				foreach ($val['sections'] as $section_index => $section) {
+					foreach ($section['items'] as $item_index => $item) {
+						$new_val['sections'][$section_index][
+							'items'
+						][$item_index]['values'] = $this->patch_attachment_ids_in_array(
+							$item['values'],
+							$requestsPayload
+						);
+					}
+				}
+
+				set_theme_mod($key, $new_val);
+			}
+
+			if (
+				$key === 'custom_logo'
+				&&
+				is_array($val)
+				&&
+				isset($val['desktop'])
+			) {
+				$new_val = $val;
+
+				$desktop_val = intval($val['desktop']);
+
+				if (isset($requestsPayload['processed_posts'][$desktop_val])) {
+					$new_val['desktop'] = intval($requestsPayload['processed_posts'][$desktop_val]);
+				}
+
+				$tablet_val = intval($val['tablet']);
+
+				if (isset($requestsPayload['processed_posts'][$tablet_val])) {
+					$new_val['tablet'] = intval($requestsPayload['processed_posts'][$tablet_val]);
+				}
+
+				$mobile_val = intval($val['mobile']);
+
+				if (isset($requestsPayload['processed_posts'][$mobile_val])) {
+					$new_val['mobile'] = intval($requestsPayload['processed_posts'][$mobile_val]);
+				}
+
+				set_theme_mod($key, $new_val);
+			}
+
+			if (
+				$key === 'custom_logo'
+				&&
+				is_numeric($val)
+				&&
+				isset($requestsPayload['processed_posts'][intval($val)])
+			) {
+				set_theme_mod(
+					$key,
+					intval($requestsPayload['processed_posts'][intval($val)])
+				);
+			}
+
+			if (
+				is_array($val)
+				&&
+				isset($val['attachment_id'])
+				&&
+				$val['attachment_id']
+				&&
+				isset(
+					$requestsPayload['processed_posts'][
+						intval($val['attachment_id'])
+					]
+				)
+			) {
+				$new_val = $val;
+
+				$new_val['attachment_id'] = intval($requestsPayload['processed_posts'][
+					intval($val['attachment_id'])
+				]);
+
+				set_theme_mod($key, $new_val);
+			}
+		}
+	}
+
+	public function patch_attachment_ids_in_array($array, $requestsPayload) {
+		foreach ($array as $key => $val) {
+			if (
+				$key === 'custom_logo'
+				&&
+				is_array($val)
+				&&
+				isset($val['desktop'])
+			) {
+				$new_val = $val;
+
+				$desktop_val = intval($val['desktop']);
+
+				if (isset($requestsPayload['processed_posts'][$desktop_val])) {
+					$new_val['desktop'] = intval($requestsPayload['processed_posts'][$desktop_val]);
+				}
+
+				$tablet_val = intval($val['tablet']);
+
+				if (isset($requestsPayload['processed_posts'][$tablet_val])) {
+					$new_val['tablet'] = intval($requestsPayload['processed_posts'][$tablet_val]);
+				}
+
+				$mobile_val = intval($val['mobile']);
+
+				if (isset($requestsPayload['processed_posts'][$mobile_val])) {
+					$new_val['mobile'] = intval($requestsPayload['processed_posts'][$mobile_val]);
+				}
+
+				$array[$key] = $new_val;
+			}
+
+			if (
+				$key === 'custom_logo'
+				&&
+				is_numeric($val)
+				&&
+				isset($requestsPayload['processed_posts'][intval($val)])
+			) {
+				$array[$key] = intval($requestsPayload['processed_posts'][intval($val)]);
+			}
+
+			if (
+				is_array($val)
+				&&
+				isset($val['attachment_id'])
+				&&
+				$val['attachment_id']
+				&&
+				isset(
+					$requestsPayload['processed_posts'][
+						intval($val['attachment_id'])
+					]
+				)
+			) {
+				$new_val = $val;
+
+				$new_val['attachment_id'] = intval($requestsPayload['processed_posts'][
+					intval($val['attachment_id'])
+				]);
+
+				$array[$key] = $new_val;
+			}
+		}
+
+		return $array;
 	}
 }
 

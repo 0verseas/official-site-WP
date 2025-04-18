@@ -535,6 +535,7 @@ class Event_Calendar extends Base {
 				'label'   => __( 'Number Of Events', 'happy-elementor-addons' ),
 				'type'    => Controls_Manager::NUMBER,
 				'min'     => 1,
+				'max'     => 2500,
 				'default' => 100,
 			]
 		);
@@ -1777,6 +1778,8 @@ class Event_Calendar extends Base {
 
 		$settings = $this->get_settings_for_display();
 
+		$time_format = get_option('time_format');
+
 		if ( $settings['event_calendar_type'] == 'google_calendar' ) {
 			$data = $this->get_google_calendar_events( $settings );
 		} elseif ( $settings['event_calendar_type'] == 'the_events_calendar' ) {
@@ -1799,14 +1802,16 @@ class Event_Calendar extends Base {
 				'data-locale'      => esc_attr( $local ),
 				'data-initialview' => esc_attr( $default_view ),
 				'data-firstday'    => $settings['event_calendar_first_day'],
-				'data-events'      => htmlspecialchars( json_encode( $data ), ENT_QUOTES, 'UTF-8' ),
+				// 'data-events'      => htmlspecialchars( json_encode( $data ), ENT_QUOTES, 'UTF-8' ),
 				'data-show-popup'  => ! empty( $settings['show_event_popup'] ) ? esc_attr( $settings['show_event_popup'] ) : '',
 				'data-allday-text' => ! empty( $settings['allday_text'] ) ? esc_html( $settings['allday_text'] ) : '',
+				'data-time-format' 	   => !empty ($time_format) ? $time_format : 'g:i a',
 			]
 		);
 
 		if ( $data ) :?>
 			<div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
+				<script> window['HaECjson<?php echo esc_html( $this->get_id() );?>'] = <?php echo json_encode( $data ); ?>; </script>
 				<div <?php $this->print_render_attribute_string( 'event-calendar' ); ?>></div>
 			</div>
 

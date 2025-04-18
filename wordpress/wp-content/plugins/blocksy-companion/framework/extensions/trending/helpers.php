@@ -34,7 +34,7 @@ if (! function_exists('blc_get_trending_posts_value')) {
 
 		$date_query = [];
 
-		$date_filter = get_theme_mod('trending_block_filter', 'all_time');
+		$date_filter = blocksy_get_theme_mod('trending_block_filter', 'all_time');
 
 		if ($date_filter && 'all_time' !== $date_filter) {
 			$days = [
@@ -64,13 +64,21 @@ if (! function_exists('blc_get_trending_posts_value')) {
 			);
 		}
 
-		$post_type = get_theme_mod('trending_block_post_type', 'post');
+		$post_type = blocksy_get_theme_mod('trending_block_post_type', 'post');
 
-		if ($post_type === 'product' && ! class_exists('WooCommerce')) {
+		if (
+			(
+				$post_type === 'product'
+				&&
+				! class_exists('WooCommerce')
+			)
+			||
+			! post_type_exists($post_type)
+		) {
 			$post_type = 'post';
 		}
 
-		$source = get_theme_mod('trending_block_post_source', 'categories');
+		$source = blocksy_get_theme_mod('trending_block_post_source', 'categories');
 
 		$query_args = [
 			'post_type' => $post_type,
@@ -82,6 +90,36 @@ if (! function_exists('blc_get_trending_posts_value')) {
 			'post_status' => 'publish'
 		];
 
+		if ($post_type === 'product') {
+			if (get_option('woocommerce_hide_out_of_stock_items') === 'yes') {
+				$query_args['meta_query'] = [
+					[
+						'key' => '_stock_status',
+						'value' => 'instock'
+					],
+					[
+						'key' => '_backorders',
+						'value' => 'no'
+					]
+				];
+			}
+
+			$trending_product_type = blocksy_get_theme_mod('trending_block_product_type', 'defualt');
+
+			if ($trending_product_type === 'sale') {
+				$query_args['post__in'] = wc_get_product_ids_on_sale();
+			}
+
+			if ($trending_product_type === 'best') {
+				$query_args['meta_key'] = 'total_sales';
+			}
+
+			if ($trending_product_type === 'rating') {
+				$query_args['meta_key'] = '_wc_average_rating';
+				$query_args['orderby'] = 'meta_value_num';
+				$query_args['order'] = 'DESC';
+			}
+		}
 
 		if ($source === 'categories') {
 			$query_args['date_query'] = $date_query;
@@ -91,7 +129,7 @@ if (! function_exists('blc_get_trending_posts_value')) {
 				$cat_option_id = 'trending_block_' . $post_type . '_taxonomy';
 			}
 
-			$cat_id = get_theme_mod($cat_option_id, 'all_categories');
+			$cat_id = blocksy_get_theme_mod($cat_option_id, 'all_categories');
 			$cat_id = (empty($cat_id) || 'all_categories' === $cat_id) ? '' : $cat_id;
 
 			if (! empty($cat_id)) {
@@ -110,7 +148,7 @@ if (! function_exists('blc_get_trending_posts_value')) {
 		}
 
 		if ($source === 'custom') {
-			$post_id = get_theme_mod('trending_block_post_id', '');
+			$post_id = blocksy_get_theme_mod('trending_block_post_id', '');
 
 			$query_args['orderby'] = 'post__in';
 			$query_args['post__in'] = ['__INEXISTING__'];
@@ -139,26 +177,119 @@ if (! function_exists('blc_get_trending_posts_value')) {
 		while ($query->have_posts()) {
 			$query->the_post();
 
+			$post_categories = get_the_category();
+
 			$individual_entry = [
 				'id' => get_the_ID(),
 				'attachment_id' => get_post_thumbnail_id(),
 				'title' => get_the_title(),
 				'url' => get_permalink(),
-				'image' => ''
+				'image' => '',
+				'taxonomy' => '',
+				'price' => ''
 			];
 
 			if (get_post_thumbnail_id()) {
-				$individual_entry['image'] = blc_call_fn(
-					['fn' => 'blocksy_image'],
+				$individual_entry['image'] = blocksy_media(
 					[
 						'attachment_id' => get_post_thumbnail_id(),
-						'size' => get_theme_mod(
+						'size' => blocksy_get_theme_mod(
 							'trending_block_thumbnails_size',
 							'thumbnail'
 						),
 						'ratio' => '1/1',
-						'tag_name' => 'div',
+						'tag_name' => 'a',
+						'html_atts' => [
+							'href' => esc_url(get_permalink()),
+						],
 					]
+				);
+			}
+
+			$show_taxonomy = blocksy_get_theme_mod('trending_block_show_taxonomy', 'no') === 'yes';
+			$taxonomy_style = blocksy_get_theme_mod('trending_block_taxonomy_style', 'simple');
+			$taxonomy_opt = blocksy_get_taxonomies_for_cpt(
+				$post_type,
+				['return_empty' => true]
+			);
+
+			$taxonomies_to_render = [];
+
+			if (
+				$show_taxonomy
+				&&
+				! empty($taxonomy_opt)
+			) {
+				$taxonomy_option_id = 'trending_block_show_' . $post_type . '_taxonomy';
+
+				$taxonomy_to_show = blocksy_get_theme_mod(
+					$taxonomy_option_id,
+					$post_type === 'product' ? 'product_cat' : array_keys($taxonomy_opt)[0]
+				);
+
+				$taxonomy_values = get_the_terms(get_the_ID(), $taxonomy_to_show);
+
+				if (
+					$taxonomy_values
+					&&
+					is_array($taxonomy_values)
+				) {
+					foreach ($taxonomy_values as $tax) {						
+						$taxonomies_to_render[] = blocksy_html_tag(
+							'a',
+							[
+								'href' => get_term_link($tax),
+								'class' => 'ct-post-taxonomy',
+							],
+							$tax->name
+						);
+					}
+	
+					if (! empty($taxonomies_to_render)) {
+
+						$divider = '';
+
+						if ($taxonomy_style === 'simple') {
+							$divider = ', ';
+						}
+
+						if ($taxonomy_style === 'underline') {
+							$divider = ' / ';
+						}
+
+						$individual_entry['taxonomy'] = blocksy_html_tag(
+							'ul',
+							[
+								'class' => 'entry-meta'
+							],
+							blocksy_html_tag(
+								'li',
+								[
+									'class' => 'meta-categories',
+									'data-type' => $taxonomy_style
+								],
+								implode($divider, $taxonomies_to_render)
+							)
+						);
+					}
+				}
+			}
+
+			$trending_block_show_price = blocksy_get_theme_mod('trending_block_show_price', 'no') === 'yes';
+
+			if (
+				$trending_block_show_price
+				&&
+				$post_type === 'product'
+			) {
+				$product = wc_get_product(get_the_ID());
+
+				$individual_entry['price'] = blocksy_html_tag(
+					'span',
+					[
+						'class' => 'price'
+					],
+					$product->get_price_html()
 				);
 			}
 
@@ -197,9 +328,8 @@ function blc_get_trending_block($result = null) {
 
 	$class = 'ct-trending-block';
 
-	$class .= ' ' . blc_call_fn(
-		['fn' => 'blocksy_visibility_classes'],
-		get_theme_mod('trending_block_visibility', [
+	$class .= ' ' . blocksy_visibility_classes(
+		blocksy_get_theme_mod('trending_block_visibility', [
 			'desktop' => true,
 			'tablet' => true,
 			'mobile' => false,
@@ -212,30 +342,66 @@ function blc_get_trending_block($result = null) {
 
 	if (is_customize_preview()) {
 		$attr['data-shortcut'] = 'border';
-		$attr['data-location'] = 'trending_posts_ext';
+		$attr['data-shortcut-location'] = 'trending_posts_ext';
 	}
 
-	$label_tag = get_theme_mod('trending_block_label_tag', 'h3');
+	$label_tag = blocksy_get_theme_mod('trending_block_label_tag', 'h3');
 
-	$trending_label = get_theme_mod(
+	$trending_label = blocksy_get_theme_mod(
 		'trending_block_label',
 		__('Trending now', 'blocksy-companion')
 	);
+
+	$icon = '<svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><path d="M13 5.8V9c0 .4-.2.6-.5.6s-.5-.2-.5-.5V7.2l-4.3 4.2c-.2.2-.6.2-.8 0L4.6 9.1.9 12.8c-.1.1-.2.2-.4.2s-.3-.1-.4-.2c-.2-.2-.2-.6 0-.8l4.1-4.1c.2-.2.6-.2.8 0l2.3 2.3 3.8-3.8H9.2c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h3.4c.2 0 .3.1.4.2v.2z"/></svg>';
+
+	if (function_exists('blc_get_icon')) {
+		$icon_source = blocksy_get_theme_mod('trending_block_icon_source', 'default');
+
+		if ($icon_source === 'custom') {
+			$icon = blc_get_icon([
+				'icon_descriptor' => blocksy_get_theme_mod('trending_block_custom_icon', [
+					'icon' => 'fas fa-fire',
+				]),
+				'icon_container' => false,
+				'icon_html_atts' => [
+					'width' => '13',
+					'height' => '13',
+					'fill' => 'currentColor'
+				]
+			]);
+		}
+	}
 
 	?>
 
 	<section <?php echo blocksy_attr_to_html($attr) ?>>
 		<div class="ct-container" <?php echo $data_page ?>>
-			<<?php echo $label_tag ?> class="ct-block-title">
-				<?php echo $trending_label ?>
 
-				<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+			<<?php echo $label_tag ?> class="ct-module-title">
+				<?php 
+					echo $trending_label;
 
+					/**
+					 * Note to code reviewers: This line doesn't need to be escaped.
+					 * The value used here escapes the value properly.
+					 * It contains an inline SVG, which is safe.
+					 */
+					echo $icon;
+				?>
+				
 				<?php if (! $result['is_last_page']) { ?>
-					<span class="ct-arrow-left">
-					</span>
+					<span class="ct-slider-arrows">
+						<span class="ct-arrow-prev">
+							<svg width="8" height="8" fill="currentColor" viewBox="0 0 8 8">
+								<path d="M5.05555,8L1.05555,4,5.05555,0l.58667,1.12-2.88,2.88,2.88,2.88-.58667,1.12Z"/>
+							</svg>
+						</span>
 
-					<span class="ct-arrow-right">
+						<span class="ct-arrow-next">
+							<svg width="8" height="8" fill="currentColor" viewBox="0 0 8 8">
+								<path d="M2.35778,6.88l2.88-2.88L2.35778,1.12,2.94445,0l4,4-4,4-.58667-1.12Z"/>
+							</svg>
+						</span>
 					</span>
 				<?php } ?>
 			</<?php echo $label_tag ?>>
@@ -243,21 +409,29 @@ function blc_get_trending_block($result = null) {
 			<?php
 				foreach ($result['posts'] as $post) {
 					echo blocksy_html_tag(
-						'a',
+						'div',
 						[
-							'href' => $post['url'],
+							'class' => 'ct-trending-block-item'
 						],
-
-						$post['image'] . blocksy_html_tag(
-							'span',
+						$post['image'] .
+						blocksy_html_tag(
+							'div',
 							[
-								'class' => 'ct-item-title',
+								'class' => 'ct-trending-block-item-content'
 							],
-							$post['title']
+							$post['taxonomy'] .
+							blocksy_html_tag(
+								'a',
+								[
+									'href' => $post['url'],
+									'class' => 'ct-post-title',
+								],
+								$post['title']
+							) .
+							$post['price']
 						)
 					);
 				}
-
 			?>
 
 		</div>

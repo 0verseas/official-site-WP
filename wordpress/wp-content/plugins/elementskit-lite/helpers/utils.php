@@ -141,15 +141,34 @@ class Utils {
 			),
 			'strike'                        => array(),
 			'br'                            => array(),
-			'table'                         => array(),
-			'thead'                         => array(),
-			'tbody'                         => array(),
-			'tfoot'                         => array(),
-			'tr'                            => array(),
-			'th'                            => array(),
-			'td'                            => array(),
-			'colgroup'                      => array(),
-			'col'                           => array(),
+			'table'  => array(),
+			'thead'  => array(),
+			'tbody'  => array(),
+			'tfoot'  => array(),
+			'tr'     => array(),
+			'th'     => array(
+				'class'   => true,
+				'colspan' => true,
+				'rowspan' => true,
+				'style'   => true,
+				'id' 	=> true,
+			),
+			'td'     => array(
+				'class'   => true,
+				'colspan' => true,
+				'rowspan' => true,
+				'style'   => true,
+				'id' 	=> true,
+			),
+			'caption'=> array(),
+			'col'    => array(
+				'span'    => true,
+				'style'   => true,
+			),
+			'colgroup' => array(
+				'span'    => true,
+				'style'   => true,
+			),
 			'strong'                        => array(),
 			'data-wow-duration'             => array(),
 			'data-wow-delay'                => array(),
@@ -348,10 +367,16 @@ class Utils {
 		$size = $image_size_key;
 
 		$html = '';
-		if ( ! empty( $image['id'] ) && $image['id'] != '-1' ) {
+		if ( ! empty( $image['id'] ) && $image['id'] != '-1' && get_post($image['id'])) {
 			$html .= wp_get_attachment_image( $image['id'], $size, false, $image_attr );
 		} else {
-			$html .= sprintf( '<img src="%s" title="%s" alt="%s" />', esc_attr( $image['url'] ), \Elementor\Control_Media::get_image_title( $image ), \Elementor\Control_Media::get_image_alt( $image ) );
+			$html .= sprintf(
+				'<img src="%s" title="%s" alt="%s" class="%s" />',
+				esc_attr($image['url']),
+				\Elementor\Control_Media::get_image_title($image),
+				\Elementor\Control_Media::get_image_alt($image),
+				(isset($image_attr['class']) ? esc_attr($image_attr['class']) : '')
+			);
 		}
 
 		$html = preg_replace( array( '/max-width:[^"]*;/', '/width:[^"]*;/', '/height:[^"]*;/' ), '', $html );
@@ -360,7 +385,7 @@ class Utils {
 	}
 
 	public static function swiper_class() {
-		return \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
+		return 'ekit-main-swiper swiper';
 	}
 
 	public static function get_page_by_title( $page_title, $post_type = 'page' ) {
@@ -378,5 +403,9 @@ class Utils {
 		}
 
 		return $page_got_by_title;
+	}
+
+	public static function remove_special_chars($string) {
+		return preg_replace('/[^A-Za-z0-9 ]/', '', $string);
 	}
 }

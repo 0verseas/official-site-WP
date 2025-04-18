@@ -6,8 +6,9 @@
 		opacity: 0.3;
 	}
 
-	.ct-image-container {
+	.ct-media-container {
 		display: flex;
+		border-radius: var(--border-radius);
 	}
 }
 
@@ -17,7 +18,6 @@
 .ct-stacked-gallery {
 
 	.product-entry-wrapper {
-		// position: relative;
 
 		@include media-breakpoint-up (lg) {
 			display: flex;
@@ -40,7 +40,7 @@
 		}
 
 		@include media-breakpoint-up (lg) {
-			padding-left: 40px;
+			margin-inline-start: 40px;
 			width: calc( 100% - var(--product-gallery-width, 50%) );
 		}
 	}

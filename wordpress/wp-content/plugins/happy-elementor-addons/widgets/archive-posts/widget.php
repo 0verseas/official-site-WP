@@ -55,6 +55,10 @@ class Archive_Posts extends Base {
         return ['archive posts', 'posts', 'post', 'recent post'];
     }
 
+	public function get_categories() {
+        return [ 'happy_addons_category', 'happy_addons_theme_builder' ];
+    }
+
     public function add_to_avoid_list($ids) {
         $this->display_ids = array_unique(array_merge($this->display_ids, $ids));
     }
@@ -655,7 +659,7 @@ class Archive_Posts extends Base {
                 ],
             ]
         );
-        
+
         $this->add_control(
             'image_align',
             [
@@ -902,7 +906,7 @@ class Archive_Posts extends Base {
         $this->start_controls_tabs(
             'pagination_color_tabs'
         );
-        
+
         $this->start_controls_tab(
             'pagination_normal_color_tab',
             [
@@ -920,7 +924,7 @@ class Archive_Posts extends Base {
 				],
 			]
 		);
-        
+
         $this->end_controls_tab();
 
         $this->start_controls_tab(
@@ -940,7 +944,7 @@ class Archive_Posts extends Base {
 				],
 			]
 		);
-        
+
         $this->end_controls_tab();
 
         $this->start_controls_tab(
@@ -960,9 +964,9 @@ class Archive_Posts extends Base {
 				],
 			]
 		);
-        
+
         $this->end_controls_tab();
-        
+
         $this->end_controls_tabs();
 
         $this->add_control(

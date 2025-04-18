@@ -80,7 +80,6 @@ if (! function_exists('blocksy_main_menu_fallback')) {
 							'aria-label' => __('Expand dropdown menu', 'blocksy'),
 							'aria-haspopup' => 'true',
 							'aria-expanded' => 'false',
-							'role' => 'menuitem'
 						],
 						''
 					);
@@ -242,7 +241,6 @@ if (! function_exists('blocksy_handle_nav_menu_start_el')) {
 						'aria-label' => __('Expand dropdown menu', 'blocksy'),
 						'aria-haspopup' => 'true',
 						'aria-expanded' => 'false',
-						'role' => 'menuitem'
 					],
 					$toggle_ghost_content
 				);
@@ -312,28 +310,26 @@ add_filter(
 			return $css_class;
 		}
 
-		$css_class[] = 'animated-submenu';
+		if (
+			isset($args['blocksy_always_inline'])
+			&&
+			$args['blocksy_always_inline']
+		) {
+			$css_class[] = 'animated-submenu-inline';
+		} else {
+			if ($depth === 0) {
+				$css_class[] = 'animated-submenu-block';
+			}
+
+			if ($depth > 0) {
+				$css_class[] = 'animated-submenu-inline';
+			}
+		}
 
 		return $css_class;
 	},
 	10, 5
 );
-
-add_filter('wp_nav_menu_items', function ($item_output, $args) {
-	if (
-		! isset($args->blocksy_advanced_item)
-		||
-		! $args->blocksy_advanced_item
-	) {
-		return $item_output;
-	}
-
-	return preg_replace(
-		'/(<li\b[^><]*)>/i',
-		'$1 role="none">',
-		$item_output
-	);
-}, 10, 2);
 
 add_filter(
 	'nav_menu_css_class',
@@ -357,47 +353,40 @@ add_filter(
 		}
 
 		if (
-			apply_filters('blocksy:menu:has_animated_submenu', true, $item, $args)
-			||
-			$depth === 0
+			(
+				apply_filters('blocksy:menu:has_animated_submenu', true, $item, $args)
+				||
+				$depth === 0
+			)
+			&&
+			(
+				! isset($args->blocksy_ajax_submenu)
+				||
+				! $args->blocksy_ajax_submenu
+			)
 		) {
-			$classes[] = 'animated-submenu';
+
+			if (
+				isset($args->blocksy_always_inline)
+				&&
+				$args->blocksy_always_inline
+			) {
+				$classes[] = 'animated-submenu-inline';
+			} else {
+				if ($depth === 0) {
+					$classes[] = 'animated-submenu-block';
+				}
+
+				if ($depth > 0) {
+					$classes[] = 'animated-submenu-inline';
+				}
+			}
 		}
 
 		return $classes;
 	},
 	50, 4
 );
-
-add_filter('wp_nav_menu', function ($nav_menu, $args) {
-	if (
-		! isset($args->blocksy_advanced_item)
-		||
-		! $args->blocksy_advanced_item
-	) {
-		return $nav_menu;
-	}
-
-	$nav_menu = str_replace(
-		'class="sub-menu"',
-		'class="sub-menu" role="menu"',
-		$nav_menu
-	);
-
-	$nav_menu = str_replace(
-		'class="menu"',
-		'class="menu" role="menubar"',
-		$nav_menu
-	);
-
-	$nav_menu = preg_replace(
-		'/(<ul\b[^><]*) class="">/i',
-		'$1 role="menubar">',
-		$nav_menu
-	);
-
-	return $nav_menu;
-}, 10, 2);
 
 add_filter(
 	'nav_menu_link_attributes',
@@ -427,8 +416,6 @@ add_filter(
 		$attr['class'] .= ' ' . $class;
 
 		$attr['class'] = trim($attr['class']);
-
-		$attr['role'] = 'menuitem';
 
 		if (isset($args->skip_ghost)) {
 			$item_classes = '';

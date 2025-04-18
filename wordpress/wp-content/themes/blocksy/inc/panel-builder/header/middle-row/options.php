@@ -16,7 +16,7 @@ if (empty($default_background)) {
 	$default_background = blocksy_background_default_value([
 		'backgroundColor' => [
 			'default' => [
-				'color' => 'var(--paletteColor8)',
+				'color' => 'var(--theme-palette-color-8)',
 			],
 		],
 	]);
@@ -109,6 +109,29 @@ $options = [
 				],
 			],
 
+			blocksy_rand_md5() => [
+				'type' => 'ct-condition',
+				'condition' => [ 'wp_customizer_current_view' => 'tablet|mobile' ],
+				'options' => [
+					'headerRowVisibility' => [
+						'label' => __( 'Row Visibility', 'blocksy' ),
+						'type' => 'ct-visibility',
+						'design' => 'block',
+						'divider' => 'top:full',
+						'allow_empty' => true,
+						'value' => blocksy_default_responsive_value([
+							'tablet' => true,
+							'mobile' => true,
+						]),
+						'choices' => blocksy_ordered_keys([
+							'tablet' => __( 'Tablet', 'blocksy' ),
+							'mobile' => __( 'Mobile', 'blocksy' ),
+						]),
+						'setting' => [ 'transport' => 'postMessage' ],
+					],
+				],
+			],
+
 		],
 	],
 
@@ -180,6 +203,73 @@ $options = [
 
 				],
 			],
+
+			blocksy_rand_md5() => [
+				'type' => 'ct-divider',
+			],
+
+			blocksy_rand_md5() => [
+				'type' => 'ct-labeled-group',
+				'label' => __( 'Backdrop Blur', 'blocksy' ),
+				'responsive' => true,
+				'choices' => [
+					[
+						'id' => 'headerRowBlur',
+						'label' => __('Default State', 'blocksy')
+					],
+
+					[
+						'id' => 'transparentHeaderRowBlur',
+						'label' => __('Transparent State', 'blocksy'),
+						'condition' => [
+							'builderSettings/has_transparent_header' => 'yes',
+						],
+					],
+
+					[
+						'id' => 'stickyHeaderRowBlur',
+						'label' => __('Sticky State', 'blocksy'),
+						'condition' => [
+							'builderSettings/has_sticky_header' => 'yes',
+						],
+					],
+				],
+				'options' => [
+
+					'headerRowBlur' => [
+						'label' => __( 'Backdrop Blur', 'blocksy' ),
+						'type' => 'ct-number',
+						'design' => 'block:right',
+						'value' => 0,
+						'min' => 0,
+						'max' => 100,
+						'responsive' => true,
+					],
+
+					'transparentHeaderRowBlur' => [
+						'label' => __( 'Backdrop Blur', 'blocksy' ),
+						'type' => 'ct-number',
+						'design' => 'block:right',
+						'value' => 0,
+						'min' => 0,
+						'max' => 100,
+						'responsive' => true,
+					],
+
+					'stickyHeaderRowBlur' => [
+						'label' => __( 'Backdrop Blur', 'blocksy' ),
+						'type' => 'ct-number',
+						'design' => 'block:right',
+						'value' => 0,
+						'min' => 0,
+						'max' => 100,
+						'responsive' => true,
+					],
+
+				],
+			],
+
+
 
 			blocksy_rand_md5() => [
 				'type' => 'ct-divider',
@@ -492,9 +582,8 @@ $options = [
 						'type' => 'ct-spacing',
 						'sync' => 'live',
 						'divider' => 'top: full',
-						'value' => blocksy_spacing_value([
-							'linked' => true,
-						]),
+						'value' => blocksy_spacing_value(),
+						'min' => 0,
 						'responsive' => true
 					],
 				],

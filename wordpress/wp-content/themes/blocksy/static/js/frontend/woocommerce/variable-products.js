@@ -1,9 +1,9 @@
 import $ from 'jquery'
 import ctEvents from 'ct-events'
 
-let originalImageUpdate = null
+import cachedFetch from 'ct-wordpress-helpers/cached-fetch'
 
-const store = {}
+let originalImageUpdate = null
 
 function isTouchDevice() {
 	try {
@@ -14,25 +14,16 @@ function isTouchDevice() {
 	}
 }
 
-const cachedFetch = (url) =>
-	store[url]
-		? new Promise((resolve) => {
-				resolve(store[url])
-				store[url] = store[url].clone()
-		  })
-		: new Promise((resolve) =>
-				fetch(url).then((response) => {
-					resolve(response)
-					store[url] = response.clone()
-				})
-		  )
-
 const makeUrlFor = ({ variation, productId, isQuickView }) => {
 	let url = new URL(ct_localizations.ajax_url)
 	let params = new URLSearchParams(url.search.slice(1))
 
 	params.append('action', 'blocksy_get_product_view_for_variation')
-	params.append('variation_id', variation.variation_id)
+
+	if (variation) {
+		params.append('variation_id', variation.variation_id)
+	}
+
 	params.append('product_id', productId)
 	params.append('is_quick_view', isQuickView)
 
@@ -49,7 +40,8 @@ const replaceFirstImage = ({ container, image }) => {
 	const containersToReplace = []
 
 	const selectorsToTry = [
-		'.woocommerce-product-gallery > .ct-image-container',
+		'.woocommerce-product-gallery .ct-product-gallery-container > .ct-media-container',
+		'.woocommerce-product-gallery .ct-stacked-gallery-container > .ct-media-container:first-child',
 		'.woocommerce-product-gallery .flexy-items > *:first-child > *',
 		'.woocommerce-product-gallery .flexy-pills > ol > *:first-child > *',
 	]
@@ -65,6 +57,10 @@ const replaceFirstImage = ({ container, image }) => {
 	containersToReplace.map((imgContainer) => {
 		if (imgContainer.href) {
 			imgContainer.href = image.full_src
+		}
+
+		if (imgContainer.dataset.src) {
+			imgContainer.dataset.src = image.full_src
 		}
 
 		if (imgContainer.dataset.height) {
@@ -103,7 +99,8 @@ const replaceFirstImage = ({ container, image }) => {
 				? image.gallery_thumbnail_src
 				: image.src
 
-			if (image.srcset && img.srcset && image.srcset !== 'false') {
+			// if (image.srcset && img.srcset && image.srcset !== 'false') {
+			if (image.srcset && image.srcset !== 'false') {
 				img.srcset = image.srcset
 			} else {
 				img.removeAttribute('srcset')
@@ -158,11 +155,25 @@ const performInPlaceUpdate = ({
 	nextVariationObj,
 }) => {
 	const currentImage = currentVariationObj
-		? { id: currentVariationObj.image_id, ...currentVariationObj.image }
+		? {
+				id: currentVariationObj.image_id,
+				...(currentVariationObj.image?.src
+					? { ...currentVariationObj.image }
+					: {
+							...currentVariationObj.blocksy_original_image,
+					  }),
+		  }
 		: (nextVariationObj || {}).blocksy_original_image
 
 	const nextImage = nextVariationObj
-		? { id: nextVariationObj.image_id, ...nextVariationObj.image }
+		? {
+				id: nextVariationObj.image_id,
+				...(nextVariationObj.image?.src
+					? { ...nextVariationObj.image }
+					: {
+							...nextVariationObj.blocksy_original_image,
+					  }),
+		  }
 		: (currentVariationObj || {}).blocksy_original_image
 
 	if (!nextImage) {
@@ -249,13 +260,18 @@ export const mount = (el) => {
 
 	originalImageUpdate = $.fn.wc_variations_image_update
 
+	// TODO: Attempt to rely only on found_variation event that woo triggers
 	$.fn.wc_variations_image_update = function (variation) {
 		const currentElement = this[0]
 
 		if (
 			currentElement.closest('.woobt-products') ||
 			currentElement.closest('.upsells') ||
-			currentElement.closest('.related')
+			currentElement.closest('.related') ||
+			!el.closest('.product') ||
+			!el
+				.closest('.product')
+				.querySelector('.woocommerce-product-gallery')
 		) {
 			return
 		}
@@ -286,20 +302,21 @@ export const mount = (el) => {
 		let currentVariationObj = false
 
 		if (allVariations) {
-			nextVariationObj = variation.variation_id
-				? allVariations.find(
-						({ variation_id }) =>
-							parseInt(variation_id) ===
-							parseInt(variation.variation_id)
-				  )
-				: false
-			currentVariationObj = currentVariation.dataset.currentVariation
-				? allVariations.find(
-						({ variation_id }) =>
-							parseInt(variation_id) ===
-							parseInt(currentVariation.dataset.currentVariation)
-				  )
-				: false
+			if (variation.variation_id) {
+				nextVariationObj = allVariations.find(
+					({ variation_id }) =>
+						parseInt(variation_id) ===
+						parseInt(variation.variation_id)
+				)
+			}
+
+			if (currentVariation.dataset.currentVariation) {
+				currentVariationObj = allVariations.find(
+					({ variation_id }) =>
+						parseInt(variation_id) ===
+						parseInt(currentVariation.dataset.currentVariation)
+				)
+			}
 		}
 
 		let defaultCanDoInPlaceUpdate = '__DEFAULT__'
@@ -351,12 +368,14 @@ export const mount = (el) => {
 				  })
 				: defaultCanDoInPlaceUpdate
 
+		// TODO: add better check for in place update
 		if (canDoInPlaceUpdate) {
 			performInPlaceUpdate({
 				container: currentVariation,
 				nextVariationObj,
 				currentVariationObj,
 			})
+
 			return
 		}
 
@@ -366,7 +385,7 @@ export const mount = (el) => {
 			;[...div.firstElementChild.children].map((el, index) => {
 				if (
 					!el.matches(
-						'.flexy-container, .ct-image-container, .ct-before-gallery'
+						'.flexy-container, .ct-product-gallery-container'
 					)
 				) {
 					el.remove()
@@ -374,7 +393,11 @@ export const mount = (el) => {
 			})
 			let didInsert = false
 			;[...currentVariation.children].map((el, index) => {
-				if (el.matches('.flexy-container, .ct-image-container')) {
+				if (
+					el.matches(
+						'.flexy-container, .ct-product-gallery-container'
+					)
+				) {
 					if (!didInsert) {
 						didInsert = true
 						el.insertAdjacentHTML(
@@ -386,7 +409,7 @@ export const mount = (el) => {
 
 				if (
 					el.matches(
-						'.flexy-container, .ct-image-container, .ct-before-gallery'
+						'.flexy-container, .ct-product-gallery-container'
 					)
 				) {
 					el.remove()
@@ -406,7 +429,7 @@ export const mount = (el) => {
 			setTimeout(() => {
 				ctEvents.trigger('blocksy:frontend:init')
 				currentVariation.removeAttribute('data-state')
-			})
+			}, 10)
 		}
 
 		if (variation.blocksy_gallery_html) {
@@ -414,6 +437,7 @@ export const mount = (el) => {
 				variation.blocksy_gallery_html,
 				variation.blocksy_gallery_style
 			)
+
 			return
 		}
 
@@ -422,31 +446,12 @@ export const mount = (el) => {
 			currentVariation.dataset.state = 'loading'
 		})
 
-		let maybeLoadedVariation = allVariations
-			? allVariations.find(
-					(nestedVariation) =>
-						store[
-							makeUrlFor({
-								variation: nestedVariation,
-								productId,
-								isQuickView,
-							})
-						] &&
-						nestedVariation.image_id === variation.image_id &&
-						variation.blocksy_gallery_source === 'default' &&
-						nestedVariation.blocksy_gallery_source === 'default'
-			  )
-			: null
-
 		cachedFetch(
 			makeUrlFor({
-				variation: maybeLoadedVariation || variation,
+				variation,
 				productId,
 				isQuickView,
-			}),
-			{
-				method: 'POST',
-			}
+			})
 		)
 			.then((response) => response.json())
 			.then(({ success, data }) => {

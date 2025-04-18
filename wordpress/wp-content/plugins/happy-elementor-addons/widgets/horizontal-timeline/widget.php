@@ -12,9 +12,9 @@ use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
-use Elementor\Core\Schemes\Typography;
 use Elementor\Utils;
 use Elementor\Group_Control_Image_Size;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 
 defined( 'ABSPATH' ) || die();
 
@@ -45,6 +45,10 @@ class Horizontal_Timeline extends Base {
 
 	public function get_keywords() {
 		return [ 'horizontal', 'timeline', 'slider', 'carousel', 'scroll' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	/**
@@ -450,6 +454,23 @@ class Horizontal_Timeline extends Base {
 		);
 
 		$this->add_control(
+			'slides_to_scroll',
+			[
+				'label' => __( 'Scroll As Shown Slides', 'happy-elementor-addons' ),
+				'type' => Controls_Manager::SWITCHER,
+				'description' => __( 'Scroll slide number will be same as Slides To Show.', 'happy-elementor-addons' ),
+				'label_on' => __( 'Yes', 'happy-elementor-addons' ),
+				'label_off' => __( 'No', 'happy-elementor-addons' ),
+				'return_value' => 'yes',
+				'frontend_available' => true,
+				'render_type' => 'ui',
+				'condition' => [
+					'slides_to_show!' => '1'
+				],
+			]
+		);
+
+		$this->add_control(
 			'arrow_prev_icon',
 			[
 				'label' => __( 'Previous Icon', 'happy-elementor-addons' ),
@@ -569,7 +590,9 @@ class Horizontal_Timeline extends Base {
 				'name' => 'date_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-horizontal-timeline-date',
-				'scheme' => Typography::TYPOGRAPHY_3
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 
@@ -1043,7 +1066,9 @@ class Horizontal_Timeline extends Base {
 				'name' => 'title_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-horizontal-timeline-title',
-				'scheme' => Typography::TYPOGRAPHY_2
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -1098,7 +1123,9 @@ class Horizontal_Timeline extends Base {
 				'name' => 'subtitle_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-horizontal-timeline-subtitle',
-				'scheme' => Typography::TYPOGRAPHY_3
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 
@@ -1128,7 +1155,9 @@ class Horizontal_Timeline extends Base {
 				'name' => 'description_typography',
 				'label' => __( 'Typography', 'happy-elementor-addons' ),
 				'selector' => '{{WRAPPER}} .ha-horizontal-timeline-description',
-				'scheme' => Typography::TYPOGRAPHY_3
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 
@@ -1161,7 +1190,7 @@ class Horizontal_Timeline extends Base {
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 
 			<?php foreach ( $settings['timeline'] as $timeline ) : ?>
-				<div class="ha-horizontal-timeline-block elementor-repeater-item-<?php echo $timeline['_id']; ?>">
+				<div class="ha-horizontal-timeline-block elementor-repeater-item-<?php echo esc_attr( $timeline['_id'] ); ?>">
 					<div class="ha-horizontal-timeline-icon-box">
 
 						<span class="ha-horizontal-timeline-date"><?php echo esc_html( $timeline['event_date'] ); ?></span>
@@ -1207,7 +1236,7 @@ class Horizontal_Timeline extends Base {
 									}
 									$this->remove_render_attribute( 'event_link');
 								}else{
-								
+
 									if ( $timeline['event_title'] ) {
 										printf( '<%1$s class="ha-horizontal-timeline-title">%2$s</%1$s>',
 											ha_escape_tags( $settings['title_tag'], 'h2' ),
@@ -1215,7 +1244,7 @@ class Horizontal_Timeline extends Base {
 										);
 									}
 							}
-							
+
 							?>
 
 							<?php if ( !empty( $timeline['event_subtitle'] ) ) : ?>

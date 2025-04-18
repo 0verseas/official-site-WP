@@ -2,10 +2,17 @@
 
 $maybe_taxonomy = blocksy_maybe_get_matching_taxonomy($post_type->name, false);
 
+if (! isset($has_post_elements)) {
+	$has_post_elements = true;
+}
+
 $options = [
 	[
 		'post_title_panel' => [
-			'label' => __( 'Post Title', 'blocksy' ),
+			'label' => blocksy_safe_sprintf(
+				__('%s Title', 'blocksy'),
+				$post_type->labels->singular_name
+			),
 			'type' => 'ct-panel',
 			'wrapperAttr' => [ 'data-label' => 'heading-label' ],
 			'setting' => [ 'transport' => 'postMessage' ],
@@ -14,7 +21,11 @@ $options = [
 				blocksy_get_options('general/page-title', [
 					'is_cpt' => $post_type->name . '_single',
 					'has_default' => true,
-					'is_single' => true
+					'is_single' => true,
+					'enabled_label' => blocksy_safe_sprintf(
+						__('%s Title', 'blocksy'),
+						$post_type->labels->singular_name
+					)
 				]),
 
 			]
@@ -22,7 +33,10 @@ $options = [
 
 		blocksy_rand_md5() => [
 			'type' => 'ct-title',
-			'label' => __( 'Post Structure', 'blocksy' ),
+			'label' => blocksy_safe_sprintf(
+				__('%s Structure', 'blocksy'),
+				$post_type->labels->singular_name
+			)
 		],
 
 		blocksy_rand_md5() => [
@@ -127,24 +141,25 @@ $options = [
 							'design' => 'block',
 							'disableRevertButton' => true,
 							'attr' => [ 'data-type' => 'content-spacing' ],
+							'choice_attr' => [ 'data-tooltip-reveal' => 'top' ],
 							'setting' => [ 'transport' => 'postMessage' ],
 							'choices' => [
 								'both'   => '<span></span>
-								<i class="ct-tooltip-top">' . __( 'Top & Bottom', 'blocksy' ) . '</i>',
+								<i class="ct-tooltip">' . __( 'Top & Bottom', 'blocksy' ) . '</i>',
 
 								'top'    => '<span></span>
-								<i class="ct-tooltip-top">' . __( 'Only Top', 'blocksy' ) . '</i>',
+								<i class="ct-tooltip">' . __( 'Only Top', 'blocksy' ) . '</i>',
 
 								'bottom' => '<span></span>
-								<i class="ct-tooltip-top">' . __( 'Only Bottom', 'blocksy' ) . '</i>',
+								<i class="ct-tooltip">' . __( 'Only Bottom', 'blocksy' ) . '</i>',
 
 								'none'   => '<span></span>
-								<i class="ct-tooltip-top">' . __( 'Disabled', 'blocksy' ) . '</i>',
+								<i class="ct-tooltip">' . __( 'Disabled', 'blocksy' ) . '</i>',
 							],
-							'desc' => sprintf(
+							'desc' => blocksy_safe_sprintf(
 								// translators: placeholder here means the actual URL.
 								__( 'You can customize the global spacing value in General ➝ Layout ➝ %sContent Area Spacing%s.', 'blocksy' ),
-								sprintf(
+								blocksy_safe_sprintf(
 									'<a data-trigger-section="general" href="%s">',
 									admin_url('/customize.php?autofocus[section]=general&ct_autofocus=general:layout_panel')
 								),
@@ -161,10 +176,16 @@ $options = [
 			'title' => __('Design', 'blocksy'),
 			'type' => 'tab',
 			'options' => [
-				blocksy_get_options('single-elements/structure-design')
+				blocksy_get_options('single-elements/structure-design', [
+					'options_conditions' => [
+						'content_style_source' => 'custom'
+					]
+				])
 			],
-		],
+		]
+	],
 
+	$has_post_elements ? [
 		blocksy_rand_md5() => [
 			'type' => 'ct-title',
 			'label' => __( 'Post Elements', 'blocksy' ),
@@ -174,12 +195,12 @@ $options = [
 			'label' => __( 'Disable Featured Image', 'blocksy' ),
 			'type' => 'ct-switch',
 			'value' => 'no',
-		],
-	],
+		]
+	] : [],
 
-	$maybe_taxonomy ? [
+	$has_post_elements && $maybe_taxonomy ? [
 		'disable_post_tags' => [
-			'label' => sprintf(
+			'label' => blocksy_safe_sprintf(
 				__('Disable %s %s', 'blocksy'),
 				$post_type->labels->singular_name,
 				get_taxonomy($maybe_taxonomy)->label
@@ -189,7 +210,7 @@ $options = [
 		],
 	] : [],
 
-	[
+	$has_post_elements ? [
 		'disable_share_box' => [
 			'label' => __( 'Disable Share Box', 'blocksy' ),
 			'type' => 'ct-switch',
@@ -230,12 +251,12 @@ $options = [
 			'type' => 'ct-switch',
 			'value' => 'no',
 		],
-	],
+	] : [],
 
-	apply_filters(
+	$has_post_elements ? apply_filters(
 		'blocksy_extensions_metabox_post_bottom',
 		[]
-	),
+	) : [],
 ];
 
 

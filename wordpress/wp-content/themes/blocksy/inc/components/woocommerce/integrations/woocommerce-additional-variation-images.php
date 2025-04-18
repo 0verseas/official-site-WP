@@ -23,26 +23,28 @@ add_filter(
 			return $result;
 		}
 
-		$variation_values = get_post_meta(
-			$variation->get_id(),
-			'blocksy_post_meta_options'
+		$variation_values = blocksy_get_post_options(
+			blocksy_translate_post_id(
+				$variation->get_id(),
+				[
+					'use_wpml_default_language_woo' => true
+				]
+			)
 		);
-
-		if (empty($variation_values)) {
-			$variation_values = [[]];
-		}
-
-		if (! $variation_values[0]) {
-			$variation_values[0] = [];
-		}
-
-		$variation_values = $variation_values[0];
 
 		$original_image = wc_get_product_attachment_props(
 			$product->get_image_id()
 		);
 
 		$original_image['id'] = $product->get_image_id();
+
+		if (
+			! isset($original_image['url'])
+			||
+			empty($original_image['url'])
+		) {
+			$original_image['src'] = wc_placeholder_img_src('full');
+		}
 
 		$result['blocksy_original_image'] = $original_image;
 
@@ -77,7 +79,7 @@ add_filter(
 
 			$blocksy_current_variation = null;
 
-			if (get_theme_mod('gallery_style', 'horizontal') === 'vertical') {
+			if (blocksy_get_theme_mod('gallery_style', 'horizontal') === 'vertical') {
 				$result['blocksy_gallery_style'] =  'thumbs-left';
 			} else {
 				$result['blocksy_gallery_style'] =  'thumbs-bottom';
@@ -113,9 +115,50 @@ function blocksy_get_product_view_for_variation() {
 	$gallery_args = [
 		'product' => $product,
 		'forced_single' => true,
+		'skip_default_variation' => true
 	];
 
-	if (isset($_GET['is_quick_view']) && $_GET['is_quick_view'] === 'yes') {
+	if (
+		isset($_GET['retrieve_json'])
+		&&
+		$_GET['retrieve_json'] === 'yes'
+	) {
+		if (isset($_GET['variation_id'])) {
+			$product = wc_get_product(absint($_GET['variation_id']));
+		}
+
+		if (! $product) {
+			wp_send_json_error();
+		}
+
+		$images_ids = blocksy_product_get_gallery_images(
+			$product,
+			[
+				'enforce_first_image_replace' => true
+			]
+		);
+
+		$images_ids = array_slice($images_ids, 0, 2);
+
+		$images = [];
+
+		foreach ($images_ids as $image_id) {
+			$image_data = wc_get_product_attachment_props($image_id);
+			$image_data['id'] = $image_id;
+
+			$images[] = $image_data;
+		}
+
+		wp_send_json_success([
+			'images' => $images
+		]);
+	}
+
+	if (
+		isset($_GET['is_quick_view'])
+		&&
+		$_GET['is_quick_view'] === 'yes'
+	) {
 		global $blocksy_is_quick_view;
 		$blocksy_is_quick_view = true;
 
@@ -129,19 +172,26 @@ function blocksy_get_product_view_for_variation() {
 	);
 
 	if (isset($_GET['variation_id'])) {
-		$variation_id = isset($_GET['variation_id']) ? absint($_GET['variation_id']) : false;
-		$variation = $variation_id ? wc_get_product($variation_id) : false;
+		$variation_id = false;
 
-		global $blocksy_current_variation;
+		if (isset($_GET['variation_id'])) {
+			$variation_id = absint($_GET['variation_id']);
+		}
 
-		if ($variation) {
-			$blocksy_current_variation = $variation;
+		if ($variation_id) {
+			$variation = wc_get_product($variation_id);
+
+			global $blocksy_current_variation;
+
+			if ($variation) {
+				$blocksy_current_variation = $variation;
+			}
 		}
 	}
 
 	$blocksy_gallery_style = 'thumbs-bottom';
 
-	if (get_theme_mod('gallery_style', 'horizontal') === 'vertical') {
+	if (blocksy_get_theme_mod('gallery_style', 'horizontal') === 'vertical') {
 		$blocksy_gallery_style = 'thumbs-left';
 	}
 
@@ -150,6 +200,7 @@ function blocksy_get_product_view_for_variation() {
 			dirname(__FILE__) . '/../single/woo-gallery-template.php',
 			$gallery_args
 		),
-		'blocksy_gallery_style' => $blocksy_gallery_style
+		'blocksy_gallery_style' => $blocksy_gallery_style,
 	]);
 }
+

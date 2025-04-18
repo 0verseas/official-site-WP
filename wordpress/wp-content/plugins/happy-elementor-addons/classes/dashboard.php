@@ -44,13 +44,13 @@ class Dashboard {
 
         add_action( 'in_admin_header', [ __CLASS__, 'remove_all_notices' ], PHP_INT_MAX );
 
-        add_action( 'admin_menu', function() {
-            remove_menu_page( 'happy-addons-setup-wizard' );
-        }, 100 );
+        // add_action( 'admin_menu', function() {
+        //     remove_menu_page( 'happy-addons-setup-wizard' );
+        // }, 100 );
     }
 
     public static function is_page() {
-        return ( isset( $_GET['page'] ) && ( $_GET['page'] === self::PAGE_SLUG || $_GET['page'] === self::LICENSE_PAGE_SLUG ) );
+        return ( isset( $_GET['page'] ) && ( sanitize_text_field($_GET['page']) === self::PAGE_SLUG || sanitize_text_field($_GET['page']) === self::LICENSE_PAGE_SLUG ) );
     }
 
     public static function remove_all_notices() {
@@ -103,7 +103,7 @@ class Dashboard {
             wp_send_json_error();
         }
 
-        $posted_data = ! empty( $_POST['data'] ) ? $_POST['data'] : '';
+        $posted_data = ! empty( $_POST['data'] ) ? ha_sanitize_array_recursively($_POST['data']) : '';
         $data = [];
         parse_str( $posted_data, $data );
 
@@ -205,6 +205,13 @@ class Dashboard {
         wp_enqueue_style(
             'happy-icons',
             HAPPY_ADDONS_ASSETS . 'fonts/style.min.css',
+            null,
+            HAPPY_ADDONS_VERSION
+        );
+
+        wp_enqueue_style(
+            'huge-icons',
+            HAPPY_ADDONS_ASSETS . 'fonts/huge-icons/huge-icons.min.css',
             null,
             HAPPY_ADDONS_VERSION
         );
@@ -350,15 +357,17 @@ class Dashboard {
             58.5
         );
 
-        self::$wizard_slug =  add_menu_page(
-            __( 'Setup Wizard', 'happy-elementor-addons' ),
-            __( 'Setup Wizard', 'happy-elementor-addons' ),
-            'manage_options',
-            self::WIZARD_PAGE_SLUG,
-            [ __CLASS__, 'wizard_page_wrapper'],
-            '',
-            null
-        );
+		if ( 1 != get_option( HAPPY_ADDONS_WIZARD_REDIRECTION_FLAG, false ) ) {
+			self::$wizard_slug =  add_menu_page(
+				__( 'Setup Wizard', 'happy-elementor-addons' ),
+				__( 'Setup Wizard', 'happy-elementor-addons' ),
+				'manage_options',
+				self::WIZARD_PAGE_SLUG,
+				[ __CLASS__, 'wizard_page_wrapper'],
+				'',
+				null
+			);
+		}
 
         $tabs = self::get_tabs();
         if ( is_array( $tabs ) ) {
@@ -392,7 +401,7 @@ class Dashboard {
 
 	public static function get_raw_usage( $format = 'raw' ) {
 		/** @var Module $module */
-        
+
 		$module = \Elementor\Modules\Usage\Module::instance();
 		$usage = PHP_EOL;
 		$widgets_list = [];

@@ -34,17 +34,13 @@ class Request_Url_Service_Weglot {
 	 * @var Option_Service_Weglot
 	 */
 	private $option_services;
-	/**
-	 * @var Amp_Service_Weglot
-	 */
-	private $amp_services;
+
 
 	/**
 	 * @since 2.0
 	 */
 	public function __construct() {
 		$this->option_services   = weglot_get_service( 'Option_Service_Weglot' );
-		$this->amp_services      = weglot_get_service( 'Amp_Service_Weglot' );
 		$this->language_services = weglot_get_service( 'Language_Service_Weglot' );
 	}
 
@@ -56,16 +52,40 @@ class Request_Url_Service_Weglot {
 	 * @return Url
 	 */
 	public function create_url_object( $url ) {
+		$default_path = '/';
+		$use_custom_path = apply_filters('use_custom_path_for_path_check', false);
+
+		if ($use_custom_path) {
+			// Apply the filter to allow modification of the path to check
+			$path_to_check = apply_filters('custom_path_to_check', $default_path);
+
+			// Parse the URL path
+			$parsed_url_path = wp_parse_url($url, PHP_URL_PATH);
+
+			// Check if the URL path is valid and contains the specified path
+			$contains_path = $parsed_url_path !== null && strpos($parsed_url_path, $path_to_check) !== false;
+
+			if ($contains_path) {
+				$home_directory = $this->get_home_wordpress_directory($path_to_check);
+			} else {
+				$home_directory = $this->get_home_wordpress_directory();
+			}
+		} else {
+			// Default behavior if the filter is not set or returns false
+			$home_directory = $this->get_home_wordpress_directory();
+		}
+
 
 		return new Url(
 			$url,
 			$this->language_services->get_original_language(),
-			$this->language_services->get_destination_languages( $this->is_allowed_private() ),
-			$this->get_home_wordpress_directory(),
+			$this->language_services->get_destination_languages($this->is_allowed_private()),
+			$home_directory,
 			$this->option_services->get_exclude_urls(),
-			$this->option_services->get_option( 'custom_urls' )
+			$this->option_services->get_option('custom_urls')
 		);
 	}
+
 
 	/**
 	 * @return Request_Url_Service_Weglot
@@ -88,7 +108,13 @@ class Request_Url_Service_Weglot {
 			$this->init_weglot_url();
 		}
 
-		return $this->weglot_url;
+		/**
+		 * Filter the Weglot URL object before it is returned.
+		 *
+		 * @param $weglot_url
+		 */
+		return apply_filters( 'weglot_url_object', $this->weglot_url );
+
 	}
 
 	/**
@@ -105,11 +131,10 @@ class Request_Url_Service_Weglot {
 		$rest_url    = wp_parse_url( site_url( $prefix ) );
 		$current_url = wp_parse_url( add_query_arg( array() ) );
 
-		if( !isset( $current_url['path'] ) || !isset( $rest_url['path'] ) ) {
-			return false;
-		} else {
-			return strpos( $current_url['path'], $rest_url['path'], 0 ) === 0;
-		}
+		$rest_path = isset($rest_url['path']) && is_string($rest_url['path']) ? $rest_url['path'] : '';
+		$current_path = isset($current_url['path']) && is_string($current_url['path']) ? $current_url['path'] : '';
+
+		return strpos($current_path, $rest_path, 0) === 0;
 	}
 
 	/**
@@ -129,7 +154,7 @@ class Request_Url_Service_Weglot {
 			}
 		}
 
-		if ( empty( $current_language ) ) {
+		if ( !$current_language ) {
 			return apply_filters( 'weglot_default_current_language_empty', $this->language_services->get_original_language() );
 		}
 
@@ -149,11 +174,12 @@ class Request_Url_Service_Weglot {
 	}
 
 	/**
+	 * @param string|null $allow_custom_path
 	 * @return string|null
 	 * @since 2.0
 	 *
 	 */
-	public function get_home_wordpress_directory() {
+	public function get_home_wordpress_directory($allow_custom_path = '') {
 		$opt_siteurl = trim( get_option( 'siteurl' ), '/' );
 		$opt_home    = trim( get_option( 'home' ), '/' );
 		if ( empty( $opt_siteurl ) || empty( $opt_home ) ) {
@@ -161,12 +187,23 @@ class Request_Url_Service_Weglot {
 		}
 
 		if (
-			( substr( $opt_home, 0, 7 ) === 'http://' && strpos( substr( $opt_home, 7 ), '/' ) !== false ) || ( substr( $opt_home, 0, 8 ) === 'https://' && strpos( substr( $opt_home, 8 ), '/' ) !== false ) ) {
-			$parsed_url = parse_url( $opt_home ); // phpcs:ignore
-			$path       = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '/';
+			(substr($opt_home, 0, 7) === 'http://' && strpos(substr($opt_home, 7), '/') !== false) ||
+			(substr($opt_home, 0, 8) === 'https://' && strpos(substr($opt_home, 8), '/') !== false)
+		) {
+			$parsed_url = parse_url($opt_home); // phpcs:ignore
+			$path = $parsed_url['path'] ?? '/';
+
+			$use_custom_path = apply_filters('use_custom_path_for_path_check', false);
+
+			if ($use_custom_path) {
+				if (empty($allow_custom_path)) {
+					return '';
+				}
+			}
 
 			return $path;
 		}
+
 
 		return null;
 	}
@@ -225,7 +262,13 @@ class Request_Url_Service_Weglot {
 		return $url;
 	}
 
+	/**
+	 *
+	 * @return bool
+	 * @since 2.0
+	 */
 	public function is_allowed_private() {
+
 		if ( current_user_can( 'administrator' )
 		     || strpos( $this->get_full_url(), 'weglot-private=1' ) !== false
 		     || isset( $_COOKIE['weglot_allow_private'] )
@@ -235,6 +278,70 @@ class Request_Url_Service_Weglot {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns the canonical URL for the current page.
+	 *
+	 * @return string The canonical URL.
+	 */
+	public function get_current_canonical_url() {
+		// If this is a singular post or page.
+		if ( is_singular() ) {
+			$url = get_permalink( get_queried_object_id() );
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		// If this is a post type archive.
+		if ( is_post_type_archive() ) {
+			$post_type = get_query_var( 'post_type' );
+			// If multiple post types are set, take the first.
+			if ( is_array( $post_type ) ) {
+				$post_type = reset( $post_type );
+			}
+			$url = get_post_type_archive_link( $post_type );
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		// Additional checks for archive types, if needed.
+		if ( is_category() ) {
+			$cat_id = get_query_var( 'cat' );
+			$url    = get_category_link( $cat_id );
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		if ( is_tag() ) {
+			$tag_id = get_query_var( 'tag_id' );
+			$url    = get_tag_link( $tag_id );
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		if ( is_author() ) {
+			$author_id = get_query_var( 'author' );
+			$url       = get_author_posts_url( $author_id );
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		// For search results, you might want to include the search query.
+		if ( is_search() ) {
+			return add_query_arg( 's', get_search_query(), home_url( '/' ) );
+		}
+
+		// For date archives (year, month, day), a canonical URL might be less straightforward.
+		// You could build something here if needed. For now, we fall back to home_url.
+
+		// If nothing else matches, fall back to the home URL.
+		return home_url( '/' );
 	}
 }
 

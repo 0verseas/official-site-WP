@@ -231,13 +231,13 @@ if ( ! class_exists( '\Wpmet\Libs\Pro_Awareness' ) ) :
 								   class="wpmet_pro_a_wrapper" title="<?php echo esc_attr( $grid['title'] ); ?>"
 								   title="<?php echo esc_attr( $grid['title'] ); ?>">
 									<div class="wpmet_pro_a_thumb">
-										<img src="<?php echo esc_attr( $grid['thumbnail'] ); ?>" alt="Thumbnail">
+										<img src="<?php echo esc_url( $grid['thumbnail'] ); ?>" alt="Thumbnail">
 									</div>
 									<!-- // thumbnail -->
 
-									<h4 class="wpmet_pro_a_grid_title"><?php echo esc_attr( $grid['title'] ); ?></h4>
+									<h4 class="wpmet_pro_a_grid_title"><?php echo esc_html( $grid['title'] ); ?></h4>
 									<?php if ( ! empty( $grid['description'] ) ) { ?>
-										<p class="wpmet_pro_a_description"><?php esc_html_e( $grid['description'],'elementskit-lite' ); ?></p>
+										<p class="wpmet_pro_a_description"><?php echo esc_html( $grid['description'] ); ?></p>
 										<!-- // description -->
 									<?php } ?>
 									<!-- // title -->
@@ -249,18 +249,19 @@ if ( ! class_exists( '\Wpmet\Libs\Pro_Awareness' ) ) :
 					?>
 				</div>
 
-				<div class="wpmet-products">
+				<div class="wpmet-products hidden">
 					<div class="wpmet-products__header">
 						<h1><?php esc_html_e('Take your website to the next level','elementskit-lite'); ?></h1>
-						<p><?php esc_html_e('We have some plugins you can install to get most from Wordpress.','elementskit-lite'); ?><br> <?php echo esc_html('These are absolute FREE to use.','elementskit-lite'); ?></p>
+						<p><?php esc_html_e('We have some plugins you can install to get most from Wordpress.','elementskit-lite'); ?>
+						<br> <?php esc_html_e('These are absolute FREE to use.','elementskit-lite'); ?></p>
 					</div>
 					<div class="wpmet-products__content">
 						<?php foreach ( $this->products as $product ) : ?>
 							<a title="<?php echo esc_attr($product['title']); ?>" class="help-card" href="<?php echo esc_url( $product['url'] ); ?>" target="_blank">
 								<label>
-									<img src="<?php echo esc_attr( $product['thumbnail'] ); ?>" alt="Thumbnail">
+									<img src="<?php echo esc_url( $product['thumbnail'] ); ?>" alt="Thumbnail">
 								</label>
-							<span><?php esc_html_e($product['description'],'elementskit-lite'); ?></span></a>
+							<span><?php echo esc_html($product['description']); ?></span></a>
 						<?php endforeach; ?>
 					</div>
 				</div>

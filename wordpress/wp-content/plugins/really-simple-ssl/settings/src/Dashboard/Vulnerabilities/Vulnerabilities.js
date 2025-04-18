@@ -1,6 +1,6 @@
 import Icon from "../../utils/Icon";
-import {__} from "@wordpress/i18n";
-import {useEffect, useState} from "react";
+import {__, _n} from "@wordpress/i18n";
+import {useEffect, useState} from "@wordpress/element";
 import useFields from "../../Settings/FieldsData";
 import useRiskData from "../../Settings/RiskConfiguration/RiskData";
 
@@ -10,14 +10,14 @@ const Vulnerabilities = () => {
         vulnerabilityScore,
         updates,
         dataLoaded,
-        riskNaming,
-        vulnerabilityCount,
-        capitalizeFirstLetter,
         fetchVulnerabilities
     } = useRiskData();
     const {fields, getFieldValue} = useFields();
     const [vulnerabilityWord, setVulnerabilityWord] = useState('');
     const [updateWord, setUpdateWord] = useState('');
+    const [updateWordCapitalized, setUpdateWordCapitalized] = useState('');
+    const [vulnerabilityWordCapitalized, setVulnerabilityWordCapitalized] = useState('');
+    const [updateString, setUpdateString] = useState('');
     const [hardeningWord, setHardeningWord] = useState('');
     const [notEnabledHardeningFields, setNotEnabledHardeningFields] = useState(0);
     const [vulEnabled, setVulEnabled] = useState(false);
@@ -36,9 +36,13 @@ const Vulnerabilities = () => {
     useEffect(() => {
         //singular or plural of the word vulnerability
         const v = (vulnerabilities === 1) ? __("vulnerability", "really-simple-ssl") : __("vulnerabilities", "really-simple-ssl");
+        setVulnerabilityWordCapitalized(v.charAt(0).toUpperCase() + v.slice(1));
         setVulnerabilityWord(v);
         const u = (updates === 1) ? __("update", "really-simple-ssl") : __("updates", "really-simple-ssl");
+        const s = _n('You have %s update pending', 'You have %s updates pending', updates, 'really-simple-ssl').replace('%s', updates);
         setUpdateWord(u);
+        setUpdateWordCapitalized(u.charAt(0).toUpperCase() + u.slice(1));
+        setUpdateString(s);
         const h = (notEnabledHardeningFields === 1) ? __("hardening feature", "really-simple-ssl") : __("hardening features", "really-simple-ssl");
         setHardeningWord(h);
     },[vulnerabilities, updates, notEnabledHardeningFields])
@@ -52,7 +56,6 @@ const Vulnerabilities = () => {
         }
     },[fields])
 
-    let risks = vulnerabilityCount();
     let vulClass = 'rsssl-inactive';
     let badgeVulStyle = vulEnabled?'rsp-success':'rsp-default';
     let badgeUpdateStyle = 'rsp-success';
@@ -79,7 +82,7 @@ const Vulnerabilities = () => {
             iconUpdateColor = 'yellow';
         }
 
-        if (score < notEnabledHardeningFields) {
+        if ( score < notEnabledHardeningFields ) {
             score = notEnabledHardeningFields;
         }
 
@@ -134,10 +137,10 @@ const Vulnerabilities = () => {
                     <div className="rsssl-hardening-list-item">
                         <Icon name={icon} color={iconColor}/>
                         <p className="rsssl-hardening-list-item-text">
-                            {__("You have %s %d pending", "really-simple-ssl").replace("%s", updates).replace("%d", updateWord)}
+                            {updateString}
                         </p>
                         <a href={rsssl_settings.plugins_url + "?plugin_status=upgrade"}
-                           style={linkStyle}>{capitalizeFirstLetter(updateWord)}</a>
+                           style={linkStyle}>{updateWordCapitalized}</a>
                     </div>
 
                 </>
@@ -148,7 +151,7 @@ const Vulnerabilities = () => {
                     <div className="rsssl-hardening-list-item">
                         <Icon name={icon} color={iconColor}/>
                         <p className="rsssl-hardening-list-item-text">
-                            {__("You have %s %d pending", "really-simple-ssl").replace("%s", updates).replace("%d", updateWord)}
+                            {updateString}
                         </p>
                     </div>
                 </>
@@ -174,6 +177,7 @@ const Vulnerabilities = () => {
                 </>
             )
         }
+
         if (vulnerabilities) {
             return (
                 <>
@@ -239,8 +243,6 @@ const Vulnerabilities = () => {
                 <div className="rsssl-hardening-list-item">
                     <Icon name="circle-check" color='green'/>
                     <p className={"rsssl-hardening-list-item-text"}>{__("Hardening features are configured", "really-simple-ssl")}</p>
-                    {/*@todo link toevoegen?*/}
-                    <a style={linkStyle} href={'#settings/vulnerabilities'} target="_blank">{__('What now', 'really-simple-ssl')}?</a>
                 </div>
             </>)
         }
@@ -255,12 +257,12 @@ const Vulnerabilities = () => {
                     <div className="rsssl-hardening-select-item">
                         {vulEnabled ? <Icon color={iconVulColor} size={23} name="radar-duotone"></Icon> : <Icon size={23}  color={iconVulEnabledColor} name="satellite-dish-duotone"></Icon>}
                         <h2>{vulEnabled ? vulnerabilities : '?'}</h2>
-                        <span className={"rsssl-badge " + badgeVulStyle}>{capitalizeFirstLetter(vulnerabilityWord)}</span>
+                        <span className={"rsssl-badge " + badgeVulStyle}>{vulnerabilityWordCapitalized}</span>
                     </div>
                     <div className="rsssl-hardening-select-item">
                         { updates ? <Icon size={23} color={iconUpdateColor} name="rotate-exclamation-light"></Icon> : <Icon size={23} color={'black'} name="rotate-light"></Icon>}
                         <h2>{updates}</h2>
-                        <span className={"rsssl-badge " + badgeUpdateStyle}>{capitalizeFirstLetter(updateWord)}</span>
+                        <span className={"rsssl-badge " + badgeUpdateStyle}>{updateWordCapitalized}</span>
                     </div>
                 </div>
                 <div className="rsssl-hardening-list">
@@ -276,12 +278,12 @@ const Vulnerabilities = () => {
                         <div className="rsssl-hardening-select-item">
                             <Icon size={23} color={'grey'} name="radar-duotone"></Icon>
                             <h2>0</h2>
-                            <span className={"rsssl-badge rsp-default"}>{capitalizeFirstLetter(vulnerabilityWord)}</span>
+                            <span className={"rsssl-badge rsp-default"}>{vulnerabilityWordCapitalized}</span>
                         </div>
                         <div className="rsssl-hardening-select-item">
                             <Icon size={23} color={'grey'} name="rotate-exclamation-light"></Icon>
                             <h2>0</h2>
-                            <span className={"rsssl-badge rsp-default"}>{capitalizeFirstLetter(updateWord)}</span>
+                            <span className={"rsssl-badge rsp-default"}>{updateWordCapitalized}</span>
                         </div>
                     </div>
                     <div className="rsssl-hardening-list">

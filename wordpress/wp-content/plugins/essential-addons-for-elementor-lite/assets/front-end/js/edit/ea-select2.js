@@ -5,8 +5,17 @@
             var IDSelect2 = $(ID).select2({
                 minimumInputLength: 3,
                 ajax: {
-                    url: eael_select2_localize.ajaxurl + "?action=eael_select2_search_post&post_type=" + obj.data.source_type + '&source_name=' + obj.data.source_name,
-                    dataType: 'json'
+                    type: 'POST',
+                    url: eael_select2_localize.ajaxurl,
+                    dataType: 'json',
+                    data: function ( params ) {
+                        return {
+                            action: 'eael_select2_search_post',
+                            post_type: obj.data.source_type,
+                            source_name: obj.data.source_name,
+                            term: params.term,
+                        }
+                    },
                 },
                 initSelection: function (element, callback) {
                     if (!obj.multiple) {
@@ -28,8 +37,13 @@
                         label.after('<span class="elementor-control-spinner">&nbsp;<i class="eicon-spinner eicon-animation-spin"></i>&nbsp;</span>');
                         $.ajax({
                             method: "POST",
-                            url: eael_select2_localize.ajaxurl + "?action=eael_select2_get_title",
-                            data: {post_type: obj.data.source_type, source_name: obj.data.source_name, id: ids}
+                            url: eael_select2_localize.ajaxurl,
+                            data: {
+                                action: 'eael_select2_get_title',
+                                post_type: obj.data.source_type, 
+                                source_name: obj.data.source_name, 
+                                id: ids
+                            }
                         }).done(function (response) {
                             if (response.success && typeof response.data.results != 'undefined') {
                                 let eaelSelect2Options = '';
@@ -65,13 +79,28 @@
                     }
                 });
 
+                let editBtn = $(ID).closest('.elementor-control-field').siblings('a');
+
+                if (obj.currentID === '') {
+                    editBtn.hide();
+                } else {
+                    editBtn.attr('href', location.origin + location.pathname + '?post=' + obj.currentID + '&action=elementor');
+                }
+
                 $(ID).on("select2:select", function(evt) {
                     var element = evt.params.data.element;
                     var $element = $(element);
+                    let selectedId = evt.params.data.id,
+                        editUrl = location.origin + location.pathname + '?post=' + selectedId + '&action=elementor';
 
                     $element.detach();
                     $(this).append($element);
                     $(this).trigger("change");
+                    editBtn.attr('href', editUrl);
+
+                    if (selectedId !== '') {
+                        editBtn.show();
+                    }
                 });
             },200);
             //Manual Sorting : Select2 drag and drop : ends
@@ -103,8 +132,32 @@ function ea_conditional_logic_type_title(value) {
         dynamic: eael_select2_localize.cl_dynamic,
         browser: eael_select2_localize.cl_browser,
         date_time: eael_select2_localize.cl_date_time,
-        recurring_day: eael_select2_localize.cl_recurring_day
+        recurring_day: eael_select2_localize.cl_recurring_day,
+        query_string: eael_select2_localize.cl_query_string,
+        url_contains: eael_select2_localize.cl_url_contains,
+        archive: eael_select2_localize.cl_archive,
+        visit_count: eael_select2_localize.cl_visit_count,
+        woo_products: eael_select2_localize.cl_woo_products,
+        woo_cart: eael_select2_localize.cl_woo_cart,
+        woo_orders: eael_select2_localize.cl_woo_orders,
     };
 
     return labelValues[value] ? labelValues[value] : '';
+}
+
+if ( window.eaelMCPTPackageRenderButton === undefined ) {
+    window.eaelMCPTPackageRenderButton = true;
+    
+    jQuery(document).on("click", ".eael-mcpt-action-btn", function() {
+        const saverButton = jQuery("#elementor-panel-footer-sub-menu-item-save-draft");
+
+        if ( saverButton.hasClass("elementor-disabled") ) {
+            location.reload();
+        }
+        jQuery(this).prop("disabled", true).addClass("disabled");
+        saverButton.trigger("click");
+        setTimeout(function() {
+            location.reload();
+        }, 1000);
+    });
 }

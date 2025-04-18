@@ -1,10 +1,9 @@
 .wp-block-separator {
 	border: none;
-	color: var(--form-field-border-initial-color);
-	max-width: var(--default-editor, var(--block-max-width));
+	color: var(--theme-form-field-border-initial-color);
 
-	&:not(.is-style-wide):not(.is-style-dots) {
-		--block-max-width: 100px;
+	&:not(:where(.is-style-wide, .is-style-dots, .alignfull, .alignwide)) {
+		--theme-block-max-width: 100px;
 	}
 
 	&:not(.is-style-dots) {

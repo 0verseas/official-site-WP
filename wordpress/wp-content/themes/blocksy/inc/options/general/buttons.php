@@ -85,11 +85,11 @@ $options = [
 
 						'value' => [
 							'default' => [
-								'color' => 'var(--paletteColor1)',
+								'color' => 'var(--theme-palette-color-1)',
 							],
 
 							'hover' => [
-								'color' => 'var(--paletteColor2)',
+								'color' => 'var(--theme-palette-color-2)',
 							],
 						],
 
@@ -132,12 +132,12 @@ $options = [
 						'divider' => 'top',
 						'setting' => [ 'transport' => 'postMessage' ],
 						'value' => blocksy_spacing_value([
-							'linked' => false,
 							'top' => '5px',
 							'left' => '20px',
 							'right' => '20px',
 							'bottom' => '5px',
 						]),
+						'min' => 0,
 						'responsive' => true
 					],
 
@@ -146,13 +146,11 @@ $options = [
 						'type' => 'ct-spacing',
 						'divider' => 'top',
 						'setting' => [ 'transport' => 'postMessage' ],
-						'value' => blocksy_spacing_value([
-							'linked' => true,
-							'top' => '3px',
-							'left' => '3px',
-							'right' => '3px',
-							'bottom' => '3px',
-						]),
+						'value' => blocksy_spacing_value(),
+						'inputAttr' => [
+							'placeholder' => '3'
+						],
+						'min' => 0,
 						'responsive' => true
 					],
 

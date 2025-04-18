@@ -113,11 +113,11 @@ $options = [
 					'design' => 'block',
 					'divider' => 'top',
 					'sync' => 'live',
-					'value' => [
+					'value' => blocksy_default_responsive_value([
 						'desktop' => true,
 						'tablet' => true,
 						'mobile' => true,
-					],
+					]),
 					'choices' => blocksy_ordered_keys([
 						'desktop' => __( 'Desktop', 'blocksy' ),
 						'tablet' => __( 'Tablet', 'blocksy' ),
@@ -216,19 +216,19 @@ $options = [
 							[
 								'title' => __( 'Text Initial', 'blocksy' ),
 								'id' => 'default',
-								'inherit' => 'var(--color)'
+								'inherit' => 'var(--theme-text-color)'
 							],
 
 							[
 								'title' => __( 'Link Initial', 'blocksy' ),
 								'id' => 'link_initial',
-								'inherit' => 'var(--linkInitialColor)'
+								'inherit' => 'var(--theme-link-initial-color)'
 							],
 
 							[
 								'title' => __( 'Link Hover', 'blocksy' ),
 								'id' => 'link_hover',
-								'inherit' => 'var(--linkHoverColor)'
+								'inherit' => 'var(--theme-link-hover-color)'
 							],
 						],
 					],
@@ -315,6 +315,103 @@ $options = [
 			],
 
 			blocksy_rand_md5() => [
+				'type' => 'ct-labeled-group',
+				'label' => __( 'Heading Color', 'blocksy' ),
+				'responsive' => true,
+				'choices' => [
+					[
+						'id' => 'headerTextHeadingColor',
+						'label' => __('Default State', 'blocksy')
+					],
+
+					[
+						'id' => 'transparentHeaderTextHeadingColor',
+						'label' => __('Transparent State', 'blocksy'),
+						'condition' => [
+							'row' => '!offcanvas',
+							'builderSettings/has_transparent_header' => 'yes',
+						],
+					],
+
+					[
+						'id' => 'stickyHeaderTextHeadingColor',
+						'label' => __('Sticky State', 'blocksy'),
+						'condition' => [
+							'row' => '!offcanvas',
+							'builderSettings/has_sticky_header' => 'yes',
+						],
+					],
+				],
+				'options' => [
+
+					'headerTextHeadingColor' => [
+						'label' => __( 'Heading Color', 'blocksy' ),
+						'type'  => 'ct-color-picker',
+						'design' => 'block:right',
+						'responsive' => true,
+						'setting' => [ 'transport' => 'postMessage' ],
+
+						'value' => [
+							'default' => [
+								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+							],
+						],
+
+						'pickers' => [
+							[
+								'title' => __( 'Initial Color', 'blocksy' ),
+								'id' => 'default',
+								'inherit' => 'var(--theme-headings-color)'
+							],
+						],
+					],
+
+					'transparentHeaderTextHeadingColor' => [
+						'label' => __( 'Heading Color', 'blocksy' ),
+						'type'  => 'ct-color-picker',
+						'design' => 'block:right',
+						'responsive' => true,
+						'setting' => [ 'transport' => 'postMessage' ],
+
+						'value' => [
+							'default' => [
+								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+							],
+						],
+
+						'pickers' => [
+							[
+								'title' => __( 'Initial Color', 'blocksy' ),
+								'id' => 'default',
+							],
+						],
+					],
+
+					'stickyHeaderTextHeadingColor' => [
+						'label' => __( 'Heading Color', 'blocksy' ),
+						'type'  => 'ct-color-picker',
+						'design' => 'block:right',
+						'responsive' => true,
+						'setting' => [ 'transport' => 'postMessage' ],
+
+						'value' => [
+							'default' => [
+								'color' => Blocksy_Css_Injector::get_skip_rule_keyword('DEFAULT'),
+							],
+						],
+
+						'pickers' => [
+							[
+								'title' => __( 'Initial Color', 'blocksy' ),
+								'id' => 'default',
+							],
+						],
+					],
+
+				],
+			],
+
+			blocksy_rand_md5() => [
 				'type' => 'ct-divider',
 			],
 
@@ -322,9 +419,7 @@ $options = [
 				'label' => __( 'Margin', 'blocksy' ),
 				'type' => 'ct-spacing',
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => blocksy_spacing_value([
-					'linked' => true,
-				]),
+				'value' => blocksy_spacing_value(),
 				'responsive' => true
 			],
 
@@ -349,11 +444,10 @@ if ($panel_type === 'header') {
 				'design' => 'block',
 				'setting' => [ 'transport' => 'postMessage' ],
 				'allow_empty' => true,
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'tablet' => true,
 					'mobile' => true,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'tablet' => __( 'Tablet', 'blocksy' ),
 					'mobile' => __( 'Mobile', 'blocksy' ),

@@ -5,10 +5,17 @@ class REALLY_SIMPLE_SECURITY
 	private static $instance;
 	public $firewall_manager;
 	public $hardening;
+	/**
+	 * Components array, so we can access singleton classes which are dynamically added, from anywhere.
+	 * @var
+	 */
+	public $components;
 
 	private function __construct()
 	{
-
+        if (!defined('RSSSL_SAFE_MODE') && file_exists(trailingslashit(WP_CONTENT_DIR) . 'rsssl-safe-mode.lock')) {
+            define('RSSSL_SAFE_MODE', true);
+        }
 	}
 
 	public static function instance()
@@ -26,10 +33,12 @@ class REALLY_SIMPLE_SECURITY
 
 	private function includes()
 	{
+
 		$path = rsssl_path.'security/';
-		require_once( $path . 'cron.php' );
 		require_once( $path . 'integrations.php' );
 		require_once( $path . 'hardening.php' );
+		require_once( $path . 'cron.php' );
+		require_once( $path . 'includes/check404/class-rsssl-simple-404-interceptor.php' );
 
 		/**
 		 * Load only on back-end

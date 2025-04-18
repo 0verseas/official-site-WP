@@ -2,6 +2,7 @@ const gulp = require('gulp')
 const buildProcess = require('ct-build-process')
 const removeCode = require('gulp-remove-code')
 const shell = require('gulp-shell')
+const glob = require('glob')
 const BundleAnalyzerPlugin =
 	require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
@@ -9,6 +10,7 @@ const data = require('./package.json')
 
 const wpExternals = {
 	'@wordpress/element': 'window.wp.element',
+	'@wordpress/is-shallow-equal': 'window.wp.isShallowEqual',
 	'@wordpress/media-utils': 'window.wp.mediaUtils',
 	'@wordpress/keyboard-shortcuts': 'window.wp.keyboardShortcuts',
 	'@wordpress/core-data': 'window.wp.coreData',
@@ -26,6 +28,9 @@ const wpExternals = {
 	'@wordpress/api-fetch': 'window.wp.apiFetch',
 	'@wordpress/widgets': 'window.wp.widgets',
 	'@wordpress/block-library': 'window.wp.blockLibrary',
+	'@wordpress/url': 'window.wp.url',
+	'@wordpress/private-apis': 'window.wp.privateApis',
+	'@wordpress/a11y': 'window.wp.a11y',
 	'blocksy-options': 'window.blocksyOptions',
 	react: 'React',
 	'react-dom': 'ReactDOM',
@@ -58,6 +63,8 @@ var options = {
 				publicPath: '',
 			},
 
+			hasStatsOutput: true,
+
 			/*
 			optimization: {
 				splitChunks: {
@@ -72,7 +79,7 @@ var options = {
 					},
 				},
 			},
-            */
+			*/
 		},
 
 		{
@@ -199,9 +206,23 @@ var options = {
 		},
 
 		{
-			input: 'static/sass/frontend/5-modules/widgets/non-critical-search-styles.scss',
+			input: 'static/sass/frontend/5-modules/blocks/non-critical-search-styles.scss',
 			output: 'static/bundle',
 			filename: 'non-critical-search-styles.min',
+			// header: buildProcess.headerFor(false, data),
+		},
+
+		{
+			input: 'static/sass/frontend/5-modules/blocks/about-me.scss',
+			output: 'static/bundle',
+			filename: 'theme-block-about-me.min',
+			// header: buildProcess.headerFor(false, data),
+		},
+
+		{
+			input: 'static/sass/frontend/5-modules/blocks/share-box.scss',
+			output: 'static/bundle',
+			filename: 'theme-block-share-box.min',
 			// header: buildProcess.headerFor(false, data),
 		},
 
@@ -268,12 +289,12 @@ var options = {
 			// header: buildProcess.headerFor(false, data),
 		},
 
-		{
-			input: 'static/sass/frontend/8-integrations/vc.scss',
-			output: 'static/bundle',
-			filename: 'vc.min',
-			// header: buildProcess.headerFor(false, data),
-		},
+		// {
+		// 	input: 'static/sass/frontend/8-integrations/vc.scss',
+		// 	output: 'static/bundle',
+		// 	filename: 'vc.min',
+		// 	// header: buildProcess.headerFor(false, data),
+		// },
 
 		{
 			input: 'static/sass/frontend/8-integrations/cf-7.scss',
@@ -281,6 +302,13 @@ var options = {
 			filename: 'cf-7.min',
 			// header: buildProcess.headerFor(false, data),
 		},
+
+		// {
+		// 	input: 'static/sass/frontend/8-integrations/fluent-form.scss',
+		// 	output: 'static/bundle',
+		// 	filename: 'fluent-form.min',
+		// 	// header: buildProcess.headerFor(false, data),
+		// },
 
 		{
 			input: 'static/sass/frontend/8-integrations/stackable.scss',
@@ -339,6 +367,13 @@ var options = {
 		},
 
 		{
+			input: 'static/sass/frontend/8-integrations/woocommerce/integrations/elementor.scss',
+			output: 'static/bundle',
+			filename: 'elementor-woocommerce-frontend.min',
+			// header: buildProcess.headerFor(false, data),
+		},
+
+		{
 			input: 'static/sass/frontend/8-integrations/tutor/main.scss',
 			output: 'static/bundle',
 			filename: 'tutor.min',
@@ -349,6 +384,20 @@ var options = {
 			input: 'static/sass/frontend/8-integrations/woocommerce/main.scss',
 			output: 'static/bundle',
 			filename: 'woocommerce.min',
+			// header: buildProcess.headerFor(false, data),
+		},
+
+		{
+			input: 'static/sass/frontend/8-integrations/woocommerce/cart-header-element-lazy.scss',
+			output: 'static/bundle',
+			filename: 'cart-header-element-lazy.min',
+			// header: buildProcess.headerFor(false, data),
+		},
+
+		{
+			input: 'static/sass/frontend/8-integrations/woocommerce/blocks/main-cart-checkout-blocks.scss',
+			output: 'static/bundle',
+			filename: 'woocommerce-cart-checkout-blocks.min',
 			// header: buildProcess.headerFor(false, data),
 		},
 
@@ -409,9 +458,21 @@ var options = {
 		},
 
 		{
+			input: 'static/sass/backend/editor/iframe.scss',
+			output: 'static/bundle',
+			filename: 'editor-iframe.min',
+			// header: buildProcess.headerFor(false, data),
+		},
+
+		{
 			input: 'static/sass/backend/editor/blocks/main.scss',
 			output: 'static/bundle',
 			filename: 'editor-styles.min',
+		},
+		{
+			input: 'static/sass/backend/editor/blocks/theme-blocks.scss',
+			output: 'static/bundle',
+			filename: 'theme-blocks-editor-styles.min',
 		},
 
 		{
@@ -424,7 +485,7 @@ var options = {
 		{
 			input: 'static/sass/backend/admin/elementor.scss',
 			output: 'static/bundle',
-			filename: 'elementor.min',
+			filename: 'elementor-editor.min',
 			// header: buildProcess.headerFor(false, data),
 		},
 
@@ -505,7 +566,7 @@ var options = {
 		new BundleAnalyzerPlugin({
 			analyzerPort: 0
 		})
-        */
+		*/
 	],
 
 	webpackResolveAliases: {
@@ -521,6 +582,7 @@ var options = {
 		'@wordpress/element',
 		'flexy',
 		'@wordpress/components',
+		'ct-wordpress-helpers',
 	],
 
 	filesToDeleteFromBuild: [
@@ -532,6 +594,7 @@ var options = {
 		'./build_tmp/build/composer.json',
 		'./build_tmp/build/yarn.lock',
 		'./build_tmp/build/wp-cli.yml',
+		'./build_tmp/build/.babelrc',
 		'./build_tmp/build/docs',
 		'./build_tmp/build/extensions.json',
 		// './build_tmp/build/gulpfile.js',
@@ -586,6 +649,6 @@ gulp.task(
 			ignoreErrors: true,
 			verbose: true,
 		})
-        */
+		*/
 	)
 )

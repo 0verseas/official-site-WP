@@ -42,7 +42,7 @@ class Assets implements Runner {
 		$this->action( 'admin_enqueue_scripts', 'enqueue' );
 		$this->action( 'admin_enqueue_scripts', 'overwrite_wplink', 99 );
 
-		if ( 'elementor' === \MyThemeShop\Helpers\Param::get( 'action' ) ) {
+		if ( 'elementor' === \RankMath\Helpers\Param::get( 'action' ) ) {
 			$this->action( 'elementor/editor/before_enqueue_scripts', 'register' );
 			$this->action( 'elementor/editor/before_enqueue_scripts', 'enqueue' );
 			$this->action( 'elementor/editor/before_enqueue_scripts', 'overwrite_wplink', 99 );
@@ -60,12 +60,13 @@ class Assets implements Runner {
 		// Styles.
 		wp_register_style( self::PREFIX . 'common', $css . 'common.css', null, rank_math()->version );
 		wp_register_style( self::PREFIX . 'cmb2', $css . 'cmb2.css', null, rank_math()->version );
-		wp_register_style( self::PREFIX . 'dashboard', $css . 'dashboard.css', [ 'rank-math-common' ], rank_math()->version );
+		wp_register_style( self::PREFIX . 'dashboard', $css . 'dashboard.css', [ 'rank-math-common', 'wp-components' ], rank_math()->version );
 		wp_register_style( self::PREFIX . 'dashboard-widget', $css . 'dashboard-widget.css', null, rank_math()->version );
 
 		// Scripts.
 		wp_register_script( self::PREFIX . 'common', $js . 'common.js', [ 'jquery', 'wp-i18n', 'lodash' ], rank_math()->version, true );
-		wp_register_script( self::PREFIX . 'dashboard', $js . 'dashboard.js', [ 'jquery', 'clipboard' ], rank_math()->version, true );
+		wp_register_script( self::PREFIX . 'dashboard', $js . 'dashboard.js', [ 'jquery', 'clipboard', 'lodash', 'wp-components', 'wp-element' ], rank_math()->version, true );
+		wp_register_script( self::PREFIX . 'components', $js . 'components.js', [ 'lodash', 'wp-components', 'wp-element', 'wp-api-fetch' ], rank_math()->version, true );
 
 		// Select2.
 		wp_register_style( 'select2-rm', $vendor . 'select2/select2.min.css', null, '4.0.6-rc.1' );
@@ -100,7 +101,7 @@ class Assets implements Runner {
 		}
 
 		if ( ! wp_script_is( 'lodash', 'registered' ) ) {
-			wp_register_script( 'lodash', rank_math()->plugin_url() . 'assets/vendor/lodash.js', [], rank_math()->version );
+			wp_register_script( 'lodash', rank_math()->plugin_url() . 'assets/vendor/lodash.js', [], rank_math()->version, [] );
 			wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 		}
 
@@ -144,7 +145,6 @@ class Assets implements Runner {
 		 * Allow other plugins to register/deregister admin styles or scripts after plugin assets.
 		 */
 		$this->do_action( 'admin/register_scripts' );
-
 	}
 
 	/**
@@ -190,7 +190,7 @@ class Assets implements Runner {
 	public function overwrite_wplink() {
 
 		wp_deregister_script( 'wplink' );
-		wp_register_script( 'wplink', rank_math()->plugin_url() . 'assets/admin/js/wplink.js', [ 'jquery', 'wpdialogs' ], rank_math()->version, true );
+		wp_register_script( 'wplink', rank_math()->plugin_url() . 'assets/admin/js/wplink.js', [ 'jquery', 'wp-a11y' ], rank_math()->version, true );
 
 		wp_localize_script(
 			'wplink',
@@ -270,7 +270,7 @@ class Assets implements Runner {
 					return true;
 				}
 				jQuery( '.rank-math-notice-permalinks-warning' ).removeClass( 'hidden' ).insertBefore( 'p.submit' );
-				noticeShown = true;	
+				noticeShown = true;
 				return true;
 			}
 

@@ -12,12 +12,14 @@ namespace RankMath\Analytics;
 
 use RankMath\Helper;
 use RankMath\Google\Api;
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Str;
+use RankMath\Helpers\Param;
 use RankMath\Google\Analytics;
 use RankMath\Google\Authentication;
-use RankMath\Google\Url_Inspection;
-use RankMath\Analytics\Workflow\Base;
+use RankMath\Sitemap\Sitemap;
+use RankMath\Analytics\Workflow\Console;
+use RankMath\Analytics\Workflow\Inspections;
+use RankMath\Analytics\Workflow\Objects;
 use RankMath\Google\Console as Google_Analytics;
 
 defined( 'ABSPATH' ) || exit;
@@ -72,7 +74,7 @@ class AJAX {
 		}
 
 		$args = [
-			'displayName' => get_bloginfo( 'sitename' ) . ' - ' . 'GA4',
+			'displayName' => get_bloginfo( 'sitename' ) . ' - GA4',
 			'parent'      => "accounts/{$account_id}",
 			'timeZone'    => empty( $timezone ) ? 'UTC' : $timezone,
 		];
@@ -219,6 +221,10 @@ class AJAX {
 			DB::purge_cache();
 		}
 
+		new Objects();
+		new Console();
+		new Inspections();
+
 		// Start fetching console data.
 		Workflow\Workflow::do_workflow(
 			'console',
@@ -343,7 +349,7 @@ class AJAX {
 		if ( empty( $rows ) ) {
 			delete_option( 'rank_math_analytics_installed' );
 		}
-
+		delete_option( 'rank_math_analytics_last_single_action_schedule_time' );
 		// Start fetching data.
 		foreach ( [ 'console', 'analytics', 'adsense' ] as $action ) {
 			Workflow\Workflow::do_workflow(
@@ -534,7 +540,7 @@ class AJAX {
 		}
 
 		foreach ( $sitemaps as $sitemap ) {
-			if ( $sitemap['path'] === $home_url . 'sitemap_index.xml' ) {
+			if ( $sitemap['path'] === $home_url . Sitemap::get_sitemap_index_slug() . '.xml' ) {
 				return true;
 			}
 		}

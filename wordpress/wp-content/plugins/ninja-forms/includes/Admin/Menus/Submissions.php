@@ -391,7 +391,7 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
 
                 if ( isset ( $_REQUEST['form_id'] ) && ! empty ( $_REQUEST['form_id'] ) ) {
                     $redirect = urlencode( remove_query_arg( array( 'download_all', 'download_file' ) ) );
-                    $url = admin_url( 'admin.php?page=nf-processing&action=download_all_subs&form_id=' . absint( $_REQUEST['form_id'] ) . '&redirect=' . $redirect );
+                    $url = admin_url( 'admin.php?page=nf-processing&action=download_all_subs&form_id=' . absint( $_REQUEST['form_id'] ) . '&redirect=' . $redirect . '&security=' . wp_create_nonce( 'ninja_forms_batch_nonce' ) );
                     $url = esc_url( $url );
                     ?>
                     var button = '<a href="<?php echo $url; ?>" class="button-secondary nf-download-all"><?php echo esc_html__( 'Download All Submissions', 'ninja-forms' ); ?></a>';
@@ -415,9 +415,16 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
 
     public function export_listen()
     {
-        // Bail if we aren't in the admin
-        if (!is_admin())
+        $current_user_can_get_nf_submissions = apply_filters( 'ninja_forms_api_allow_get_submissions', current_user_can( 'manage_options' ) );
+        // Ensure that we are in admin and user has permission to export
+        if (
+            !is_admin() ||
+            !is_user_logged_in() ||
+            !$current_user_can_get_nf_submissions
+        ) {
+
             return false;
+        }
 
         if (!isset ($_REQUEST['form_id']) || empty ($_REQUEST['form_id'])) {
             return false;
@@ -738,6 +745,7 @@ final class NF_Admin_Menus_Submissions extends NF_Abstracts_Submenu
                     'timeFormat'            =>  esc_attr( get_option('time_format') ),
                     'siteUrl'               =>  esc_url_raw( site_url() ),
                     'adminUrl'              =>  esc_url_raw( admin_url() ),
+                    'pluginsUrl'            =>  esc_url_raw( plugins_url() ),
                     'restUrl'               =>  esc_url_raw( get_rest_url() ),
                     'token'                 =>  wp_create_nonce( 'wp_rest' ),
                     'submissionsSettings'   =>  get_option( 'ninja_forms_submissions_settings' )

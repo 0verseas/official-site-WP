@@ -34,6 +34,9 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
     public function get_help_url() {
         return 'https://wpmet.com/doc/pricing-table/';
     }
+    protected function is_dynamic_content(): bool {
+        return false;
+    }
 
     protected function register_controls() {
 
@@ -275,8 +278,7 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
-					'{{WRAPPER}} .elementskit-single-pricing .elementskit-pricing-lists {{CURRENT_ITEM}} i' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .elementskit-single-pricing .elementskit-pricing-lists {{CURRENT_ITEM}} svg path'	=> 'stroke: {{VALUE}}; fill: {{VALUE}};'
+					'{{WRAPPER}} .elementskit-single-pricing .elementskit-pricing-lists {{CURRENT_ITEM}} > :is(i, svg)' => 'color: {{VALUE}}; fill: {{VALUE}};',
 				],
             ]
 		);
@@ -299,8 +301,7 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementskit-single-pricing .elementskit-pricing-lists {{CURRENT_ITEM}} i' => 'font-size: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .elementskit-single-pricing .elementskit-pricing-lists {{CURRENT_ITEM}} svg' => 'max-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .elementskit-single-pricing .elementskit-pricing-lists {{CURRENT_ITEM}} > :is(i, svg)' => 'font-size: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -312,6 +313,20 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 				'type'	=> Controls_Manager::TEXT,
 				'dynamic' => [
 					'active' => true,
+				],
+			]
+		);
+
+		$repeater->add_control(
+			'ekit_pricing_list_info_icon_color',
+			[
+				'label' =>esc_html__( 'Info Icon Color', 'elementskit-lite' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} {{CURRENT_ITEM}} .ekit-pricing-list-info :is(i, svg)' => 'color: {{VALUE}}; fill: {{VALUE}};',
+				],
+				'condition' => [
+					'ekit_pricing_list_info!' => '',
 				],
 			]
 		);
@@ -2049,6 +2064,10 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 			[
 				'label'		=> esc_html__( 'Spacing', 'elementskit-lite' ),
 				'type'		=> Controls_Manager::SLIDER,
+                'default' => [
+                    'size' => 10,
+                    'unit' => 'px',
+                ],
 				'selectors'	=> [
 					'{{WRAPPER}} .elementskit-pricing-lists > li > i' => 'padding-right: {{SIZE}}{{UNIT}};',
 					'{{WRAPPER}} .elementskit-pricing-lists > li > svg' => 'margin-right: {{SIZE}}{{UNIT}};',
@@ -2178,7 +2197,7 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
             Group_Control_Background::get_type(),
             array(
                 'name'     => 'ekit_pricing_btn_bg_color_group',
-				'exclude' => ['image'],
+				'exclude' => ['image'], // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
                 'selector' => '{{WRAPPER}} .elementskit-single-pricing a.elementskit-pricing-btn',
             )
         );
@@ -2208,7 +2227,7 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
             Group_Control_Background::get_type(),
             array(
                 'name'     => 'ekit_pricing_btn_bg_hover_color_group',
-				'exclude' => ['image'],
+				'exclude' => ['image'], // PHPCS:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
                 'selector' => '{{WRAPPER}} .elementskit-single-pricing a.elementskit-pricing-btn:hover',
             )
         );
@@ -2411,6 +2430,14 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 				[
 					'label' 		=> esc_html__( 'Header', 'elementskit-lite' ),
 					'type' 			=> Controls_Manager::SLIDER,
+					'size_units' => [ 'px'],
+					'range' => [
+						'px' => [
+							'min' => 0,
+							'max' => 4,
+							'step' => 1,
+						],
+					],
 					'condition'		=> [
 						'ekit_pricing_order_enable'	=> 'yes',
 					]
@@ -2422,6 +2449,14 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 				[
 					'label' 		=> esc_html__( 'Price Tag', 'elementskit-lite' ),
 					'type' 			=> Controls_Manager::SLIDER,
+					'size_units' => [ 'px'],
+					'range' => [
+						'px' => [
+							'min' => 0,
+							'max' => 4,
+							'step' => 1,
+						],
+					],
 					'condition'		=> [
 						'ekit_pricing_order_enable'	=> 'yes',
 					]
@@ -2433,6 +2468,14 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 				[
 					'label' 		=> esc_html__( 'Features', 'elementskit-lite' ),
 					'type' 			=> Controls_Manager::SLIDER,
+					'size_units' => [ 'px'],
+					'range' => [
+						'px' => [
+							'min' => 0,
+							'max' => 4,
+							'step' => 1,
+						],
+					],
 					'condition'		=> [
 						'ekit_pricing_order_enable'	=> 'yes',
 					]
@@ -2444,6 +2487,14 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 				[
 					'label' 		=> esc_html__( 'Button', 'elementskit-lite' ),
 					'type' 			=> Controls_Manager::SLIDER,
+					'size_units' => [ 'px'],
+					'range' => [
+						'px' => [
+							'min' => 0,
+							'max' => 4,
+							'step' => 1,
+						],
+					],
 					'condition'		=> [
 						'ekit_pricing_order_enable'	=> 'yes',
 					]
@@ -2592,7 +2643,8 @@ class ElementsKit_Widget_Pricing extends Widget_Base {
 								<?php echo esc_html($repeat['ekit_pricing_list']); ?>
 								
 								<?php if ( !empty( $repeat[ 'ekit_pricing_list_info' ] ) ): ?>
-									<div class="ekit-pricing-list-info eicon-info-circle-o" data-info-tip="true">
+									<div class="ekit-pricing-list-info" data-info-tip="true">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/></svg>
 										<span></span>
 										<p class="ekit-pricing-list-info-content ekit-pricing-<?php echo esc_attr( $this->get_ID() ); ?> ekit-pricing-list-info-<?php echo esc_attr( $repeat[ '_id' ] ); ?>" data-info-tip-content="true"><?php echo esc_attr( $repeat[ 'ekit_pricing_list_info' ] ); ?></p>
 									</div>

@@ -76,50 +76,19 @@ if (! function_exists('blocksy_get_svg_pattern')) {
 	function blocksy_get_svg_pattern($name, $color = '#ccc') {
 		$opacity = 1;
 
-		$colorPalette = blocksy_get_colors(
-			get_theme_mod('colorPalette'),
-			[
-				'color1' => ['color' => '#2872fa'],
-				'color2' => ['color' => '#1559ed'],
-				'color3' => ['color' => '#3A4F66'],
-				'color4' => ['color' => '#192a3d'],
-				'color5' => ['color' => '#e1e8ed'],
-				'color6' => ['color' => '#f2f5f7'],
-				'color7' => ['color' => '#FAFBFC'],
-				'color8' => ['color' => '#ffffff'],
-			]
-		);
+		if (strpos($color, 'theme-palette-color') !== false) {
+			$palette = blocksy_manager()->colors->get_color_palette();
 
-		if (strpos($color, 'paletteColor1') !== false) {
-			$color = $colorPalette['color1'];
-		}
+			foreach ($palette as $key => $value) {
+				if (strpos($key, 'color') !== false) {
+					$number = str_replace('color', '', $key);
 
-		if (strpos($color, 'paletteColor2') !== false) {
-			$color = $colorPalette['color2'];
-		}
-
-		if (strpos($color, 'paletteColor3') !== false) {
-			$color = $colorPalette['color3'];
-		}
-
-		if (strpos($color, 'paletteColor4') !== false) {
-			$color = $colorPalette['color4'];
-		}
-
-		if (strpos($color, 'paletteColor5') !== false) {
-			$color = $colorPalette['color5'];
-		}
-
-		if (strpos($color, 'paletteColor6') !== false) {
-			$color = $colorPalette['color6'];
-		}
-
-		if (strpos($color, 'paletteColor7') !== false) {
-			$color = $colorPalette['color7'];
-		}
-
-		if (strpos($color, 'paletteColor8') !== false) {
-			$color = $colorPalette['color8'];
+					if (strpos($color, 'theme-palette-color-' . $number) !== false) {
+						$color = $value['color'];
+						break;
+					}
+				}
+			}
 		}
 
 		if (strpos($color, 'rgb') !== false) {
@@ -136,7 +105,7 @@ if (! function_exists('blocksy_get_svg_pattern')) {
 				)
 			));
 
-			$color = sprintf("#%02x%02x%02x", $rgb_array[0], $rgb_array[1], $rgb_array[2]);
+			$color = blocksy_safe_sprintf("#%02x%02x%02x", $rgb_array[0], $rgb_array[1], $rgb_array[2]);
 
 			if (count($rgb_array) > 3) {
 				$opacity = $rgb_array[3];
@@ -391,10 +360,17 @@ if (! function_exists('blocksy_output_single_background_css')) {
 			] . ', ' . $backgroundColor['default'] . ')';
 		}
 
-		$args['css']->put(
-			$args['selector'],
-			"background-color: {$backgroundColor['default']}"
-		);
+		if ($args['value']['background_type'] !== 'gradient') {
+			$args['css']->put(
+				$args['selector'],
+				"background-color: {$backgroundColor['default']}"
+			);
+		} else {
+			$args['css']->put(
+				$args['selector'],
+				"background-color: initial"
+			);
+		}
 
 		if (
 			strpos($backgroundColor['default'], 'CT_CSS_SKIP_RULE') === false

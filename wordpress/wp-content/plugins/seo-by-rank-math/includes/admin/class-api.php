@@ -10,7 +10,7 @@
 
 namespace RankMath\Admin;
 
-defined( 'ABSPATH' ) || exit;
+use WP_Error;
 
 /**
  * Api class.
@@ -121,13 +121,22 @@ class Api {
 	 */
 	public function deactivate_site( $username, $api_key ) {
 		$this->is_blocking = false;
-		$this->http_post(
-			'deactivateSite',
+		$data              = wp_json_encode(
 			[
 				'username' => $username,
 				'api_key'  => $api_key,
 				'site_url' => esc_url( home_url() ),
 			]
+		);
+
+		$response = wp_remote_post(
+			RANK_MATH_SITE_URL . '/wp-json/rankmath/v1/deactivateSite',
+			[
+				'body'    => $data,
+				'headers' => [
+					'Content-Type' => 'application/json',
+				],
+			],
 		);
 	}
 
@@ -215,7 +224,7 @@ class Api {
 	/**
 	 * Decode the response and format any error messages for debugging
 	 *
-	 * @param array $response The response from the curl request.
+	 * @param array|WP_Error $response The response from the curl request.
 	 *
 	 * @return array|false The JSON decoded into an array
 	 */
@@ -236,7 +245,7 @@ class Api {
 	/**
 	 * Check if the response was successful or a failure. If it failed, store the error.
 	 *
-	 * @param array $response The response from the curl request.
+	 * @param array|WP_Error $response The response from the curl request.
 	 */
 	protected function determine_success( $response ) {
 		if ( is_wp_error( $response ) ) {

@@ -1,15 +1,15 @@
 #header {
 	[data-row] {
 		position: var(--position, relative);
-		box-shadow: var(--box-shadow);
-		border-top: var(--borderTop);
-		border-bottom: var(--borderBottom);
+		box-shadow: var(--theme-box-shadow);
+		border-top: var(--theme-border-top);
+		border-bottom: var(--theme-border-bottom);
+		backdrop-filter: blur(var(--theme-backdrop-blur));
 
 		> div {
-			// min-height: var(--height);
 			min-height: var(--shrink-height, var(--height));
-			border-top: var(--borderTop);
-			border-bottom: var(--borderBottom);
+			border-top: var(--theme-border-top);
+			border-bottom: var(--theme-border-bottom);
 		}
 	}
 
@@ -29,11 +29,13 @@
 // row boxed width
 #header [data-row*='boxed'] {
 	box-shadow: none;
+	backdrop-filter: none;
 
 	> div {
 		padding: var(--padding, 0 35px);
-		box-shadow: var(--box-shadow);
+		box-shadow: var(--theme-box-shadow);
 		border-radius: var(--row-border-radius);
+		backdrop-filter: blur(var(--theme-backdrop-blur));
 
 		@include media-breakpoint-down(sm) {
 			--padding: 0 5vw;

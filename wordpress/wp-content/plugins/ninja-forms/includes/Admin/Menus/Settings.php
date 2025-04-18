@@ -23,24 +23,6 @@ final class NF_Admin_Menus_Settings extends NF_Abstracts_Submenu
         // Catch Contact Form 7 reCAPTCHA conflict.
         add_filter( 'nf_admin_notices', array( $this, 'ninja_forms_cf7_notice' ) );
 
-        // Remove rollback option for anyone that has no 2.9x data.
-        add_filter( 'ninja_forms_plugin_settings', array( $this, 'maybe_hide_rollback' ) );
-    }
-
-    /**
-     * Function to detect installations without 2.9x tables and prevent them from accessing 2.9x.
-     *
-     * @since 3.5
-     * @param Array $settings The Ninja Forms settings array.
-     * @return Array
-     */
-    public function maybe_hide_rollback( $settings )
-    {
-        global $wpdb;
-        if (0 == $wpdb->query( "SHOW TABLES LIKE '{$wpdb->prefix}ninja_forms_fields'")) {
-            unset($settings['advanced']['downgrade']);
-        }
-        return $settings;
     }
 
     public function body_class( $classes )
@@ -117,7 +99,12 @@ final class NF_Admin_Menus_Settings extends NF_Abstracts_Submenu
 
             foreach( $settings as $id => $setting ){
 
-                $value = ( isset( $setting_defaults[ $id ] ) ) ? $setting_defaults[$id] : '';
+                $value = '';
+                if(isset($setting_defaults[$id])) {
+                    $value = $setting_defaults[$id];
+                } elseif(isset($setting['value'])) {
+                    $value = $setting['value'];
+                }
 
                 $grouped_settings[$group][$id]['id'] = $this->prefix( $grouped_settings[$group][$id]['id'] );
                 $grouped_settings[$group][$id]['value'] = $value;
@@ -145,11 +132,13 @@ final class NF_Admin_Menus_Settings extends NF_Abstracts_Submenu
 
             $saved_field_id = $saved_field->get_id();
 
+            $label = esc_html( $saved_field->get_setting( 'label' ) ); 
+
             $grouped_settings[ 'saved_fields'][] = array(
                 'id' => '',
                 'type' => 'html',
                 'html' => '<a class="js-delete-saved-field button button-secondary" data-id="' . $saved_field_id . '">' . esc_html__( 'Delete', 'ninja-forms' ) . '</a>',
-                'label' => $saved_field->get_setting( 'label' ),
+                'label' => $label,
 
             );
         }
@@ -186,11 +175,6 @@ final class NF_Admin_Menus_Settings extends NF_Abstracts_Submenu
             'nonce'         => wp_create_nonce( "ninja_forms_settings_nonce" ),
             'batchNonce'   => wp_create_nonce( 'ninja_forms_batch_nonce' ),
             'i18n'          => array(
-                'downgradeMessage'                 => esc_html__( 'Are you sure you want to downgrade?', 'ninja-forms' ),
-                'downgradeWarningMessage'          => esc_html__( 'You WILL lose any forms or submissions created on this version of Ninja Forms.', 'ninja-forms' ),
-                'downgradeConfirmMessage'          => esc_html__( 'Type ', 'ninja-forms' ) . '<span style="color: red";>' . 'DOWNGRADE' . "</span>" . esc_html__( ' to confirm.', 'ninja-forms' ),
-                'downgradeButtonPrimary'           => esc_html__( 'Downgrade', 'ninja-forms'),
-                'downgradeButtonSecondary'         => esc_html__( 'Cancel', 'ninja-forms' ),
                 'trashExpiredSubsMessage'          => esc_html__( 'Are you sure you want to trash all expired submissions?', 'ninja-forms' ),
                 'trashExpiredSubsButtonPrimary'    => esc_html__( 'Trash', 'ninja-forms' ),
                 'trashExpiredSubsButtonSecondary'  => esc_html__( 'Cancel', 'ninja-forms' ),
@@ -212,11 +196,6 @@ final class NF_Admin_Menus_Settings extends NF_Abstracts_Submenu
             'nonce'         => wp_create_nonce( "ninja_forms_settings_nonce" ),
             'batchNonce'   => wp_create_nonce( 'ninja_forms_batch_nonce' ),
             'i18n'          => array(
-                'downgradeMessage'                 => esc_html__( 'Are you sure you want to downgrade?', 'ninja-forms' ),
-                'downgradeWarningMessage'          => esc_html__( 'You WILL lose any forms or submissions created on this version of Ninja Forms.', 'ninja-forms' ),
-                'downgradeConfirmMessage'          => esc_html__( 'Type ', 'ninja-forms' ) . '<span style="color: red";>' . 'DOWNGRADE' . "</span>" . esc_html__( ' to confirm.', 'ninja-forms' ),
-                'downgradeButtonPrimary'           => esc_html__( 'Downgrade', 'ninja-forms'),
-                'downgradeButtonSecondary'         => esc_html__( 'Cancel', 'ninja-forms' ),
                 'trashExpiredSubsMessage'          => esc_html__( 'Are you sure you want to trash all expired submissions?', 'ninja-forms' ),
                 'trashExpiredSubsButtonPrimary'    => esc_html__( 'Trash', 'ninja-forms' ),
                 'trashExpiredSubsButtonSecondary'  => esc_html__( 'Cancel', 'ninja-forms' ),

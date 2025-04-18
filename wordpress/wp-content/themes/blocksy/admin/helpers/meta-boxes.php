@@ -45,11 +45,14 @@ class Blocksy_Meta_Boxes {
 					return;
 				}
 
-				$post_id = $variation->ID;
-
-				$values = get_post_meta(
-					$post_id, 'blocksy_post_meta_options'
+				$post_id = blocksy_translate_post_id(
+					$variation->ID,
+					[
+						'use_wpml_default_language_woo' => true
+					]
 				);
+
+				$values = get_post_meta($post_id, 'blocksy_post_meta_options');
 
 				if (empty($values)) {
 					$values = [[]];
@@ -59,7 +62,7 @@ class Blocksy_Meta_Boxes {
 					$values[0] = [];
 				}
 
-				echo blocksy_html_tag( 'input', [
+				echo blocksy_html_tag('input', [
 					'type' => 'hidden',
 					'class' => 'ct-options-panel-storage',
 					'value' => htmlspecialchars(wp_json_encode($values[0])),
@@ -92,8 +95,7 @@ class Blocksy_Meta_Boxes {
 			'blocksy_meta',
 			array(
 				'get_callback' => function ($object) {
-					$post_id = $object['id'];
-					return get_post_meta($post_id, 'blocksy_post_meta_options', true);
+					return blocksy_get_post_options($object['id']);
 				},
 				'update_callback' => function ($value, $object) {
 					$post_id = $object->ID;
@@ -137,10 +139,10 @@ class Blocksy_Meta_Boxes {
 
 			add_meta_box(
 				'blocksy_settings_meta_box',
-				sprintf(
+				blocksy_safe_sprintf(
 					// Translators: %s is the theme name.
-					__( '%s Settings', 'blocksy' ),
-					__( 'Blocksy', 'blocksy' )
+					__('%s Settings', 'blocksy'),
+					__('Blocksy', 'blocksy')
 				),
 				function ($post) {
 					$values = get_post_meta($post->ID, 'blocksy_post_meta_options');
@@ -178,7 +180,9 @@ class Blocksy_Meta_Boxes {
 
 					wp_nonce_field(basename(__FILE__), 'blocksy_settings_meta_box');
 				},
-				$type, 'normal', 'default'
+				$type,
+				'normal',
+				'default'
 			);
 		}
 	}
@@ -187,9 +191,13 @@ class Blocksy_Meta_Boxes {
 		// Checks save status.
 		$is_autosave = wp_is_post_autosave($post_id);
 		$is_revision = wp_is_post_revision($post_id);
+
 		$is_valid_nonce = !! (
 			isset($_POST['blocksy_settings_meta_box']) && wp_verify_nonce(
-				sanitize_text_field(wp_unslash($_POST['blocksy_settings_meta_box'])), basename(__FILE__)
+				sanitize_text_field(
+					wp_unslash($_POST['blocksy_settings_meta_box'])
+				),
+				basename(__FILE__)
 			)
 		);
 

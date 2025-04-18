@@ -55,6 +55,7 @@ abstract class Context_Weglot {
 			'\WeglotWP\Services\Translate_Service_Weglot',
 			'\WeglotWP\Services\Private_Language_Service_Weglot',
 			'\WeglotWP\Services\Href_Lang_Service_Weglot',
+			'\WeglotWP\Services\Feature_Flags_Service_Weglot',
 			'\WeglotWP\Services\Menu_Options_Service_Weglot',
 
 			'\WeglotWP\Third\Amp\Amp_Service_Weglot',
@@ -90,6 +91,7 @@ abstract class Context_Weglot {
 			'\WeglotWP\Actions\Admin\Customize_Menu_Weglot',
 			'\WeglotWP\Actions\Admin\Permalink_Weglot',
 			'\WeglotWP\Actions\Admin\Metabox_Url_Translate_Weglot',
+			'\WeglotWP\Actions\Admin\Metabox_Visual_Editor_Weglot',
 			'\WeglotWP\Actions\Front\Translate_Page_Weglot',
 			'\WeglotWP\Actions\Front\Front_Enqueue_Weglot',
 			'\WeglotWP\Actions\Front\Shortcode_Weglot',
@@ -112,6 +114,7 @@ abstract class Context_Weglot {
 			'\WeglotWP\Third\Woocommercepdf\WCPDF_Weglot',
 			'\WeglotWP\Third\UnderConstructionPage\Ucp_Tracking',
 			'\WeglotWP\Third\Maintenance\Maintenance_Tracking',
+			'\WeglotWP\Third\Woocommerce\Wc_Tracking_Weglot',
 			'\WeglotWP\Third\TheEventsCalendar\Theeventscalendar_Words',
 			'\WeglotWP\Third\Contactform7\Contactform7_Json_Keys',
 			'\WeglotWP\Third\WpOptimize\Wp_Optimize_Cache',
@@ -140,6 +143,19 @@ function weglot_init() {
 
 	if ( $cancel_init ) {
 		return;
+	}
+
+	if (version_compare(PHP_VERSION, '7.4', '<')) {
+		add_action( 'admin_notices', array( '\WeglotWP\Notices\Php_Weglot', 'admin_notice' ) );
+	}
+
+	if (version_compare(PHP_VERSION, '7.4', '<')) {
+		add_action('admin_notices', function () {
+			if (!get_transient('weglot_php_version_notice')) {
+				add_action('admin_notices', array('\WeglotWP\Notices\Php_Weglot', 'admin_notice'));
+				set_transient('weglot_php_version_notice', true, DAY_IN_SECONDS);
+			}
+		});
 	}
 
 	if ( ! function_exists( 'curl_version' ) || ! function_exists( 'curl_exec' ) ) {

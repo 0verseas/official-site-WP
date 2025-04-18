@@ -10,7 +10,7 @@ use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 
 defined( 'ABSPATH' ) || die();
 
@@ -47,6 +47,10 @@ class Dual_Button extends Base {
     public function get_keywords() {
         return [ 'button', 'btn', 'dual', 'advance', 'link' ];
     }
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
 
 	/**
      * Register widget content controls
@@ -442,7 +446,9 @@ class Dual_Button extends Base {
                 'name' => 'button_typography',
                 'label' => __( 'Typography', 'happy-elementor-addons' ),
                 'selector' => '{{WRAPPER}} .ha-dual-btn',
-                'scheme' => Typography::TYPOGRAPHY_4,
+                'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_ACCENT,
+				],
             ]
 		);
 
@@ -530,7 +536,9 @@ class Dual_Button extends Base {
                 'name' => 'left_button_typography',
                 'label' => __( 'Typography', 'happy-elementor-addons' ),
                 'selector' => '{{WRAPPER}} .ha-dual-btn--left',
-                'scheme' => Typography::TYPOGRAPHY_4,
+                'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_ACCENT,
+				],
             ]
         );
 
@@ -674,7 +682,9 @@ class Dual_Button extends Base {
                 'name' => 'connector_typography',
                 'label' => __( 'Typography', 'happy-elementor-addons' ),
                 'selector' => '{{WRAPPER}} .ha-dual-btn-connector',
-                'scheme' => Typography::TYPOGRAPHY_3
+                'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
             ]
 		);
 
@@ -737,7 +747,9 @@ class Dual_Button extends Base {
                 'name' => 'right_button_typography',
                 'label' => __( 'Typography', 'happy-elementor-addons' ),
                 'selector' => '{{WRAPPER}} .ha-dual-btn--right',
-                'scheme' => Typography::TYPOGRAPHY_4,
+                'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_ACCENT,
+				],
             ]
         );
 

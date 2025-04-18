@@ -31,14 +31,20 @@ const getParamObj = (hash) => {
             themeMode: hashParams.get('themeMode'),
             ...colorsObj,
             presentation: hashParams.get('presentation'),
+            lazyLoad: hashParams.get('lazyLoad'),
             copy_text: hashParams.get('copy_text'),
             add_text: hashParams.get('add_text'),
             draw: hashParams.get('draw'),
+            add_image: hashParams.get('add_image'),
             position: hashParams.get('position'),
             download: hashParams.get('download'),
             toolbar: hashParams.get('toolbar'),
-            doc_details: hashParams.get('doc_details'),
-            doc_rotation: hashParams.get('doc_rotation'),
+            doc_details: hashParams.get('pdf_details'),
+            doc_rotation: hashParams.get('pdf_rotation'),
+            selection_tool: hashParams.get('selection_tool'),
+            scrolling: hashParams.get('scrolling'),
+            spreads: hashParams.get('spreads'),
+            is_pro_active: hashParams.get('is_pro_active'),
         };
 
 
@@ -108,7 +114,7 @@ const pdfIframeStyle = (data) => {
     let settingsPos = '';
 
     if (data.toolbar === false || data.toolbar == 'false') {
-        data.presentation = false; data.download = true; data.copy_text = true; data.add_text = true; data.draw = true, data.doc_details = false; data.doc_rotation = false;
+        data.presentation = false; data.download = true; data.copy_text = true; data.add_text = true; data.draw = true, data.doc_details = false; data.doc_rotation = false, data.add_image = false;
     }
 
     let position = 'top';
@@ -123,10 +129,10 @@ const pdfIframeStyle = (data) => {
         copy_text = 'text';
     }
 
-    // console.log({data});
 
     let doc_details = isDisplay(data.doc_details);
     let doc_rotation = isDisplay(data.doc_rotation);
+    let add_image = isDisplay(data.add_image);
 
     const otherhead = document.getElementsByTagName("head")[0];
 
@@ -134,6 +140,8 @@ const pdfIframeStyle = (data) => {
     style.setAttribute('id', 'EBiframeStyleID');
 
     let pdfCustomColor = '';
+
+
 
     if (data.themeMode == 'custom') {
         if (!data.customColor) {
@@ -205,6 +213,9 @@ const pdfIframeStyle = (data) => {
             bottom: 32px;
             top: auto; 
         }
+        #mainContainer {
+            top: -40px!important;
+        }
     `;
     }
 
@@ -223,11 +234,14 @@ const pdfIframeStyle = (data) => {
         #secondaryOpenFile, #toolbarViewerRight #openFile{
             display: none!important;
         }
-        #secondaryDownload, #secondaryPrint, #toolbarViewerRight #print, #toolbarViewerRight #download{
+        #secondaryDownload, #secondaryPrint, #print, #download{
             display: ${download}!important;
         }
         #pageRotateCw{
             display: ${doc_rotation}!important;
+        }
+        #editorStamp{
+            display: ${add_image}!important;
         }
         #pageRotateCcw{
             display: ${doc_rotation}!important;
@@ -237,6 +251,9 @@ const pdfIframeStyle = (data) => {
         }
         .textLayer{
             user-select: ${copy_text}!important;
+            -webkit-user-select: ${copy_text}!important;
+            -moz-user-select: ${copy_text}!important;   
+            -ms-user-select: ${copy_text}!important;    
         }
         button#cursorSelectTool{
             display: ${copy_text}!important;
@@ -267,6 +284,7 @@ const manupulatePDFIframe = (e) => {
     let data = getParamObj(hashNewUrl.hash);
     pdfIframeStyle(data);
     setThemeMode(data.themeMode);
+
 }
 
 window.addEventListener('hashchange', (e) => {
@@ -278,4 +296,46 @@ let data = getParamObj(location.hash);
 
 pdfIframeStyle(data);
 setThemeMode(data.themeMode);
+
+
+
+document.querySelector(".presentationMode")?.addEventListener("click", function () {
+
+    var mainContainer = document.getElementById("mainContainer");
+    if (mainContainer && !document.fullscreenElement) {
+        mainContainer.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+});
+
+document.getElementById("viewBookmark")?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const url = e.target.getAttribute('href');
+    if (url !== null) {
+        alert(`Current Page: ${url}`);
+    }
+});
+
+
+if (data.lazyLoad === false || data.lazyLoad == 'false') {
+    document.querySelector('html').style.opacity = '1';
+}
+else {
+    function updateOpacity() {
+        const pdfViewer = document.querySelector('.pdfViewer');
+
+        if (pdfViewer.innerHTML.trim()) {
+            document.querySelector('html').style.opacity = '1';
+            document.querySelector('html').style.transition = '500ms';
+            clearInterval(intervalId);  // Clear the interval once opacity is set to 1
+        }
+    }
+    const intervalId = setInterval(updateOpacity, 100);
+    updateOpacity();
+}
 

@@ -204,7 +204,7 @@ class WPCode_Library {
 	 *
 	 * @return array
 	 */
-	private function get_from_server() {
+	protected function get_from_server() {
 		$data = $this->process_response( $this->make_request( $this->all_snippets_endpoint ) );
 
 		if ( empty( $data['snippets'] ) ) {
@@ -227,7 +227,8 @@ class WPCode_Library {
 	 */
 	public function make_request( $endpoint = '', $method = 'GET', $data = array() ) {
 		$args = array(
-			'method' => $method,
+			'method'  => $method,
+			'timeout' => 10,
 		);
 		if ( wpcode()->library_auth->has_auth() ) {
 			$args['headers'] = $this->get_authenticated_headers();
@@ -263,16 +264,17 @@ class WPCode_Library {
 	public function get_authenticated_headers() {
 		// Build the headers of the request.
 		return array(
-			'Content-Type'    => 'application/x-www-form-urlencoded',
-			'Cache-Control'   => 'no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0',
-			'Pragma'          => 'no-cache',
-			'Expires'         => 0,
-			'Origin'          => site_url(),
-			'WPCode-Referer'  => site_url(),
-			'WPCode-Sender'   => 'WordPress',
-			'WPCode-Site'     => esc_attr( get_option( 'blogname' ) ),
-			'WPCode-Version'  => esc_attr( WPCODE_VERSION ),
-			'X-WPCode-ApiKey' => wpcode()->library_auth->get_auth_key(),
+			'Content-Type'     => 'application/x-www-form-urlencoded',
+			'Cache-Control'    => 'no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0',
+			'Pragma'           => 'no-cache',
+			'Expires'          => 0,
+			'Origin'           => site_url(),
+			'WPCode-Referer'   => site_url(),
+			'WPCode-Sender'    => 'WordPress',
+			'WPCode-Site'      => esc_attr( get_option( 'blogname' ) ),
+			'WPCode-Version'   => esc_attr( WPCODE_VERSION ),
+			'WPCode-Client-Id' => wpcode()->library_auth->get_client_id(),
+			'X-WPCode-ApiKey'  => wpcode()->library_auth->get_auth_key(),
 		);
 	}
 
@@ -364,7 +366,7 @@ class WPCode_Library {
 
 		$snippet_data = apply_filters( 'wpcode_library_import_snippet_data', $snippet_data );
 
-		$snippet = new WPCode_Snippet( $snippet_data );
+		$snippet = wpcode_get_snippet( $snippet_data );
 
 		$snippet->save();
 
@@ -409,7 +411,7 @@ class WPCode_Library {
 			$snippets_from_library = array();
 
 			$args     = array(
-				'post_type'   => 'wpcode',
+				'post_type'   => wpcode_get_post_type(),
 				'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					array(
 						'key'     => $this->snippet_library_id_meta_key,
@@ -705,6 +707,36 @@ class WPCode_Library {
 				admin_url( 'admin.php' )
 			),
 			'wpcode_add_from_library'
+		);
+	}
+
+	/**
+	 * Get just the snippets from usernames.
+	 *
+	 * @return array
+	 */
+	public function get_username_snippets() {
+		$usernames = $this->get_library_usernames();
+
+		$snippets   = array();
+		$categories = array();
+
+		foreach ( $usernames as $username => $data ) {
+			$username_snippets = $this->get_snippets_by_username( $username, $data['version'] );
+			if ( ! empty( $username_snippets['snippets'] ) ) {
+				$categories[] = array(
+					'slug'  => $username,
+					'name'  => $data['label'],
+					'count' => count( $username_snippets['snippets'] ),
+				);
+				// Append snippets to the $this->data['snippets'] array.
+				$snippets = array_merge( $snippets, $username_snippets['snippets'] );
+			}
+		}
+
+		return array(
+			'categories' => $categories,
+			'snippets'   => $snippets,
 		);
 	}
 }

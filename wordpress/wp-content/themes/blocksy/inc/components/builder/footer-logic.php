@@ -226,7 +226,7 @@ class Blocksy_Footer_Builder {
 
 	public function get_section_value() {
 		if (! $this->section_value || is_customize_preview()) {
-			$this->section_value = get_theme_mod(
+			$this->section_value = blocksy_get_theme_mod(
 				'footer_placements',
 				$this->get_default_value()
 			);
@@ -256,9 +256,9 @@ class Blocksy_Footer_Builder {
 
 	private function get_filtered_section_id() {
 		if (
-			isset($this->get_section_value()['__forced_static_footer__'])
-			&&
 			is_customize_preview()
+			&&
+			isset($this->get_section_value()['__forced_static_footer__'])
 		) {
 			return $this->get_section_value()['__forced_static_footer__'];
 		}
@@ -271,7 +271,7 @@ class Blocksy_Footer_Builder {
 	}
 
 	public function patch_value_for($processed_terms) {
-		$current_value = get_theme_mod(
+		$current_value = blocksy_get_theme_mod(
 			'footer_placements',
 			$this->get_default_value()
 		);

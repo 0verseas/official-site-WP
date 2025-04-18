@@ -5,11 +5,21 @@
  * @package wpcode
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Class WPCode_Auto_Insert_Single.
  */
 class WPCode_Auto_Insert_Site_Wide extends WPCode_Auto_Insert_Type {
 
+	/**
+	 * The type unique name (slug).
+	 *
+	 * @var string
+	 */
+	public $name = 'site_wide';
 	/**
 	 * The category of this type.
 	 *
@@ -23,7 +33,28 @@ class WPCode_Auto_Insert_Site_Wide extends WPCode_Auto_Insert_Type {
 	 * @return void
 	 */
 	public function init() {
-		$this->label     = __( 'Site wide', 'insert-headers-and-footers' );
+		$this->locations = array(
+			'site_wide_header' => array(),
+			'site_wide_body'   => array(),
+			'site_wide_footer' => array(),
+		);
+	}
+
+	/**
+	 * Load the label.
+	 *
+	 * @return void
+	 */
+	public function load_label() {
+		$this->label = __( 'Site Wide (Frontend)', 'insert-headers-and-footers' );
+	}
+
+	/**
+	 * Load the available locations.
+	 *
+	 * @return void
+	 */
+	public function load_locations() {
 		$this->locations = array(
 			'site_wide_header' => array(
 				'label'       => esc_html__( 'Site Wide Header', 'insert-headers-and-footers' ),

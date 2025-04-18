@@ -73,25 +73,27 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 
 		$redirect_url = admin_url( 'admin.php?page=' . Helper_Pages_Weglot::SETTINGS );
 		if ( ! isset( $_GET['tab'] ) || ! isset( $_GET['_wpnonce'] ) ) { //phpcs:ignore
-			wp_redirect( $redirect_url );
+			wp_safe_redirect( $redirect_url );
 			exit;
 		}
 
 		if ( ! wp_verify_nonce( $_GET[ '_wpnonce' ], 'weglot_save_settings' ) ) { //phpcs:ignore
-			wp_redirect( $redirect_url );
+			wp_safe_redirect( $redirect_url );
 			exit;
 		}
 
 		$tab = $_GET[ 'tab' ]; //phpcs:ignore
 		$options = $_POST[ WEGLOT_SLUG ]; //phpcs:ignore
 
+		// SAVE USER VERSION OF PLUGIN INTO SETTINGS.
+		$options['custom_settings']['wp_user_version'] = WEGLOT_VERSION;
 		$options_bdd = $this->option_services->get_options_bdd_v3();
 
 		switch ( $tab ) {
 			case Helper_Tabs_Admin_Weglot::SETTINGS:
 				$has_first_settings = $this->option_services->get_has_first_settings();
 				$options            = $this->sanitize_options_settings( $options, $has_first_settings );
-				$response           = $this->option_services->save_options_to_weglot( $options, $has_first_settings );
+				$response           = $this->option_services->save_options_to_weglot( $options );
 
 				if ( $response['success'] && is_array( $response['result'] ) ) {
 					delete_transient( 'weglot_cache_cdn' );
@@ -122,12 +124,17 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 
 					// get menu options.
 					$options_menu = $this->option_services->get_option( 'menu_switcher' );
-					if ( ! empty( $options_menu ) ) {
-						foreach ( $options_menu as $key => $menu ) {
-							if ( $options['custom_settings']['button_style']['is_dropdown'] ) {
-								$options_menu[ $key ]['dropdown'] = 1;
-							} else {
-								$options_menu[ $key ]['dropdown'] = 0;
+					if ( is_array( $options_menu ) ) {
+						if ( ! empty( $options_menu ) ) {
+							foreach ( $options_menu as $key => $menu ) {
+								// Ensure $menu is an array before modifying
+								if ( is_array( $menu ) ) {
+									if ( $options['custom_settings']['button_style']['is_dropdown'] ) {
+										$options_menu[ $key ]['dropdown'] = 1;
+									} else {
+										$options_menu[ $key ]['dropdown'] = 0;
+									}
+								}
 							}
 						}
 					}
@@ -145,19 +152,6 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 
 				$this->option_services->set_options( $options_bdd );
 				break;
-			case Helper_Tabs_Admin_Weglot::CUSTOM_URLS:
-				if ( null === $options_bdd ) {
-					$options_bdd['custom_urls'] = array();
-				}
-
-				if ( array_key_exists( 'custom_urls', $options ) ) {
-					$options_bdd['custom_urls'] = $options['custom_urls'];
-				} else {
-					$options_bdd['custom_urls'] = array();
-				}
-
-				$this->option_services->set_options( $options_bdd );
-				break;
 		}
 
 		wp_redirect( $redirect_url ); //phpcs:ignore
@@ -168,13 +162,12 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 	/**
 	 * @since 2.0
 	 * @version 2.0.6
-	 * @param array $options
+	 * @param array<string|int,mixed> $options
 	 * @param mixed $has_first_settings
-	 * @return array
+	 * @return array<string|int,mixed>
 	 */
 	public function sanitize_options_settings( $options, $has_first_settings = false ) {
 		$user_info = $this->user_api_services->get_user_info( $options['api_key_private'] );
-		$plans     = $this->user_api_services->get_plans();
 		$switchers = $this->option_services->get_switchers_editor_button();
 
 		// Limit language.
@@ -198,32 +191,38 @@ class Options_Weglot implements Hooks_Interface_Weglot {
 			$options['custom_settings']['button_style']['with_name']   = $default_options['custom_settings']['button_style']['with_name'];
 		}
 
-		$options['custom_settings']['button_style']['custom_css'] = isset( $options['custom_settings']['button_style']['custom_css'] ) ? stripcslashes( $options['custom_settings']['button_style']['custom_css'] ) : '';
+		// Prioritize custom_css from options : custom_css, fallback to button_style : custom_css if needed
+		if (!empty($options['custom_css'])) {
+			$options['custom_settings']['button_style']['custom_css'] = stripcslashes($options['custom_css']);
+		}
+		elseif (!isset($options['custom_css']) && !empty($options['custom_settings']['button_style']['custom_css'])) {
+			$options['custom_css'] = stripcslashes($options['custom_settings']['button_style']['custom_css']);
+		}
+		else {
+			$options['custom_settings']['button_style']['custom_css'] = isset($options['custom_settings']['button_style']['custom_css']) ? stripcslashes($options['custom_settings']['button_style']['custom_css']) : '';
+		}
 
 		$options['custom_settings']['button_style']['flag_type'] = isset( $options['custom_settings']['button_style']['flag_type'] ) ? $options['custom_settings']['button_style']['flag_type'] : Helper_Flag_Type::RECTANGLE_MAT;
 
 		$options['custom_settings']['translate_email']  = isset( $options['custom_settings']['translate_email'] );
 		$options['custom_settings']['translate_search'] = isset( $options['custom_settings']['translate_search'] );
 		$options['custom_settings']['translate_amp']    = isset( $options['custom_settings']['translate_amp'] );
+		$options['custom_settings']['wp_user_version']  = $options['custom_settings']['wp_user_version'] ?? '';
+
+		if(WEGLOT_WOOCOMMERCE){
+			$options['custom_settings']['woocommerce_integration'] = true;
+		}
 
 		$options['auto_switch'] = isset( $options['auto_switch'] );
 
-		if ( ! isset( $options['excluded_blocks'] ) ) {
-			$options['excluded_blocks'] = array();
-		} else {
-			array_walk_recursive(
-				$options['excluded_blocks'],
-				function ( &$element ) {
-					// We remove unwanted backslashes.
-					$element = stripslashes( $element );
-				}
-			);
+		// Ensure options:custom_settings:switchers is set correctly
+		$options['custom_settings']['switchers'] = !empty($switchers) ? $switchers : [];
+
+		// Ensure $options['switchers'] is also updated if it's empty but custom_settings['switchers'] is not
+		if (empty($options['switchers']) && !empty($options['custom_settings']['switchers'])) {
+			$options['switchers'] = $options['custom_settings']['switchers'];
 		}
-		if(!empty($switchers)){
-			foreach ( $switchers as $switcher ) {
-				$options['custom_settings']['switchers'][] = $switcher;
-			}
-		}
+
 		return $options;
 	}
 }

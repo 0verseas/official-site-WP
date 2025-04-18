@@ -1,6 +1,7 @@
 <?php
 
 namespace Essential_Addons_Elementor\Elements;
+use Essential_Addons_Elementor\Classes\Helper;
 
 // If this file is called directly, abort.
 if (!defined('ABSPATH')) {
@@ -11,10 +12,10 @@ use \Elementor\Controls_Manager;
 use \Elementor\Group_Control_Border;
 use \Elementor\Group_Control_Box_Shadow;
 use \Elementor\Group_Control_Typography;
-use \Elementor\Core\Schemes\Typography;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use \Elementor\Widget_Base;
 use \Elementor\Group_Control_Background;
-use \Elementor\Core\Schemes\Color;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 
 class Formstack extends Widget_Base {
 
@@ -50,6 +51,10 @@ class Formstack extends Widget_Base {
             'ea',
             'essential addons'
         ];
+    }
+
+    public function has_widget_inner_wrapper(): bool {
+        return ! Helper::eael_e_optimized_markup();
     }
 
     public function get_custom_help_url () {
@@ -208,6 +213,9 @@ class Formstack extends Widget_Base {
                 'condition'   => [
                     'eael_formstack_custom_title_description' => 'yes',
                 ],
+                'ai' => [
+					'active' => false,
+				],
             ]
         );
 
@@ -541,7 +549,9 @@ class Formstack extends Widget_Base {
             [
                 'name'     => 'eael_formstack_form_description_typography',
                 'label'    => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme'   => Typography::TYPOGRAPHY_4,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_ACCENT
+                ],
                 'selector' => '{{WRAPPER}} .eael-formstack-description'
             ]
         );
@@ -1632,9 +1642,8 @@ class Formstack extends Widget_Base {
             [
                 'label'     => __('Title Color', 'essential-addons-for-elementor-lite'),
                 'type'      => Controls_Manager::COLOR,
-                'scheme'    => [
-                    'type'  => Color::get_type(),
-                    'value' => Color::COLOR_1,
+                'global' => [
+	                'default' => Global_Colors::COLOR_PRIMARY
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .eael-formstack .fsProgressBarContainer .fsProgressText' => 'color: {{VALUE}};',
@@ -1791,7 +1800,9 @@ class Formstack extends Widget_Base {
             [
                 'name'     => 'eael_formstack_pagination_button_typography',
                 'label'    => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme'   => Typography::TYPOGRAPHY_1,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+                ],
                 'selector' => '{{WRAPPER}} .eael-formstack .fsPagination button .fsFull',
             ]
         );
@@ -2106,7 +2117,7 @@ class Formstack extends Widget_Base {
 
 
         ?>
-        <div <?php echo $this->get_render_attribute_string('eael_formstack_wrapper'); ?>>
+        <div <?php $this->print_render_attribute_string('eael_formstack_wrapper'); ?>>
             <?php if ($settings['eael_formstack_custom_title_description'] == 'yes') { ?>
                 <div class="eael-formstack-heading">
                     <?php if ($settings['eael_formstack_form_title_custom'] != '') { ?>
@@ -2116,13 +2127,17 @@ class Formstack extends Widget_Base {
                     <?php } ?>
                     <?php if ($settings['eael_formstack_form_description_custom'] != '') { ?>
                         <div class="eael-contact-form-description eael-formstack-description">
-                            <?php echo $this->parse_text_editor($settings['eael_formstack_form_description_custom']); ?>
+                            <?php 
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            echo $this->parse_text_editor( $settings['eael_formstack_form_description_custom'] ); ?>
                         </div>
                     <?php } ?>
                 </div>
             <?php } ?>
             <div class="fsForm">
-                <?php echo $form_data; ?>
+                <?php
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo $this->parse_text_editor( $form_data ); ?>
             </div>
         </div>
         <?php

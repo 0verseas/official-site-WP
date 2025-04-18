@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: Stop User Enumeration
-Plugin URI: https://fullworks.net/products/stop-user-enumeration/
-Description: User enumeration is a technique used by hackers to get your login name if you are using permalinks. This plugin stops that.
-Version: 1.4.7
+Plugin URI: https://fullworksplugins.com/products/stop-user-enumeration/
+Description: Helps secure your site against hacking attacks through detecting  User Enumeration
+Version: 1.6.3
 Author: Fullworks
-Requires at least: 4.6
-Requires PHP: 5.6
+Requires at least: 6.3
+Requires PHP: 7.4
 Text Domain: stop-user-enumeration
 Domain Path: /languages
 Author URI: https://fullworksplugins.com/
@@ -37,7 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 define( 'STOP_USER_ENUMERATION_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'STOP_USER_ENUMERATION_PLUGIN_VERSION', '1.4.7' );
+define( 'STOP_USER_ENUMERATION_PLUGIN_VERSION', '1.6.3' );
 
 
 // Include the autoloader, so we can dynamically include the classes.

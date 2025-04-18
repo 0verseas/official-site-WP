@@ -6,21 +6,55 @@ import {
 	createRef,
 } from '@wordpress/element'
 import PickerModal, { getNoColorPropFor } from './picker-modal'
-import { Transition } from 'react-spring/renderprops'
-import bezierEasing from 'bezier-easing'
 import classnames from 'classnames'
 import { __ } from 'ct-i18n'
 import { normalizeCondition, matchValuesWithCondition } from 'match-conditions'
 
 import usePopoverMaker from '../../helpers/usePopoverMaker'
+import { getComputedStyleValue } from './utils'
 
-const resolveInherit = (picker, option, values) => {
+import OutsideClickHandler from '../react-outside-click-handler'
+
+const computePickerTitle = ({ picker, value, values }) => {
+	if ((value || { color: '' }).color.indexOf('INHERIT') > -1) {
+		return __('Inherited', 'blocksy')
+	}
+
+	if (picker.title !== picker.title.toString()) {
+		return (
+			Object.keys(picker.title).reduce((approvedTitle, currentTitle) => {
+				if (approvedTitle) {
+					return approvedTitle
+				}
+
+				if (
+					matchValuesWithCondition(
+						normalizeCondition(picker.title[currentTitle]),
+						values
+					)
+				) {
+					return currentTitle
+				}
+
+				return approvedTitle
+			}, null) || Object.keys(picker.title)[0]
+		)
+	}
+
+	return picker.title
+}
+
+export const resolveInherit = (picker, option, values, device) => {
 	if (typeof picker.inherit === 'string') {
 		if (picker.inherit.indexOf('self') > -1) {
-			const currentValue = values[option.id] || option.value
+			const currentValue =
+				(option.responsive
+					? values[option.id][device]
+					: values[option.id]) || option.value
 			const pickerToInheritFrom = picker.inherit.split(':')[1]
 
-			let maybeNextValue = currentValue[pickerToInheritFrom].color
+			let maybeNextValue =
+				currentValue[pickerToInheritFrom]?.color || 'CT_CSS_SKIP_RULE'
 
 			if (maybeNextValue.indexOf('CT_CSS_SKIP_RULE') > -1) {
 				maybeNextValue = option.pickers.find(
@@ -79,28 +113,21 @@ const SinglePicker = ({
 	onChange,
 	picker,
 
-	onPickingChange,
-	stopTransitioning,
+	onOutsideClick,
 
 	innerRef,
 
 	containerRef,
 	modalRef,
 
-	isTransitioning,
-	isPicking,
+	onPickingChange,
+	modalOpen,
+
 	values,
+
+	device,
 }) => {
 	const el = useRef()
-
-	const { appendToBody = true } = option
-
-	const { refreshPopover, styles, popoverProps } = usePopoverMaker({
-		contentRef: modalRef,
-		ref: containerRef || {},
-		defaultHeight: 379,
-		shouldCalculate: !option.inline_modal || appendToBody,
-	})
 
 	if (option.inline_modal) {
 		return (
@@ -115,93 +142,33 @@ const SinglePicker = ({
 		)
 	}
 
-	let modal = null
-
-	if (
-		isTransitioning === picker.id ||
-		(isPicking || '').split(':')[0] === picker.id
-	) {
-		modal = createPortal(
-			<Transition
-				items={isPicking}
-				onRest={() => stopTransitioning()}
-				config={{
-					duration: 100,
-					easing: bezierEasing(0.25, 0.1, 0.25, 1.0),
-				}}
-				from={
-					(isPicking || '').indexOf(':') === -1
-						? {
-								transform: 'scale3d(0.95, 0.95, 1)',
-								opacity: 0,
-						  }
-						: { opacity: 1 }
-				}
-				enter={
-					(isPicking || '').indexOf(':') === -1
-						? {
-								transform: 'scale3d(1, 1, 1)',
-								opacity: 1,
-						  }
-						: {
-								opacity: 1,
-						  }
-				}
-				leave={
-					(isPicking || '').indexOf(':') === -1
-						? {
-								transform: 'scale3d(0.95, 0.95, 1)',
-								opacity: 0,
-						  }
-						: {
-								opacity: 1,
-						  }
-				}>
-				{(isPicking) =>
-					(isPicking || '').split(':')[0] === picker.id &&
-					((props) => (
-						<PickerModal
-							style={{
-								...props,
-								...(appendToBody ? styles : {}),
-							}}
-							option={option}
-							onChange={onChange}
-							picker={picker}
-							value={value}
-							el={el}
-							inheritValue={
-								picker.inherit
-									? resolveInherit(picker, option, values)
-											.background
-									: ''
-							}
-							wrapperProps={
-								appendToBody
-									? popoverProps
-									: {
-											ref: modalRef,
-									  }
-							}
-							appendToBody={appendToBody}
-						/>
-					))
-				}
-			</Transition>,
-			appendToBody
-				? document.body
-				: el.current.closest('section').parentNode
-		)
-	}
-
 	return (
-		<div
-			ref={(instance) => {
-				el.current = instance
+		<OutsideClickHandler
+			useCapture={false}
+			display="inline-block"
+			disabled={!modalOpen}
+			wrapperProps={{
+				ref: (instance) => {
+					el.current = instance
 
-				if (innerRef) {
-					innerRef.current = instance
+					if (innerRef) {
+						innerRef.current = instance
+					}
+				},
+			}}
+			additionalRefs={[modalRef]}
+			onOutsideClick={(e) => {
+				if (
+					(el.current.closest('.ct-color-picker-container') ===
+						e.target.closest('.ct-color-picker-container') &&
+						(e.target.closest('.ct-color-picker-single') ||
+							e.target.matches('.ct-color-picker-single'))) ||
+					el.current.closest('.ct-modal-tabs-content') === e.target
+				) {
+					return
 				}
+
+				onOutsideClick(e)
 			}}
 			className={classnames('ct-color-picker-single', {})}>
 			<span tabIndex="0">
@@ -219,37 +186,36 @@ const SinglePicker = ({
 						if (option.skipModal) {
 							return
 						}
+
 						e.stopPropagation()
 
-						refreshPopover()
-
-						let futureIsPicking = isPicking
-							? isPicking.split(':')[0] === picker.id
-								? null
-								: `${picker.id}:${isPicking.split(':')[0]}`
-							: picker.id
-
-						onPickingChange(futureIsPicking)
+						onPickingChange(el)
 					}}
+					data-tooltip-reveal="top"
 					style={
 						((value || {}).color || '').indexOf(
 							getNoColorPropFor(option)
 						) === -1
 							? {
-									background: (value || {}).color,
+									background: getComputedStyleValue(
+										(value || {}).color
+									),
 							  }
 							: {
 									...(picker.inherit &&
 									(value || {}).color !==
 										getNoColorPropFor(option)
-										? resolveInherit(picker, option, values)
+										? resolveInherit(
+												picker,
+												option,
+												values,
+												device
+										  )
 										: {}),
 							  }
 					}>
-					<i className="ct-tooltip-top">
-						{(value || { color: '' }).color.indexOf('INHERIT') > -1
-							? __('Inherited', 'blocksy')
-							: picker.title}
+					<i className="ct-tooltip">
+						{computePickerTitle({ picker, value, values })}
 					</i>
 
 					{(value || { color: '' }).color.indexOf('INHERIT') > -1 && (
@@ -260,8 +226,11 @@ const SinglePicker = ({
 				</span>
 			</span>
 
-			{modal}
-		</div>
+			{option.afterPill &&
+				option.afterPill({
+					picker,
+				})}
+		</OutsideClickHandler>
 	)
 }
 

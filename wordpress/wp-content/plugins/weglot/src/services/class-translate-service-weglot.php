@@ -49,7 +49,6 @@ class Translate_Service_Weglot {
 	 * @var Generate_Switcher_Service_Weglot
 	 */
 	private $generate_switcher_service;
-	private $href_lang_services;
 
 
 	/**
@@ -171,11 +170,15 @@ class Translate_Service_Weglot {
 
 		$type      = apply_filters( 'weglot_type_treat_page', $type );
 		$canonical = $this->get_canonical_url_from_content( $content );
+		$force_request_url = apply_filters( 'weglot_get_current_canonical_url', false );
 
+		$weglot_force_translate_cart = apply_filters( 'weglot_force_translate_cart', false );
+		if( $weglot_force_translate_cart){
+			$content   = $this->force_translate_cart($content);
+		}
 		// No need to translate but prepare new dom with button.
 		if (
 			$this->current_language === $this->original_language
-			|| ! $active_translation
 			|| $this->check_404_exclusion_before_treat()
 			|| ! $this->request_url_services->get_weglot_url()->getForLanguage( $this->request_url_services->get_current_language(), false )
 		) {
@@ -190,10 +193,28 @@ class Translate_Service_Weglot {
 				if ( 'xml' === $type || 'json' === $type ) {
 					return $content;
 				} else {
-					return $this->weglot_render_dom( $content, $canonical );
+					//we check if we need to translate some forced child
+					$translate_inside_exclusions_blocks   = $this->option_services->get_translate_inside_exclusions_blocks();
+					if(0 < count($translate_inside_exclusions_blocks)){
+						add_filter('weglot_parser_whitelist', function ($whitelist) {
+							$translate_inside_exclusions_blocks = $this->option_services->get_translate_inside_exclusions_blocks();
+							return array_merge($whitelist, $translate_inside_exclusions_blocks);
+						});
+						$parser = $this->parser_services->get_parser();
+						if($force_request_url){
+							$request_url = $this->request_url_services->get_current_canonical_url();
+							$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical, $request_url);
+						}else{
+							$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical);
+						}
+						return $this->weglot_render_dom( $translated_content, $canonical );
+					}else{
+						return $this->weglot_render_dom( $content, $canonical );
+					}
 				}
 			}
 		}
+		do_action('weglot_treat_page_hook', $this->current_language);
 
 		$parser = $this->parser_services->get_parser();
 
@@ -201,18 +222,27 @@ class Translate_Service_Weglot {
 			switch ( $type ) {
 				case 'json':
 					$extra_keys         = apply_filters( 'weglot_add_json_keys', array() );
-					$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, $extra_keys );
+					$translated_content = $parser->translate( $content, $this->original_language,$this->current_language, $extra_keys );
 					$translated_content = wp_json_encode( $this->replace_url_services->replace_link_in_json( json_decode( $translated_content, true ) ) );
 
 					return apply_filters( 'weglot_json_treat_page', $translated_content );
 				case 'xml':
 					$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical );
+					if ( $this->current_language !== $this->original_language ) {
+						$translated_content = $this->replace_url_services->replace_link_in_xml( $translated_content );
+					}
 					$translated_content = apply_filters( 'weglot_html_treat_page', $translated_content );
 
 					return apply_filters( 'weglot_xml_treat_page', $translated_content );
 				case 'html':
-					$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical );
-					$translated_content = apply_filters( 'weglot_html_treat_page', $translated_content );
+					if($force_request_url){
+						$request_url = $this->request_url_services->get_current_canonical_url();
+						$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical, $request_url);
+					}else{
+						$translated_content = $parser->translate( $content, $this->original_language, $this->current_language, array(), $canonical);
+					}					$translated_content = apply_filters( 'weglot_html_treat_page', $translated_content );
+					$translated_content = $this->replace_url_services->proxify_url( $translated_content );
+					$translated_content = $this->disable_automated_translation_services( $translated_content );
 
 					return $this->weglot_render_dom( $translated_content, $canonical );
 				default:
@@ -256,6 +286,27 @@ class Translate_Service_Weglot {
 		return preg_replace( '/<!--(.*)-->/Uis', '', $html );
 	}
 
+	/**
+	 * Force translate woocommerce cart.
+	 *
+	 * @param string $content the HTML string.
+	 *
+	 * @return string
+	 * @since 2.3.0
+	 */
+	private function force_translate_cart( $content ) {
+		if ( false !== strpos( wp_get_referer(), '/cart/' ) ) {
+			// This is the cart page
+			$parser = $this->parser_services->get_parser();
+			$current_language = $this->request_url_services->create_url_object( wp_get_referer() )->getCurrentLanguage();
+			if($current_language->getInternalCode() != $this->original_language){
+				$translated_content = $parser->translate( $content, $this->original_language, $current_language->getInternalCode() );
+				$translated_content = apply_filters( 'weglot_html_treat_page', $translated_content );
+				return $this->weglot_render_dom( $translated_content );
+			}
+		}
+		return $content;
+	}
 
 	/**
 	 * Replace links and add switcher on the final HTML.
@@ -274,7 +325,7 @@ class Translate_Service_Weglot {
 			$dom = $this->replace_url_services->replace_link_in_dom( $dom );
 		}
 
-		// Remove hreflangs if non canonical page.
+		// Remove hreflangs if non-canonical page.
 		if ( '' !== $canonical ) {
 			$canonical   = urldecode( $canonical );
 			$current_url = $this->request_url_services->get_weglot_url();
@@ -289,6 +340,25 @@ class Translate_Service_Weglot {
 		}
 
 		return apply_filters( 'weglot_render_dom', $dom );
+	}
+
+	/**
+	 * Disable automated translation services adding translate="no" attributes.
+	 *
+	 * @param string $html the HTML string.
+	 *
+	 * @return string
+	 * @since 2.3.0
+	 */
+	private function disable_automated_translation_services( $html ) {
+		$remove_auto_service_translate = apply_filters( 'weglot_remove_google_translate', true );
+		if($remove_auto_service_translate){
+			$pattern = '/<html(\s*>|\s+)/i';
+			$replacement = '<html translate="no"$1';
+			return preg_replace($pattern, $replacement, $html);
+		}
+
+		return $html;
 	}
 }
 

@@ -1,124 +1,518 @@
-import { typographyOption } from '../../../../static/js/customizer/sync/variables/typography'
 import ctEvents from 'ct-events'
+
+import { typographyOption } from '../../../../static/js/customizer/sync/variables/typography'
 import { updateAndSaveEl } from '../../../../static/js/customizer/sync'
-import { responsiveClassesFor } from '../../../../static/js/customizer/sync/helpers'
 import {
 	getRootSelectorFor,
 	assembleSelector,
 	withKeys,
 	mutateSelector,
+	getSkipRuleKeyword,
 } from '../../../../static/js/customizer/sync/helpers'
 
-export const handleMenuVariables = ({ itemId }) => ({
-	headerMenuItemsSpacing: {
-		selector: assembleSelector(getRootSelectorFor({ itemId })),
-		variable: 'menu-items-spacing',
-		unit: 'px',
-	},
+export const handleMenuVariables = ({ itemId, values }) => {
+	const header_menu_type = values.header_menu_type || 'type-1'
 
-	headerMenuItemsHeight: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '> ul > li > a',
-			})
-		),
-		variable: 'menu-item-height',
-		unit: '%',
-	},
+	const allSkipped = {
+		default: {
+			color: getSkipRuleKeyword('DEFAULT'),
+		},
+		hover: {
+			color: getSkipRuleKeyword('DEFAULT'),
+		},
+		active: {
+			color: getSkipRuleKeyword('DEFAULT'),
+		},
+		'hover-type-3': {
+			color: getSkipRuleKeyword('DEFAULT'),
+		},
+		'active-type-3': {
+			color: getSkipRuleKeyword('DEFAULT'),
+		},
+	}
 
-	...typographyOption({
-		id: 'headerMenuFont',
+	const valuesDefaults = {
+		menuFontColor: {
+			default: { color: 'var(--theme-text-color)' },
+			hover: {
+				color: getSkipRuleKeyword('DEFAULT'),
+			},
+			active: {
+				color: getSkipRuleKeyword('DEFAULT'),
+			},
+			'hover-type-3': { color: '#ffffff' },
+			'active-type-3': {
+				color: getSkipRuleKeyword('DEFAULT'),
+			},
+		},
 
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '> ul > li > a',
-			})
-		),
-	}),
+		transparentMenuFontColor: allSkipped,
+		stickyMenuFontColor: allSkipped,
+	}
 
-	dropdownTopOffset: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-		variable: 'dropdown-top-offset',
-		unit: 'px',
-	},
+	const extractKeyWithDefault = (key) => (values) => {
+		return values[key] || valuesDefaults[key]
+	}
 
-	stickyStateDropdownTopOffset: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: mutateSelector({
+	const menuFontColor = [
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '> ul > li > a',
+				})
+			),
+			variable: 'theme-link-initial-color',
+			type: 'color:default',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('menuFontColor'),
+		},
+
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '> ul > li > a',
+				})
+			),
+			variable: 'theme-link-hover-color',
+			type:
+				header_menu_type === 'type-3'
+					? 'color:hover-type-3'
+					: 'color:hover',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('menuFontColor'),
+		},
+
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '> ul > li > a',
+				})
+			),
+			variable: 'theme-link-active-color',
+			type:
+				header_menu_type === 'type-3'
+					? 'color:active-type-3'
+					: 'color:active',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('menuFontColor'),
+		},
+	]
+
+	const transparentMenuFontColor = [
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '> ul > li > a',
+					}),
+					operation: 'between',
+					to_add: '[data-transparent-row="yes"]',
+				})
+			),
+			variable: 'theme-link-initial-color',
+			type: 'color:default',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('transparentMenuFontColor'),
+		},
+
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '> ul > li > a',
+					}),
+					operation: 'between',
+					to_add: '[data-transparent-row="yes"]',
+				})
+			),
+			variable: 'theme-link-hover-color',
+			type:
+				header_menu_type === 'type-3'
+					? 'color:hover-type-3'
+					: 'color:hover',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('transparentMenuFontColor'),
+		},
+
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '> ul > li > a',
+					}),
+					operation: 'between',
+					to_add: '[data-transparent-row="yes"]',
+				})
+			),
+			variable: 'theme-link-active-color',
+			type:
+				header_menu_type === 'type-3'
+					? 'color:active-type-3'
+					: 'color:active',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('transparentMenuFontColor'),
+		},
+	]
+
+	const stickyMenuFontColor = [
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '> ul > li > a',
+					}),
+					operation: 'between',
+					to_add: '[data-sticky*="yes"]',
+				})
+			),
+			variable: 'theme-link-initial-color',
+			type: 'color:default',
+
+			fullValue: true,
+
+			extractValue: extractKeyWithDefault('stickyMenuFontColor'),
+		},
+
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '> ul > li > a',
+					}),
+					operation: 'between',
+					to_add: '[data-sticky*="yes"]',
+				})
+			),
+			variable: 'theme-link-hover-color',
+			type:
+				header_menu_type === 'type-3'
+					? 'color:hover-type-3'
+					: 'color:hover',
+
+			fullValue: true,
+			extractValue: extractKeyWithDefault('stickyMenuFontColor'),
+		},
+
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '> ul > li > a',
+					}),
+					operation: 'between',
+					to_add: '[data-sticky*="yes"]',
+				})
+			),
+			variable: 'theme-link-active-color',
+			type:
+				header_menu_type === 'type-3'
+					? 'color:active-type-3'
+					: 'color:active',
+
+			fullValue: true,
+
+			extractValue: extractKeyWithDefault('stickyMenuFontColor'),
+		},
+	]
+
+	return {
+		headerMenuItemsSpacing: {
+			selector: assembleSelector(getRootSelectorFor({ itemId })),
+			variable: 'menu-items-spacing',
+			unit: 'px',
+		},
+
+		headerMenuItemsGap: {
+			selector: assembleSelector(getRootSelectorFor({ itemId })),
+			variable: 'menu-items-gap',
+			unit: 'px',
+		},
+
+		headerMenuItemsHeight: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '> ul > li > a',
+				})
+			),
+			variable: 'menu-item-height',
+			unit: '%',
+		},
+
+		...typographyOption({
+			id: 'headerMenuFont',
+
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '> ul > li > a',
+				})
+			),
+		}),
+
+		dropdownTopOffset: {
+			selector: assembleSelector(
+				mutateSelector({
 					selector: getRootSelectorFor({ itemId }),
 					operation: 'suffix',
 					to_add: '.sub-menu',
-				}),
-				operation: 'between',
-				to_add: '[data-sticky*="yes"]',
-			})
+				})
+			),
+			variable: 'dropdown-top-offset',
+			unit: 'px',
+		},
+
+		stickyStateDropdownTopOffset: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '.sub-menu',
+					}),
+					operation: 'between',
+					to_add: '[data-sticky*="yes"]',
+				})
+			),
+			variable: 'sticky-state-dropdown-top-offset',
+			unit: 'px',
+		},
+
+		dropdown_horizontal_offset: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '.sub-menu',
+				})
+			),
+			variable: 'dropdown-horizontal-offset',
+			unit: 'px',
+		},
+
+		dropdownMenuWidth: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '.sub-menu',
+				})
+			),
+			variable: 'dropdown-width',
+			unit: 'px',
+		},
+
+		dropdownItemsSpacing: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '.sub-menu',
+				})
+			),
+			variable: 'dropdown-items-spacing',
+			unit: 'px',
+		},
+
+		...typographyOption({
+			id: 'headerDropdownFont',
+
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '.sub-menu .ct-menu-link',
+				})
+			),
+		}),
+
+		...withKeys(
+			['headerDropdownDivider', 'dropdown_items_type'],
+			[
+				{
+					selector: assembleSelector(
+						mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu',
+						})
+					),
+					fullValue: true,
+					extractValue: ({ headerDropdownDivider }) => {
+						return headerDropdownDivider
+					},
+					variable: 'dropdown-divider',
+					type: 'border',
+				},
+
+				{
+					selector: assembleSelector(
+						mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu',
+						})
+					),
+					fullValue: true,
+					extractValue: ({
+						dropdown_items_type,
+						headerDropdownDivider,
+					}) => {
+						if (dropdown_items_type !== 'padded') {
+							return 'CT_CSS_SKIP_RULE'
+						}
+
+						return headerDropdownDivider['style'] !== 'none'
+							? '1'
+							: '0'
+					},
+					unit: '',
+					variable: 'has-divider',
+				},
+			]
 		),
-		variable: 'sticky-state-dropdown-top-offset',
-		unit: 'px',
-	},
 
-	dropdown_horizontal_offset: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-		variable: 'dropdown-horizontal-offset',
-		unit: 'px',
-	},
+		headerMenuMargin: {
+			selector: assembleSelector(getRootSelectorFor({ itemId })),
+			type: 'spacing',
+			variable: 'margin',
+			responsive: true,
+			important: true,
+		},
 
-	dropdownMenuWidth: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-		variable: 'dropdown-width',
-		unit: 'px',
-	},
+		headerToplevelBorderRadius: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '> ul > li > a',
+				})
+			),
+			type: 'spacing',
+			variable: 'menu-item-radius',
+			responsive: true,
+		},
 
-	dropdownItemsSpacing: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-		variable: 'dropdown-items-spacing',
-		unit: 'px',
-	},
+		headerDropdownShadow: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '.sub-menu',
+				})
+			),
+			type: 'box-shadow',
+			variable: 'theme-box-shadow',
+			responsive: true,
+		},
 
-	...typographyOption({
-		id: 'headerDropdownFont',
+		headerDropdownRadius: {
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({ itemId }),
+					operation: 'suffix',
+					to_add: '.sub-menu',
+				})
+			),
+			type: 'spacing',
+			variable: 'theme-border-radius',
+			responsive: true,
+		},
 
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-	}),
+		header_menu_type: [
+			...menuFontColor,
 
-	...withKeys(
-		['headerDropdownDivider', 'dropdown_items_type'],
-		[
+			...(values.stickyMenuFontColor ? stickyMenuFontColor : []),
+
+			...(values.transparentMenuFontColor
+				? transparentMenuFontColor
+				: []),
+		],
+
+		// default state
+		menuFontColor,
+
+		menuIndicatorColor: [
+			{
+				selector: assembleSelector(getRootSelectorFor({ itemId })),
+				variable: 'menu-indicator-hover-color',
+				type: 'color:hover',
+				responsive: true,
+			},
+
+			{
+				selector: assembleSelector(getRootSelectorFor({ itemId })),
+				variable: 'menu-indicator-active-color',
+				type: 'color:active',
+				responsive: true,
+			},
+		],
+
+		headerDropdownFontColor: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '.sub-menu .ct-menu-link',
+					})
+				),
+				variable: 'theme-link-initial-color',
+				type: 'color:default',
+			},
+
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '.sub-menu .ct-menu-link',
+					})
+				),
+				variable: 'theme-link-hover-color',
+				type: 'color:hover',
+			},
+
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: getRootSelectorFor({ itemId }),
+						operation: 'suffix',
+						to_add: '.sub-menu .ct-menu-link',
+					})
+				),
+				variable: 'theme-link-active-color',
+				type: 'color:active',
+			},
+		],
+
+		headerDropdownBackground: [
 			{
 				selector: assembleSelector(
 					mutateSelector({
@@ -127,12 +521,8 @@ export const handleMenuVariables = ({ itemId }) => ({
 						to_add: '.sub-menu',
 					})
 				),
-				fullValue: true,
-				extractValue: ({ headerDropdownDivider }) => {
-					return headerDropdownDivider
-				},
-				variable: 'dropdown-divider',
-				type: 'border',
+				variable: 'dropdown-background-color',
+				type: 'color:default',
 			},
 
 			{
@@ -143,567 +533,244 @@ export const handleMenuVariables = ({ itemId }) => ({
 						to_add: '.sub-menu',
 					})
 				),
-				fullValue: true,
-				extractValue: ({
-					dropdown_items_type,
-					headerDropdownDivider,
-				}) => {
-					if (dropdown_items_type !== 'padded') {
-						return 'CT_CSS_SKIP_RULE'
-					}
-
-					return headerDropdownDivider['style'] !== 'none' ? '1' : '0'
-				},
-				unit: '',
-				variable: 'has-divider',
+				variable: 'dropdown-background-hover-color',
+				type: 'color:hover',
 			},
-		]
-	),
+		],
 
-	headerMenuMargin: {
-		selector: assembleSelector(getRootSelectorFor({ itemId })),
-		type: 'spacing',
-		variable: 'margin',
-		responsive: true,
-		important: true,
-	},
+		// transparent state
+		transparentMenuFontColor,
 
-	headerToplevelBorderRadius: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '> ul > li > a',
-			})
-		),
-		type: 'spacing',
-		variable: 'menu-item-radius',
-		responsive: true,
-	},
-
-	headerDropdownShadow: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-		type: 'box-shadow',
-		variable: 'box-shadow',
-		responsive: true,
-	},
-
-	headerDropdownRadius: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'suffix',
-				to_add: '.sub-menu',
-			})
-		),
-		type: 'spacing',
-		variable: 'border-radius',
-		responsive: true,
-	},
-
-	// default state
-	menuFontColor: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '> ul > li > a',
-				})
-			),
-			variable: 'linkInitialColor',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '> ul > li > a',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '> ul > li > a',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'el-suffix',
-					to_add: '[data-menu*="type-3"] > ul > li > a',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover-type-3',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'el-suffix',
-					to_add: '[data-menu*="type-3"] > ul > li > a',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active-type-3',
-		},
-	],
-
-	menuIndicatorColor: {
-		selector: assembleSelector(getRootSelectorFor({ itemId })),
-		variable: 'menu-indicator-active-color',
-		type: 'color:active',
-		responsive: true,
-	},
-
-	headerDropdownFontColor: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '.sub-menu',
-				})
-			),
-			variable: 'linkInitialColor',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '.sub-menu',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '.sub-menu',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active',
-		},
-	],
-
-	headerDropdownBackground: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '.sub-menu',
-				})
-			),
-			variable: 'dropdown-background-color',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: getRootSelectorFor({ itemId }),
-					operation: 'suffix',
-					to_add: '.sub-menu',
-				})
-			),
-			variable: 'dropdown-background-hover-color',
-			type: 'color:hover',
-		},
-	],
-
-	// transparent state
-	transparentMenuFontColor: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
+		transparentMenuIndicatorColor: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
 						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '> ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'linkInitialColor',
-			type: 'color:default',
-		},
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
 
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
+				variable: 'menu-indicator-hover-color',
+				type: 'color:hover',
+				responsive: true,
+			},
+
+			{
+				selector: assembleSelector(
+					mutateSelector({
 						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '> ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover',
-		},
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
 
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
+				variable: 'menu-indicator-active-color',
+				type: 'color:active',
+				responsive: true,
+			},
+		],
+
+		transparentHeaderDropdownFontColor: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu .ct-menu-link',
+						}),
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
+				variable: 'theme-link-initial-color',
+				type: 'color:default',
+			},
+
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu .ct-menu-link',
+						}),
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
+				variable: 'theme-link-hover-color',
+				type: 'color:hover',
+			},
+
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu .ct-menu-link',
+						}),
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
+				variable: 'theme-link-active-color',
+				type: 'color:active',
+			},
+		],
+
+		transparentHeaderDropdownBackground: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu',
+						}),
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
+				variable: 'dropdown-background-color',
+				type: 'color:default',
+			},
+
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu',
+						}),
+						operation: 'between',
+						to_add: '[data-transparent-row="yes"]',
+					})
+				),
+				variable: 'dropdown-background-hover-color',
+				type: 'color:hover',
+			},
+		],
+
+		// sticky state
+		stickyMenuFontColor,
+
+		stickyMenuIndicatorColor: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
 						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '> ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active',
-		},
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'menu-indicator-hover-color',
+				type: 'color:hover',
+				responsive: true,
+			},
 
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
+			{
+				selector: assembleSelector(
+					mutateSelector({
 						selector: getRootSelectorFor({ itemId }),
-						operation: 'el-suffix',
-						to_add: '[data-menu*="type-3"] > ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'menu-indicator-active-color',
+				type: 'color:active',
+				responsive: true,
+			},
+		],
 
-			variable: 'linkHoverColor',
-			type: 'color:hover-type-3',
-		},
+		stickyHeaderDropdownFontColor: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu .ct-menu-link',
+						}),
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'theme-link-initial-color',
+				type: 'color:default',
+			},
 
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'el-suffix',
-						to_add: '[data-menu*="type-3"] > ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu .ct-menu-link',
+						}),
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'theme-link-hover-color',
+				type: 'color:hover',
+			},
 
-			variable: 'linkActiveColor',
-			type: 'color:active-type-3',
-		},
-	],
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu .ct-menu-link',
+						}),
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'theme-link-active-color',
+				type: 'color:active',
+			},
+		],
 
-	transparentMenuIndicatorColor: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'between',
-				to_add: '[data-transparent-row="yes"]',
-			})
-		),
+		stickyHeaderDropdownBackground: [
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu',
+						}),
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'dropdown-background-color',
+				type: 'color:default',
+			},
 
-		variable: 'menu-indicator-active-color',
-		type: 'color:active',
-		responsive: true,
-	},
-
-	transparentHeaderDropdownFontColor: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'linkInitialColor',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active',
-		},
-	],
-
-	transparentHeaderDropdownBackground: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'dropdown-background-color',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-transparent-row="yes"]',
-				})
-			),
-			variable: 'dropdown-background-hover-color',
-			type: 'color:hover',
-		},
-	],
-
-	// sticky state
-	stickyMenuFontColor: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '> ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkInitialColor',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '> ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '> ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'el-suffix',
-						to_add: '[data-menu*="type-3"] > ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover-type-3',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'el-suffix',
-						to_add: '[data-menu*="type-3"] > ul > li > a',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active-type-3',
-		},
-	],
-
-	stickyMenuIndicatorColor: {
-		selector: assembleSelector(
-			mutateSelector({
-				selector: getRootSelectorFor({ itemId }),
-				operation: 'between',
-				to_add: '[data-sticky*="yes"]',
-			})
-		),
-		variable: 'menu-indicator-active-color',
-		type: 'color:active',
-		responsive: true,
-	},
-
-	stickyHeaderDropdownFontColor: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkInitialColor',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkHoverColor',
-			type: 'color:hover',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'linkActiveColor',
-			type: 'color:active',
-		},
-	],
-
-	stickyHeaderDropdownBackground: [
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'dropdown-background-color',
-			type: 'color:default',
-		},
-
-		{
-			selector: assembleSelector(
-				mutateSelector({
-					selector: mutateSelector({
-						selector: getRootSelectorFor({ itemId }),
-						operation: 'suffix',
-						to_add: '.sub-menu',
-					}),
-					operation: 'between',
-					to_add: '[data-sticky*="yes"]',
-				})
-			),
-			variable: 'dropdown-background-hover-color',
-			type: 'color:hover',
-		},
-	],
-})
+			{
+				selector: assembleSelector(
+					mutateSelector({
+						selector: mutateSelector({
+							selector: getRootSelectorFor({ itemId }),
+							operation: 'suffix',
+							to_add: '.sub-menu',
+						}),
+						operation: 'between',
+						to_add: '[data-sticky*="yes"]',
+					})
+				),
+				variable: 'dropdown-background-hover-color',
+				type: 'color:hover',
+			},
+		],
+	}
+}
 
 export const handleMenuOptions = ({
 	selector,
@@ -724,7 +791,7 @@ export const handleMenuOptions = ({
 
 	if (optionId === 'headerMenuItemsSpacing') {
 		ctEvents.trigger('ct:header:update')
-		ctEvents.trigger('ct:header:render-frame')
+		ctEvents.trigger('ct:header:refresh-menu-submenus')
 	}
 
 	if (

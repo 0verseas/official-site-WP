@@ -12,7 +12,8 @@ namespace RankMath\Analytics;
 
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
+use RankMath\Google\Analytics;
 use RankMathPro\Analytics\Pageviews;
 use RankMath\Google\Console as Google_Analytics;
 
@@ -217,7 +218,7 @@ class Stats extends Keywords {
 
 			array_push( $sql_parts, sprintf( "WHEN %s BETWEEN '%s' AND '%s' THEN 'range%d'", $column, $start_date, $end_date, $index ) );
 
-			$index ++;
+			++$index;
 		}
 
 		array_push( $sql_parts, "ELSE 'none'" );
@@ -229,14 +230,14 @@ class Stats extends Keywords {
 	/**
 	 * Get date array
 	 *
-	 * @param  array $dates Dates.
-	 * @param  array $default Default value.
+	 * @param  array $dates         Dates.
+	 * @param  array $default_value Default value.
 	 * @return array
 	 */
-	public function get_date_array( $dates, $default ) {
+	public function get_date_array( $dates, $default_value ) {
 		$data = [];
 		foreach ( $dates as $date => $d ) {
-			$data[ $date ]                  = $default;
+			$data[ $date ]                  = $default_value;
 			$data[ $date ]['date']          = $date;
 			$data[ $date ]['dateFormatted'] = $d['start'] === $d['end'] ? $d['formatted_date'] : $d['formatted_period'];
 			$data[ $date ]['formattedDate'] = $d['formatted_date'];
@@ -452,12 +453,12 @@ class Stats extends Keywords {
 	/**
 	 * Get filter data.
 	 *
-	 * @param string $filter  Filter key.
-	 * @param string $default Filter default value.
+	 * @param string $filter        Filter key.
+	 * @param string $default_value Filter default value.
 	 *
 	 * @return mixed
 	 */
-	public function get_date_from_cookie( $filter, $default ) {
+	public function get_date_from_cookie( $filter, $default_value ) {
 		$cookie_key = 'rank_math_analytics_' . $filter;
 		$new_value  = sanitize_title( Param::post( $filter ) );
 		if ( $new_value ) {
@@ -466,10 +467,10 @@ class Stats extends Keywords {
 		}
 
 		if ( ! empty( $_COOKIE[ $cookie_key ] ) ) {
-			return $_COOKIE[ $cookie_key ];
+			return sanitize_text_field( $_COOKIE[ $cookie_key ] );
 		}
 
-		return $default;
+		return $default_value;
 	}
 
 	/**
@@ -503,6 +504,7 @@ class Stats extends Keywords {
 		$offset         = $args['offset'];
 		$perpage        = $args['perpage'];
 		$order_by_field = $args['orderBy'];
+		$sub_where      = $args['sub_where'];
 
 		$order_position_fields = [ 'position', 'diffPosition' ];
 		$order_metrics_fields  = [ 'clicks', 'diffClicks', 'impressions', 'diffImpressions', 'ctr', 'diffCtr' ];
@@ -544,7 +546,7 @@ class Stats extends Keywords {
 			$positions = $this->get_position_data_by_dimension(
 				[
 					'dimension' => $dimension,
-					'sub_where' => ' AND ' . $dimension . " IN ('" . join( "', '", $dimensions ) . "')",
+					'sub_where' => ' AND ' . $dimension . " IN ('" . join( "', '", $dimensions ) . "') " . $sub_where,
 				]
 			);
 
@@ -563,12 +565,6 @@ class Stats extends Keywords {
 		}
 
 		$page_urls = \array_merge( \array_keys( $rows ), $args['pages'] );
-
-		$pageviews = [];
-		if ( \class_exists( 'RankMathPro\Analytics\Pageviews' ) && $args['pageview'] && ! empty( $page_urls ) ) {
-			$pageviews = Pageviews::get_pageviews( [ 'pages' => $page_urls ] );
-			$pageviews = $pageviews['rows'];
-		}
 
 		if ( $args['objects'] ) {
 			$objects = $this->get_objects( $page_urls );
@@ -608,20 +604,6 @@ class Stats extends Keywords {
 			);
 		}
 
-		if ( $args['pageview'] && ! empty( $pageviews ) ) {
-			foreach ( $pageviews as $pageview ) {
-				$page = $pageview['page'];
-				if ( ! isset( $rows[ $page ] ) ) {
-					$rows[ $page ] = [];
-				}
-
-				$rows[ $page ]['pageviews'] = [
-					'total'      => (int) $pageview['pageviews'],
-					'difference' => (int) $pageview['difference'],
-				];
-			}
-		}
-
 		if ( $args['objects'] && ! empty( $objects ) ) {
 			foreach ( $objects as $object ) {
 				$page = $object['page'];
@@ -632,7 +614,7 @@ class Stats extends Keywords {
 			}
 		}
 
-		return $rows;
+		return $this->do_filter( 'analytics/rows', $rows, $args, $page_urls );
 	}
 
 	/**
@@ -777,7 +759,7 @@ class Stats extends Keywords {
 	 */
 	public function get_metrics_data_by_dimension( $args = [] ) {
 		global $wpdb;
-
+		Helper::enable_big_selects_for_queries();
 		$args = wp_parse_args(
 			$args,
 			[

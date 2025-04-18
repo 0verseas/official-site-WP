@@ -8,21 +8,6 @@ class HeaderAdditions {
 	private $has_account_modal = '__empty__';
 
 	public function __construct() {
-		add_action(
-			'customize_controls_enqueue_scripts',
-			function () {
-				$this->enqueue_static();
-			}
-		);
-
-		add_action(
-			'admin_enqueue_scripts',
-			function () {
-				$this->enqueue_static();
-			},
-			50
-		);
-
 		add_filter('blocksy:header:selective_refresh', function ($selective_refresh) {
 			$selective_refresh[] = [
 				'id' => 'header_placements_item:account',
@@ -236,11 +221,7 @@ class HeaderAdditions {
 		});
 
 		add_filter('blocksy:header:settings', function ($opt) {
-			$opt = blc_call_fn(
-				[
-					'fn' => 'blocksy_get_options',
-					'default' => 'array'
-				],
+			$opt = blocksy_get_options(
 				dirname(__FILE__) . '/header/header-options.php',
 				[],
 				false
@@ -251,13 +232,13 @@ class HeaderAdditions {
 
 		add_filter(
 			'blocksy:footer:offcanvas-drawer',
-			function ($els) {
-				global $blocksy_has_default_header;
+			function ($els, $payload) {
+				if ($payload['location'] !== 'start') {
+					return $els;
+				}
 
 				if (
-					isset($blocksy_has_default_header)
-					&&
-					$blocksy_has_default_header
+					$payload['blocksy_has_default_header']
 					&&
 					$this->has_account_modal()
 				) {
@@ -265,62 +246,9 @@ class HeaderAdditions {
 				}
 
 				return $els;
-			}
-		);
-	}
-
-	public function enqueue_static() {
-		if (!function_exists('get_plugin_data')) {
-			require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-		}
-
-		global $wp_customize;
-
-		$data = get_plugin_data(BLOCKSY__FILE__);
-
-		$deps = ['ct-options-scripts'];
-
-		$current_screen = get_current_screen();
-
-		if ($current_screen && $current_screen->id === 'customize') {
-			$deps = ['ct-customizer-controls'];
-		}
-
-		wp_enqueue_script(
-			'blocksy-admin-scripts',
-			BLOCKSY_URL . 'static/bundle/options.js',
-			$deps,
-			$data['Version'],
-			true
-		);
-
-		$conditions_manager = new ConditionsManager();
-
-		$localize = array_merge(
-			[
-				'all_condition_rules' => $conditions_manager->get_all_rules(),
-				'singular_condition_rules' => $conditions_manager->get_all_rules([
-					'filter' => 'singular'
-				]),
-				'archive_condition_rules' => $conditions_manager->get_all_rules([
-					'filter' => 'archive'
-				]),
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'rest_url' => get_rest_url(),
-			]
-		);
-
-		wp_localize_script(
-			'blocksy-admin-scripts',
-			'blocksy_admin',
-			$localize
-		);
-
-		wp_enqueue_style(
-			'blocksy-styles',
-			BLOCKSY_URL . 'static/bundle/options.min.css',
-			[],
-			$data['Version']
+			},
+			10,
+			2
 		);
 	}
 
@@ -357,10 +285,12 @@ class HeaderAdditions {
 				]
 			);
 
+			$transparent_behaviour = blocksy_expand_responsive_value($transparent_behaviour);
+
 			$transparent_result = [];
 
 			foreach ($transparent_behaviour as $device => $value) {
-				if (!$value) {
+				if (! $value) {
 					continue;
 				}
 
@@ -456,6 +386,13 @@ class HeaderAdditions {
 				]
 			);
 
+			if (! is_array($sticky_behaviour)) {
+				$sticky_behaviour = [
+					'desktop' => $sticky_behaviour,
+					'mobile' => $sticky_behaviour,
+				];
+			}
+
 			$has_sticky_header_result = [
 				'devices' => [],
 
@@ -472,7 +409,7 @@ class HeaderAdditions {
 			];
 
 			foreach ($sticky_behaviour as $device => $value) {
-				if (!$value) {
+				if (! $value) {
 					continue;
 				}
 
@@ -491,7 +428,11 @@ class HeaderAdditions {
 		$conditions = $this->get_conditions();
 
 		foreach ($conditions as $index => $single_condition) {
-			$particular_conditions = $single_condition['conditions'];
+			if (! isset($single_condition['conditions']['conditions'])) {
+				continue;
+			}
+
+			$particular_conditions = $single_condition['conditions']['conditions'];
 
 			foreach ($particular_conditions as $nested_index => $single_particular_condition) {
 				if (
@@ -511,7 +452,7 @@ class HeaderAdditions {
 				}
 			}
 
-			$conditions[$index]['conditions'] = $particular_conditions;
+			$conditions[$index]['conditions']['conditions'] = $particular_conditions;
 		}
 
 		$this->set_conditions($conditions);
@@ -519,15 +460,19 @@ class HeaderAdditions {
 		$section_value = blocksy_manager()->header_builder->get_section_value();
 
 		foreach ($section_value['sections'] as $index => $current_section) {
-			if (!isset($current_section['settings'])) {
+			if (! isset($current_section['settings'])) {
 				continue;
 			}
 
-			if (!isset($current_section['settings']['transparent_conditions'])) {
+			if (
+				! isset($current_section['settings']['transparent_conditions'])
+				||
+				! isset($current_section['settings']['transparent_conditions']['conditions'])
+			) {
 				continue;
 			}
 
-			foreach ($current_section['settings']['transparent_conditions'] as $cond_index => $single_condition) {
+			foreach ($current_section['settings']['transparent_conditions']['conditions'] as $cond_index => $single_condition) {
 				$particular_conditions = $single_condition;
 
 				if (
@@ -546,7 +491,7 @@ class HeaderAdditions {
 					$single_condition['payload']['post_id'] = $post_id;
 				}
 
-				$section_value['sections'][$index]['settings']['transparent_conditions'][$cond_index] = $single_condition;
+				$section_value['sections'][$index]['settings']['transparent_conditions']['conditions'][$cond_index] = $single_condition;
 			}
 		}
 
@@ -554,7 +499,7 @@ class HeaderAdditions {
 	}
 
 	public function get_conditions() {
-		$option = get_theme_mod('blocksy_premium_header_conditions', []);
+		$option = blocksy_get_theme_mod('blocksy_premium_header_conditions', []);
 
 		if (empty($option)) {
 			return [];
@@ -586,8 +531,7 @@ class HeaderAdditions {
 
 		$atts = $render->get_item_data_for('account');
 
-		$html = blc_call_fn(
-			['fn' => 'blocksy_render_view'],
+		$html = blocksy_render_view(
 			dirname(__FILE__) . '/header/account-modal.php',
 			[
 				'current_url' => blocksy_current_url(),
@@ -629,6 +573,20 @@ class HeaderAdditions {
 		}
 
 		$atts = $render->get_item_data_for('account');
+
+		$account_user_visibility = blocksy_akg('account_user_visibility', $atts, [
+			'logged_in' => true,
+			'logged_out' => true,
+		]);
+
+		if (
+			! $account_user_visibility['logged_out']
+			&&
+			! is_user_logged_in()
+		) {
+			$this->has_account_modal = false;
+			return false;
+		}
 
 		if (blocksy_akg('login_account_action', $atts, 'modal') !== 'modal') {
 			$this->has_account_modal = false;

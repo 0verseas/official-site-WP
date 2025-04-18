@@ -54,7 +54,9 @@ abstract class WPCode_Snippet_Execute_Type {
 
 		$code = $this->prepare_snippet_output();
 
-		return apply_filters( "wpcode_snippet_output_{$this->type}", $code, $this->snippet );
+		$output = apply_filters( "wpcode_snippet_output_{$this->type}", $code, $this->snippet );
+
+		return apply_filters( 'wpcode_snippet_output', $output, $this->snippet );
 	}
 
 	/**
@@ -84,4 +86,12 @@ abstract class WPCode_Snippet_Execute_Type {
 		return $this->snippet->get_code();
 	}
 
+	/**
+	 * Get the scss snippet code.
+	 *
+	 * @return string
+	 */
+	public function get_snippet_compiled_code() {
+		return $this->snippet->get_compiled_code();
+	}
 }

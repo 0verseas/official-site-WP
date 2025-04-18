@@ -1,6 +1,8 @@
 <?php
 namespace EmbedPress\Ends\Back\Settings;
 
+use EmbedPress\Includes\Classes\Helper; 
+
 class EmbedpressSettings {
 	var $page_slug = '';
 	/**
@@ -18,6 +20,7 @@ class EmbedpressSettings {
 		// ajax
 		add_action( 'wp_ajax_embedpress_elements_action', [$this, 'update_elements_list']);
 		add_action( 'wp_ajax_embedpress_settings_action', [$this, 'save_settings']);
+		
 
 		// Migration
 		$option = 'embedpress_elements_updated'; // to update initially for backward compatibility
@@ -81,6 +84,8 @@ class EmbedpressSettings {
 
 		add_action( 'admin_init', [$this, 'embedpress_maybe_redirect_to_settings']  );
 
+		
+
 
 	}
 	function embedpress_maybe_redirect_to_settings() {
@@ -105,6 +110,12 @@ class EmbedpressSettings {
 
 	}
 	public function update_elements_list() {
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(array('message' => 'You do not have sufficient permissions to access this functionality.'));
+			return;
+		}
+		
 		if ( !empty($_POST['_wpnonce'] && wp_verify_nonce( $_POST['_wpnonce'], 'embedpress_elements_action')) ) {
 			$option = EMBEDPRESS_PLG_NAME.":elements";
 			$elements = (array) get_option( $option, []);
@@ -170,13 +181,14 @@ class EmbedpressSettings {
 		global $template, $page_slug, $nonce_field, $ep_page, $gen_menu_template_names, $brand_menu_template_names, $pro_active, $coming_soon, $success_message, $error_message, $platform_menu_template_names;
 
 		$page_slug = $this->page_slug; // make this available for included template
-		$template = !empty( $_GET['page_type'] ) ? sanitize_text_field( $_GET['page_type']) : 'general';
+		$template = !empty( $_GET['page_type'] ) ? sanitize_file_name( $_GET['page_type']) : 'general';
+		
 		$nonce_field = wp_nonce_field('ep_settings_nonce', 'ep_settings_nonce', true, false);
 		$ep_page = admin_url('admin.php?page='.$this->page_slug);
 		$gen_menu_template_names = apply_filters('ep_general_menu_tmpl_names', ['general', 'shortcode',]);
 		$platform_menu_template_names = apply_filters('ep_platform_menu_tmpl_names', [ 'youtube', 'vimeo', 'wistia', 'twitch','dailymotion', 'soundcloud' ,'spotify','google-calendar','opensea']);
 		$brand_menu_template_names = apply_filters('ep_brand_menu_templates', ['custom-logo', 'branding',]);
-		$pro_active = is_embedpress_pro_active();
+		$pro_active = apply_filters('embedpress/is_allow_rander', false);
 		$coming_soon = "<span class='ep-coming-soon'>". esc_html__( '(Coming soon)', 'embedpress'). "</span>";
 		$success_message = esc_html__( "Settings Updated", "embedpress" );
 		$error_message = esc_html__( "Ops! Something went wrong.", "embedpress" );

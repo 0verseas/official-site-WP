@@ -7,21 +7,21 @@
 		gap: 5px;
 
 		input[type="text"] {
-			--form-field-height: 35px;
+			--theme-form-field-height: 35px;
 		}
 
 		.button {
-			--buttonMinHeight: 35px;
-			--buttonShadow: none;
-			--buttonTransform: none;
+			--theme-button-min-height: 35px;
+			--theme-button-shadow: none;
+			--theme-button-transform: none;
 		}
 	}
 }
 
 .bbp-the-content-wrapper {
 	input[type="button"] {
-		--buttonShadow: none;
-		--buttonTransform: none;
+		--theme-button-shadow: none;
+		--theme-button-transform: none;
 	}
 }
 

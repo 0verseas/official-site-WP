@@ -11,8 +11,10 @@ import OutsideClickHandler from './react-outside-click-handler'
 
 import { __ } from 'ct-i18n'
 
+import InputWithValidCssExpression from '../components/InputWithValidCssExpression'
+import { getNumericKeyboardEvents } from '../helpers/getNumericKeyboardEvents'
+
 export const clamp = (min, max, value) => Math.max(min, Math.min(max, value))
-const clampMax = (max, value) => Math.min(max, value)
 
 export const round = (value, decimalPlaces = 1) => {
 	const multiplier = Math.pow(10, decimalPlaces)
@@ -36,7 +38,6 @@ const UnitsList = ({
 	toggleOpen,
 	currentUnit,
 	getNumericValue,
-	getAllowedDecimalPlaces,
 
 	forced_current_unit,
 	setForcedCurrentUnit,
@@ -50,17 +51,14 @@ const UnitsList = ({
 
 		if (Object.keys(futureUnitDescriptor).includes('min')) {
 			onChange(
-				`${round(
-					clamp(
-						option.units.find(({ unit: u }) => u === unit).min,
-						option.units.find(({ unit: u }) => u === unit).max,
-						numericValue === '' ? -Infinity : numericValue
-					),
-					getAllowedDecimalPlaces(unit)
+				`${clamp(
+					option.units.find(({ unit: u }) => u === unit).min,
+					option.units.find(({ unit: u }) => u === unit).max,
+					numericValue === '' ? -Infinity : numericValue
 				)}${unit}`
 			)
 		} else {
-			onChange(value)
+			onChange(`${numericValue}${currentUnit}`)
 		}
 
 		if (
@@ -132,22 +130,14 @@ export default class Slider extends Component {
 		is_open: false,
 		is_empty_input: false,
 		forced_current_unit: '__DEFAULT__',
+
+		localValue: '__DEFAULT__',
 	}
 
 	el = createRef()
 
 	hasUnitsList = () =>
 		this.props.option.units && this.props.option.units.length > 1
-
-	getAllowedDecimalPlaces = (properUnit = null) => {
-		const decimals = this.props.option.units
-			? this.props.option.units.find(
-					({ unit }) => unit === (properUnit || this.getCurrentUnit())
-			  )?.decimals || 0
-			: this.props.option.decimals
-
-		return decimals !== 0 && !decimals ? 0 : decimals
-	}
 
 	withDefault = (currentUnit, defaultUnit) =>
 		this.props.option.units
@@ -188,6 +178,17 @@ export default class Slider extends Component {
 			({ unit }) => unit === computedUnit
 		)
 
+		if (
+			computedUnit === '' &&
+			this.props.value.toString() ===
+				parseFloat(this.props.value).toString() &&
+			!this.props.option.units.find(
+				({ unit, type }) => unit === '' && !type
+			)
+		) {
+			return defaultUnit
+		}
+
 		if (maybeActualUnit) {
 			return computedUnit
 		}
@@ -218,15 +219,18 @@ export default class Slider extends Component {
 		}
 
 		if (!maybeValue) {
-			if (
-				this.props.option.defaultPosition &&
-				this.props.option.defaultPosition === 'center' &&
-				forPosition
-			) {
-				let min = parseFloat(this.getMin(), 10)
-				let max = parseFloat(this.getMax(), 10)
+			if (forPosition) {
+				if (
+					this.props.option.defaultPosition &&
+					this.props.option.defaultPosition === 'center'
+				) {
+					let min = parseFloat(this.getMin(), 10)
+					let max = parseFloat(this.getMax(), 10)
 
-				return (max - min) / 2 + min
+					return (max - min) / 2 + min
+				}
+
+				return parseFloat(this.getMin(), 10)
 			}
 
 			return ''
@@ -243,20 +247,17 @@ export default class Slider extends Component {
 
 		this.props.onChange(
 			`${roundWholeNumbers(
-				round(
-					linearScale(
-						[0, width],
-						[
-							parseFloat(this.getMin(), 10),
-							parseFloat(this.getMax(), 10),
-						],
-						true
-					)(
-						document.body.classList.contains('rtl')
-							? width - elLeftOffset
-							: elLeftOffset
-					),
-					this.getAllowedDecimalPlaces()
+				linearScale(
+					[0, width],
+					[
+						parseFloat(this.getMin(), 10),
+						parseFloat(this.getMax(), 10),
+					],
+					true
+				)(
+					document.body.classList.contains('rtl')
+						? width - elLeftOffset
+						: elLeftOffset
 				),
 
 				shiftKey ? 10 : 1
@@ -294,6 +295,24 @@ export default class Slider extends Component {
 	handleBlur = () => {
 		this.setState({ is_empty_input: false })
 
+		if (this.state.localValue !== '__DEFAULT__') {
+			const futureValue = parseFloat(this.state.localValue, 10)
+
+			if (futureValue || futureValue === 0) {
+				this.props.onChange(
+					`${clamp(
+						parseFloat(this.getMin(), 10),
+						parseFloat(this.getMax(), 10),
+						futureValue
+					)}${this.getCurrentUnit()}`
+				)
+			}
+
+			this.setState({ localValue: '__DEFAULT__' })
+
+			return
+		}
+
 		if (this.props.option.value === 'CT_CSS_SKIP_RULE') {
 			if (this.props.value === 'CT_CSS_SKIP_RULE') {
 				return
@@ -319,7 +338,7 @@ export default class Slider extends Component {
 		)
 	}
 
-	handleChange = (value) => {
+	handleChange = (value, shouldClamp = true) => {
 		if (this.props.option.value === 'CT_CSS_SKIP_RULE') {
 			if (value.toString().trim() === '') {
 				this.props.onChange('CT_CSS_SKIP_RULE')
@@ -332,7 +351,7 @@ export default class Slider extends Component {
 			return
 		}
 
-		if (value.toString().trim() === '') {
+		if (this.props.option.value !== '' && value.toString().trim() === '') {
 			this.setState({ is_empty_input: true })
 			return
 		}
@@ -340,10 +359,15 @@ export default class Slider extends Component {
 		this.setState({ is_empty_input: false })
 
 		this.props.onChange(
-			`${clampMax(
-				parseFloat(this.getMax(), 10),
-				parseFloat(value || this.getMin())
-			)}${this.getCurrentUnit()}`
+			`${
+				shouldClamp
+					? clamp(
+							parseFloat(this.getMin(), 10),
+							parseFloat(this.getMax(), 10),
+							value
+					  )
+					: value
+			}${this.getCurrentUnit()}`
 		)
 	}
 
@@ -421,27 +445,26 @@ export default class Slider extends Component {
 				{this.props.beforeOption && this.props.beforeOption()}
 
 				{this.isCustomValueInput() ? (
-					<>
-						<input
-							type="text"
-							{...(this.props.option.ref
+					<InputWithValidCssExpression
+						value={
+							this.state.is_empty_input ||
+							this.props.value === 'NaN' ||
+							(this.props.value || '')
+								.toString()
+								.indexOf('CT_CSS_SKIP_RULE') > -1
+								? ''
+								: this.props.value
+						}
+						inputProps={{
+							...(this.props.option.ref
 								? { ref: this.props.option.ref }
-								: {})}
-							value={
-								this.state.is_empty_input ||
-								this.props.value === 'NaN' ||
-								(this.props.value || '')
-									.toString()
-									.indexOf('CT_CSS_SKIP_RULE') > -1
-									? ''
-									: this.props.value
-							}
-							onFocus={() => this.handleFocus()}
-							onChange={({ target: { value } }) =>
-								this.handleChange(value)
-							}
-						/>
-					</>
+								: {}),
+						}}
+						onFocus={() => this.handleFocus()}
+						onChange={(value) => {
+							this.handleChange(value)
+						}}
+					/>
 				) : (
 					<div
 						onMouseDown={({ pageX, pageY }) => {
@@ -457,46 +480,26 @@ export default class Slider extends Component {
 						<div style={{ width: `${this.getLeftValue()}%` }} />
 						<span
 							tabIndex="0"
-							onKeyDown={(e) => {
-								const valueForComputation =
-									this.getNumericValue()
-
-								let step =
-									1 /
-									Math.pow(10, this.getAllowedDecimalPlaces())
-
-								let actualStep = e.shiftKey ? step * 10 : step
-
-								/**
-								 * Arrow up or left
-								 */
-								if (e.keyCode === 38 || e.keyCode === 39) {
-									e.preventDefault()
-
+							{...getNumericKeyboardEvents({
+								handleHorizontal: true,
+								value:
+									this.state.localValue !== '__DEFAULT__'
+										? this.state.localValue
+										: this.state.is_empty_input
+										? 0
+										: this.getNumericValue({
+												forPosition: true,
+										  }),
+								onChange: (value) => {
 									this.props.onChange(
 										`${clamp(
 											parseFloat(this.getMin(), 10),
 											parseFloat(this.getMax(), 10),
-											valueForComputation + actualStep
+											value
 										)}${this.getCurrentUnit()}`
 									)
-								}
-
-								/**
-								 * Arrow down or right
-								 */
-								if (e.keyCode === 40 || e.keyCode === 37) {
-									e.preventDefault()
-
-									this.props.onChange(
-										`${clamp(
-											parseFloat(this.getMin(), 10),
-											parseFloat(this.getMax(), 10),
-											valueForComputation - actualStep
-										)}${this.getCurrentUnit()}`
-									)
-								}
-							}}
+								},
+							})}
 							style={{
 								'--position': `${this.getLeftValue()}%`,
 							}}
@@ -521,31 +524,64 @@ export default class Slider extends Component {
 							active: this.state.is_open,
 						})}>
 						{!this.isCustomValueInput() && (
-							<>
-								<input
-									type="number"
-									{...(this.props.option.ref
-										? { ref: this.props.option.ref }
-										: {})}
-									step={
-										1 /
-										Math.pow(
-											10,
-											this.getAllowedDecimalPlaces()
+							<input
+								type="number"
+								{...(this.props.option.ref
+									? { ref: this.props.option.ref }
+									: {})}
+								step={1}
+								value={
+									this.state.localValue !== '__DEFAULT__'
+										? this.state.localValue
+										: this.state.is_empty_input
+										? ''
+										: this.getNumericValue()
+								}
+								onFocus={() => this.handleFocus()}
+								onBlur={() => this.handleBlur()}
+								onChange={({ target: { value } }) => {
+									// If the value is within valid bounds,
+									// Just update the value and reset the localValue, if needed.
+									if (
+										parseFloat(value, 10) ===
+										clamp(
+											parseFloat(this.getMin(), 10),
+											parseFloat(this.getMax(), 10),
+											parseFloat(value, 10)
 										)
-									}
-									value={
-										this.state.is_empty_input
-											? ''
-											: this.getNumericValue()
-									}
-									onFocus={() => this.handleFocus()}
-									onBlur={() => this.handleBlur()}
-									onChange={({ target: { value } }) => {
+									) {
 										this.handleChange(value)
-									}}
-								/>
-							</>
+
+										if (
+											this.state.localValue !==
+											'__DEFAULT__'
+										) {
+											this.setState({
+												localValue: '__DEFAULT__',
+											})
+										}
+									} else {
+										this.setState({ localValue: value })
+									}
+								}}
+								{...getNumericKeyboardEvents({
+									value:
+										this.state.localValue !== '__DEFAULT__'
+											? this.state.localValue
+											: this.state.is_empty_input
+											? 0
+											: this.getNumericValue({
+													forPosition: true,
+											  }),
+									onChange: (value) => {
+										this.handleChange(value)
+
+										this.setState({
+											localValue: '__DEFAULT__',
+										})
+									},
+								})}
+							/>
 						)}
 
 						{!this.hasUnitsList() && (
@@ -576,9 +612,6 @@ export default class Slider extends Component {
 								}
 								currentUnit={this.getCurrentUnit()}
 								getNumericValue={this.getNumericValue}
-								getAllowedDecimalPlaces={
-									this.getAllowedDecimalPlaces
-								}
 							/>
 						)}
 					</div>

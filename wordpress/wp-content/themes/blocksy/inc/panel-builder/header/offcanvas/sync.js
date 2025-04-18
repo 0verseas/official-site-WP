@@ -74,6 +74,14 @@ ctEvents.on(
 			}).section
 
 		variableDescriptors['offcanvas'] = ({ itemId }) => ({
+			
+			offcanvas_heading_font_color: {
+				selector: '#offcanvas .ct-panel-actions',
+				variable: 'theme-text-color',
+				type: 'color:default',
+				responsive: true,
+			},
+
 			offcanvasBackground: [
 				...handleSectionBackground({ itemId }),
 				...handleRootBackground({ itemId }),
@@ -84,10 +92,10 @@ ctEvents.on(
 				selector: assembleSelector(
 					`${
 						getRootSelectorFor({ itemId })[0]
-					} [data-behaviour*="side"]`
+					} #offcanvas`
 				),
 				type: 'box-shadow',
-				variable: 'box-shadow',
+				variable: 'theme-box-shadow',
 				responsive: true,
 			},
 
@@ -191,7 +199,7 @@ ctEvents.on(
 							to_add: '.ct-toggle-close',
 						})
 					),
-					variable: 'icon-color',
+					variable: 'theme-icon-color',
 					type: 'color:default',
 					responsive: true,
 				},
@@ -204,7 +212,7 @@ ctEvents.on(
 							to_add: '.ct-toggle-close:hover',
 						})
 					),
-					variable: 'icon-color',
+					variable: 'theme-icon-color',
 					type: 'color:hover',
 					responsive: true,
 				},
@@ -274,7 +282,7 @@ ctEvents.on(
 						to_add: '.ct-toggle-close',
 					})
 				),
-				variable: 'icon-size',
+				variable: 'theme-icon-size',
 				unit: 'px',
 			},
 
@@ -324,6 +332,22 @@ ctEvents.on(
 			}
 
 			ctEvents.on('ct:sync:dynamic-css:updated', cb)
+		}
+
+		if (optionId === 'has_offcanvas_heading') {
+			wp.customize.preview.trigger('ct:sync:refresh_partial', {
+				id: 'header_placements_offcanvas',
+			})
+		}
+
+		if (optionId === 'offcanvas_heading') {
+			const maybeHeading = document.querySelector(
+				'#offcanvas .ct-panel-heading'
+			)
+
+			if (maybeHeading) {
+				maybeHeading.innerHTML = optionValue
+			}
 		}
 
 		if (optionId === 'menu_close_button_type') {

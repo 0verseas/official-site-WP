@@ -36,6 +36,14 @@ class ElementsKit_Widget_FAQ extends Widget_Base {
         return 'https://wpmet.com/doc/faq/';
     }
 
+    protected function is_dynamic_content(): bool {
+        return false;
+    }
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
     protected function register_controls() {
         $this->start_controls_section(
             'ekit_faq_section_tab', [
@@ -98,6 +106,15 @@ class ElementsKit_Widget_FAQ extends Widget_Base {
             ]
         );
 
+        //faq schema
+        $this->add_control(
+			'ekit_faq_schema',
+			[
+				'label' => esc_html__( 'FAQ Schema', 'elementskit-lite' ),
+				'type' => Controls_Manager::SWITCHER,
+				'separator' => 'before',
+			]
+        );
         $this->end_controls_section();
 
         //Title Style Section
@@ -291,7 +308,6 @@ class ElementsKit_Widget_FAQ extends Widget_Base {
                 ],
             ]
         );
-
         $this->end_controls_section();
 
         $this->insert_pro_message();
@@ -320,6 +336,30 @@ class ElementsKit_Widget_FAQ extends Widget_Base {
             </div>
         </div>
         <?php endforeach; endif; ?>
+        <?php
+            if ( isset( $settings['ekit_faq_schema'] ) && 'yes' === $settings['ekit_faq_schema'] ) {
+                $json = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'FAQPage',
+                    'mainEntity' => [],
+                ];
+
+                foreach ( $settings['ekit_faq_content_items'] as $index => $item ) {
+                    $faq_schema_text = !empty( $item['ekit_faq_content'] ) ? $item['ekit_faq_content'] : '';
+                    $json['mainEntity'][] = [
+                        '@type' => 'Question',
+                        'name' => esc_html($item['ekit_faq_title']),
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text' => \ElementsKit_Lite\Utils::kses( $faq_schema_text ),
+                        ],
+                    ];
+                }
+                ?>
+                <script type="application/ld+json"><?php echo wp_json_encode( $json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); ?></script>
+                <?php
+            }
+        ?>
 
     <?php
     }

@@ -12,7 +12,7 @@ namespace RankMath\Redirections;
 
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
-use MyThemeShop\Helpers\Param;
+use RankMath\Helpers\Param;
 use RankMath\Helpers\Sitepress;
 
 defined( 'ABSPATH' ) || exit;
@@ -132,7 +132,7 @@ class Watcher {
 	 * @param integer $tt_id    The term taxonomy id.
 	 * @param string  $taxonomy Taxonomy slug of the related term.
 	 *
-	 * @return bool
+	 * @return void
 	 */
 	public function handle_term_update( $term_id, $tt_id, $taxonomy ) {
 		if ( ! in_array( $taxonomy, array_keys( Helper::get_accessible_taxonomies() ), true ) ) {
@@ -265,6 +265,7 @@ class Watcher {
 			'redirections',
 			[
 				'redirection' => $redirection_id,
+				'action'      => 'edit',
 				'security'    => wp_create_nonce( 'redirection_list_action' ),
 			]
 		);

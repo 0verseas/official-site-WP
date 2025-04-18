@@ -13,7 +13,6 @@ namespace RankMath\Schema;
 use RankMath\Helper;
 use RankMath\Traits\Hooker;
 use RankMath\Schema\DB;
-use MyThemeShop\Helpers\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -76,7 +75,7 @@ class Singular implements Snippet {
 		if ( ! empty( $schemas ) ) {
 			$has_product = array_filter(
 				$schemas,
-				function( $schema ) {
+				function ( $schema ) {
 					return ! empty( $schema['@type'] ) && in_array( $schema['@type'], [ 'WooCommerceProduct', 'EDDProduct' ], true );
 				}
 			);
@@ -112,8 +111,8 @@ class Singular implements Snippet {
 		}
 
 		if (
-			( Conditional::is_woocommerce_active() && is_singular( 'product' ) ) ||
-			( Conditional::is_edd_active() && is_singular( 'download' ) )
+			( Helper::is_woocommerce_active() && is_singular( 'product' ) ) ||
+			( Helper::is_edd_active() && is_singular( 'download' ) )
 		) {
 			return 'product';
 		}

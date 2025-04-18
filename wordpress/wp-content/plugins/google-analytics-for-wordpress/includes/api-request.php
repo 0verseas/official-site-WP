@@ -128,6 +128,42 @@ final class MonsterInsights_API_Request {
 	public $testurl = '';
 
 	/**
+	 * Store license.
+	 */
+	public $license;
+
+	/**
+	 * Store version.
+	 */
+	public $miversion;
+
+	/**
+	 * Site secret key.
+	 */
+	public $sitei;
+
+	/**
+	 * Compare end date.
+	 *
+	 * @var string
+	 */
+	protected $compare_end;
+
+	/**
+	 * Compare start date.
+	 *
+	 * @var string
+	 */
+	protected $compare_start;
+
+	/**
+	 * Site URL.
+	 *
+	 * @var string
+	 */
+	public $site_url;
+
+	/**
 	 * Additional data to add to request body
 	 *
 	 * @since 7.0.0
@@ -150,8 +186,7 @@ final class MonsterInsights_API_Request {
 		// Set class properties.
 		$this->base     = trailingslashit( monsterinsights_get_api_url() );
 		$this->route    = $route;
-		$this->protocol = 'https://';
-		$this->url      = trailingslashit( $this->protocol . $this->base . $this->route );
+		$this->url      = trailingslashit( 'https://' . $this->base . $this->route );
 		$this->method   = $method;
 		$this->network  = is_network_admin() || ! empty( $args['network'] );
 
@@ -165,8 +200,11 @@ final class MonsterInsights_API_Request {
 		$this->start  = ! empty( $args['start'] ) ? $args['start'] : '';
 		$this->end    = ! empty( $args['end'] ) ? $args['end'] : '';
 
+		$this->compare_start = ! empty( $args['compare_start'] ) ? $args['compare_start'] : '';
+		$this->compare_end   = ! empty( $args['compare_end'] ) ? $args['compare_end'] : '';
+
 		// We need to do this hack so that the network panel + the site_url of the main site are distinct
-		$this->site_url = is_network_admin() ? network_admin_url() : site_url();
+		$this->site_url = is_network_admin() ? network_admin_url() : home_url();
 
 		if ( monsterinsights_is_pro_version() ) {
 			$this->license = $this->network ? MonsterInsights()->license->get_network_license_key() : MonsterInsights()->license->get_site_license_key();
@@ -226,6 +264,14 @@ final class MonsterInsights_API_Request {
 			$body['end'] = $this->end;
 		}
 
+		if ( ! empty( $this->compare_start ) ) {
+			$body['compare_start'] = $this->compare_start;
+		}
+
+		if ( ! empty( $this->compare_end ) ) {
+			$body['compare_end'] = $this->compare_end;
+		}
+
 		if ( ! empty( $this->sitei ) ) {
 			$body['sitei'] = $this->sitei;
 		}
@@ -249,7 +295,7 @@ final class MonsterInsights_API_Request {
 
 		$body['wp_timezone'] = wp_timezone_string(); // Timezone from WP Settings.
 
-		$body['timezone'] = date( 'e' );
+		$body['timezone'] = date( 'e' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
 
 		$body['network'] = $this->network ? 'network' : 'site';
 
@@ -258,7 +304,7 @@ final class MonsterInsights_API_Request {
 		// This filter will be removed in the future.
 		$body = apply_filters( 'monsterinsights_api_request_body', $body );
 
-        $body = array_merge($body, $extra_params);
+		$body = array_merge($body, $extra_params);
 
 		$string = http_build_query( $body, '', '&' );
 
@@ -272,23 +318,17 @@ final class MonsterInsights_API_Request {
 			'MIAPI-Sender'  => 'WordPress',
 		);
 
-		// if ( $this->apikey ) {
-		// $headers['X-MonsterInsights-ApiKey'] = $this->apikey;
-		// }
-
 		// Setup data to be sent to the API.
 		$data = array(
 			'headers'    => $headers,
 			'body'       => $body,
-			'timeout'    => 3000,
+			'timeout'    => 3000, // phpcs:ignore
 			'user-agent' => 'MI/' . MONSTERINSIGHTS_VERSION . '; ' . $this->site_url,
 			'sslverify'  => false,
 		);
 
 		// Perform the query and retrieve the response.
 		$response = 'GET' == $this->method ? wp_remote_get( esc_url_raw( $this->url ) . '?' . $string, $data ) : wp_remote_post( esc_url_raw( $this->url ), $data );
-
-		// return new WP_Error( 'debug', '<pre>' . var_export( $response, true ) . '</pre>' );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -304,7 +344,7 @@ final class MonsterInsights_API_Request {
 		}
 
 		// If not a 200 status header, send back error.
-		if ( 200 != $response_code ) {
+		if ( 200 != $response_code && 204 != $response_code) {
 			$type = ! empty( $response_body['type'] ) ? $response_body['type'] : 'api-error';
 
 			if ( empty( $response_code ) ) {

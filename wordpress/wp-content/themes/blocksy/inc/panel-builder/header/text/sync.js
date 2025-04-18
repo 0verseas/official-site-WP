@@ -11,7 +11,9 @@ import {
 
 const getVariables = ({ itemId, fullItemId, panelType }) => ({
 	headerTextMaxWidth: {
-		selector: assembleSelector(getRootSelectorFor({ itemId, panelType })),
+		selector: assembleSelector(
+			getRootSelectorFor({ itemId, fullItemId, panelType })
+		),
 		variable: 'max-width',
 		responsive: true,
 		unit: '%',
@@ -19,11 +21,15 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 
 	...typographyOption({
 		id: 'headerTextFont',
-		selector: assembleSelector(getRootSelectorFor({ itemId, panelType })),
+		selector: assembleSelector(
+			getRootSelectorFor({ itemId, fullItemId, panelType })
+		),
 	}),
 
 	headerTextMargin: {
-		selector: assembleSelector(getRootSelectorFor({ itemId, panelType })),
+		selector: assembleSelector(
+			getRootSelectorFor({ itemId, fullItemId, panelType })
+		),
 		type: 'spacing',
 		variable: 'margin',
 		responsive: true,
@@ -34,28 +40,39 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 	headerTextColor: [
 		{
 			selector: assembleSelector(
-				getRootSelectorFor({ itemId, panelType })
+				getRootSelectorFor({ itemId, fullItemId, panelType })
 			),
-			variable: 'color',
+			variable: 'theme-text-color',
 			type: 'color:default',
 			responsive: true,
 		},
 
 		{
 			selector: assembleSelector(
-				getRootSelectorFor({ itemId, panelType })
+				getRootSelectorFor({ itemId, fullItemId, panelType })
 			),
-			variable: 'linkInitialColor',
+			variable: 'theme-link-initial-color',
 			type: 'color:link_initial',
 			responsive: true,
 		},
 
 		{
 			selector: assembleSelector(
-				getRootSelectorFor({ itemId, panelType })
+				getRootSelectorFor({ itemId, fullItemId, panelType })
 			),
-			variable: 'linkHoverColor',
+			variable: 'theme-link-hover-color',
 			type: 'color:link_hover',
+			responsive: true,
+		},
+	],
+
+	headerTextHeadingColor: [
+		{
+			selector: assembleSelector(
+				getRootSelectorFor({ itemId, fullItemId, panelType })
+			),
+			variable: 'theme-heading-color',
+			type: 'color:default',
 			responsive: true,
 		},
 	],
@@ -65,13 +82,17 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 		{
 			selector: assembleSelector(
 				mutateSelector({
-					selector: getRootSelectorFor({ itemId, panelType }),
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
 					operation: 'between',
 					to_add: '[data-transparent-row="yes"]',
 				})
 			),
 
-			variable: 'color',
+			variable: 'theme-text-color',
 			type: 'color:default',
 			responsive: true,
 		},
@@ -79,13 +100,17 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 		{
 			selector: assembleSelector(
 				mutateSelector({
-					selector: getRootSelectorFor({ itemId, panelType }),
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
 					operation: 'between',
 					to_add: '[data-transparent-row="yes"]',
 				})
 			),
 
-			variable: 'linkInitialColor',
+			variable: 'theme-link-initial-color',
 			type: 'color:link_initial',
 			responsive: true,
 		},
@@ -93,14 +118,38 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 		{
 			selector: assembleSelector(
 				mutateSelector({
-					selector: getRootSelectorFor({ itemId, panelType }),
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
 					operation: 'between',
 					to_add: '[data-transparent-row="yes"]',
 				})
 			),
 
-			variable: 'linkHoverColor',
+			variable: 'theme-link-hover-color',
 			type: 'color:link_hover',
+			responsive: true,
+		},
+	],
+
+	transparentHeaderTextHeadingColor: [
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
+					operation: 'between',
+					to_add: '[data-transparent-row="yes"]',
+				})
+			),
+
+			variable: 'theme-heading-color',
+			type: 'color:default',
 			responsive: true,
 		},
 	],
@@ -110,12 +159,16 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 		{
 			selector: assembleSelector(
 				mutateSelector({
-					selector: getRootSelectorFor({ itemId, panelType }),
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
 					operation: 'between',
 					to_add: '[data-sticky*="yes"]',
 				})
 			),
-			variable: 'color',
+			variable: 'theme-text-color',
 			type: 'color:default',
 			responsive: true,
 		},
@@ -123,12 +176,16 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 		{
 			selector: assembleSelector(
 				mutateSelector({
-					selector: getRootSelectorFor({ itemId, panelType }),
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
 					operation: 'between',
 					to_add: '[data-sticky*="yes"]',
 				})
 			),
-			variable: 'linkInitialColor',
+			variable: 'theme-link-initial-color',
 			type: 'color:link_initial',
 			responsive: true,
 		},
@@ -136,19 +193,44 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 		{
 			selector: assembleSelector(
 				mutateSelector({
-					selector: getRootSelectorFor({ itemId, panelType }),
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
 					operation: 'between',
 					to_add: '[data-sticky*="yes"]',
 				})
 			),
-			variable: 'linkHoverColor',
+			variable: 'theme-link-hover-color',
 			type: 'color:link_hover',
 			responsive: true,
 		},
 	],
 
+	stickyHeaderTextHeadingColor: [
+		{
+			selector: assembleSelector(
+				mutateSelector({
+					selector: getRootSelectorFor({
+						itemId,
+						fullItemId,
+						panelType,
+					}),
+					operation: 'between',
+					to_add: '[data-sticky*="yes"]',
+				})
+			),
+			variable: 'theme-heading-color',
+			type: 'color:default',
+			responsive: true,
+		},
+	],
+
 	header_html_horizontal_alignment: {
-		selector: assembleSelector(getRootSelectorFor({ itemId, panelType })),
+		selector: assembleSelector(
+			getRootSelectorFor({ itemId, fullItemId, panelType })
+		),
 		variable: 'horizontal-alignment',
 		responsive: true,
 		unit: '',
@@ -160,6 +242,7 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 			mutateSelector({
 				selector: getRootSelectorFor({
 					itemId,
+					fullItemId,
 					panelType: 'footer',
 				}),
 				operation: 'replace-last',
@@ -176,6 +259,7 @@ const getVariables = ({ itemId, fullItemId, panelType }) => ({
 			mutateSelector({
 				selector: getRootSelectorFor({
 					itemId,
+					fullItemId,
 					panelType: 'footer',
 				}),
 				operation: 'replace-last',

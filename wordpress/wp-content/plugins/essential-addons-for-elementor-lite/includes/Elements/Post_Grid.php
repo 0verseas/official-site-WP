@@ -12,7 +12,7 @@ use \Elementor\Controls_Manager;
 use \Elementor\Group_Control_Border;
 use \Elementor\Group_Control_Box_Shadow;
 use \Elementor\Group_Control_Typography;
-use \Elementor\Core\Schemes\Typography;
+use \Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use \Elementor\Widget_Base;
 use Essential_Addons_Elementor\Classes\Helper as HelperClass;
 use Essential_Addons_Elementor\Traits\Helper;
@@ -20,6 +20,9 @@ use Essential_Addons_Elementor\Traits\Helper;
 class Post_Grid extends Widget_Base
 {
     use Helper;
+
+	protected $page_id;
+
     public function get_name()
     {
         return 'eael-post-grid';
@@ -67,6 +70,10 @@ class Post_Grid extends Widget_Base
             'ea',
             'essential addons',
         ];
+    }
+
+    public function has_widget_inner_wrapper(): bool {
+        return ! HelperClass::eael_e_optimized_markup();
     }
 
     public function get_custom_help_url()
@@ -245,18 +252,6 @@ class Post_Grid extends Widget_Base
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
-        $this->add_control(
-            'eael_post_grid_preset_style',
-            [
-                'label' => __('Select Style', 'essential-addons-for-elementor-lite'),
-                'type' => Controls_Manager::SELECT,
-                'options' => [
-                    '' => __('Default', 'essential-addons-for-elementor-lite'),
-                    'two' => __('Style Two', 'essential-addons-for-elementor-lite'),
-                    'three' => __('Style Three', 'essential-addons-for-elementor-lite'),
-                ],
-            ]
-        );
 
         $this->add_control(
             'eael_post_grid_style_three_alert',
@@ -390,7 +385,9 @@ class Post_Grid extends Widget_Base
             [
                 'name' => 'eael_post_grid_meta_date_typography',
                 'label' => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_3,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_TEXT
+                ],
                 'selector' => '{{WRAPPER}} .eael-meta-posted-on',
             ]
         );
@@ -510,7 +507,9 @@ class Post_Grid extends Widget_Base
             [
                 'name' => 'eael_post_grid_meta_typography',
                 'label' => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_3,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_TEXT
+                ],
                 'selector' => '{{WRAPPER}} .eael-entry-meta > span',
                 'condition' => [
                     'meta_position' => 'meta-entry-footer',
@@ -522,7 +521,9 @@ class Post_Grid extends Widget_Base
             [
                 'name' => 'eael_post_grid_meta_header_typography',
                 'label' => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_3,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_TEXT
+                ],
                 'selector' => '{{WRAPPER}} .eael-entry-meta > span',
                 'condition' => [
                     'meta_position' => 'meta-entry-header',
@@ -664,7 +665,9 @@ class Post_Grid extends Widget_Base
             [
                 'name' => 'eael_post_grid_title_typography',
                 'label' => __('Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_1,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_PRIMARY
+                ],
                 'selector' => '{{WRAPPER}} .eael-entry-title, {{WRAPPER}} .eael-entry-title a',
             ]
         );
@@ -736,7 +739,9 @@ class Post_Grid extends Widget_Base
             [
                 'name' => 'eael_post_grid_excerpt_typography',
                 'label' => __('Excerpt Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_3,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_TEXT
+                ],
                 'selector' => '{{WRAPPER}} .eael-grid-post-excerpt p',
             ]
         );
@@ -828,7 +833,9 @@ class Post_Grid extends Widget_Base
             [
                 'name' => 'eael_post_grid_terms_typography',
                 'label' => __('Meta Typography', 'essential-addons-for-elementor-lite'),
-                'scheme' => Typography::TYPOGRAPHY_3,
+                'global' => [
+	                'default' => Global_Typography::TYPOGRAPHY_TEXT
+                ],
                 'selector' => '{{WRAPPER}} .post-meta-categories li, {{WRAPPER}} .post-meta-categories li a',
             ]
         );
@@ -1080,8 +1087,8 @@ class Post_Grid extends Widget_Base
             ]
         );
 
-        echo '<div ' . $this->get_render_attribute_string( 'post_grid_wrapper' ) . '>
-            <div ' . $this->get_render_attribute_string( 'post_grid_container' ) . ' data-layout-mode="' . $settings["layout_mode"] . '">';
+        echo '<div '; $this->print_render_attribute_string( 'post_grid_wrapper' ); echo '>
+            <div '; $this->print_render_attribute_string( 'post_grid_container' ); echo ' data-layout-mode="' . esc_attr( $settings["layout_mode"] ) . '">';
 
         $template = $this->get_template($settings['eael_dynamic_template_Layout']);
         $settings['loadable_file_name'] = $this->get_filename_only($template);
@@ -1093,6 +1100,8 @@ class Post_Grid extends Widget_Base
         set_transient( 'eael_post_grid_excerpt_expanison_indicator_'. $this->get_id(), $this->get_settings_for_display('excerpt_expanison_indicator'), DAY_IN_SECONDS );
         $settings['read_more_button_text'] = $this->get_settings_for_display('read_more_button_text');
         $settings['excerpt_expanison_indicator'] = $this->get_settings_for_display('excerpt_expanison_indicator');
+
+        $args['ignore_sticky_posts'] = isset( $settings['ignore_sticky_posts'] ) && 'yes' === $settings['ignore_sticky_posts'];
 
         if(file_exists($template)){
             $query = new \WP_Query( $args );
@@ -1107,11 +1116,11 @@ class Post_Grid extends Widget_Base
                     include($template);
                 }
             }else {
-                _e('<p class="no-posts-found">No posts found!</p>', 'essential-addons-for-elementor-lite');
+                echo '<p class="no-posts-found">' . esc_html__( 'No posts found!', 'essential-addons-for-elementor-lite' ) . '</p>';
             }
             wp_reset_postdata();
         } else {
-            _e('<p class="no-posts-found">No Layout Found!</p>', 'essential-addons-for-elementor-lite');
+            echo '<p class="no-posts-found">' . esc_html__( 'No Layout Found', 'essential-addons-for-elementor-lite' ) . '</p>';
         }
 
 
@@ -1127,7 +1136,7 @@ class Post_Grid extends Widget_Base
             <script type="text/javascript">
                 jQuery(document).ready(function($) {
                     jQuery(".eael-post-grid").each(function() {
-                        var $scope = jQuery(".elementor-element-<?php echo $this->get_id(); ?>"),
+                        var $scope = jQuery(".elementor-element-<?php echo esc_js( $this->get_id() ); ?>"),
                             $gallery = $(this),
                             $layout_mode = $gallery.data('layout-mode');
 

@@ -11,7 +11,10 @@
 
 namespace LiteSpeed;
 
-defined('WPINC') || exit;
+use WpOrg\Requests\Autoload;
+use WpOrg\Requests\Requests;
+
+defined('WPINC') || exit();
 
 class Img_Optm extends Base
 {
@@ -25,6 +28,7 @@ class Img_Optm extends Base
 	const TYPE_NEW_REQ = 'new_req';
 	const TYPE_RESCAN = 'rescan';
 	const TYPE_DESTROY = 'destroy';
+	const TYPE_RESET_COUNTER = 'reset_counter';
 	const TYPE_CLEAN = 'clean';
 	const TYPE_PULL = 'pull';
 	const TYPE_BATCH_SWITCH_ORI = 'batch_switch_ori';
@@ -33,19 +37,19 @@ class Img_Optm extends Base
 	const TYPE_RESET_ROW = 'reset_row';
 	const TYPE_RM_BKUP = 'rm_bkup';
 
-	const STATUS_NEW 		= 0; // 'new';
-	const STATUS_RAW 		= 1; // 'raw';
-	const STATUS_REQUESTED 	= 3; // 'requested';
-	const STATUS_NOTIFIED 	= 6; // 'notified';
-	const STATUS_DUPLICATED 	= 8; // 'duplicated';
-	const STATUS_PULLED 		= 9; // 'pulled';
-	const STATUS_FAILED 		= -1; //'failed';
-	const STATUS_MISS 		= -3; // 'miss';
-	const STATUS_ERR_FETCH 	= -5; // 'err_fetch';
-	const STATUS_ERR_404 	= -6; // 'err_404';
-	const STATUS_ERR_OPTM 	= -7; // 'err_optm';
-	const STATUS_XMETA 		= -8; // 'xmeta';
-	const STATUS_ERR 		= -9; // 'err';
+	const STATUS_NEW = 0; // 'new';
+	const STATUS_RAW = 1; // 'raw';
+	const STATUS_REQUESTED = 3; // 'requested';
+	const STATUS_NOTIFIED = 6; // 'notified';
+	const STATUS_DUPLICATED = 8; // 'duplicated';
+	const STATUS_PULLED = 9; // 'pulled';
+	const STATUS_FAILED = -1; //'failed';
+	const STATUS_MISS = -3; // 'miss';
+	const STATUS_ERR_FETCH = -5; // 'err_fetch';
+	const STATUS_ERR_404 = -6; // 'err_404';
+	const STATUS_ERR_OPTM = -7; // 'err_optm';
+	const STATUS_XMETA = -8; // 'xmeta';
+	const STATUS_ERR = -9; // 'err';
 	const DB_SIZE = 'litespeed-optimize-size';
 	const DB_SET = 'litespeed-optimize-set';
 
@@ -66,6 +70,7 @@ class Img_Optm extends Base
 	private $__media;
 	private $__data;
 	protected $_summary;
+	private $_format = '';
 
 	/**
 	 * Init
@@ -83,7 +88,15 @@ class Img_Optm extends Base
 		$this->_table_img_optming = $this->__data->tb('img_optming');
 
 		$this->_summary = self::get_summary();
-		if (empty($this->_summary['next_post_id'])) $this->_summary['next_post_id'] = 0;
+		if (empty($this->_summary['next_post_id'])) {
+			$this->_summary['next_post_id'] = 0;
+		}
+		if ($this->conf(Base::O_IMG_OPTM_WEBP)) {
+			$this->_format = 'webp';
+			if ($this->conf(Base::O_IMG_OPTM_WEBP) == 2) {
+				$this->_format = 'avif';
+			}
+		}
 	}
 
 	/**
@@ -103,7 +116,8 @@ class Img_Optm extends Base
 		}
 
 		// Load gathered images
-		if (!$this->_existed_src_list) { // To aavoid extra query when recalling this function
+		if (!$this->_existed_src_list) {
+			// To aavoid extra query when recalling this function
 			self::debug('SELECT src from img_optm table');
 			if ($this->__data->tb_exist('img_optm')) {
 				$q = "SELECT src FROM `$this->_table_img_optm` WHERE post_id = %d";
@@ -201,7 +215,8 @@ class Img_Optm extends Base
 		self::save_summary();
 
 		// Check if has credit to push
-		$allowance = Cloud::cls()->allowance(Cloud::SVC_IMG_OPTM);
+		$err = false;
+		$allowance = Cloud::cls()->allowance(Cloud::SVC_IMG_OPTM, $err);
 
 		$wet_limit = $this->wet_limit();
 
@@ -212,7 +227,7 @@ class Img_Optm extends Base
 
 		if (!$allowance) {
 			self::debug('❌ No credit');
-			Admin_Display::error(Error::msg('out_of_quota'));
+			Admin_Display::error(Error::msg($err));
 			$this->_finished_running();
 			return;
 		}
@@ -233,14 +248,21 @@ class Img_Optm extends Base
 			return;
 		}
 
+		$allowance -= $total_requested;
+
+		if ($allowance < 1) {
+			self::debug('❌ Too many requested images ' . $total_requested);
+			Admin_Display::error(Error::msg('too_many_requested'));
+			$this->_finished_running();
+			return;
+		}
+
 		// Limit maximum number of items waiting to be pulled
 		$q = "SELECT COUNT(1) FROM `$this->_table_img_optming` WHERE optm_status = %d";
 		$q = $wpdb->prepare($q, array(self::STATUS_NOTIFIED));
 		$total_notified = $wpdb->get_var($q);
-		$max_notified = $allowance * 5;
-
-		if ($total_notified > $max_notified) {
-			self::debug('❌ Too many notified images (' . $total_notified . ' > ' . $max_notified . ')');
+		if ($total_notified > 0) {
+			self::debug('❌ Too many notified images (' . $total_notified . ')');
 			Admin_Display::error(Error::msg('too_many_notified'));
 			$this->_finished_running();
 			return;
@@ -249,11 +271,12 @@ class Img_Optm extends Base
 		$q = "SELECT COUNT(1) FROM `$this->_table_img_optming` WHERE optm_status IN (%d, %d)";
 		$q = $wpdb->prepare($q, array(self::STATUS_NEW, self::STATUS_RAW));
 		$total_new = $wpdb->get_var($q);
-		$allowance -= $total_new;
+		// $allowance -= $total_new;
 
-		// Get images
+		// May need to get more images
 		$list = array();
-		if ($allowance > 0) {
+		$more = $allowance - $total_new;
+		if ($more > 0) {
 			$q = "SELECT b.post_id, b.meta_value
 				FROM `$wpdb->posts` a
 				LEFT JOIN `$wpdb->postmeta` b ON b.post_id = a.ID
@@ -265,22 +288,12 @@ class Img_Optm extends Base
 				ORDER BY a.ID
 				LIMIT %d
 				";
-			$q = $wpdb->prepare($q, array($this->_summary['next_post_id'], $allowance));
+			$q = $wpdb->prepare($q, array($this->_summary['next_post_id'], $more));
 			$list = $wpdb->get_results($q);
-		}
-
-		if (!$list) {
-			// $msg = __('No new image to send.', 'litespeed-cache');
-			// Admin_Display::succeed($msg);
-
-			// self::debug('new_req() bypass: no new image found');
-			// $this->_finished_running();
-			// return;
-		}
-
-		if ($list) {
 			foreach ($list as $v) {
-				if (!$v->post_id) continue;
+				if (!$v->post_id) {
+					continue;
+				}
 
 				$this->_summary['next_post_id'] = $v->post_id;
 
@@ -304,12 +317,6 @@ class Img_Optm extends Base
 
 			self::save_summary();
 
-			if (!$this->_img_in_queue) {
-				self::debug('gather_images bypass: empty _img_in_queue');
-				$this->_finished_running();
-				return;
-			}
-
 			$num_a = count($this->_img_in_queue);
 			self::debug('Images found: ' . $num_a);
 			$this->_filter_duplicated_src();
@@ -329,7 +336,7 @@ class Img_Optm extends Base
 		}
 
 		// Push to Cloud server
-		$accepted_imgs = $this->_send_request();
+		$accepted_imgs = $this->_send_request($allowance);
 
 		$this->_finished_running();
 		if (!$accepted_imgs) {
@@ -339,7 +346,7 @@ class Img_Optm extends Base
 		$placeholder1 = Admin_Display::print_plural($accepted_imgs[0], 'image');
 		$placeholder2 = Admin_Display::print_plural($accepted_imgs[1], 'image');
 		$msg = sprintf(__('Pushed %1$s to Cloud server, accepted %2$s.', 'litespeed-cache'), $placeholder1, $placeholder2);
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -382,19 +389,39 @@ class Img_Optm extends Base
 		// check file exists or not
 		$_img_info = $this->__media->info($short_file_path, $this->tmp_pid);
 
-		if (!$_img_info || !in_array(pathinfo($short_file_path, PATHINFO_EXTENSION), array('jpg', 'jpeg', 'png', 'gif'))) {
+		$extension = pathinfo($short_file_path, PATHINFO_EXTENSION);
+		if (!$_img_info || !in_array($extension, array('jpg', 'jpeg', 'png', 'gif'))) {
 			self::debug2('bypass image due to file not exist: pid ' . $this->tmp_pid . ' ' . $short_file_path);
+			return;
+		}
+
+		// Check if optimized file exists or not
+		$target_needed = false;
+		if ($this->_format) {
+			$target_file_path = $short_file_path . '.' . $this->_format;
+			if (!$this->__media->info($target_file_path, $this->tmp_pid)) {
+				$target_needed = true;
+			}
+		}
+		if ($this->conf(self::O_IMG_OPTM_ORI)) {
+			$target_file_path = substr($short_file_path, 0, -strlen($extension)) . 'bk.' . $extension;
+			if (!$this->__media->info($target_file_path, $this->tmp_pid)) {
+				$target_needed = true;
+			}
+		}
+		if (!$target_needed) {
+			self::debug2('bypass image due to optimized file exists: pid ' . $this->tmp_pid . ' ' . $short_file_path);
 			return;
 		}
 
 		// Debug2::debug2( '[Img_Optm] adding image: pid ' . $this->tmp_pid );
 
 		$this->_img_in_queue[] = array(
-			'pid'	=> $this->tmp_pid,
-			'md5'	=> $_img_info['md5'],
-			'url'	=> $_img_info['url'],
-			'src'	=> $short_file_path, // not needed in LiteSpeed IAPI, just leave for local storage after post
-			'mime_type'	=> !empty($meta_value['mime-type']) ? $meta_value['mime-type'] : '',
+			'pid' => $this->tmp_pid,
+			'md5' => $_img_info['md5'],
+			'url' => $_img_info['url'],
+			'src' => $short_file_path, // not needed in LiteSpeed IAPI, just leave for local storage after post
+			'mime_type' => !empty($meta_value['mime-type']) ? $meta_value['mime-type'] : '',
 		);
 	}
 
@@ -405,7 +432,9 @@ class Img_Optm extends Base
 	 */
 	private function _save_raw()
 	{
-		if (empty($this->_img_in_queue)) return;
+		if (empty($this->_img_in_queue)) {
+			return;
+		}
 		$data = array();
 		$pid_list = array();
 		foreach ($this->_img_in_queue as $k => $v) {
@@ -416,7 +445,7 @@ class Img_Optm extends Base
 				unset($this->_img_in_queue[$k]);
 				continue;
 			}
-			$pid_list[] = (int)$v['pid'];
+			$pid_list[] = (int) $v['pid'];
 
 			$data[] = $v['pid'];
 			$data[] = self::STATUS_RAW;
@@ -453,7 +482,12 @@ class Img_Optm extends Base
 				$existed_pid[] = $v->post_id;
 			}
 			self::debug('pid list to update postmeta', $existed_pid);
-			$wpdb->query($wpdb->prepare("UPDATE `$wpdb->postmeta` SET meta_value=%s WHERE post_id IN ('" . implode("','", $existed_pid) . "') AND meta_key=%s", array($this->_thumbnail_set, self::DB_SET)));
+			$wpdb->query(
+				$wpdb->prepare("UPDATE `$wpdb->postmeta` SET meta_value=%s WHERE post_id IN ('" . implode("','", $existed_pid) . "') AND meta_key=%s", array(
+					$this->_thumbnail_set,
+					self::DB_SET,
+				))
+			);
 		}
 
 		# Add new meta
@@ -481,7 +515,9 @@ class Img_Optm extends Base
 		$set = array();
 		foreach (Media::cls()->get_image_sizes() as $size) {
 			$curr_size = $size['width'] . 'x' . $size['height'];
-			if (in_array($curr_size, $set)) continue;
+			if (in_array($curr_size, $set)) {
+				continue;
+			}
 			$set[] = $curr_size;
 		}
 		$this->_thumbnail_set = implode(PHP_EOL, $set);
@@ -523,15 +559,19 @@ class Img_Optm extends Base
 	{
 		global $wpdb;
 
-		if (!$this->__data->tb_exist('img_optm')) return;
+		if (!$this->__data->tb_exist('img_optm')) {
+			return;
+		}
 
-		if (!$this->_img_in_queue) return;
+		if (!$this->_img_in_queue) {
+			return;
+		}
 
 		$finished_ids = array();
 
 		Utility::compatibility();
 		$post_ids = array_unique(array_column($this->_img_in_queue, 'pid'));
-		$list = $wpdb->get_results("SELECT post_id FROM `$this->_table_img_optm` WHERE post_id in (" . implode(',', $post_ids) . ") GROUP BY post_id");
+		$list = $wpdb->get_results("SELECT post_id FROM `$this->_table_img_optm` WHERE post_id in (" . implode(',', $post_ids) . ') GROUP BY post_id');
 		foreach ($list as $v) {
 			$finished_ids[] = $v->post_id;
 		}
@@ -545,7 +585,7 @@ class Img_Optm extends Base
 		}
 
 		// Drop all existing legacy records
-		$wpdb->query("DELETE FROM `$this->_table_img_optm` WHERE post_id in (" . implode(',', $post_ids) . ")");
+		$wpdb->query("DELETE FROM `$this->_table_img_optm` WHERE post_id in (" . implode(',', $post_ids) . ')');
 	}
 
 	/**
@@ -574,7 +614,7 @@ class Img_Optm extends Base
 
 		$count = count($img_in_queue_invalid);
 		$msg = sprintf(__('Cleared %1$s invalid images.', 'litespeed-cache'), $count);
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 
 		self::debug('Found invalid src [total] ' . $count);
 	}
@@ -585,37 +625,46 @@ class Img_Optm extends Base
 	 * @since 1.6.7
 	 * @access private
 	 */
-	private function _send_request()
+	private function _send_request($allowance)
 	{
 		global $wpdb;
 
-		$_img_in_queue = $wpdb->get_results("SELECT id,src,post_id FROM `$this->_table_img_optming` WHERE optm_status=" . self::STATUS_RAW);
-		if (!$_img_in_queue) return;
+		$q = "SELECT id, src, post_id FROM `$this->_table_img_optming` WHERE optm_status=%d LIMIT %d";
+		$q = $wpdb->prepare($q, array(self::STATUS_RAW, $allowance));
+		$_img_in_queue = $wpdb->get_results($q);
+		if (!$_img_in_queue) {
+			return;
+		}
 
 		self::debug('Load img in queue [total] ' . count($_img_in_queue));
 
 		$list = array();
 		foreach ($_img_in_queue as $v) {
-			/**
-			 * Filter `litespeed_img_optm_options_per_image`
-			 * @since 2.4.2
-			 */
-			/**
-			 * 				$optm_options |= API::IMG_OPTM_BM_ORI;
-			 * 				$optm_options |= API::IMG_OPTM_BM_WEBP;
-			 * 				$optm_options |= API::IMG_OPTM_BM_LOSSLESS;
-			 * 				$optm_options |= API::IMG_OPTM_BM_EXIF;
-			 */
-			$optm_options = apply_filters('litespeed_img_optm_options_per_image', 0, $v->src);
-
 			$_img_info = $this->__media->info($v->src, $v->post_id);
+			# If record is invalid, remove from img_optming table
+			if (empty($_img_info['url']) || empty($_img_info['md5'])) {
+				$wpdb->query($wpdb->prepare("DELETE FROM `$this->_table_img_optming` WHERE id=%d", $v->id));
+				continue;
+			}
+
 			$img = array(
-				'id'	=> $v->id,
-				'url'	=> $_img_info['url'],
-				'md5'	=> $_img_info['md5'],
+				'id' => $v->id,
+				'url' => $_img_info['url'],
+				'md5' => $_img_info['md5'],
 			);
-			if ($optm_options) {
-				$img['optm_options'] = $optm_options;
+			// Build the needed image types for request as we now support soft reset counter
+			if ($this->_format) {
+				$target_file_path = $v->src . '.' . $this->_format;
+				if ($this->__media->info($target_file_path, $v->post_id)) {
+					$img['optm_' . $this->_format] = 0;
+				}
+			}
+			if ($this->conf(self::O_IMG_OPTM_ORI)) {
+				$extension = pathinfo($v->src, PATHINFO_EXTENSION);
+				$target_file_path = substr($v->src, 0, -strlen($extension)) . 'bk.' . $extension;
+				if ($this->__media->info($target_file_path, $v->post_id)) {
+					$img['optm_ori'] = 0;
+				}
 			}
 
 			$list[] = $img;
@@ -628,13 +677,15 @@ class Img_Optm extends Base
 		}
 
 		$data = array(
-			'action'		=> self::CLOUD_ACTION_NEW_REQ,
-			'list' 			=> json_encode($list),
-			'optm_ori'		=> $this->conf(self::O_IMG_OPTM_ORI) ? 1 : 0,
-			'optm_webp'		=> $this->conf(self::O_IMG_OPTM_WEBP) ? 1 : 0,
-			'optm_lossless'	=> $this->conf(self::O_IMG_OPTM_LOSSLESS) ? 1 : 0,
-			'keep_exif'		=> $this->conf(self::O_IMG_OPTM_EXIF) ? 1 : 0,
+			'action' => self::CLOUD_ACTION_NEW_REQ,
+			'list' => \json_encode($list),
+			'optm_ori' => $this->conf(self::O_IMG_OPTM_ORI) ? 1 : 0,
+			'optm_lossless' => $this->conf(self::O_IMG_OPTM_LOSSLESS) ? 1 : 0,
+			'keep_exif' => $this->conf(self::O_IMG_OPTM_EXIF) ? 1 : 0,
 		);
+		if ($this->_format) {
+			$data['optm_' . $this->_format] = 1;
+		}
 
 		// Push to Cloud server
 		$json = Cloud::post(Cloud::SVC_IMG_OPTM, $data);
@@ -675,16 +726,9 @@ class Img_Optm extends Base
 			return Cloud::err('too_often');
 		}
 
-		$post_data = json_decode(file_get_contents('php://input'), true);
+		$post_data = \json_decode(file_get_contents('php://input'), true);
 		if (is_null($post_data)) {
 			$post_data = $_POST;
-		}
-
-		// Validate key
-		if (empty($post_data['domain_key']) || $post_data['domain_key'] !== md5($this->conf(self::O_API_KEY))) {
-			$this->_summary['notify_ts_err'] = time();
-			self::save_summary();
-			return Cloud::err('wrong_key');
 		}
 
 		global $wpdb;
@@ -695,7 +739,7 @@ class Img_Optm extends Base
 			return Cloud::err('no notified data');
 		}
 
-		if (empty($post_data['server']) || substr($post_data['server'], -11) !== '.quic.cloud') {
+		if (empty($post_data['server']) || (substr($post_data['server'], -11) !== '.quic.cloud' && substr($post_data['server'], -15) !== '.quicserver.com')) {
 			self::debug('notify exit: no/wrong server');
 			return Cloud::err('no/wrong server');
 		}
@@ -716,19 +760,23 @@ class Img_Optm extends Base
 
 		if ($status == self::STATUS_NOTIFIED) {
 			// Notified data format: [ img_optm_id => [ id=>, src_size=>, ori=>, ori_md5=>, ori_reduced=>, webp=>, webp_md5=>, webp_reduced=> ] ]
-			$q = "SELECT a.*, b.meta_id as b_meta_id, b.meta_value AS b_optm_info
+			$q =
+				"SELECT a.*, b.meta_id as b_meta_id, b.meta_value AS b_optm_info
 					FROM `$this->_table_img_optming` a
 					LEFT JOIN `$wpdb->postmeta` b ON b.post_id = a.post_id AND b.meta_key = %s
-					WHERE a.id IN ( " . implode(',', array_fill(0, count($notified_data), '%d')) . " )";
+					WHERE a.id IN ( " .
+				implode(',', array_fill(0, count($notified_data), '%d')) .
+				' )';
 			$list = $wpdb->get_results($wpdb->prepare($q, array_merge(array(self::DB_SIZE), array_keys($notified_data))));
 			$ls_optm_size_row_exists_postids = array();
 			foreach ($list as $v) {
 				$json = $notified_data[$v->id];
+				// self::debug('Notified data for [id] ' . $v->id, $json);
 
 				$server = !empty($json['server']) ? $json['server'] : $post_data['server'];
 
 				$server_info = array(
-					'server'	=> $server,
+					'server' => $server,
 				);
 
 				// Save server side ID to send taken notification after pulled
@@ -738,11 +786,13 @@ class Img_Optm extends Base
 				}
 
 				// Optm info array
-				$postmeta_info =  array(
+				$postmeta_info = array(
 					'ori_total' => 0,
 					'ori_saved' => 0,
 					'webp_total' => 0,
 					'webp_saved' => 0,
+					'avif_total' => 0,
+					'avif_saved' => 0,
 				);
 				// Init postmeta_info for the first one
 				if (!empty($v->b_meta_id)) {
@@ -773,9 +823,20 @@ class Img_Optm extends Base
 					$this->_summary['reduced'] += $json['webp_reduced'];
 				}
 
+				if (!empty($json['avif'])) {
+					$server_info['avif_md5'] = $json['avif_md5'];
+					$server_info['avif'] = $json['avif'];
+
+					// Append meta info
+					$postmeta_info['avif_total'] += $json['src_size'];
+					$postmeta_info['avif_saved'] += $json['avif_reduced'];
+
+					$this->_summary['reduced'] += $json['avif_reduced'];
+				}
+
 				// Update status and data in working table
 				$q = "UPDATE `$this->_table_img_optming` SET optm_status = %d, server_info = %s WHERE id = %d ";
-				$wpdb->query($wpdb->prepare($q, array($status, json_encode($server_info), $v->id)));
+				$wpdb->query($wpdb->prepare($q, array($status, \json_encode($server_info), $v->id)));
 
 				// Update postmeta for optm summary
 				$postmeta_info = serialize($postmeta_info);
@@ -789,7 +850,6 @@ class Img_Optm extends Base
 					$wpdb->query($wpdb->prepare($q, array($postmeta_info, $v->b_meta_id)));
 				}
 
-
 				// write log
 				$pid_log = $last_log_pid == $v->post_id ? '.' : $v->post_id;
 				self::debug('notify_img [status] ' . $status . " \t\t[pid] " . $pid_log . " \t\t[id] " . $v->id);
@@ -800,9 +860,10 @@ class Img_Optm extends Base
 
 			// Mark need_pull tag for cron
 			self::update_option(self::DB_NEED_PULL, self::STATUS_NOTIFIED);
-		} else { // Other errors will directly remove the working records
+		} else {
+			// Other errors will directly remove the working records
 			// Delete from working table
-			$q = "DELETE FROM `$this->_table_img_optming` WHERE id IN ( " . implode(',', array_fill(0, count($notified_data), '%d')) . " ) ";
+			$q = "DELETE FROM `$this->_table_img_optming` WHERE id IN ( " . implode(',', array_fill(0, count($notified_data), '%d')) . ' ) ';
 			$wpdb->query($wpdb->prepare($q, $notified_data));
 		}
 
@@ -847,7 +908,45 @@ class Img_Optm extends Base
 			return;
 		}
 
+		if (defined('LITESPEED_IMG_OPTM_PULL_CRON') && !LITESPEED_IMG_OPTM_PULL_CRON) {
+			self::debug('Cron disabled [define] LITESPEED_IMG_OPTM_PULL_CRON');
+			return;
+		}
+
 		self::cls()->pull($force);
+	}
+
+	/**
+	 * Calculate pull theads
+	 *
+	 * @since  5.8
+	 * @access private
+	 */
+	private function _calc_pull_threads()
+	{
+		global $wpdb;
+
+		if (defined('LITESPEED_IMG_OPTM_PULL_THREADS')) {
+			return LITESPEED_IMG_OPTM_PULL_THREADS;
+		}
+
+		// Tune number of images per request based on number of images waiting and cloud packages
+		$imgs_per_req = 1; // base 1, ramp up to ~50 max
+
+		// Ramp up the request rate based on how many images are waiting
+		$c = "SELECT count(id) FROM `$this->_table_img_optming` WHERE optm_status = %d";
+		$_c = $wpdb->prepare($c, array(self::STATUS_NOTIFIED));
+		$images_waiting = $wpdb->get_var($_c);
+		if ($images_waiting && $images_waiting > 0) {
+			$imgs_per_req = ceil($images_waiting / 1000); //ie. download 5/request if 5000 images are waiting
+		}
+
+		// Cap the request rate at 50 images per request
+		$imgs_per_req = min(50, $imgs_per_req);
+
+		self::debug('Pulling images at rate: ' . $imgs_per_req . ' Images per request.');
+
+		return $imgs_per_req;
 	}
 
 	/**
@@ -859,8 +958,10 @@ class Img_Optm extends Base
 	public function pull($manual = false)
 	{
 		global $wpdb;
+		$timeoutLimit = ini_get('max_execution_time');
+		$endts = time() + $timeoutLimit;
 
-		self::debug('' . ($manual ? 'Manually' : 'Cron') . ' pull started');
+		self::debug('' . ($manual ? 'Manually' : 'Cron') . ' pull started [timeout: ' . $timeoutLimit . 's]');
 
 		if ($this->cron_running()) {
 			self::debug('Pull cron is running');
@@ -870,163 +971,303 @@ class Img_Optm extends Base
 			return;
 		}
 
-		$q = "SELECT * FROM `$this->_table_img_optming` WHERE optm_status = %d ORDER BY id LIMIT 1";
-		$_q = $wpdb->prepare($q, self::STATUS_NOTIFIED);
+		$this->_summary['last_pulled'] = time();
+		$this->_summary['last_pulled_by_cron'] = !$manual;
+		self::save_summary();
 
-		$optm_ori = $this->conf(self::O_IMG_OPTM_ORI);
+		$imgs_per_req = $this->_calc_pull_threads();
+		$q = "SELECT * FROM `$this->_table_img_optming` WHERE optm_status = %d ORDER BY id LIMIT %d";
+		$_q = $wpdb->prepare($q, array(self::STATUS_NOTIFIED, $imgs_per_req));
+
 		$rm_ori_bkup = $this->conf(self::O_IMG_OPTM_RM_BKUP);
-		$optm_webp = $this->conf(self::O_IMG_OPTM_WEBP);
 
 		$total_pulled_ori = 0;
 		$total_pulled_webp = 0;
-		$beginning = time();
+		$total_pulled_avif = 0;
 
 		$server_list = array();
 
-		while ($row_img = $wpdb->get_row($_q)) {
-			/**
-			 * Update cron timestamp to avoid duplicated running
-			 * @since  1.6.2
-			 */
-			$this->_update_cron_running();
-
-			$local_file = $this->wp_upload_dir['basedir'] . '/' . $row_img->src;
-
-			$server_info = json_decode($row_img->server_info, true);
-			if (empty($server_info['ori'])) {
-				// Delete working table
-				$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
-				$wpdb->query($wpdb->prepare($q, $row_img->id));
-
-				continue;
-			}
-			/**
-			 * Use wp orignal get func to avoid allow_url_open off issue
-			 * @since  1.6.5
-			 */
-			$image_url = $server_info['server'] . '/' . $server_info['ori'];
-			self::debug('Pulling image: ' . $image_url);
-			$response = wp_remote_get($image_url, array('timeout' => 60));
-			if (is_wp_error($response)) {
-				$error_message = $response->get_error_message();
-				self::debug('❌ failed to pull image: ' . $error_message);
-				return;
-			}
-
-			if ($response['response']['code'] == 404) {
-				$this->_step_back_image($row_img->id);
-
-				$msg = __('Some optimized image file(s) has expired and was cleared.', 'litespeed-cache');
-				Admin_Display::error($msg);
-				continue;
-			}
-
-			file_put_contents($local_file . '.tmp', $response['body']);
-
-			if (!file_exists($local_file . '.tmp') || !filesize($local_file . '.tmp') || md5_file($local_file . '.tmp') !== $server_info['ori_md5']) {
-				self::debug('❌ Failed to pull optimized img: file md5 mismatch [url] ' . $server_info['server'] . '/' . $server_info['ori'] . ' [server_md5] ' . $server_info['ori_md5']);
-
-				// Delete working table
-				$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
-				$wpdb->query($wpdb->prepare($q, $row_img->id));
-
-				$msg = __('One or more pulled images does not match with the notified image md5', 'litespeed-cache');
-				Admin_Display::error($msg);
-				continue;
-			}
-
-			// Backup ori img
-			if (!$rm_ori_bkup) {
-				$extension = pathinfo($local_file, PATHINFO_EXTENSION);
-				$bk_file = substr($local_file, 0, -strlen($extension)) . 'bk.' . $extension;
-				file_exists($local_file) && rename($local_file, $bk_file);
-			}
-
-			// Replace ori img
-			rename($local_file . '.tmp', $local_file);
-
-			self::debug('Pulled optimized img: ' . $local_file);
-
-			/**
-			 * API Hook
-			 * @since  2.9.5
-			 * @since  3.0 $row_img has less elements now. Most useful ones are `post_id`/`src`
-			 */
-			do_action('litespeed_img_pull_ori', $row_img, $local_file);
-
-			$total_pulled_ori++;
-			// }
-
-			// Save webp image
-			$webp_size = 0;
-
-			if (!empty($server_info['webp'])) {
-				// Fetch
-				$response = wp_remote_get($server_info['server'] . '/' . $server_info['webp'], array('timeout' => 60));
-				if (is_wp_error($response)) {
-					$error_message = $response->get_error_message();
-					self::debug('failed to pull webp image: ' . $error_message);
-					return;
+		try {
+			while ($img_rows = $wpdb->get_results($_q)) {
+				self::debug('timeout left: ' . ($endts - time()) . 's');
+				if (function_exists('set_time_limit')) {
+					$endts += 600;
+					self::debug('Endtime extended to ' . date('Ymd H:i:s', $endts));
+					set_time_limit(600); // This will be no more important as we use noabort now
 				}
+				// Disabled as we use noabort
+				// if ($endts - time() < 10) {
+				// 	self::debug("🚨 End loop due to timeout limit reached " . $timeoutLimit . "s");
+				// 	break;
+				// }
 
-				if ($response['response']['code'] == 404) {
-					$this->_step_back_image($row_img->id);
+				/**
+				 * Update cron timestamp to avoid duplicated running
+				 * @since  1.6.2
+				 */
+				$this->_update_cron_running();
 
-					$msg = __('Optimized WebP file expired and was cleared.', 'litespeed-cache');
-					Admin_Display::error($msg);
-					return;
+				// Run requests in parallel
+				$requests = array(); // store each request URL for Requests::request_multiple()
+				$imgs_by_req = array(); // store original request data so that we can reference it in the response
+				$req_counter = 0;
+				foreach ($img_rows as $row_img) {
+					// request original image
+					$server_info = \json_decode($row_img->server_info, true);
+					if (!empty($server_info['ori'])) {
+						$image_url = $server_info['server'] . '/' . $server_info['ori'];
+						self::debug('Queueing pull: ' . $image_url);
+						$requests[$req_counter] = array(
+							'url' => $image_url,
+							'type' => 'GET',
+						);
+						$imgs_by_req[$req_counter++] = array(
+							'type' => 'ori',
+							'data' => $row_img,
+						);
+					}
+
+					// request webp image
+					$webp_size = 0;
+					if (!empty($server_info['webp'])) {
+						$image_url = $server_info['server'] . '/' . $server_info['webp'];
+						self::debug('Queueing pull WebP: ' . $image_url);
+						$requests[$req_counter] = array(
+							'url' => $image_url,
+							'type' => 'GET',
+						);
+						$imgs_by_req[$req_counter++] = array(
+							'type' => 'webp',
+							'data' => $row_img,
+						);
+					}
+
+					// request avif image
+					$avif_size = 0;
+					if (!empty($server_info['avif'])) {
+						$image_url = $server_info['server'] . '/' . $server_info['avif'];
+						self::debug('Queueing pull AVIF: ' . $image_url);
+						$requests[$req_counter] = array(
+							'url' => $image_url,
+							'type' => 'GET',
+						);
+						$imgs_by_req[$req_counter++] = array(
+							'type' => 'avif',
+							'data' => $row_img,
+						);
+					}
 				}
+				self::debug('Loaded images count: ' . $req_counter);
 
-				file_put_contents($local_file . '.webp', $response['body']);
+				$complete_action = function ($response, $req_count) use ($imgs_by_req, $rm_ori_bkup, &$total_pulled_ori, &$total_pulled_webp, &$total_pulled_avif, &$server_list) {
+					global $wpdb;
+					$row_data = isset($imgs_by_req[$req_count]) ? $imgs_by_req[$req_count] : false;
+					if (false === $row_data) {
+						self::debug('❌ failed to pull image: Request not found in lookup variable.');
+						return;
+					}
+					$row_type = isset($row_data['type']) ? $row_data['type'] : 'ori';
+					$row_img = $row_data['data'];
+					$local_file = $this->wp_upload_dir['basedir'] . '/' . $row_img->src;
+					$server_info = \json_decode($row_img->server_info, true);
 
-				if (!file_exists($local_file . '.webp') || !filesize($local_file . '.webp') || md5_file($local_file . '.webp') !== $server_info['webp_md5']) {
-					self::debug('❌ Failed to pull optimized webp img: file md5 mismatch, server md5: ' . $server_info['webp_md5']);
+					if (empty($response->success)) {
+						if (!empty($response->status_code) && 404 == $response->status_code) {
+							$this->_step_back_image($row_img->id);
+
+							$msg = __('Some optimized image file(s) has expired and was cleared.', 'litespeed-cache');
+							Admin_Display::error($msg);
+							return;
+						} else {
+							// handle error
+							$image_url = $server_info['server'] . '/' . $server_info[$row_type];
+							self::debug(
+								'❌ failed to pull image (' .
+									$row_type .
+									'): ' .
+									(!empty($response->status_code) ? $response->status_code : '') .
+									' [Local: ' .
+									$row_img->src .
+									'] / [remote: ' .
+									$image_url .
+									']'
+							);
+							throw new \Exception('Failed to pull image ' . (!empty($response->status_code) ? $response->status_code : '') . ' [url] ' . $image_url);
+							return;
+						}
+					}
+					// Handle wp_remote_get 404 as its success=true
+					if (!empty($response->status_code)) {
+						if ($response->status_code == 404) {
+							$this->_step_back_image($row_img->id);
+
+							$msg = __('Some optimized image file(s) has expired and was cleared.', 'litespeed-cache');
+							Admin_Display::error($msg);
+							return;
+						}
+						// Note: if there is other error status code found in future, handle here
+					}
+
+					if ('webp' === $row_type) {
+						file_put_contents($local_file . '.webp', $response->body);
+
+						if (!file_exists($local_file . '.webp') || !filesize($local_file . '.webp') || md5_file($local_file . '.webp') !== $server_info['webp_md5']) {
+							self::debug('❌ Failed to pull optimized webp img: file md5 mismatch, server md5: ' . $server_info['webp_md5']);
+
+							// Delete working table
+							$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
+							$wpdb->query($wpdb->prepare($q, $row_img->id));
+
+							$msg = __('Pulled WebP image md5 does not match the notified WebP image md5.', 'litespeed-cache');
+							Admin_Display::error($msg);
+							return;
+						}
+
+						self::debug('Pulled optimized img WebP: ' . $local_file . '.webp');
+
+						$webp_size = filesize($local_file . '.webp');
+
+						/**
+						 * API for WebP
+						 * @since 2.9.5
+						 * @since  3.0 $row_img less elements (see above one)
+						 * @see #751737  - API docs for WEBP generation
+						 */
+						do_action('litespeed_img_pull_webp', $row_img, $local_file . '.webp');
+
+						$total_pulled_webp++;
+					} elseif ('avif' === $row_type) {
+						file_put_contents($local_file . '.avif', $response->body);
+
+						if (!file_exists($local_file . '.avif') || !filesize($local_file . '.avif') || md5_file($local_file . '.avif') !== $server_info['avif_md5']) {
+							self::debug('❌ Failed to pull optimized avif img: file md5 mismatch, server md5: ' . $server_info['avif_md5']);
+
+							// Delete working table
+							$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
+							$wpdb->query($wpdb->prepare($q, $row_img->id));
+
+							$msg = __('Pulled AVIF image md5 does not match the notified AVIF image md5.', 'litespeed-cache');
+							Admin_Display::error($msg);
+							return;
+						}
+
+						self::debug('Pulled optimized img AVIF: ' . $local_file . '.avif');
+
+						$avif_size = filesize($local_file . '.avif');
+
+						/**
+						 * API for AVIF
+						 * @since 7.0
+						 */
+						do_action('litespeed_img_pull_avif', $row_img, $local_file . '.avif');
+
+						$total_pulled_avif++;
+					} else {
+						// "ori" image type
+						file_put_contents($local_file . '.tmp', $response->body);
+
+						if (!file_exists($local_file . '.tmp') || !filesize($local_file . '.tmp') || md5_file($local_file . '.tmp') !== $server_info['ori_md5']) {
+							self::debug(
+								'❌ Failed to pull optimized img: file md5 mismatch [url] ' .
+									$server_info['server'] .
+									'/' .
+									$server_info['ori'] .
+									' [server_md5] ' .
+									$server_info['ori_md5']
+							);
+
+							// Delete working table
+							$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
+							$wpdb->query($wpdb->prepare($q, $row_img->id));
+
+							$msg = __('One or more pulled images does not match with the notified image md5', 'litespeed-cache');
+							Admin_Display::error($msg);
+							return;
+						}
+
+						// Backup ori img
+						if (!$rm_ori_bkup) {
+							$extension = pathinfo($local_file, PATHINFO_EXTENSION);
+							$bk_file = substr($local_file, 0, -strlen($extension)) . 'bk.' . $extension;
+							file_exists($local_file) && rename($local_file, $bk_file);
+						}
+
+						// Replace ori img
+						rename($local_file . '.tmp', $local_file);
+
+						self::debug('Pulled optimized img: ' . $local_file);
+
+						/**
+						 * API Hook
+						 * @since  2.9.5
+						 * @since  3.0 $row_img has less elements now. Most useful ones are `post_id`/`src`
+						 */
+						do_action('litespeed_img_pull_ori', $row_img, $local_file);
+
+						self::debug2('Remove _table_img_optming record [id] ' . $row_img->id);
+					}
 
 					// Delete working table
 					$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
 					$wpdb->query($wpdb->prepare($q, $row_img->id));
 
-					$msg = __('Pulled WebP image md5 does not match the notified WebP image md5.', 'litespeed-cache');
-					Admin_Display::error($msg);
-					return;
+					// Save server_list to notify taken
+					if (empty($server_list[$server_info['server']])) {
+						$server_list[$server_info['server']] = array();
+					}
+
+					$server_info_id = !empty($server_info['file_id']) ? $server_info['file_id'] : $server_info['id'];
+					$server_list[$server_info['server']][] = $server_info_id;
+
+					$total_pulled_ori++;
+				};
+
+				$force_wp_remote_get = defined('LITESPEED_FORCE_WP_REMOTE_GET') && LITESPEED_FORCE_WP_REMOTE_GET;
+				if (!$force_wp_remote_get && class_exists('\WpOrg\Requests\Requests') && class_exists('\WpOrg\Requests\Autoload') && version_compare(PHP_VERSION, '5.6.0', '>=')) {
+					// Make sure Requests can load internal classes.
+					Autoload::register();
+
+					// Run pull requests in parallel
+					Requests::request_multiple($requests, array(
+						'timeout' => 60,
+						'connect_timeout' => 60,
+						'complete' => $complete_action,
+					));
+				} else {
+					foreach ($requests as $cnt => $req) {
+						$wp_response = wp_remote_get($req['url'], array('timeout' => 60));
+						$request_response = array(
+							'success' => false,
+							'status_code' => 0,
+							'body' => null,
+						);
+						if (is_wp_error($wp_response)) {
+							$error_message = $wp_response->get_error_message();
+							self::debug('❌ failed to pull image: ' . $error_message);
+						} else {
+							$request_response['success'] = true;
+							$request_response['status_code'] = $wp_response['response']['code'];
+							$request_response['body'] = $wp_response['body'];
+						}
+						self::debug('response code [code] ' . $wp_response['response']['code'] . ' [url] ' . $req['url']);
+
+						$request_response = (object) $request_response;
+
+						$complete_action($request_response, $cnt);
+					}
 				}
-
-				self::debug('Pulled optimized img WebP: ' . $local_file . '.webp');
-
-				$webp_size = filesize($local_file . '.webp');
-
-				/**
-				 * API for WebP
-				 * @since 2.9.5
-				 * @since  3.0 $row_img less elements (see above one)
-				 * @see #751737  - API docs for WEBP generation
-				 */
-				do_action('litespeed_img_pull_webp', $row_img, $local_file . '.webp');
-
-				$total_pulled_webp++;
+				self::debug('Current batch pull finished');
 			}
-
-			self::debug2('Remove _table_img_optming record [id] ' . $row_img->id);
-
-			// Delete working table
-			$q = "DELETE FROM `$this->_table_img_optming` WHERE id = %d ";
-			$wpdb->query($wpdb->prepare($q, $row_img->id));
-
-			// Save server_list to notify taken
-			if (empty($server_list[$server_info['server']])) {
-				$server_list[$server_info['server']] = array();
-			}
-
-			$server_info_id = !empty($server_info['file_id']) ? $server_info['file_id'] : $server_info['id'];
-			$server_list[$server_info['server']][] = $server_info_id;
+		} catch (\Exception $e) {
+			Admin_Display::error('Image pull process failure: ' . $e->getMessage());
 		}
 
 		// Notify IAPI images taken
 		foreach ($server_list as $server => $img_list) {
 			$data = array(
-				'action'	=> self::CLOUD_ACTION_TAKEN,
-				'list' 		=> $img_list,
-				'server'	=> $server,
+				'action' => self::CLOUD_ACTION_TAKEN,
+				'list' => $img_list,
+				'server' => $server,
 			);
 			// TODO: improve this so we do not call once per server, but just once and then filter on the server side
 			Cloud::post(Cloud::SVC_IMG_OPTM, $data);
@@ -1035,7 +1276,7 @@ class Img_Optm extends Base
 		if (empty($this->_summary['img_taken'])) {
 			$this->_summary['img_taken'] = 0;
 		}
-		$this->_summary['img_taken'] += $total_pulled_ori + $total_pulled_webp;
+		$this->_summary['img_taken'] += $total_pulled_ori + $total_pulled_webp + $total_pulled_avif;
 		self::save_summary();
 
 		// Manually running needs to roll back timestamp for next running
@@ -1044,7 +1285,7 @@ class Img_Optm extends Base
 		}
 
 		// $msg = sprintf(__('Pulled %d image(s)', 'litespeed-cache'), $total_pulled_ori + $total_pulled_webp);
-		// Admin_Display::succeed($msg);
+		// Admin_Display::success($msg);
 
 		// Check if there is still task in queue
 		$q = "SELECT * FROM `$this->_table_img_optming` WHERE optm_status = %d LIMIT 1";
@@ -1069,6 +1310,8 @@ class Img_Optm extends Base
 	private function _step_back_image($id)
 	{
 		global $wpdb;
+
+		self::debug('Push image back to new status [id] ' . $id);
 
 		// Reset the image to gathered status
 		$q = "UPDATE `$this->_table_img_optming` SET optm_status = %d WHERE id = %d ";
@@ -1132,7 +1375,25 @@ class Img_Optm extends Base
 		}
 
 		$msg = __('Cleaned up unfinished data successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
+	}
+
+	/**
+	 * Reset image counter
+	 *
+	 * @since 7.0
+	 * @access private
+	 */
+	private function _reset_counter()
+	{
+		self::debug('reset image optm counter');
+		$this->_summary['next_post_id'] = 0;
+		self::save_summary();
+
+		$this->clean();
+
+		$msg = __('Reset image optimization counter successfully.', 'litespeed-cache');
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1145,7 +1406,7 @@ class Img_Optm extends Base
 	{
 		global $wpdb;
 
-		self::debug('excuting DESTROY process');
+		self::debug('executing DESTROY process');
 
 		$offset = !empty($_GET['litespeed_i']) ? $_GET['litespeed_i'] : 0;
 		/**
@@ -1169,7 +1430,9 @@ class Img_Optm extends Base
 		$list = $wpdb->get_results($q);
 		$i = 0;
 		foreach ($list as $v) {
-			if (!$v->post_id) continue;
+			if (!$v->post_id) {
+				continue;
+			}
 
 			$meta_value = $this->_parse_wp_meta_value($v);
 			if (!$meta_value) {
@@ -1191,7 +1454,13 @@ class Img_Optm extends Base
 		$offset++;
 		$to_be_continued = $wpdb->get_row($wpdb->prepare($img_q, array($offset * $limit, 1)));
 		if ($to_be_continued) {
-			return Router::self_redirect(Router::ACTION_IMG_OPTM, self::TYPE_DESTROY);
+			# Check if post_id is beyond next_post_id
+			self::debug('[next_post_id] ' . $this->_summary['next_post_id'] . ' [cursor post id] ' . $to_be_continued->post_id);
+			if ($to_be_continued->post_id <= $this->_summary['next_post_id']) {
+				self::debug('redirecting to next');
+				return Router::self_redirect(Router::ACTION_IMG_OPTM, self::TYPE_DESTROY);
+			}
+			self::debug('🎊 Finished destroying');
 		}
 
 		// Delete postmeta info
@@ -1208,7 +1477,7 @@ class Img_Optm extends Base
 		self::delete_option(self::DB_NEED_PULL);
 
 		$msg = __('Destroy all optimization data successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1220,10 +1489,15 @@ class Img_Optm extends Base
 		if (!$is_ori_file) {
 			$short_file_path = $this->tmp_path . $short_file_path;
 		}
+		self::debug('deleting ' . $short_file_path);
 
 		// del webp
 		$this->__media->info($short_file_path . '.webp', $this->tmp_pid) && $this->__media->del($short_file_path . '.webp', $this->tmp_pid);
 		$this->__media->info($short_file_path . '.optm.webp', $this->tmp_pid) && $this->__media->del($short_file_path . '.optm.webp', $this->tmp_pid);
+
+		// del avif
+		$this->__media->info($short_file_path . '.avif', $this->tmp_pid) && $this->__media->del($short_file_path . '.avif', $this->tmp_pid);
+		$this->__media->info($short_file_path . '.optm.avif', $this->tmp_pid) && $this->__media->del($short_file_path . '.optm.avif', $this->tmp_pid);
 
 		$extension = pathinfo($short_file_path, PATHINFO_EXTENSION);
 		$local_filename = substr($short_file_path, 0, -strlen($extension) - 1);
@@ -1232,6 +1506,7 @@ class Img_Optm extends Base
 
 		// del optimized ori
 		if ($this->__media->info($bk_file, $this->tmp_pid)) {
+			self::debug('deleting optim ori');
 			$this->__media->del($short_file_path, $this->tmp_pid);
 			$this->__media->rename($bk_file, $short_file_path, $this->tmp_pid);
 		}
@@ -1269,7 +1544,7 @@ class Img_Optm extends Base
 
 		if (!$list) {
 			$msg = __('Rescanned successfully.', 'litespeed-cache');
-			Admin_Display::succeed($msg);
+			Admin_Display::success($msg);
 
 			self::debug('rescan bypass: no gathered image found');
 			return;
@@ -1300,7 +1575,7 @@ class Img_Optm extends Base
 		}
 
 		// Build gathered images
-		$q = "SELECT src, post_id FROM `$this->_table_img_optm` WHERE post_id IN (" . implode(',', array_fill(0, count($pid_set), '%d')) . ")";
+		$q = "SELECT src, post_id FROM `$this->_table_img_optm` WHERE post_id IN (" . implode(',', array_fill(0, count($pid_set), '%d')) . ')';
 		$list = $wpdb->get_results($wpdb->prepare($q, $pid_set));
 		foreach ($list as $v) {
 			$this->_existed_src_list[] = $v->post_id . '.' . $v->src;
@@ -1318,7 +1593,7 @@ class Img_Optm extends Base
 			}
 		}
 
-		self::debug('rescaned [img] ' . count($this->_img_in_queue));
+		self::debug('rescanned [img] ' . count($this->_img_in_queue));
 
 		$count = count($this->_img_in_queue);
 		if ($count > 0) {
@@ -1331,7 +1606,7 @@ class Img_Optm extends Base
 		}
 
 		$msg = $count ? sprintf(__('Rescanned %d images successfully.', 'litespeed-cache'), $count) : __('Rescanned successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1368,7 +1643,9 @@ class Img_Optm extends Base
 		$q = $wpdb->prepare($img_q, array($offset * $limit, $limit));
 		$list = $wpdb->get_results($q);
 		foreach ($list as $v) {
-			if (!$v->post_id) continue;
+			if (!$v->post_id) {
+				continue;
+			}
 
 			$meta_value = $this->_parse_wp_meta_value($v);
 			if (!$meta_value) {
@@ -1396,7 +1673,7 @@ class Img_Optm extends Base
 		}
 
 		$msg = __('Calculated backups successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1460,7 +1737,9 @@ class Img_Optm extends Base
 		$q = $wpdb->prepare($img_q, array($offset * $limit, $limit));
 		$list = $wpdb->get_results($q);
 		foreach ($list as $v) {
-			if (!$v->post_id) continue;
+			if (!$v->post_id) {
+				continue;
+			}
 
 			$meta_value = $this->_parse_wp_meta_value($v);
 			if (!$meta_value) {
@@ -1488,7 +1767,7 @@ class Img_Optm extends Base
 		}
 
 		$msg = __('Removed backups successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1535,8 +1814,8 @@ class Img_Optm extends Base
 				AND a.post_mime_type IN ('image/jpeg', 'image/png', 'image/gif')
 			";
 		$groups_all = $wpdb->get_var($q);
-		$groups_new = $wpdb->get_var($q . ' AND ID>' . (int)$this->_summary['next_post_id'] . ' ORDER BY ID');
-		$groups_done = $wpdb->get_var($q . ' AND ID<' . (int)$this->_summary['next_post_id'] . ' ORDER BY ID');
+		$groups_new = $wpdb->get_var($q . ' AND ID>' . (int) $this->_summary['next_post_id'] . ' ORDER BY ID');
+		$groups_done = $wpdb->get_var($q . ' AND ID<=' . (int) $this->_summary['next_post_id'] . ' ORDER BY ID');
 
 		$q = "SELECT b.post_id
 			FROM `$wpdb->posts` a
@@ -1551,21 +1830,16 @@ class Img_Optm extends Base
 		$max_id = $wpdb->get_var($q);
 
 		$count_list = array(
-			'max_id'	=> $max_id,
-			'groups_all'	=> $groups_all,
-			'groups_new'	=> $groups_new,
-			'groups_done'	=> $groups_done,
+			'max_id' => $max_id,
+			'groups_all' => $groups_all,
+			'groups_new' => $groups_new,
+			'groups_done' => $groups_done,
 		);
 
 		// images count from work table
 		if ($this->__data->tb_exist('img_optming')) {
 			$q = "SELECT COUNT(DISTINCT post_id),COUNT(*) FROM `$this->_table_img_optming` WHERE optm_status = %d";
-			$groups_to_check = array(
-				self::STATUS_RAW,
-				self::STATUS_REQUESTED,
-				self::STATUS_NOTIFIED,
-				self::STATUS_ERR_FETCH,
-			);
+			$groups_to_check = array(self::STATUS_RAW, self::STATUS_REQUESTED, self::STATUS_NOTIFIED, self::STATUS_ERR_FETCH);
 			foreach ($groups_to_check as $v) {
 				$count_list['img.' . $v] = $count_list['group.' . $v] = 0;
 				list($count_list['group.' . $v], $count_list['img.' . $v]) = $wpdb->get_row($wpdb->prepare($q, $v), ARRAY_N);
@@ -1623,13 +1897,37 @@ class Img_Optm extends Base
 	 * Batch switch images to ori/optm version
 	 *
 	 * @since  1.6.2
-	 * @access private
+	 * @access public
 	 */
-	private function _batch_switch($type)
+	public function batch_switch($type)
 	{
 		global $wpdb;
 
-		$offset = !empty($_GET['litespeed_i']) ? $_GET['litespeed_i'] : 0;
+		if (defined('LITESPEED_CLI') || defined('DOING_CRON')) {
+			$offset = 0;
+			while ($offset !== 'done') {
+				Admin_Display::info("Starting switch to $type [offset] $offset");
+				$offset = $this->_batch_switch($type, $offset);
+			}
+		} else {
+			$offset = !empty($_GET['litespeed_i']) ? $_GET['litespeed_i'] : 0;
+
+			$newOffset = $this->_batch_switch($type, $offset);
+			if ($newOffset !== 'done') {
+				return Router::self_redirect(Router::ACTION_IMG_OPTM, $type);
+			}
+		}
+
+		$msg = __('Switched images successfully.', 'litespeed-cache');
+		Admin_Display::success($msg);
+	}
+
+	/**
+	 * Switch images per offset
+	 */
+	private function _batch_switch($type, $offset)
+	{
+		global $wpdb;
 		$limit = 500;
 		$this->tmp_type = $type;
 
@@ -1647,7 +1945,9 @@ class Img_Optm extends Base
 		$list = $wpdb->get_results($q);
 		$i = 0;
 		foreach ($list as $v) {
-			if (!$v->post_id) continue;
+			if (!$v->post_id) {
+				continue;
+			}
 
 			$meta_value = $this->_parse_wp_meta_value($v);
 			if (!$meta_value) {
@@ -1664,16 +1964,14 @@ class Img_Optm extends Base
 			}
 		}
 
-		self::debug('batch switched images total: ' . $i);
+		self::debug('batch switched images total: ' . $i . ' [type] ' . $type);
 
 		$offset++;
 		$to_be_continued = $wpdb->get_row($wpdb->prepare($img_q, array($offset * $limit, 1)));
 		if ($to_be_continued) {
-			return Router::self_redirect(Router::ACTION_IMG_OPTM, $type);
+			return $offset;
 		}
-
-		$msg = __('Switched images successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		return 'done';
 	}
 
 	/**
@@ -1691,8 +1989,10 @@ class Img_Optm extends Base
 		$bk_file = $local_filename . '.bk.' . $extension;
 		$bk_optm_file = $local_filename . '.bk.optm.' . $extension;
 
+		// self::debug('_switch_bk_file ' . $bk_file . ' [type] ' . $this->tmp_type);
 		// switch to ori
-		if ($this->tmp_type === self::TYPE_BATCH_SWITCH_ORI) {
+		if ($this->tmp_type === self::TYPE_BATCH_SWITCH_ORI || $this->tmp_type == 'orig') {
+			// self::debug('switch to orig ' . $bk_file);
 			if (!$this->__media->info($bk_file, $this->tmp_pid)) {
 				return;
 			}
@@ -1700,7 +2000,8 @@ class Img_Optm extends Base
 			$this->__media->rename($bk_file, $local_filename . '.' . $extension, $this->tmp_pid);
 		}
 		// switch to optm
-		elseif ($this->tmp_type === self::TYPE_BATCH_SWITCH_OPTM) {
+		elseif ($this->tmp_type === self::TYPE_BATCH_SWITCH_OPTM || $this->tmp_type == 'optm') {
+			// self::debug('switch to optm ' . $bk_file);
 			if (!$this->__media->info($bk_optm_file, $this->tmp_pid)) {
 				return;
 			}
@@ -1717,7 +2018,7 @@ class Img_Optm extends Base
 	 */
 	private function _switch_optm_file($type)
 	{
-		Admin_Display::succeed(__('Switched to optimized file successfully.', 'litespeed-cache'));
+		Admin_Display::success(__('Switched to optimized file successfully.', 'litespeed-cache'));
 		return;
 		global $wpdb;
 
@@ -1744,6 +2045,20 @@ class Img_Optm extends Base
 					$msg = __('Enabled WebP file successfully.', 'litespeed-cache');
 				}
 			}
+			// to switch avif file
+			elseif ($switch_type === 'avif') {
+				if ($this->__media->info($v->src . '.avif', $v->post_id)) {
+					$this->__media->rename($v->src . '.avif', $v->src . '.optm.avif', $v->post_id);
+					self::debug('Disabled AVIF: ' . $v->src);
+
+					$msg = __('Disabled AVIF file successfully.', 'litespeed-cache');
+				} elseif ($this->__media->info($v->src . '.optm.avif', $v->post_id)) {
+					$this->__media->rename($v->src . '.optm.avif', $v->src . '.avif', $v->post_id);
+					self::debug('Enable AVIF: ' . $v->src);
+
+					$msg = __('Enabled AVIF file successfully.', 'litespeed-cache');
+				}
+			}
 			// to switch original file
 			else {
 				$extension = pathinfo($v->src, PATHINFO_EXTENSION);
@@ -1768,7 +2083,7 @@ class Img_Optm extends Base
 			}
 		}
 
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1815,7 +2130,7 @@ class Img_Optm extends Base
 		delete_post_meta($post_id, self::DB_SET);
 
 		$msg = __('Reset the optimized data successfully.', 'litespeed-cache');
-		Admin_Display::succeed($msg);
+		Admin_Display::success($msg);
 	}
 
 	/**
@@ -1847,12 +2162,12 @@ class Img_Optm extends Base
 		if ($list) {
 			foreach ($list as $v) {
 				$img_data[] = array(
-					'id'	=> $v->id,
-					'optm_status'	=> $v->optm_status,
-					'src'	=> $v->src,
-					'srcpath_md5'	=> $v->srcpath_md5,
-					'src_md5'	=> $v->src_md5,
-					'server_info'	=> $v->server_info,
+					'id' => $v->id,
+					'optm_status' => $v->optm_status,
+					'src' => $v->src,
+					'srcpath_md5' => $v->srcpath_md5,
+					'src_md5' => $v->src_md5,
+					'server_info' => $v->server_info,
 				);
 			}
 		}
@@ -1892,6 +2207,10 @@ class Img_Optm extends Base
 				$this->_rescan();
 				break;
 
+			case self::TYPE_RESET_COUNTER:
+				$this->_reset_counter();
+				break;
+
 			case self::TYPE_DESTROY:
 				$this->_destroy();
 				break;
@@ -1904,15 +2223,12 @@ class Img_Optm extends Base
 				self::start_async();
 				break;
 
-				/**
-				 * Batch switch
-				 * @since 1.6.3
-				 */
 			case self::TYPE_BATCH_SWITCH_ORI:
 			case self::TYPE_BATCH_SWITCH_OPTM:
-				$this->_batch_switch($type);
+				$this->batch_switch($type);
 				break;
 
+			case substr($type, 0, 4) === 'avif':
 			case substr($type, 0, 4) === 'webp':
 			case substr($type, 0, 4) === 'orig':
 				$this->_switch_optm_file($type);

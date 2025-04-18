@@ -6,7 +6,7 @@
  */
 namespace Happy_Addons\Elementor\Widget;
 
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Utils;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
@@ -48,6 +48,10 @@ class Review extends Base {
 
 	public function get_keywords() {
 		return [ 'review', 'comment', 'feedback', 'testimonial' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	public function get_style_depends() {
@@ -462,7 +466,9 @@ class Review extends Base {
 			[
 				'name' => 'name_typography',
 				'selector' => '{{WRAPPER}} .ha-review-reviewer',
-				'scheme' => Typography::TYPOGRAPHY_2,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
+				],
 			]
 		);
 
@@ -503,7 +509,9 @@ class Review extends Base {
 			[
 				'name' => 'job_title_typography',
 				'selector' => '{{WRAPPER}} .ha-review-position',
-				'scheme' => Typography::TYPOGRAPHY_3,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 
@@ -544,7 +552,9 @@ class Review extends Base {
 			[
 				'name' => 'review_typography',
 				'selector' => '{{WRAPPER}} .ha-review-desc',
-				'scheme' => Typography::TYPOGRAPHY_3,
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 
@@ -812,7 +822,8 @@ class Review extends Base {
 			<# } #>
 			<div class="ha-review-header">
 				<# if (settings.title) { #>
-					<{{ settings.title_tag }} {{{ view.getRenderAttributeString( 'title' ) }}}>{{{ settings.title }}}</{{ settings.title_tag }}>
+					<# var title_tag = elementor.helpers.validateHTMLTag( settings.title_tag ); #>
+					<{{ title_tag }} {{{ view.getRenderAttributeString( 'title' ) }}}>{{{ settings.title }}}</{{ title_tag }}>
 				<# } #>
 				<# if (settings.job_title) { #>
 					<div {{{ view.getRenderAttributeString( 'job_title' ) }}}>{{{ settings.job_title }}}</div>

@@ -51,13 +51,31 @@ $options = [
 				'value' => 'simple',
 				'view' => 'text',
 				'design' => 'block',
-				'divider' => 'top',
+				'divider' => 'top:full',
 				'setting' => [ 'transport' => 'postMessage' ],
-
 				'choices' => [
 					'simple' => __( 'Simple', 'blocksy' ),
 					'outline' => __( 'Outline', 'blocksy' ),
 					'solid' => __( 'Solid', 'blocksy' ),
+				],
+			],
+
+			blocksy_rand_md5() => [
+				'type' => 'ct-condition',
+				'condition' => [ 'trigger_design' => '!simple' ],
+				'options' => [
+
+					'trigger_icon_container_spacing' => [
+						'label' => __( 'Container Spacing', 'blocksy' ),
+						'type' => 'ct-slider',
+						'min' => 5,
+						'max' => 50,
+						'value' => 10,
+						'divider' => 'top',
+						'responsive' => true,
+						'setting' => [ 'transport' => 'postMessage' ],
+					],
+
 				],
 			],
 
@@ -71,12 +89,11 @@ $options = [
 				'design' => 'block',
 				'allow_empty' => true,
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'desktop' => false,
 					'tablet' => false,
 					'mobile' => false,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'desktop' => __( 'Desktop', 'blocksy' ),
 					'tablet' => __( 'Tablet', 'blocksy' ),
@@ -201,13 +218,13 @@ $options = [
 									[
 										'title' => __( 'Initial', 'blocksy' ),
 										'id' => 'default',
-										'inherit' => 'var(--color)'
+										'inherit' => 'var(--theme-text-color)'
 									],
 
 									[
 										'title' => __( 'Hover', 'blocksy' ),
 										'id' => 'hover',
-										'inherit' => 'var(--linkHoverColor)'
+										'inherit' => 'var(--theme-link-hover-color)'
 									],
 								],
 							],
@@ -328,13 +345,13 @@ $options = [
 							[
 								'title' => __( 'Initial', 'blocksy' ),
 								'id' => 'default',
-								'inherit' => 'var(--color)'
+								'inherit' => 'var(--theme-text-color)'
 							],
 
 							[
 								'title' => __( 'Hover', 'blocksy' ),
 								'id' => 'hover',
-								'inherit' => 'var(--paletteColor2)',
+								'inherit' => 'var(--theme-palette-color-2)',
 							],
 						],
 					],
@@ -585,9 +602,7 @@ $options = [
 				'label' => __( 'Margin', 'blocksy' ),
 				'type' => 'ct-spacing',
 				'setting' => [ 'transport' => 'postMessage' ],
-				'value' => blocksy_spacing_value([
-					'linked' => true,
-				]),
+				'value' => blocksy_spacing_value(),
 				'responsive' => true,
 				'divider' => 'top'
 			],
@@ -607,11 +622,10 @@ $options = [
 				'divider' => 'top:full',
 				'setting' => [ 'transport' => 'postMessage' ],
 				'allow_empty' => true,
-				'value' => [
+				'value' => blocksy_default_responsive_value([
 					'tablet' => true,
 					'mobile' => true,
-				],
-
+				]),
 				'choices' => blocksy_ordered_keys([
 					'tablet' => __( 'Tablet', 'blocksy' ),
 					'mobile' => __( 'Mobile', 'blocksy' ),

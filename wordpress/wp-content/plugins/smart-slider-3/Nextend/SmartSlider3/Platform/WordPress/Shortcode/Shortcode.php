@@ -201,7 +201,11 @@ class Shortcode {
          */
         add_filter('render_block_nextend/smartslider3', function ($block_content, $parsed_block) {
             if (!empty($parsed_block['attrs']['slider'])) {
-                return self::render(array('slider' => $parsed_block['attrs']['slider']));
+                if (Request::$GET->getVar('customize_changeset_uuid') !== null) {
+                    return self::renderIframe($parsed_block['attrs']['slider']);
+                } else {
+                    return self::render(array('slider' => $parsed_block['attrs']['slider']));
+                }
             }
 
             return '';

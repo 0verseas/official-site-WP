@@ -52,16 +52,28 @@ export const getRowInitialMinHeight = (el) => {
 		}
 	}
 
-	if (el.querySelector('[data-items] > [data-id*="widget-area"]')) {
-		const widgetAreaComp = getComputedStyle(
-			el.querySelector('[data-items] > [data-id*="widget-area"]')
-		)
+	const selectors = [
+		'[data-items] > [data-id*="widget-area"]',
+		'[data-items] > [data-id*="content-block"]',
+		'[data-items] > [data-id*="text"]',
+	]
 
-		let widgetAreaHeight = parseFloat(widgetAreaComp.height)
+	let maxHeight = selectors.reduce((acc, selector) => {
+		if (el.querySelector(selector)) {
+			const comp = getComputedStyle(el.querySelector(selector))
 
-		if (widgetAreaHeight > rowHeight) {
-			rowHeight = widgetAreaHeight
+			let height = parseFloat(comp.height)
+
+			if (height > acc) {
+				return height
+			}
 		}
+
+		return acc
+	}, 0)
+
+	if (maxHeight > rowHeight) {
+		rowHeight = maxHeight
 	}
 
 	return rowHeight + borderHeight
@@ -109,9 +121,9 @@ export const getRowStickyHeight = (el, hasBorder = true) => {
 		let stickyHeight = el.getBoundingClientRect().height - borderHeight
 
 		if (
-			stickyHeight !== rowStickyHeight ||
+			Math.round(stickyHeight) !== Math.round(rowStickyHeight) ||
 			// case when content is forcing the initial height to be bigger
-			rowStickyHeight > getRowInitialMinHeight(el)
+			Math.round(rowStickyHeight) > Math.round(getRowInitialMinHeight(el))
 		) {
 			el.blcStickyHeight = el.getBoundingClientRect().height
 			return stickyHeight

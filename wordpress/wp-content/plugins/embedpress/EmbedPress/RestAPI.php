@@ -2,6 +2,7 @@
 
 namespace EmbedPress;
 
+use EmbedPress\Includes\Classes\Helper;
 use Embera\Embera;
 use WP_Error as WP_ErrorAlias;
 use WP_REST_Request;
@@ -14,7 +15,7 @@ use WP_REST_Response;
  *
  * @package     EmbedPress
  * @author      EmbedPress <help@embedpress.com>
- * @copyright   Copyright (C) 2020 WPDeveloper. All rights reserved.
+ * @copyright   Copyright (C) 2023 WPDeveloper. All rights reserved.
  * @license     GPLv3 or later
  * @since       1.0.0
  */
@@ -40,10 +41,14 @@ class RestAPI
             return new WP_ErrorAlias('embedpress_invalid_url', 'Invalid Embed URL', ['status' => 404]);
         }
 
+        $atts = Helper::removeQuote($atts);
+
         $urlInfo = Shortcode::parseContent( $url, true, $atts);
         if (empty($urlInfo)) {
             return new WP_ErrorAlias('embedpress_invalid_url', 'Invalid Embed URL', ['status' => 404]);
         }
         return new WP_REST_Response($urlInfo, 200);
     }
+
+    
 }

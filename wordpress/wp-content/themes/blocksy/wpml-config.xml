@@ -1,11 +1,11 @@
 <wpml-config>
 	<custom-fields>
-		<custom-field action="copy">blocksy_post_meta_options</custom-field>
+		<custom-field action="copy-once" encoding="json">blocksy_post_meta_options</custom-field>
 		<custom-field action="copy">template_type</custom-field>
 	</custom-fields>
 
 	<custom-term-fields>
-		<custom-term-field action="copy">blocksy_taxonomy_meta_options</custom-term-field>
+		<custom-term-field action="copy-once">blocksy_taxonomy_meta_options</custom-term-field>
 	</custom-term-fields>
 
 	<admin-texts>
@@ -70,6 +70,9 @@
 			<key name="flickr" />
 			<key name="phone" />
 			<key name="email" />
+			<key name="free_not_enought_message" />
+			<key name="free_enought_message" />
+			<key name="breadcrumb_home_text" />
 		</key>
 
 		<key name="theme_mods_blocksy-child">
@@ -133,6 +136,9 @@
 			<key name="flickr" />
 			<key name="phone" />
 			<key name="email" />
+			<key name="free_not_enought_message" />
+			<key name="free_enought_message" />
+			<key name="breadcrumb_home_text" />
 		</key>
 	</admin-texts>
 </wpml-config>
