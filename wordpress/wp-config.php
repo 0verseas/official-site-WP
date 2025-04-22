@@ -127,9 +127,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
 
-//define( 'DISALLOW_FILE_EDIT', true );   
-//@ini_set('session.cookie_httponly', true); 
-//@ini_set('session.cookie_secure', true); 
+//define( 'DISALLOW_FILE_EDIT', true );
+//@ini_set('session.cookie_httponly', true);
+//@ini_set('session.cookie_secure', true);
 //@ini_set('session.use_only_cookies', true);
 
 //define( 'COOKIE_DOMAIN', 'cmn-hant.overseas.ncnu.edu.tw' );
@@ -147,7 +147,8 @@ require_once ABSPATH . 'wp-settings.php';
 //define('COOKIEPATH', '/');
 //define('SITECOOKIEPATH', '/');
 
-
+define('WP_HOME', 'https://cmn-hant.overseas.ncnu.edu.tw');
+define('WP_SITEURL', 'https://cmn-hant.overseas.ncnu.edu.tw');
 
 
 

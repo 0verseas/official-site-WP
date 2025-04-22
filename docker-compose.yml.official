@@ -39,7 +39,7 @@ services:
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=lets-encr"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.options=default"
             - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=check-host@file,wp-secure-headers@file,traefik-compress@file"
-#            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ncnuipwhitelist@fil,check-host@file,wp-secure-headers@file,traefik-compress@file" # 禁止對外連接
+#            - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ncnuipwhitelist@file,check-host@file,wp-secure-headers@file,traefik-compress@file" # 禁止對外連接
         networks:
             - bridge
 
